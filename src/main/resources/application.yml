@@ -8,4 +8,4 @@ server:
 
 xapi:
   authorisation: NjZmMmI0ZmMwMDFlM2RhOTkyZDIzYjU3ZDhhNzQ1NzY1NWJlYTA3ODoxYzBlMWI2ODI3NjA2ZDdlZmVkNzFlMjA0OTM5ZDA0OGY5NGY4NDJi
-  baseUrl: http://localhost:8083/data/xAPI
+  url: http://localhost:8083/data/xAPI

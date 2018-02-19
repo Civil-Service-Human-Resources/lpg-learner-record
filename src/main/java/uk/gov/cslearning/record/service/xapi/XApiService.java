@@ -37,7 +37,7 @@ public class XApiService implements Serializable {
 
     @Autowired
     public XApiService(@Value("${xapi.authorisation}") String authorisation,
-                       @Value("${xapi.baseUrl}") String baseUrl) {
+                       @Value("${xapi.url}") String baseUrl) {
         checkArgument(authorisation != null);
         checkArgument(baseUrl != null);
         this.authorisation = authorisation;
