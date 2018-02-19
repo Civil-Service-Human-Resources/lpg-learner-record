@@ -1,0 +1,4 @@
+worker-id: 8cc42fa6-fae0-4d3b-8f5c-d39a2a328e64
+logs.users: []
+logs.groups: []
+topology.submitter.user: max

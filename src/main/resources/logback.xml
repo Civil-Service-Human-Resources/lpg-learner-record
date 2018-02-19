@@ -1,0 +1,28 @@
+<configuration>
+
+    <property scope="context" name="profile" value="${spring.profile:-development}" />
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <if condition='property("profile").equals("staging") || property("profile").equals("production")'>
+        <then>
+            <root level="warn">
+                <appender-ref ref="console" />
+            </root>
+        </then>
+        <else>
+            <root level="debug">
+                <appender-ref ref="console" />
+            </root>
+        </else>
+    </if>
+
+    <logger name="org.apache.http" level="warn" />
+    <logger name="org.apache.storm" level="warn" />
+    <logger name="org.eclipse.jetty" level="warn" />
+    <logger name="org.springframework" level="info" />
+</configuration>

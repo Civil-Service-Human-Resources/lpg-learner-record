@@ -1,0 +1,7 @@
+
+spring:
+  resources:
+    add-mappings: false
+
+server:
+  port: 9000

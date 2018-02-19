@@ -1,0 +1,30 @@
+sudo: required
+
+language: java
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: "install, build and push"
+    - install:
+      - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+      - docker pull cshr/lpg-learner-record || true
+      - ./gradlew init
+    - script:
+      - ./gradlew build
+      - echo "----- 1 -----" && docker build -t cshr/lpg-learner-record:latest .
+      - echo "----- 2 -----" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      - echo "----- 3 -----" && docker tag cshr/lpg-learner-record:latest cshr/lpg-learner-record:${TRAVIS_COMMIT}
+      - echo "----- 4 -----" && docker push cshr/lpg-learner-record
+    - stage: Deploy
+      script:
+        - echo "./deploy.sh lpglearnerrecord"
+
+addons:
+  ssh_known_hosts:
+  - test-lpg.uksouth.cloudapp.azure.com
+  - 10.0.10.4
+  - 10.0.11.4
+  - 10.0.12.4
