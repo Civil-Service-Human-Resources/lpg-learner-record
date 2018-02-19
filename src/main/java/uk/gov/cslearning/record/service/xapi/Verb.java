@@ -5,6 +5,7 @@ public enum Verb {
     COMPLETED("http://adlnet.gov/expapi/verbs/completed"),
     FAILED("http://adlnet.gov/expapi/verbs/failed"),
     INITIALISED("http://adlnet.gov/expapi/verbs/initialized"),
+    LAUNCHED("http://adlnet.gov/expapi/verbs/launched"),
     PASSED("http://adlnet.gov/expapi/verbs/passed"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),
     VIEWED("http://id.tincanapi.com/verb/viewed");

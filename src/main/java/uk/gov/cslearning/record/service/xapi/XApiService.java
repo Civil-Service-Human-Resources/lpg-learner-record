@@ -98,6 +98,7 @@ public class XApiService implements Serializable {
                         LocalDateTime.parse(timestamp, COMPLETION_DATE_FORMATTER)));
             }
         }
+
         return statements;
     }
 }

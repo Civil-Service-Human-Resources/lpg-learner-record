@@ -65,6 +65,7 @@ public class SummariseRecord extends BaseBatchBolt {
                         state = "completed";
                         completionDate = statement.getTimestamp();
                         break;
+                    case LAUNCHED:
                     case INITIALISED:
                         state = "in-progress";
                         score = null;
