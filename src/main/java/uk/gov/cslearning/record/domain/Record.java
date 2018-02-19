@@ -2,6 +2,8 @@ package uk.gov.cslearning.record.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -16,6 +18,7 @@ public class Record {
 
     private String result;
 
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
     @JsonCreator

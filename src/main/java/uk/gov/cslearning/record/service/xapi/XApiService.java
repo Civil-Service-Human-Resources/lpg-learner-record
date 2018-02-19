@@ -3,6 +3,8 @@ package uk.gov.cslearning.record.service.xapi;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 @Service
@@ -28,6 +31,19 @@ public class XApiService implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XApiService.class);
 
+    private String authorisation;
+
+    private String baseUrl;
+
+    @Autowired
+    public XApiService(@Value("${xapi.authorisation}") String authorisation,
+                       @Value("${xapi.baseUrl}") String baseUrl) {
+        checkArgument(authorisation != null);
+        checkArgument(baseUrl != null);
+        this.authorisation = authorisation;
+        this.baseUrl = baseUrl;
+    }
+
     public Collection<Statement> getStatements(String userId, String activityId) {
         LOGGER.debug("Getting XApi statements for user {} and activity {}", userId, activityId);
 
@@ -35,7 +51,7 @@ public class XApiService implements Serializable {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Experience-API-Version", "1.0.3");
-        headers.add("Authorization", "Basic NjZmMmI0ZmMwMDFlM2RhOTkyZDIzYjU3ZDhhNzQ1NzY1NWJlYTA3ODoxYzBlMWI2ODI3NjA2ZDdlZmVkNzFlMjA0OTM5ZDA0OGY5NGY4NDJi");
+        headers.add("Authorization", "Basic " + authorisation);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
@@ -49,7 +65,7 @@ public class XApiService implements Serializable {
         }
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "http://localhost:8083/data/xAPI/statements",
+                baseUrl + "/statements",
                 HttpMethod.GET, entity, String.class, urlVariables);
 
         Map data = gson.fromJson(response.getBody(), Map.class);
