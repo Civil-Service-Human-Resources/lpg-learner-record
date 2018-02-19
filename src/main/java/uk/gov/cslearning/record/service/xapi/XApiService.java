@@ -92,7 +92,7 @@ public class XApiService implements Serializable {
             }
             Verb verb = Verb.fromUri(verbId);
             if (verb == null) {
-                LOGGER.info("Unrecognised verb {}, ignoring statement.", verbId);
+                LOGGER.debug("Unrecognised verb {}, ignoring statement.", verbId);
             } else {
                 statements.add(new Statement(objectId, verb, score,
                         LocalDateTime.parse(timestamp, COMPLETION_DATE_FORMATTER)));
