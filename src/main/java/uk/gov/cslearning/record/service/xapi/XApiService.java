@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -60,13 +61,16 @@ public class XApiService implements Serializable {
 
         Map<String, String> urlVariables = new HashMap<>();
         urlVariables.put("agent", gson.toJson(agent));
+
+        String url = baseUrl + "/statements?agent={agent}";
+
         if (activityId != null) {
             urlVariables.put("activity", activityId);
+            url += "&activity={activity}";
         }
 
         ResponseEntity<String> response = restTemplate.exchange(
-                baseUrl + "/statements",
-                HttpMethod.GET, entity, String.class, urlVariables);
+                url, HttpMethod.GET, entity, String.class, urlVariables);
 
         Map data = gson.fromJson(response.getBody(), Map.class);
 
