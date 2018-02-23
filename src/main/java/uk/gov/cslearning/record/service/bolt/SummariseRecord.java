@@ -78,6 +78,12 @@ public class SummariseRecord extends BaseBatchBolt {
                         result = null;
                         completionDate = null;
                         break;
+                    case REGISTERED:
+                        state = "registered";
+                        score = null;
+                        result = null;
+                        completionDate = null;
+                        break;
                 }
             }
 
