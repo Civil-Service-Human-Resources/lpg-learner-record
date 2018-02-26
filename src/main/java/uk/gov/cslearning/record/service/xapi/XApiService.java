@@ -63,7 +63,8 @@ public class XApiService implements Serializable {
 
         if (activityId != null) {
             urlVariables.put("activity", activityId);
-            url += "&activity={activity}";
+            urlVariables.put("related_activities", "true");
+            url += "&activity={activity}&related_activities={related_activities}";
         }
 
         ResponseEntity<String> response = restTemplate.exchange(
