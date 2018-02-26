@@ -9,6 +9,7 @@ public enum Verb {
     PASSED("http://adlnet.gov/expapi/verbs/passed"),
     REGISTERED("http://adlnet.gov/expapi/verbs/registered"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),
+    UNREGISTERED("http://adlnet.gov/expapi/verbs/unregistered"),
     VIEWED("http://id.tincanapi.com/verb/viewed");
 
     public static Verb fromUri(String uri) {

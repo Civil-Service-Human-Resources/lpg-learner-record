@@ -18,20 +18,28 @@ public class Record {
 
     private String result;
 
+    private String score;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
     @JsonCreator
     public Record(@JsonProperty("activityId") String activityId, @JsonProperty("state") String state,
-                  @JsonProperty("result") String result, @JsonProperty("completionDate") LocalDateTime completionDate) {
+                  @JsonProperty("result") String result, @JsonProperty("score") String score,
+                  @JsonProperty("completionDate") LocalDateTime completionDate) {
         this.activityId = activityId;
         this.state = state;
         this.result = result;
+        this.score = score;
         this.completionDate = completionDate;
     }
 
     public String getActivityId() {
         return activityId;
+    }
+
+    public String getScore() {
+        return score;
     }
 
     public String getState() {

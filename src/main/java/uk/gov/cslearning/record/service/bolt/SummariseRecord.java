@@ -46,9 +46,8 @@ public class SummariseRecord extends BaseBatchBolt {
             String activityId = null;
             String state = null;
             String result = null;
-
             // TODO: score
-            String score;
+            String score = null;
 
             for (Statement statement : statements) {
                 if (activityId == null) {
@@ -84,12 +83,18 @@ public class SummariseRecord extends BaseBatchBolt {
                         result = null;
                         completionDate = null;
                         break;
+                    case UNREGISTERED:
+                        state = "unregistered";
+                        score = null;
+                        result = null;
+                        completionDate = null;
+                        break;
                 }
             }
 
             Record record = null;
             if (activityId != null) {
-                record = new Record(activityId, state, result, completionDate);
+                record = new Record(activityId, state, result, score, completionDate);
             }
             collector.emit(new Values(id, record));
         }
