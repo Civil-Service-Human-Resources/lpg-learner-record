@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.domain.Record;
 import uk.gov.cslearning.record.service.LearnerRecordService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.OK;
@@ -44,5 +46,19 @@ public class LearnerRecord {
                     .collect(toList());
         }
         return new ResponseEntity<>(new Records(records), OK);
+    }
+
+    public static final class Records {
+
+        private List<Record> records;
+
+        public Records(List<Record> records) {
+            checkArgument(records != null, "records is null");
+            this.records = new ArrayList<>(records);
+        }
+
+        public List<Record> getRecords() {
+            return unmodifiableList(records);
+        }
     }
 }

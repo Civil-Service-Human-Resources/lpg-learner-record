@@ -26,4 +26,8 @@ public enum Verb {
     Verb(String uri) {
         this.uri = uri;
     }
+
+    public String getUri() {
+        return uri;
+    }
 }

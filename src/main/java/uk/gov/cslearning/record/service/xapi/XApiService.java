@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
@@ -43,15 +44,7 @@ public class XApiService implements Serializable {
     }
 
     public Collection<Statement> getStatements(String userId, String activityId) {
-        LOGGER.debug("Getting XApi statements for user {} and activity {}", userId, activityId);
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Experience-API-Version", "1.0.3");
-        headers.add("Authorization", "Basic " + authorisation);
-
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        LOGGER.debug("Getting xAPI statements for user {} and activity {}", userId, activityId);
 
         Gson gson = new Gson();
         Agent agent = new Agent(userId);
@@ -67,6 +60,32 @@ public class XApiService implements Serializable {
             url += "&activity={activity}&related_activities={related_activities}";
         }
 
+        return makeXAPIRequest(url, urlVariables);
+    }
+
+    public Collection<Statement> getStatements(Verb verb) {
+
+        LOGGER.debug("Getting xAPI statements for verb {}", verb);
+
+        Map<String, String> urlVariables = new HashMap<>();
+        urlVariables.put("verb", verb.getUri());
+
+        String url = baseUrl + "/statements?verb={verb}";
+
+        return makeXAPIRequest(url, urlVariables);
+    }
+
+    private Collection<Statement> makeXAPIRequest(String url, Map<String, String> urlVariables) {
+        LOGGER.debug("Making request to xAPI");
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Experience-API-Version", "1.0.3");
+        headers.add("Authorization", "Basic " + authorisation);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
         ResponseEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.GET, entity, String.class, urlVariables);
 
@@ -76,11 +95,16 @@ public class XApiService implements Serializable {
             return statements;
         }
 
+        Gson gson = new Gson();
         Map data = gson.fromJson(response.getBody(), Map.class);
 
         Collection<Map> rawStatements = (Collection) data.get("statements");
 
         for (Map rawStatement : rawStatements) {
+            Map actor = (Map) rawStatement.get("actor");
+            if (actor == null || !"Agent".equals(actor.get("objectType"))) {
+                continue;
+            }
             Map object = (Map) rawStatement.get("object");
             if (object == null || !"Activity".equals(object.get("objectType"))) {
                 continue;
@@ -91,6 +115,7 @@ public class XApiService implements Serializable {
             }
             Map result = (Map) rawStatement.get("result");
             String timestamp = (String) rawStatement.get("timestamp");
+            String userId = (String) actor.get("name");
             String objectId = (String) object.get("id");
             String verbId = (String) rawVerb.get("id");
             String score = null;
@@ -101,7 +126,7 @@ public class XApiService implements Serializable {
             if (verb == null) {
                 LOGGER.debug("Unrecognised verb {}, ignoring statement.", verbId);
             } else {
-                statements.add(new Statement(objectId, verb, score,
+                statements.add(new Statement(objectId, userId, verb, score,
                         LocalDateTime.parse(timestamp, COMPLETION_DATE_FORMATTER)));
             }
         }
