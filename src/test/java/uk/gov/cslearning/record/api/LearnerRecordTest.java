@@ -42,7 +42,7 @@ public class LearnerRecordTest {
     @Test
     public void shouldReturnEmptyListForInvalidUser() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/record/abc")
+                MockMvcRequestBuilders.get("/records/abc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -56,7 +56,7 @@ public class LearnerRecordTest {
                 .thenReturn(ImmutableList.of(new Record("activityId", "complete", null, null, LocalDateTime.now())));
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/record/1")
+                MockMvcRequestBuilders.get("/records/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
