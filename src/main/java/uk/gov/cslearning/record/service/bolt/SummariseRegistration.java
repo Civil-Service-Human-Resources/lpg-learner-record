@@ -52,7 +52,7 @@ public class SummariseRegistration extends BaseBatchBolt {
                     activityId = statement.getActivityId();
                 }
                 if (userId == null) {
-//                    userId = statement.get();
+                    userId = statement.getUserId();
                 }
                 switch (statement.getVerb()) {
                     case REGISTERED:
