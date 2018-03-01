@@ -1,0 +1,21 @@
+#! /usr/bin/env bash
+
+docker build -t cshr/lpg-wso2-is:$TRAVIS_COMMIT .
+docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+docker push cshr/lpg-wso2-is
+
+echo ${TRAVIS_COMMIT}
+
+export PATH="`pwd`/pyhome/bin:${PATH}"
+export PYTHONPATH="`pwd`/pyhome/lib/python/site-packages:${PYTHONPATH}"
+export PYTHONPATH="`pwd`/pyhome/lib/python2.7/site-packages:${PYTHONPATH}"
+python -c "import ansible, sys; sys.exit(0) if ansible.__version__ == '2.4.3.0' else sys.exit(1)"
+if [ $? -ne 0 ]; then
+  rm -rf pyhome
+  PYTHONUSERBASE=pyhome pip install --user ansible==2.4.3.0
+fi
+
+./environ/deploy dev ${TRAVIS_COMMIT}
+
+# cd test/headless
+# npm install
