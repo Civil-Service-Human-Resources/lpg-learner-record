@@ -1,0 +1,24 @@
+#! /usr/bin/env bash
+
+docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+docker pull cshr/lpg-learner-record || true
+./gradlew init
+./gradlew build
+docker build -t cshr/lpg-learner-record:latest .
+docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+docker tag cshr/lpg-learner-record:latest cshr/lpg-learner-record:${TRAVIS_COMMIT}
+docker push cshr/lpg-learner-record
+
+export PATH="`pwd`/pyhome/bin:${PATH}"
+export PYTHONPATH="`pwd`/pyhome/lib/python/site-packages:${PYTHONPATH}"
+export PYTHONPATH="`pwd`/pyhome/lib/python2.7/site-packages:${PYTHONPATH}"
+python -c "import ansible, sys; sys.exit(0) if ansible.__version__ == '2.4.3.0' else sys.exit(1)"
+if [ $? -ne 0 ]; then
+  rm -rf pyhome
+  PYTHONUSERBASE=pyhome pip install --user ansible==2.4.3.0
+fi
+
+./environ/deploy dev ${TRAVIS_COMMIT}
+
+# cd test/headless
+# npm install

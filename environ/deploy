@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+repoName=lpg-ansible-mvp
+
+cd "$(dirname "$0")"
+
+if [ -d $repoName ]; then
+    cd ${repoName}
+    git clean -f
+    git config advice.detachedHead false
+    git reset --hard HEAD
+    git remote update
+    git checkout origin/master
+else
+    git clone https://github.com/Civil-Service-Human-Resources/lpg-ansible-mvp
+    git config advice.detachedHead false
+    cd ${repoName}
+fi
+
+./deploy.sh lpglearnerrecord "$1" "$2"  || exit 2
