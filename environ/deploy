@@ -17,4 +17,4 @@ else
     cd ${repoName}
 fi
 
-./deploy.sh lpg-learner-record "$1" "$2"  || exit 2
+./deploy.sh lpglearnerrecord "$1" "$2"  || exit 2
