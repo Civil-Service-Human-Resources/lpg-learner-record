@@ -48,12 +48,19 @@ public class SummariseRecord extends BaseBatchBolt {
             String result = null;
             // TODO: score
             String score = null;
+            String preference = null;
 
             for (Statement statement : statements) {
                 if (activityId == null) {
                     activityId = statement.getActivityId();
                 }
                 switch (statement.getVerb()) {
+                    case LIKED:
+                        preference = "liked";
+                        break;
+                    case DISLIKED:
+                        preference = "disliked";
+                        break;
                     case FAILED:
                         result = "failed";
                         break;
@@ -94,7 +101,7 @@ public class SummariseRecord extends BaseBatchBolt {
 
             Record record = null;
             if (activityId != null) {
-                record = new Record(activityId, state, result, score, completionDate);
+                record = new Record(activityId, state, result,preference, score, completionDate);
             }
             collector.emit(new Values(id, record));
         }

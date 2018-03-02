@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
@@ -45,6 +46,7 @@ public class LearnerRecord {
                     .filter(record -> state.equals(record.getState()))
                     .collect(toList());
         }
+
         return new ResponseEntity<>(new Records(records), OK);
     }
 
