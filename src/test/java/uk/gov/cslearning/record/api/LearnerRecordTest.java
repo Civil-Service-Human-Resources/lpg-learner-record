@@ -53,7 +53,7 @@ public class LearnerRecordTest {
     public void shouldReturnRecords() throws Exception {
 
         when(learnerRecordService.getLearnerRecord("1", null))
-                .thenReturn(ImmutableList.of(new Record("activityId", "complete", null, null, LocalDateTime.now())));
+                .thenReturn(ImmutableList.of(new Record("activityId", "complete", null, null, null, LocalDateTime.now())));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/records/1")

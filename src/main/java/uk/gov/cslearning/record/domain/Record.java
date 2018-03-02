@@ -13,22 +13,25 @@ import java.util.Set;
 public class Record {
 
     private String activityId;
-
     private String state;
-
+    private String preference;
     private String result;
-
     private String score;
+
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
     @JsonCreator
-    public Record(@JsonProperty("activityId") String activityId, @JsonProperty("state") String state,
-                  @JsonProperty("result") String result, @JsonProperty("score") String score,
+    public Record(@JsonProperty("activityId") String activityId,
+                  @JsonProperty("state") String state,
+                  @JsonProperty("result") String result,
+                  @JsonProperty("preference") String preference,
+                  @JsonProperty("score") String score,
                   @JsonProperty("completionDate") LocalDateTime completionDate) {
         this.activityId = activityId;
         this.state = state;
+        this.preference = preference;
         this.result = result;
         this.score = score;
         this.completionDate = completionDate;
@@ -48,6 +51,10 @@ public class Record {
 
     public LocalDateTime getCompletionDate() {
         return completionDate;
+    }
+
+    public String getPreference() {
+        return preference;
     }
 
     public String getResult() {
