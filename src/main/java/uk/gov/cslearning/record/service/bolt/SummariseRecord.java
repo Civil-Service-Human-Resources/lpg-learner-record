@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.bolt;
 
+import gov.adlnet.xapi.model.Statement;
 import org.apache.storm.coordination.BatchOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -8,10 +9,14 @@ import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import uk.gov.cslearning.record.domain.Record;
-import uk.gov.cslearning.record.service.xapi.Statement;
+import uk.gov.cslearning.record.service.xapi.StatementStream;
+import uk.gov.cslearning.record.service.xapi.activity.Activity;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class SummariseRecord extends BaseBatchBolt {
 
@@ -28,81 +33,31 @@ public class SummariseRecord extends BaseBatchBolt {
 
     @Override
     public void execute(Tuple tuple) {
+        String activityId = (String) tuple.getValue(1);
         Statement statement = (Statement) tuple.getValue(2);
-        if (!groupedStatements.containsKey(statement.getActivityId())) {
-            groupedStatements.put(statement.getActivityId(), new ArrayList<>());
+        if (!groupedStatements.containsKey(activityId)) {
+            groupedStatements.put(activityId, new ArrayList<>());
         }
-        groupedStatements.get(statement.getActivityId()).add(statement);
+        groupedStatements.get(activityId).add(statement);
     }
 
     @Override
     public void finishBatch() {
 
-        for (List<Statement> statements : groupedStatements.values()) {
+        for (Entry<String, List<Statement>> entry : groupedStatements.entrySet()) {
 
-            statements.sort(Comparator.comparing(Statement::getTimestamp));
+            List<Statement> statements = entry.getValue();
 
-            LocalDateTime completionDate = null;
-            String activityId = null;
-            String state = null;
-            String result = null;
-            // TODO: score
-            String score = null;
-            String preference = null;
+            Activity activity = Activity.getFor(statements.get(0));
 
-            for (Statement statement : statements) {
-                if (activityId == null) {
-                    activityId = statement.getActivityId();
-                }
-                switch (statement.getVerb()) {
-                    case LIKED:
-                        preference = "liked";
-                        break;
-                    case DISLIKED:
-                        preference = "disliked";
-                        break;
-                    case FAILED:
-                        result = "failed";
-                        break;
-                    case PASSED:
-                        result = "passed";
-                        break;
-                    case COMPLETED:
-                        state = "completed";
-                        completionDate = statement.getTimestamp();
-                        break;
-                    case LAUNCHED:
-                    case INITIALISED:
-                        state = "in-progress";
-                        score = null;
-                        result = null;
-                        completionDate = null;
-                        break;
-                    case TERMINATED:
-                        state = "terminated";
-                        score = null;
-                        result = null;
-                        completionDate = null;
-                        break;
-                    case REGISTERED:
-                        state = "registered";
-                        score = null;
-                        result = null;
-                        completionDate = null;
-                        break;
-                    case UNREGISTERED:
-                        state = "unregistered";
-                        score = null;
-                        result = null;
-                        completionDate = null;
-                        break;
-                }
-            }
+            Record record = new Record();
+            record.setCourseId(activity.getCourseId());
+            record.setModuleId(activity.getModuleId());
+            record.setEventId(activity.getEventId());
 
-            Record record = null;
-            if (activityId != null) {
-                record = new Record(activityId, state, result,preference, score, completionDate);
-            }
+            StatementStream stream = new StatementStream(statements);
+            record = stream.replay(record);
+
             collector.emit(new Values(id, record));
         }
     }

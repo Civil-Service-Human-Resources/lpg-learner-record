@@ -13,17 +13,19 @@ import org.apache.storm.generated.DistributedRPC;
 import org.apache.storm.generated.InvalidTopologyException;
 import org.apache.storm.thrift.TException;
 import org.apache.storm.tuple.Fields;
+import org.apache.storm.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.domain.Record;
 import uk.gov.cslearning.record.domain.Registration;
-import uk.gov.cslearning.record.service.bolt.*;
+import uk.gov.cslearning.record.service.bolt.GetStatementsForActivity;
+import uk.gov.cslearning.record.service.bolt.RegistrationAggregator;
+import uk.gov.cslearning.record.service.bolt.SummariseRegistration;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import javax.annotation.PostConstruct;
-import java.io.Serializable;
+import javax.swing.text.html.HTMLDocument;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -37,17 +39,17 @@ public class RegistrationService {
 
     private DistributedRPC.Iface client;
 
+    @Autowired(required = false)
     private LocalCluster cluster;
 
     private XApiService xApiService;
 
     @Autowired
-    public RegistrationService(DistributedRPC.Iface client, XApiService xApiService, LocalCluster cluster) {
+    public RegistrationService(DistributedRPC.Iface client, XApiService xApiService) {
         checkArgument(client != null);
         checkArgument(xApiService != null);
         this.client = client;
         this.xApiService = xApiService;
-        this.cluster = cluster;
     }
 
     @PostConstruct
@@ -55,16 +57,20 @@ public class RegistrationService {
         LOGGER.debug("Configuring registrations topology");
 
         LinearDRPCTopologyBuilder builder = new LinearDRPCTopologyBuilder(FUNCTION);
-        builder.addBolt(new GetRegistrationStatements(xApiService));
+        builder.addBolt(new GetStatementsForActivity(xApiService));
         builder.addBolt(new SummariseRegistration())
-            .fieldsGrouping(new Fields("id", "activityId"));
+                .fieldsGrouping(new Fields("id", "activityId"));
         builder.addBolt(new RegistrationAggregator())
-            .fieldsGrouping(new Fields("id"));
+                .fieldsGrouping(new Fields("id"));
+
+        Config config = new Config();
 
         if (cluster != null) {
-            cluster.submitTopology(FUNCTION, new Config(), builder.createLocalTopology((ILocalDRPC) client));
+            cluster.submitTopology(FUNCTION, config, builder.createLocalTopology((ILocalDRPC) client));
         } else {
-            StormSubmitter.submitTopology(FUNCTION, new Config(), builder.createRemoteTopology());
+            config.putAll(Utils.readDefaultConfig());
+            // TODO version or timestamp function
+            StormSubmitter.submitTopology(FUNCTION, config, builder.createRemoteTopology());
         }
     }
 

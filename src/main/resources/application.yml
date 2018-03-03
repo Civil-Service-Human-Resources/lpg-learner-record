@@ -9,6 +9,11 @@ spring:
 server:
   port: 9000
 
+storm:
+  host: 127.0.0.1
+  port: 3772
+
 xapi:
-  authorisation: NjZmMmI0ZmMwMDFlM2RhOTkyZDIzYjU3ZDhhNzQ1NzY1NWJlYTA3ODoxYzBlMWI2ODI3NjA2ZDdlZmVkNzFlMjA0OTM5ZDA0OGY5NGY4NDJi
+  username: 66f2b4fc001e3da992d23b57d8a7457655bea078
+  password: 1c0e1b6827606d7efed71e204939d048f94f842b
   url: http://localhost:8083/data/xAPI

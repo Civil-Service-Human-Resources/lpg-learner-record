@@ -1,17 +1,17 @@
 package uk.gov.cslearning.record.service.bolt;
 
+import gov.adlnet.xapi.model.Statement;
 import org.apache.storm.coordination.BatchOutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseBatchBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
-import org.apache.storm.tuple.Values;
-import uk.gov.cslearning.record.domain.Registration;
-import uk.gov.cslearning.record.service.xapi.Statement;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SummariseRegistration extends BaseBatchBolt {
 
@@ -28,11 +28,12 @@ public class SummariseRegistration extends BaseBatchBolt {
 
     @Override
     public void execute(Tuple tuple) {
+        String activityId = (String) tuple.getValue(1);
         Statement statement = (Statement) tuple.getValue(2);
-        if (!groupedStatements.containsKey(statement.getActivityId())) {
-            groupedStatements.put(statement.getActivityId(), new ArrayList<>());
+        if (!groupedStatements.containsKey(activityId)) {
+            groupedStatements.put(activityId, new ArrayList<>());
         }
-        groupedStatements.get(statement.getActivityId()).add(statement);
+        groupedStatements.get(activityId).add(statement);
     }
 
     @Override
@@ -40,37 +41,7 @@ public class SummariseRegistration extends BaseBatchBolt {
 
         for (List<Statement> statements : groupedStatements.values()) {
 
-            statements.sort(Comparator.comparing(Statement::getTimestamp));
-
-            LocalDateTime lastUpdated = null;
-            String activityId = null;
-            String userId = null;
-            String state = null;
-
-            for (Statement statement : statements) {
-                if (activityId == null) {
-                    activityId = statement.getActivityId();
-                }
-                if (userId == null) {
-                    userId = statement.getUserId();
-                }
-                switch (statement.getVerb()) {
-                    case REGISTERED:
-                        state = "registered";
-                        lastUpdated = statement.getTimestamp();
-                        break;
-                    case UNREGISTERED:
-                        state = "unregistered";
-                        lastUpdated = statement.getTimestamp();
-                        break;
-                }
-            }
-
-            Registration registration = null;
-            if (activityId != null) {
-                registration = new Registration(activityId, state, userId, lastUpdated);
-            }
-            collector.emit(new Values(id, registration));
+//            collector.emit(new Values(id, registration));
         }
     }
 

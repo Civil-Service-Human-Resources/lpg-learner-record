@@ -11,3 +11,6 @@ cache:
 
 install: true
 script: ./environ/ci
+
+addons:
+  srcclr: true

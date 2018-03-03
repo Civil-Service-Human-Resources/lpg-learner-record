@@ -3,10 +3,7 @@ package uk.gov.cslearning.record.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.Record;
 import uk.gov.cslearning.record.service.LearnerRecordService;
 
@@ -24,17 +21,17 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping("/records")
-public class LearnerRecord {
+public class LearnerRecordController {
 
     private LearnerRecordService service;
 
     @Autowired
-    public LearnerRecord(LearnerRecordService service) {
+    public LearnerRecordController(LearnerRecordService service) {
         checkArgument(service != null);
         this.service = service;
     }
 
-    @RequestMapping(path = "/{userId}", method = GET)
+    @GetMapping(path = "/{userId}")
     public ResponseEntity<Records> search(@PathVariable("userId") String userId,
                                           @RequestParam(name = "activityId", required = false) String activityId,
                                           @RequestParam(name = "state", required = false) String state) {

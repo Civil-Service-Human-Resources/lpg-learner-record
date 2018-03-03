@@ -19,6 +19,3 @@ if [ $? -ne 0 ]; then
 fi
 
 ./environ/deploy dev ${TRAVIS_COMMIT}
-
-# cd test/headless
-# npm install
