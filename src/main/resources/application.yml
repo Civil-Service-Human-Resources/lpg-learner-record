@@ -10,10 +10,10 @@ server:
   port: 9000
 
 storm:
-  host: 127.0.0.1
-  port: 3772
+  host: ${STORM_HOST:127.0.0.1}
+  port: ${STORM_PORT:3772}
 
 xapi:
-  username: 66f2b4fc001e3da992d23b57d8a7457655bea078
-  password: 1c0e1b6827606d7efed71e204939d048f94f842b
-  url: http://localhost:8083/data/xAPI
+  username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
+  password: ${XAPI_PASSWORD:1c0e1b6827606d7efed71e204939d048f94f842b}
+  url: ${XAPI_URL:http://localhost:8083/data/xAPI}

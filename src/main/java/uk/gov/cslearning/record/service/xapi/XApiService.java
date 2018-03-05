@@ -47,11 +47,16 @@ public class XApiService implements Serializable {
 
         Agent agent = new Agent(userId, "mailto:noone@cslearning.gov.uk");
 
-        StatementResult result = statementClient
-                .filterByActor(agent)
-                .filterByActivity(activityId)
-                .includeRelatedActivities(true)
-                .getStatements();
+        statementClient = statementClient
+                .filterByActor(agent);
+
+        if (activityId != null) {
+            statementClient = statementClient
+                    .filterByActivity(activityId)
+                    .includeRelatedActivities(true);
+        }
+
+        StatementResult result = statementClient.getStatements();
 
         List<Statement> statements = new ArrayList<>(result.getStatements());
         while (result.hasMore()) {

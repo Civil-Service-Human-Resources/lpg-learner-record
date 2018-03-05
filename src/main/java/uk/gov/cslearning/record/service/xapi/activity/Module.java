@@ -8,7 +8,10 @@ public class Module extends Activity {
     private static final String COURSE_ID = "courseId";
 
     static {
-        Activity.register(Module.class, ActivityType.COURSE);
+        Activity.register(Module.class, ActivityType.CLASSROOM);
+        Activity.register(Module.class, ActivityType.LINK);
+        Activity.register(Module.class, ActivityType.ELEARNING);
+        Activity.register(Module.class, ActivityType.VIDEO);
     }
 
     Module(Statement statement) {

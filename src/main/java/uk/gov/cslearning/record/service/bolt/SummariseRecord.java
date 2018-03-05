@@ -50,16 +50,18 @@ public class SummariseRecord extends BaseBatchBolt {
 
             Activity activity = Activity.getFor(statements.get(0));
 
-            Record record = new Record();
-            record.setCourseId(activity.getCourseId());
-            record.setModuleId(activity.getModuleId());
-            record.setEventId(activity.getEventId());
-            record.setUserId(statements.get(0).getActor().getName());
+            if (activity != null) {
+                Record record = new Record();
+                record.setCourseId(activity.getCourseId());
+                record.setModuleId(activity.getModuleId());
+                record.setEventId(activity.getEventId());
+                record.setUserId(statements.get(0).getActor().getName());
 
-            StatementStream stream = new StatementStream(statements);
-            record = stream.replay(record);
+                StatementStream stream = new StatementStream(statements);
+                record = stream.replay(record);
 
-            collector.emit(new Values(id, record));
+                collector.emit(new Values(id, record));
+            }
         }
     }
 

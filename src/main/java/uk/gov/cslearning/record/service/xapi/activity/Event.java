@@ -10,7 +10,7 @@ public class Event extends Activity {
     private static final String MODULE_ID = "moduleId";
 
     static {
-        Activity.register(Event.class, ActivityType.COURSE);
+        Activity.register(Event.class, ActivityType.EVENT);
     }
 
     Event(Statement statement) {

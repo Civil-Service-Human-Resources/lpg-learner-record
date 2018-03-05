@@ -36,16 +36,13 @@ public class StormConfig {
 
         @Bean
         public DRPCClient client(StormProperties properties) throws TTransportException {
-            Config config = new Config();
-            config.putAll(Utils.readDefaultConfig());
-            return new DRPCClient(config, properties.getHost(), properties.getPort());
-        }
-
-        @EventListener(ContextStartedEvent.class)
-        public void contextStarted() {
             if (System.getProperty("storm.jar") == null) {
                 System.setProperty("storm.jar", "build/libs/learner-record.jar");
             }
+
+            Config config = new Config();
+            config.putAll(Utils.readDefaultConfig());
+            return new DRPCClient(config, properties.getHost(), properties.getPort());
         }
     }
 }

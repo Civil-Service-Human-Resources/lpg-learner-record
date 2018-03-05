@@ -33,7 +33,7 @@ public class LearnerRecordController {
         this.userRecordService = userRecordService;
     }
 
-    @GetMapping(path = "/")
+    @GetMapping
     public ResponseEntity<Records> activityRecord(@RequestParam(name = "activityId") String activityId) {
         List<Record> records = activityRecordService.getActivityRecord(activityId);
         return new ResponseEntity<>(new Records(records), OK);
