@@ -39,6 +39,7 @@ dependencies {
     }
     compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile 'org.springframework.boot:spring-boot-starter-jersey'
+    compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.boot:spring-boot-configuration-processor'
 
     compile 'com.google.code.gson:gson:2.8.2'
