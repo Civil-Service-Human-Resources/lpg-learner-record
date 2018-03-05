@@ -31,11 +31,11 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 
 @Service
-public class LearnerRecordService {
+public class UserRecordService {
 
-    private static final String FUNCTION = "learner-record";
+    private static final String FUNCTION = "user-record";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
 
     private DistributedRPC.Iface client;
 
@@ -45,7 +45,7 @@ public class LearnerRecordService {
     private XApiService xApiService;
 
     @Autowired
-    public LearnerRecordService(DistributedRPC.Iface client, XApiService xApiService) {
+    public UserRecordService(DistributedRPC.Iface client, XApiService xApiService) {
         checkArgument(client != null);
         checkArgument(xApiService != null);
         this.client = client;
@@ -54,7 +54,7 @@ public class LearnerRecordService {
 
     @PostConstruct
     public void configure() throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        LOGGER.debug("Configuring learner record topology");
+        LOGGER.debug("Configuring user record topology");
 
         LinearDRPCTopologyBuilder builder = new LinearDRPCTopologyBuilder(FUNCTION);
         builder.addBolt(new GetStatementsForUser(xApiService));
@@ -74,8 +74,8 @@ public class LearnerRecordService {
         }
     }
 
-    public List<Record> getLearnerRecord(String userId, String activityId) {
-        LOGGER.debug("Retrieving learner record for user {}, activity {} and state {}", userId, activityId);
+    public List<Record> getUserRecord(String userId, String activityId) {
+        LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
         try {
             Gson gson = new Gson();
             String response = client.execute(FUNCTION, gson.toJson(new Arguments(userId, activityId)));

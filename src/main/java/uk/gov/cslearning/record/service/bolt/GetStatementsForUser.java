@@ -11,7 +11,7 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.cslearning.record.service.LearnerRecordService.Arguments;
+import uk.gov.cslearning.record.service.UserRecordService.Arguments;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.io.IOException;

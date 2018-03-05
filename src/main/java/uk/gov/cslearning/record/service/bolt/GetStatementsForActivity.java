@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.service.bolt;
 
 import gov.adlnet.xapi.model.Activity;
+import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.Statement;
 import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
@@ -40,8 +41,8 @@ public class GetStatementsForActivity extends BaseBasicBolt {
                 if (!(statement.getObject() instanceof Activity)) {
                     continue;
                 }
-                String statementActivityId = ((Activity) statement.getObject()).getId();
-                collector.emit(new Values(input.getValue(0), statementActivityId, statement));
+                String userId = statement.getActor().getName();
+                collector.emit(new Values(input.getValue(0), userId, statement));
             }
         } catch (IOException e) {
             LOGGER.error("Exception retrieving xAPI statements.", e);
@@ -50,6 +51,6 @@ public class GetStatementsForActivity extends BaseBasicBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("id", "activityId", "statement"));
+        declarer.declare(new Fields("id", "userId", "statement"));
     }
 }

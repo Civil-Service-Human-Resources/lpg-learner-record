@@ -13,6 +13,8 @@ public class Record {
 
     private String eventId;
 
+    private String userId;
+
     private State state;
 
     private String preference;
@@ -49,6 +51,14 @@ public class Record {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public State getState() {

@@ -10,7 +10,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import uk.gov.cslearning.record.domain.Record;
 import uk.gov.cslearning.record.domain.State;
-import uk.gov.cslearning.record.service.LearnerRecordService;
+import uk.gov.cslearning.record.service.ActivityRecordService;
+import uk.gov.cslearning.record.service.UserRecordService;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -28,7 +29,10 @@ public class LearnerRecordControllerTest {
     private LearnerRecordController controller;
 
     @Mock
-    private LearnerRecordService learnerRecordService;
+    private ActivityRecordService activityRecordService;
+
+    @Mock
+    private UserRecordService userRecordService;
 
     @BeforeTest
     public void setup() {
@@ -49,7 +53,7 @@ public class LearnerRecordControllerTest {
     @Test
     public void shouldReturnRecords() throws Exception {
 
-        when(learnerRecordService.getLearnerRecord("1", null))
+        when(userRecordService.getUserRecord("1", null))
                 .thenReturn(ImmutableList.of(createRecord(State.COMPLETED)));
 
         mockMvc.perform(
@@ -58,7 +62,7 @@ public class LearnerRecordControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.records", hasSize(1)))
-                .andExpect(jsonPath("$.records[0].state").value("COMPLETED"));
+                .andExpect(jsonPath("$.records[0].state").value(State.COMPLETED.name()));
     }
 
     private Record createRecord(State state) {

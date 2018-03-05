@@ -1,42 +1,50 @@
 package uk.gov.cslearning.record.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.Record;
-import uk.gov.cslearning.record.service.LearnerRecordService;
+import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.service.ActivityRecordService;
+import uk.gov.cslearning.record.service.UserRecordService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping("/records")
 public class LearnerRecordController {
 
-    private LearnerRecordService service;
+    private ActivityRecordService activityRecordService;
+
+    private UserRecordService userRecordService;
 
     @Autowired
-    public LearnerRecordController(LearnerRecordService service) {
-        checkArgument(service != null);
-        this.service = service;
+    public LearnerRecordController(ActivityRecordService activityRecordService, UserRecordService userRecordService) {
+        checkArgument(activityRecordService != null);
+        checkArgument(userRecordService != null);
+        this.activityRecordService = activityRecordService;
+        this.userRecordService = userRecordService;
+    }
+
+    @GetMapping(path = "/")
+    public ResponseEntity<Records> activityRecord(@RequestParam(name = "activityId") String activityId) {
+        List<Record> records = activityRecordService.getActivityRecord(activityId);
+        return new ResponseEntity<>(new Records(records), OK);
     }
 
     @GetMapping(path = "/{userId}")
-    public ResponseEntity<Records> search(@PathVariable("userId") String userId,
+    public ResponseEntity<Records> userRecord(@PathVariable("userId") String userId,
                                           @RequestParam(name = "activityId", required = false) String activityId,
-                                          @RequestParam(name = "state", required = false) String state) {
+                                          @RequestParam(name = "state", required = false) State state) {
 
-        List<Record> records = service.getLearnerRecord(userId, activityId);
+        List<Record> records = userRecordService.getUserRecord(userId, activityId);
 
         if (state != null) {
             records = records.stream()

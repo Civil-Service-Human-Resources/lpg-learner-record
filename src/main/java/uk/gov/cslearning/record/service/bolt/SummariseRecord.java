@@ -33,12 +33,12 @@ public class SummariseRecord extends BaseBatchBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        String activityId = (String) tuple.getValue(1);
+        String groupId = (String) tuple.getValue(1);
         Statement statement = (Statement) tuple.getValue(2);
-        if (!groupedStatements.containsKey(activityId)) {
-            groupedStatements.put(activityId, new ArrayList<>());
+        if (!groupedStatements.containsKey(groupId)) {
+            groupedStatements.put(groupId, new ArrayList<>());
         }
-        groupedStatements.get(activityId).add(statement);
+        groupedStatements.get(groupId).add(statement);
     }
 
     @Override
@@ -54,6 +54,7 @@ public class SummariseRecord extends BaseBatchBolt {
             record.setCourseId(activity.getCourseId());
             record.setModuleId(activity.getModuleId());
             record.setEventId(activity.getEventId());
+            record.setUserId(statements.get(0).getActor().getName());
 
             StatementStream stream = new StatementStream(statements);
             record = stream.replay(record);

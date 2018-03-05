@@ -18,24 +18,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.domain.Registration;
+import uk.gov.cslearning.record.domain.Record;
 import uk.gov.cslearning.record.service.bolt.GetStatementsForActivity;
-import uk.gov.cslearning.record.service.bolt.RegistrationAggregator;
-import uk.gov.cslearning.record.service.bolt.SummariseRegistration;
+import uk.gov.cslearning.record.service.bolt.RecordAggregator;
+import uk.gov.cslearning.record.service.bolt.SummariseRecord;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import javax.annotation.PostConstruct;
-import javax.swing.text.html.HTMLDocument;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 @Service
-public class RegistrationService {
+public class ActivityRecordService {
 
-    private static final String FUNCTION = "registrations";
+    private static final String FUNCTION = "activity-record";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityRecordService.class);
 
     private DistributedRPC.Iface client;
 
@@ -45,7 +44,7 @@ public class RegistrationService {
     private XApiService xApiService;
 
     @Autowired
-    public RegistrationService(DistributedRPC.Iface client, XApiService xApiService) {
+    public ActivityRecordService(DistributedRPC.Iface client, XApiService xApiService) {
         checkArgument(client != null);
         checkArgument(xApiService != null);
         this.client = client;
@@ -54,13 +53,13 @@ public class RegistrationService {
 
     @PostConstruct
     public void configure() throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        LOGGER.debug("Configuring registrations topology");
+        LOGGER.debug("Configuring activity record topology");
 
         LinearDRPCTopologyBuilder builder = new LinearDRPCTopologyBuilder(FUNCTION);
         builder.addBolt(new GetStatementsForActivity(xApiService));
-        builder.addBolt(new SummariseRegistration())
-                .fieldsGrouping(new Fields("id", "activityId"));
-        builder.addBolt(new RegistrationAggregator())
+        builder.addBolt(new SummariseRecord())
+                .fieldsGrouping(new Fields("id", "userId"));
+        builder.addBolt(new RecordAggregator())
                 .fieldsGrouping(new Fields("id"));
 
         Config config = new Config();
@@ -74,12 +73,12 @@ public class RegistrationService {
         }
     }
 
-    public List<Registration> getRegistrations() {
-        LOGGER.debug("Retrieving registrations");
+    public List<Record> getActivityRecord(String activityId) {
+        LOGGER.debug("Retrieving activity record");
         try {
             Gson gson = new Gson();
-            String response = client.execute(FUNCTION, null);
-            return Lists.newArrayList(gson.fromJson(response, Registration[].class));
+            String response = client.execute(FUNCTION, activityId);
+            return Lists.newArrayList(gson.fromJson(response, Record[].class));
         } catch (TException e) {
             throw new RuntimeException(e);
         }
