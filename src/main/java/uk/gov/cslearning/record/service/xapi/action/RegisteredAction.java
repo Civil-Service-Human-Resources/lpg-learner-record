@@ -9,7 +9,7 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class RegisteredAction extends Action {
 
     static {
-        Action.register(RegisteredAction.class, ActivityType.CLASSROOM, Verb.REGISTERED);
+        Action.register(RegisteredAction.class, ActivityType.FACETOFACE, Verb.REGISTERED);
     }
 
     RegisteredAction(Statement statement) {

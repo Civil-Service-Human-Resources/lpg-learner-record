@@ -9,8 +9,8 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class TerminatedAction extends Action {
 
     static {
-        Action.register(TerminatedAction.class, ActivityType.CLASSROOM, Verb.TERMINATED);
-        Action.register(TerminatedAction.class, ActivityType.CLASSROOM, Verb.UNREGISTERED);
+        Action.register(TerminatedAction.class, ActivityType.FACETOFACE, Verb.TERMINATED);
+        Action.register(TerminatedAction.class, ActivityType.FACETOFACE, Verb.UNREGISTERED);
         Action.register(TerminatedAction.class, ActivityType.ELEARNING, Verb.TERMINATED);
         Action.register(TerminatedAction.class, ActivityType.LINK, Verb.TERMINATED);
         Action.register(TerminatedAction.class, ActivityType.VIDEO, Verb.TERMINATED);

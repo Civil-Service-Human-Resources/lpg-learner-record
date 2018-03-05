@@ -8,7 +8,7 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class DislikedAction extends Action {
 
     static {
-        Action.register(DislikedAction.class, ActivityType.CLASSROOM, Verb.DISLIKED);
+        Action.register(DislikedAction.class, ActivityType.FACETOFACE, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.ELEARNING, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.VIDEO, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.LINK, Verb.DISLIKED);
