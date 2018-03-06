@@ -2,10 +2,11 @@
 spring:
   resources:
     add-mappings: false
-  security:
-    user:
-      name: ${AUTH_USER:user}
-      password: ${AUTH_PASSWORD:password}
+
+security:
+  user:
+    name: ${AUTH_USER:user}
+    password: ${AUTH_PASSWORD:password}
 
 server:
   port: 9000

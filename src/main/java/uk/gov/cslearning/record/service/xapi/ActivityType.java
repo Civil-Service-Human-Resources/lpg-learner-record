@@ -6,7 +6,7 @@ public enum ActivityType {
     COURSE("http://adlnet.gov/expapi/activities/course"),
     ELEARNING("http://cslearning.gov.uk/types/elearning"),
     EVENT("http://activitystrea.ms/schema/1.0/event"),
-    VIDEO("http://activitystrea.ms/schema/1.0/video"),
+    VIDEO("https://w3id.org/xapi/acrossx/activities/video"),
     LINK("http://adlnet.gov/expapi/activities/link");
 
     public static ActivityType fromUri(String uri) {

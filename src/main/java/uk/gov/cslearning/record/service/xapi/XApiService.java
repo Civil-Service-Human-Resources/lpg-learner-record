@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.service.xapi;
 
 import gov.adlnet.xapi.client.StatementClient;
+import gov.adlnet.xapi.model.Account;
 import gov.adlnet.xapi.model.Agent;
 import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.StatementResult;
@@ -29,6 +30,8 @@ public class XApiService implements Serializable {
             .appendLiteral('Z')
             .toFormatter();
 
+    private static final String HOMEPAGE = "https://cslearning.gov.uk/";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XApiService.class);
 
     private XApiProperties xApiProperties;
@@ -45,7 +48,7 @@ public class XApiService implements Serializable {
         StatementClient statementClient = new StatementClient(xApiProperties.getUrl(), xApiProperties.getUsername(),
                 xApiProperties.getPassword());
 
-        Agent agent = new Agent(userId, "mailto:noone@cslearning.gov.uk");
+        Agent agent = new Agent(null, new Account(userId, HOMEPAGE));
 
         statementClient = statementClient
                 .filterByActor(agent);
