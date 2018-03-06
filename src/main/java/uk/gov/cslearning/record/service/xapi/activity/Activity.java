@@ -70,7 +70,8 @@ public abstract class Activity {
         return getXApiActivity().getDefinition();
     }
 
-    String getActivityId() {
+    // TODO: package-private scope
+    public String getActivityId() {
         if (getXApiActivity() == null) {
             LOGGER.warn("Statement has no activity ID", statement);
             return null;
