@@ -38,10 +38,8 @@ public abstract class Activity {
 
     public static Activity getFor(Statement statement) {
         ActivityDefinition definition = ((gov.adlnet.xapi.model.Activity) statement.getObject()).getDefinition();
-        ActivityType type;
-        if (definition == null) {
-            type = ActivityType.COURSE;
-        } else {
+        ActivityType type = null;
+        if (definition != null) {
             type = ActivityType.fromUri(definition.getType());
         }
         Class<? extends Activity> activityClass = ACTIVITIES.get(type);

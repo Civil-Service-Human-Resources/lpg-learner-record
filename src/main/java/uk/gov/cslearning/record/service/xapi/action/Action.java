@@ -30,10 +30,8 @@ public abstract class Action {
 
     public static Action getFor(Statement statement) {
         ActivityDefinition definition = ((gov.adlnet.xapi.model.Activity) statement.getObject()).getDefinition();
-        ActivityType type;
-        if (definition == null) {
-            type = ActivityType.COURSE;
-        } else {
+        ActivityType type = null;
+        if (definition != null) {
             type = ActivityType.fromUri(definition.getType());
         }
         Verb verb = Verb.fromUri(statement.getVerb().getId());

@@ -2,12 +2,13 @@ package uk.gov.cslearning.record.service.xapi;
 
 public enum Verb {
 
-    LIKED("https://w3id.org/xapi/acrossx/verbs/liked"),
-    DISLIKED("https://w3id.org/xapi/acrossx/verbs/disliked"),
     COMPLETED("http://adlnet.gov/expapi/verbs/completed"),
+    DISLIKED("https://w3id.org/xapi/acrossx/verbs/disliked"),
+    EXPERIENCED("http://adlnet.gov/expapi/verbs/experienced"),
     FAILED("http://adlnet.gov/expapi/verbs/failed"),
     INITIALISED("http://adlnet.gov/expapi/verbs/initialized"),
     LAUNCHED("http://adlnet.gov/expapi/verbs/launched"),
+    LIKED("https://w3id.org/xapi/acrossx/verbs/liked"),
     PASSED("http://adlnet.gov/expapi/verbs/passed"),
     REGISTERED("http://adlnet.gov/expapi/verbs/registered"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),

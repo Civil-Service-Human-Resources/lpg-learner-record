@@ -2,9 +2,9 @@ package uk.gov.cslearning.record.service.xapi;
 
 public enum ActivityType {
 
-    FACETOFACE("http://cslearning.gov.uk/types/face-to-face"),
+    FACETOFACE("http://cslearning.gov.uk/activities/face-to-face"),
     COURSE("http://adlnet.gov/expapi/activities/course"),
-    ELEARNING("http://cslearning.gov.uk/types/elearning"),
+    ELEARNING("http://cslearning.gov.uk/activities/elearning"),
     EVENT("http://activitystrea.ms/schema/1.0/event"),
     VIDEO("https://w3id.org/xapi/acrossx/activities/video"),
     LINK("http://adlnet.gov/expapi/activities/link");
