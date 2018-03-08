@@ -5,8 +5,6 @@ import uk.gov.cslearning.record.service.xapi.ActivityType;
 
 public class Module extends Activity {
 
-    private static final String COURSE_ID = "courseId";
-
     static {
         Activity.register(Module.class, ActivityType.FACETOFACE);
         Activity.register(Module.class, ActivityType.LINK);
@@ -20,7 +18,7 @@ public class Module extends Activity {
 
     @Override
     public String getCourseId() {
-        return getExtensionValue(COURSE_ID);
+        return getParent(COURSE_ID_PREFIX);
     }
 
     @Override

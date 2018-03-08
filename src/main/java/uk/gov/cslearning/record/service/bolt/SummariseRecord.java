@@ -52,8 +52,9 @@ public class SummariseRecord extends BaseBatchBolt {
 
             if (activity != null) {
                 Record record = new Record();
-                //TODO update to course / module / event
-                record.setCourseId(activity.getActivityId());
+                record.setCourseId(activity.getCourseId());
+                record.setModuleId(activity.getModuleId());
+                record.setEventId(activity.getEventId());
                 record.setUserId(statements.get(0).getActor().getAccount().getName());
 
                 StatementStream stream = new StatementStream(statements);

@@ -1,19 +1,22 @@
 package uk.gov.cslearning.record.service.xapi.activity;
 
-import com.google.gson.JsonElement;
 import gov.adlnet.xapi.model.ActivityDefinition;
+import gov.adlnet.xapi.model.ContextActivities;
 import gov.adlnet.xapi.model.Statement;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
-import uk.gov.cslearning.record.service.xapi.action.Action;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.Collections.emptyList;
 
 public abstract class Activity {
+
+    protected static final String COURSE_ID_PREFIX = "http://cslearning.gov.uk/courses";
+
+    protected static final String MODULE_ID_PREFIX = "http://cslearning.gov.uk/modules";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Activity.class);
 
@@ -60,30 +63,39 @@ public abstract class Activity {
         ACTIVITIES.put(type, activityClass);
     }
 
-    gov.adlnet.xapi.model.Activity getXApiActivity() {
-        return ((gov.adlnet.xapi.model.Activity) statement.getObject());
-    }
-
-    ActivityDefinition getXApiActivityDefinition() {
-        return getXApiActivity().getDefinition();
-    }
-
-    // TODO: package-private scope
-    public String getActivityId() {
-        if (getXApiActivity() == null) {
+    String getActivityId() {
+        gov.adlnet.xapi.model.Activity activity = ((gov.adlnet.xapi.model.Activity) statement.getObject());
+        if (activity == null) {
             LOGGER.warn("Statement has no activity ID", statement);
             return null;
         }
-        return getXApiActivity().getId();
+        return activity.getId();
     }
 
-    String getExtensionValue(String key) {
-        Map<String, JsonElement> extensions = getXApiActivityDefinition().getExtensions();
-        if (extensions == null || extensions.containsKey(key)) {
-            LOGGER.warn("Statement recorded with no {}", key, statement);
-            return null;
+    String getParent(String idPrefix) {
+        List<gov.adlnet.xapi.model.Activity> parents = null;
+
+        if (statement.getContext() != null) {
+            ContextActivities activities = statement.getContext().getContextActivities();
+            if (activities != null) {
+                parents = activities.getParent();
+            }
         }
-        return extensions.get(key).getAsString();
+
+        if (parents == null) {
+            parents = emptyList();
+        }
+
+        Optional<gov.adlnet.xapi.model.Activity> parent = parents.stream()
+                .filter(activity -> activity.getId().startsWith(idPrefix))
+                .findFirst();
+
+        return parent
+                .map(gov.adlnet.xapi.model.Activity::getId)
+                .orElseGet(() -> {
+                    LOGGER.debug("No parent found in statement {} for prefix {}", statement.getId(), idPrefix);
+                    return null;
+                });
     }
 
     public abstract String getCourseId();
