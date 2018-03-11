@@ -5,7 +5,7 @@ public enum ActivityType {
     FACETOFACE("http://cslearning.gov.uk/activities/face-to-face"),
     COURSE("http://adlnet.gov/expapi/activities/course"),
     ELEARNING("http://cslearning.gov.uk/activities/elearning"),
-    EVENT("http://activitystrea.ms/schema/1.0/event"),
+    EVENT("http://adlnet.gov/expapi/activities/event"),
     VIDEO("https://w3id.org/xapi/acrossx/activities/video"),
     LINK("http://adlnet.gov/expapi/activities/link");
 
