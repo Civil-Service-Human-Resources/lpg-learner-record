@@ -6,19 +6,19 @@ import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.Verb;
 
-public class RegisteredAction extends Action {
+public class UnregisteredAction extends Action {
 
     static {
-        Action.register(RegisteredAction.class, ActivityType.EVENT, Verb.REGISTERED);
+        Action.register(UnregisteredAction.class, ActivityType.EVENT, Verb.UNREGISTERED);
     }
 
-    RegisteredAction(Statement statement) {
+    UnregisteredAction(Statement statement) {
         super(statement);
     }
 
     @Override
     public Record replay(Record record) {
-        record.setState(State.REGISTERED);
+        record.setState(State.UNREGISTERED);
         record.setResult(null);
         record.setScore(null);
         record.setCompletionDate(null);
