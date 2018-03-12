@@ -6,13 +6,13 @@ import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.Verb;
 
-public class UnregisteredAction extends Action {
+public class UnRegisteredAction extends Action {
 
     static {
-        Action.register(UnregisteredAction.class, ActivityType.EVENT, Verb.UNREGISTERED);
+        Action.register(UnRegisteredAction.class, ActivityType.EVENT, Verb.UNREGISTERED);
     }
 
-    UnregisteredAction(Statement statement) {
+    UnRegisteredAction(Statement statement) {
         super(statement);
     }
 

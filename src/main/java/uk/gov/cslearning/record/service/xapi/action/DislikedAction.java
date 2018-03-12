@@ -22,7 +22,7 @@ public class DislikedAction extends Action {
 
     @Override
     public Record replay(Record record) {
-        record.setPreference("disliked");
+        record.setPreference("DISLIKED");
         return record;
     }
 }

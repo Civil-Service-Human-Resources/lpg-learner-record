@@ -22,7 +22,7 @@ public class LikedAction extends Action {
 
     @Override
     public Record replay(Record record) {
-        record.setPreference("liked");
+        record.setPreference("LIKED");
         return record;
     }
 }
