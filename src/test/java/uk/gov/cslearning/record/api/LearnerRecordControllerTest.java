@@ -1,13 +1,13 @@
 package uk.gov.cslearning.record.api;
 
 import com.google.common.collect.ImmutableList;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 import uk.gov.cslearning.record.domain.Record;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.ActivityRecordService;
@@ -34,7 +34,7 @@ public class LearnerRecordControllerTest {
     @Mock
     private UserRecordService userRecordService;
 
-    @BeforeTest
+    @Before
     public void setup() {
         initMocks(this);
         mockMvc = standaloneSetup(controller).build();

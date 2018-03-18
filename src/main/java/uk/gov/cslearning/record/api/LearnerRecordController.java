@@ -9,11 +9,10 @@ import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
 
 import java.util.ArrayList;
-import java.util.List;
-
+import java.util.Collection;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableCollection;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -35,16 +34,16 @@ public class LearnerRecordController {
 
     @GetMapping
     public ResponseEntity<Records> activityRecord(@RequestParam(name = "activityId") String activityId) {
-        List<Record> records = activityRecordService.getActivityRecord(activityId);
+        Collection<Record> records = activityRecordService.getActivityRecord(activityId);
         return new ResponseEntity<>(new Records(records), OK);
     }
 
     @GetMapping(path = "/{userId}")
     public ResponseEntity<Records> userRecord(@PathVariable("userId") String userId,
-                                          @RequestParam(name = "activityId", required = false) String activityId,
-                                          @RequestParam(name = "state", required = false) State state) {
+                                              @RequestParam(name = "activityId", required = false) String activityId,
+                                              @RequestParam(name = "state", required = false) State state) {
 
-        List<Record> records = userRecordService.getUserRecord(userId, activityId);
+        Collection<Record> records = userRecordService.getUserRecord(userId, activityId);
 
         if (state != null) {
             records = records.stream()
@@ -57,15 +56,15 @@ public class LearnerRecordController {
 
     public static final class Records {
 
-        private List<Record> records;
+        private Collection<Record> records;
 
-        public Records(List<Record> records) {
+        public Records(Collection<Record> records) {
             checkArgument(records != null, "records is null");
             this.records = new ArrayList<>(records);
         }
 
-        public List<Record> getRecords() {
-            return unmodifiableList(records);
+        public Collection<Record> getRecords() {
+            return unmodifiableCollection(records);
         }
     }
 }

@@ -19,8 +19,8 @@ group = 'uk.gov.cslearning'
 version = '0.1.0-' + (System.getenv('TRAVIS_COMMIT') ?: 'local')
 
 bootJar {
-    archiveName = 'learning-catalogue.jar'
-    mainClassName = 'uk.gov.cslearning.catalogue.Application'
+    archiveName = 'learner-record.jar'
+    mainClassName = 'uk.gov.cslearning.record.Application'
 }
 
 dependencies {
@@ -34,13 +34,8 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.google.guava:guava:23.5-jre'
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.4.0'
     compile 'gov.adlnet:jxapi:2.0.1'
     compile 'org.apache.commons:commons-lang3:3.7'
-    compile('org.apache.storm:storm-core:1.2.1') {
-        exclude module: 'log4j-slf4j-impl'
-        exclude module: 'servlet-api'
-    }
     compile 'org.codehaus.janino:janino:3.0.8'
     compile 'org.reflections:reflections:0.9.11'
 

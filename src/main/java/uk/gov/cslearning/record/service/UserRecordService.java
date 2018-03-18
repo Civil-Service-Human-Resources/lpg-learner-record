@@ -1,98 +1,42 @@
 package uk.gov.cslearning.record.service;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import org.apache.storm.Config;
-import org.apache.storm.ILocalDRPC;
-import org.apache.storm.LocalCluster;
-import org.apache.storm.StormSubmitter;
-import org.apache.storm.drpc.LinearDRPCTopologyBuilder;
-import org.apache.storm.generated.AlreadyAliveException;
-import org.apache.storm.generated.AuthorizationException;
-import org.apache.storm.generated.DistributedRPC;
-import org.apache.storm.generated.InvalidTopologyException;
-import org.apache.storm.thrift.TException;
-import org.apache.storm.tuple.Fields;
-import org.apache.storm.utils.Utils;
+import gov.adlnet.xapi.model.Activity;
+import gov.adlnet.xapi.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Record;
-import uk.gov.cslearning.record.service.bolt.GetStatementsForUser;
-import uk.gov.cslearning.record.service.bolt.RecordAggregator;
-import uk.gov.cslearning.record.service.bolt.SummariseRecord;
+import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import javax.annotation.PostConstruct;
-import java.io.Serializable;
-import java.util.List;
+import java.io.IOException;
+import java.util.Collection;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 @Service
 public class UserRecordService {
 
-    private static final String FUNCTION = "user-record";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
-
-    private DistributedRPC.Iface client;
-
-    @Autowired(required = false)
-    private LocalCluster cluster;
 
     private XApiService xApiService;
 
     @Autowired
-    public UserRecordService(DistributedRPC.Iface client, XApiService xApiService) {
-        checkArgument(client != null);
+    public UserRecordService(XApiService xApiService) {
         checkArgument(xApiService != null);
-        this.client = client;
         this.xApiService = xApiService;
     }
 
-    @PostConstruct
-    public void configure() throws InvalidTopologyException, AuthorizationException, AlreadyAliveException {
-        LOGGER.debug("Configuring user record topology");
-
-        LinearDRPCTopologyBuilder builder = new LinearDRPCTopologyBuilder(FUNCTION);
-        builder.addBolt(new GetStatementsForUser(xApiService));
-        builder.addBolt(new SummariseRecord())
-                .fieldsGrouping(new Fields("id", "activityId"));
-        builder.addBolt(new RecordAggregator())
-                .fieldsGrouping(new Fields("id"));
-
-        Config config = new Config();
-
-        if (cluster != null) {
-            cluster.submitTopology(FUNCTION, config, builder.createLocalTopology((ILocalDRPC) client));
-        } else {
-            config.putAll(Utils.readDefaultConfig());
-            // TODO version or timestamp function
-            StormSubmitter.submitTopology(FUNCTION, config, builder.createRemoteTopology());
-        }
-    }
-
-    public List<Record> getUserRecord(String userId, String activityId) {
+    public Collection<Record> getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
         try {
-            Gson gson = new Gson();
-            String response = client.execute(FUNCTION, gson.toJson(new Arguments(userId, activityId)));
-            return Lists.newArrayList(gson.fromJson(response, Record[].class));
-        } catch (TException e) {
-            throw new RuntimeException(e);
-        }
-    }
+            Collection<Statement> statements = xApiService.getStatements(userId, activityId);
 
-    public static class Arguments implements Serializable {
-
-        public String userId;
-        public String activityId;
-
-        public Arguments(String userId, String activityId) {
-            this.userId = userId;
-            this.activityId = activityId;
+            StatementStream stream = new StatementStream();
+            return stream.replay(statements, statement -> ((Activity) statement.getObject()).getId());
+        } catch (IOException e) {
+            throw new RuntimeException("Exception retrieving xAPI statements.", e);
         }
     }
 }

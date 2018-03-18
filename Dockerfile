@@ -14,6 +14,6 @@ ENV XAPI_URL http://localhost:8083/data/xAPI
 
 EXPOSE 9000
 
-CMD java -Dstorm.jar=/data/app.jar -jar /data/app.jar
+CMD java -Dstorm.jar=/data/storm.jar -jar /data/app.jar
 
 ADD build/libs/learner-record.jar /data/app.jar
