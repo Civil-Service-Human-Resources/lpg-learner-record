@@ -63,7 +63,7 @@ public class XApiService implements Serializable {
 
         List<Statement> statements = new ArrayList<>(result.getStatements());
         while (result.hasMore()) {
-            result = statementClient.getStatements(result.getMore());
+            result = statementClient.getStatements(stripPath(xApiProperties.getUrl(), result.getMore()));
             statements.addAll(result.getStatements());
         }
         return statements;
@@ -82,9 +82,17 @@ public class XApiService implements Serializable {
 
         List<Statement> statements = new ArrayList<>(result.getStatements());
         while (result.hasMore()) {
-            result = statementClient.getStatements(result.getMore());
+            result = statementClient.getStatements(stripPath(xApiProperties.getUrl(), result.getMore()));
             statements.addAll(result.getStatements());
         }
         return statements;
+    }
+
+    private String stripPath(String url, String more) {
+        int length = 1;
+        while (!url.endsWith(more.substring(0, length))) {
+            length += 1;
+        }
+        return more.substring(length);
     }
 }
