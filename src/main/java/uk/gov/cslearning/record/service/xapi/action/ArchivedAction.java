@@ -25,8 +25,5 @@ public class ArchivedAction extends Action {
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
         courseRecord.setState(State.ARCHIVED);
-        moduleRecord.setResult(null);
-        moduleRecord.setScore(null);
-        moduleRecord.setCompletionDate(null);
     }
 }
