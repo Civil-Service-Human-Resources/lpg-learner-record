@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.domain.Record;
+import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
@@ -28,7 +28,7 @@ public class UserRecordService {
         this.xApiService = xApiService;
     }
 
-    public Collection<Record> getUserRecord(String userId, String activityId) {
+    public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, activityId);

@@ -1,14 +1,12 @@
 package uk.gov.cslearning.record.service.xapi.action;
 
-import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.ActivityDefinition;
 import gov.adlnet.xapi.model.Statement;
 import org.reflections.Reflections;
-import uk.gov.cslearning.record.domain.Record;
+import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.Verb;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -62,5 +60,5 @@ public abstract class Action {
         this.statement = statement;
     }
 
-    public abstract Record replay(Record record);
+    public abstract ModuleRecord replay(ModuleRecord record);
 }

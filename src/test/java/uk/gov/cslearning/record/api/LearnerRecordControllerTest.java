@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import uk.gov.cslearning.record.domain.Record;
+import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
@@ -54,7 +54,7 @@ public class LearnerRecordControllerTest {
     public void shouldReturnRecords() throws Exception {
 
         when(userRecordService.getUserRecord("1", null))
-                .thenReturn(ImmutableList.of(createRecord(State.COMPLETED)));
+                .thenReturn(ImmutableList.of(createRecord("abc", "1")));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/records/1")
@@ -62,12 +62,10 @@ public class LearnerRecordControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.records", hasSize(1)))
-                .andExpect(jsonPath("$.records[0].state").value(State.COMPLETED.name()));
+                .andExpect(jsonPath("$.records[0].courseId").value("abc"));
     }
 
-    private Record createRecord(State state) {
-        Record record = new Record();
-        record.setState(state);
-        return record;
+    private CourseRecord createRecord(String courseId, String userId) {
+        return new CourseRecord(courseId, userId);
     }
 }

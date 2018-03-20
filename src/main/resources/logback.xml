@@ -1,6 +1,7 @@
 <configuration>
 
     <property scope="context" name="profile" value="${spring.profile:-development}" />
+    <property scope="context" name="application.name" value="learner-record" />
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -8,7 +9,7 @@
         </encoder>
     </appender>
 
-    <if condition='property("profile").equals("staging") || property("profile").equals("production")'>
+    <if condition='property("profile").equals("production")'>
         <then>
             <root level="warn">
                 <appender-ref ref="console" />

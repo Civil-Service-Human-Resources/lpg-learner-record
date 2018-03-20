@@ -3,7 +3,8 @@ package uk.gov.cslearning.record.service.xapi;
 import gov.adlnet.xapi.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.cslearning.record.domain.Record;
+import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 
@@ -13,10 +14,10 @@ public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
 
-    public Collection<Record> replay(Collection<Statement> statements, GroupId id) {
+    public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
 
-        Collection<Record> records = new ArrayList<>();
         Map<String, List<Statement>> groups = new HashMap<>();
+        Map<String, CourseRecord> records = new HashMap<>();
 
         for (Statement statement : statements) {
             String groupId = id.get(statement);
@@ -34,24 +35,31 @@ public class StatementStream {
             Activity activity = Activity.getFor(group.get(0));
 
             if (activity != null) {
-                Record record = new Record();
-                record.setCourseId(activity.getCourseId());
-                record.setModuleId(activity.getModuleId());
-                record.setEventId(activity.getEventId());
-                record.setUserId(group.get(0).getActor().getAccount().getName());
+                String courseId = activity.getCourseId();
+                CourseRecord courseRecord = records.get(courseId);
+                if (courseRecord == null) {
+                    String userId = group.get(0).getActor().getAccount().getName();
+                    courseRecord = new CourseRecord(courseId, userId);
+                    records.put(courseId, courseRecord);
+                }
+
+                ModuleRecord moduleRecord = new ModuleRecord();
+                moduleRecord.setModuleId(activity.getModuleId());
+                moduleRecord.setEventId(activity.getEventId());
 
                 for (Statement statement : group) {
                     Action action = Action.getFor(statement);
                     if (action != null) {
-                        action.replay(record);
+                        action.replay(moduleRecord);
                     } else {
                         LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
                     }
                 }
-                records.add(record);
+
+                courseRecord.addModuleRecord(moduleRecord);
             }
         }
-        return records;
+        return records.values();
     }
 
     public interface GroupId {
