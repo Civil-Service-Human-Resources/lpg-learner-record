@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.service.xapi.action;
 
 import gov.adlnet.xapi.model.Statement;
+import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
@@ -19,11 +20,11 @@ public class InitialisedAction extends Action {
     }
 
     @Override
-    public ModuleRecord replay(ModuleRecord record) {
-        record.setState(State.IN_PROGRESS);
-        record.setResult(null);
-        record.setScore(null);
-        record.setCompletionDate(null);
-        return record;
+    public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
+        courseRecord.setState(State.IN_PROGRESS);
+        moduleRecord.setState(State.IN_PROGRESS);
+        moduleRecord.setResult(null);
+        moduleRecord.setScore(null);
+        moduleRecord.setCompletionDate(null);
     }
 }

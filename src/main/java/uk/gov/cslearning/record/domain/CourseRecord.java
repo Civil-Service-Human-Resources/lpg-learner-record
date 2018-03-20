@@ -14,6 +14,10 @@ public class CourseRecord {
 
     private String userId;
 
+    private State state;
+
+    private String preference;
+
     private Collection<ModuleRecord> moduleRecords;
 
     public CourseRecord(String courseId, String userId) {
@@ -32,6 +36,22 @@ public class CourseRecord {
         return userId;
     }
 
+    public String getPreference() {
+        return preference;
+    }
+
+    public void setPreference(String preference) {
+        this.preference = preference;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
         return unmodifiableCollection(moduleRecords);
@@ -40,5 +60,12 @@ public class CourseRecord {
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
         moduleRecords.add(moduleRecord);
+    }
+
+    public ModuleRecord getModuleRecord(String moduleId) {
+        return this.moduleRecords.stream()
+                .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
+                .findFirst()
+                .orElse(null);
     }
 }

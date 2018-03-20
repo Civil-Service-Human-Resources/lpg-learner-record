@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service.xapi.action;
 import gov.adlnet.xapi.model.ActivityDefinition;
 import gov.adlnet.xapi.model.Statement;
 import org.reflections.Reflections;
+import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.Verb;
@@ -60,5 +61,5 @@ public abstract class Action {
         this.statement = statement;
     }
 
-    public abstract ModuleRecord replay(ModuleRecord record);
+    public abstract void replay(CourseRecord courseRecord, ModuleRecord record);
 }

@@ -1,7 +1,6 @@
 package uk.gov.cslearning.record.service.xapi;
 
 import gov.adlnet.xapi.model.Statement;
-import org.codehaus.janino.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -34,43 +33,58 @@ public class StatementStream {
             List<Statement> group = entry.getValue();
             group.sort(Comparator.comparing(Statement::getTimestamp));
 
-            Activity activity = Activity.getFor(group.get(0));
+            for (Statement statement : group) {
+                Activity activity = Activity.getFor(statement);
 
-            if (activity != null) {
-                String courseId = activity.getCourseId();
-                CourseRecord courseRecord = records.get(courseId);
-                if (courseRecord == null) {
-                    String userId = group.get(0).getActor().getAccount().getName();
-                    courseRecord = new CourseRecord(courseId, userId);
-                    records.put(courseId, courseRecord);
-                }
-
-                if (activity instanceof Course) {
-                    for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
-                        replay(statements, moduleRecord);
+                if (activity != null) {
+                    String courseId = activity.getCourseId();
+                    if (courseId == null) {
+                        LOGGER.info("Ignoring statement with no course ID {}", statement);
+                        continue;
                     }
-                } else {
-                    ModuleRecord moduleRecord = new ModuleRecord();
-                    moduleRecord.setModuleId(activity.getModuleId());
-                    moduleRecord.setEventId(activity.getEventId());
+                    CourseRecord courseRecord = records.get(courseId);
+                    if (courseRecord == null) {
+                        String userId = group.get(0).getActor().getAccount().getName();
+                        if (userId == null) {
+                            LOGGER.info("Ignoring statement with no user ID {}", statement);
+                            continue;
+                        }
+                        courseRecord = new CourseRecord(courseId, userId);
+                        records.put(courseId, courseRecord);
+                    }
 
-                    replay(statements, moduleRecord);
+                    if (activity instanceof Course) {
+                        replay(statement, courseRecord, null);
+                        for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
+                            replay(statement, courseRecord, moduleRecord);
+                        }
+                    } else {
+                        String moduleId = activity.getModuleId();
+                        if (moduleId == null) {
+                            LOGGER.info("Ignoring statement with no module ID {}", statement);
+                            continue;
+                        }
+                        ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+                        if (moduleRecord == null) {
+                            moduleRecord = new ModuleRecord(moduleId);
+                            courseRecord.addModuleRecord(moduleRecord);
+                        }
 
-                    courseRecord.addModuleRecord(moduleRecord);
+                        moduleRecord.setEventId(activity.getEventId());
+                        replay(statement, courseRecord, moduleRecord);
+                    }
                 }
             }
         }
         return records.values();
     }
 
-    private void replay(Collection<Statement> statements, ModuleRecord moduleRecord) {
-        for (Statement statement : statements) {
-            Action action = Action.getFor(statement);
-            if (action != null) {
-                action.replay(moduleRecord);
-            } else {
-                LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
-            }
+    private void replay(Statement statement, CourseRecord courseRecord, ModuleRecord moduleRecord) {
+        Action action = Action.getFor(statement);
+        if (action != null) {
+            action.replay(courseRecord, moduleRecord);
+        } else {
+            LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
         }
     }
 

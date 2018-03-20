@@ -5,6 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import java.time.LocalDateTime;
 
+import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
+
 public class ModuleRecord {
 
     private String moduleId;
@@ -13,8 +15,6 @@ public class ModuleRecord {
 
     private State state;
 
-    private String preference;
-
     private Result result;
 
     private String score;
@@ -22,7 +22,9 @@ public class ModuleRecord {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
-    public ModuleRecord() {
+    public ModuleRecord(String moduleId) {
+        checkArgument(moduleId != null);
+        this.moduleId = moduleId;
     }
 
     public String getModuleId() {
@@ -71,13 +73,5 @@ public class ModuleRecord {
 
     public void setCompletionDate(LocalDateTime completionDate) {
         this.completionDate = completionDate;
-    }
-
-    public String getPreference() {
-        return preference;
-    }
-
-    public void setPreference(String preference) {
-        this.preference = preference;
     }
 }
