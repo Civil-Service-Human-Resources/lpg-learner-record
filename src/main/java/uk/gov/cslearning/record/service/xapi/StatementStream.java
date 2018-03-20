@@ -1,12 +1,14 @@
 package uk.gov.cslearning.record.service.xapi;
 
 import gov.adlnet.xapi.model.Statement;
+import org.codehaus.janino.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
+import uk.gov.cslearning.record.service.xapi.activity.Course;
 
 import java.util.*;
 
@@ -43,23 +45,33 @@ public class StatementStream {
                     records.put(courseId, courseRecord);
                 }
 
-                ModuleRecord moduleRecord = new ModuleRecord();
-                moduleRecord.setModuleId(activity.getModuleId());
-                moduleRecord.setEventId(activity.getEventId());
-
-                for (Statement statement : group) {
-                    Action action = Action.getFor(statement);
-                    if (action != null) {
-                        action.replay(moduleRecord);
-                    } else {
-                        LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
+                if (activity instanceof Course) {
+                    for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
+                        replay(statements, moduleRecord);
                     }
-                }
+                } else {
+                    ModuleRecord moduleRecord = new ModuleRecord();
+                    moduleRecord.setModuleId(activity.getModuleId());
+                    moduleRecord.setEventId(activity.getEventId());
 
-                courseRecord.addModuleRecord(moduleRecord);
+                    replay(statements, moduleRecord);
+
+                    courseRecord.addModuleRecord(moduleRecord);
+                }
             }
         }
         return records.values();
+    }
+
+    private void replay(Collection<Statement> statements, ModuleRecord moduleRecord) {
+        for (Statement statement : statements) {
+            Action action = Action.getFor(statement);
+            if (action != null) {
+                action.replay(moduleRecord);
+            } else {
+                LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
+            }
+        }
     }
 
     public interface GroupId {
