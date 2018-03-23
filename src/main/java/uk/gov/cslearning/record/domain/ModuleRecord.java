@@ -19,6 +19,8 @@ public class ModuleRecord {
 
     private String score;
 
+    private Boolean rated = Boolean.FALSE;
+
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
@@ -73,5 +75,13 @@ public class ModuleRecord {
 
     public void setCompletionDate(LocalDateTime completionDate) {
         this.completionDate = completionDate;
+    }
+
+    public Boolean getRated() {
+        return rated;
+    }
+
+    public void setRated(Boolean rated) {
+        this.rated = rated;
     }
 }

@@ -11,6 +11,7 @@ public enum Verb {
     LAUNCHED("http://adlnet.gov/expapi/verbs/launched"),
     LIKED("https://w3id.org/xapi/acrossx/verbs/liked"),
     PASSED("http://adlnet.gov/expapi/verbs/passed"),
+    RATED("http://id.tincanapi.com/verb/rated"),
     REGISTERED("http://adlnet.gov/expapi/verbs/registered"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),
     UNREGISTERED("http://adlnet.gov/expapi/verbs/unregistered"),
