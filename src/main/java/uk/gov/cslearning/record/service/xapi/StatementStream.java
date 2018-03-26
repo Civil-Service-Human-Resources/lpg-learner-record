@@ -11,6 +11,9 @@ import uk.gov.cslearning.record.service.xapi.activity.Course;
 
 import java.util.*;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+
 public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
@@ -20,12 +23,22 @@ public class StatementStream {
         Map<String, List<Statement>> groups = new HashMap<>();
         Map<String, CourseRecord> records = new HashMap<>();
 
+        List<Statement> sortedStatements = new ArrayList<>(statements);
+        sortedStatements.sort(Comparator.comparing(Statement::getTimestamp));
+
         for (Statement statement : statements) {
             String groupId = id.get(statement);
             if (!groups.containsKey(groupId)) {
                 groups.put(groupId, new ArrayList<>());
             }
             groups.get(groupId).add(statement);
+
+            List<String> relatedIds = getParents(statement);
+            for (String relatedId : relatedIds) {
+                if (groups.containsKey(relatedId)) {
+                    groups.get(groupId).addAll(groups.get(relatedId));
+                }
+            }
         }
 
         for (Map.Entry<String, List<Statement>> entry : groups.entrySet()) {
@@ -77,6 +90,17 @@ public class StatementStream {
             }
         }
         return records.values();
+    }
+
+    private List<String> getParents(Statement statement) {
+        if (statement.getContext() != null
+                && statement.getContext().getContextActivities() != null) {
+            List<gov.adlnet.xapi.model.Activity> parents = statement.getContext().getContextActivities().getParent();
+            if (parents != null) {
+                return parents.stream().map(gov.adlnet.xapi.model.Activity::getId).collect(toList());
+            }
+        }
+        return emptyList();
     }
 
     private void replay(Statement statement, CourseRecord courseRecord, ModuleRecord moduleRecord) {
