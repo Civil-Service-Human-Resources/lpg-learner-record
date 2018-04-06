@@ -13,6 +13,7 @@ public enum Verb {
     PASSED("http://adlnet.gov/expapi/verbs/passed"),
     RATED("http://id.tincanapi.com/verb/rated"),
     REGISTERED("http://adlnet.gov/expapi/verbs/registered"),
+    RETRIEVED("https://w3id.org/xapi/dod-isd/verbs/retrieved"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),
     UNREGISTERED("http://adlnet.gov/expapi/verbs/unregistered"),
     VIEWED("http://id.tincanapi.com/verb/viewed");
