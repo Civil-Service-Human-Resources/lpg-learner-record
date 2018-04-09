@@ -24,5 +24,6 @@ public class LikedAction extends Action {
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
         courseRecord.setPreference("LIKED");
+        courseRecord.setState(null);
     }
 }
