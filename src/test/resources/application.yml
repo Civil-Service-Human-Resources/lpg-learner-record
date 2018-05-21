@@ -20,8 +20,9 @@ oauth:
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
 
-csrs:
-  getByUidUrl: "http://localhost:9002/civilServants/"
+registry:
+  serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
+  findByUidUrlFormat: "${registry.serviceUrl}/civilServants/%s
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}

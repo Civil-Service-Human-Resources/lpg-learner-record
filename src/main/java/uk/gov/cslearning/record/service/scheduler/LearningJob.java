@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.*;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Component
 public class LearningJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearningJob.class);
@@ -37,6 +39,7 @@ public class LearningJob {
     @Autowired
     private UserRecordService userRecordService;
 
+    @Autowired
     public LearningJob(IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService) {
         this.identityService = identityService;
         this.registryService = registryService;
@@ -62,6 +65,8 @@ public class LearningJob {
                         completed = true;
                         break;
                     }
+                    // get next required by
+                    // if next req, is less than a month and havent sent week send week etc
                 }
                 if (!completed){
                     incompleteCourses.add(c);
@@ -70,7 +75,7 @@ public class LearningJob {
             if (!incompleteCourses.isEmpty()) {
                 StringBuilder requiredLearning = new StringBuilder();
                 for (Course c: incompleteCourses){
-                    requiredLearning.append(c.getName() + " ");
+                    requiredLearning.append(c.getTitle() + " ");
                 }
                 notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId);
             }
