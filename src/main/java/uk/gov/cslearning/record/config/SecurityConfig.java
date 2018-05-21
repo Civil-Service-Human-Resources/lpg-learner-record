@@ -28,14 +28,6 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 @EnableOAuth2Client
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private IdentityService identityService;
-
-    @Bean
-    public LearningJob learningJob() {
-        return new LearningJob(identityService);
-    }
-
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
