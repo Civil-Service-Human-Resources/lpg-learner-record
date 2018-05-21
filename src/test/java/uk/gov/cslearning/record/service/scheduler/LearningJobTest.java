@@ -25,6 +25,6 @@ public class LearningJobTest {
 
     @Test
     public void doStuff() {
-        learningJob.getIdentityListFromResponse();
+        learningJob.sendNotificationForIncompleteCourses();
     }
 }
