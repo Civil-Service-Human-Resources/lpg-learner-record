@@ -36,3 +36,8 @@ catalogue:
   password: ${LEARNING_CATALOGUE_PASSWORD:password}
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
+
+govNotify:
+  key: ${GOV_NOTIFY_API_KEY:key}
+  template:
+    requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}

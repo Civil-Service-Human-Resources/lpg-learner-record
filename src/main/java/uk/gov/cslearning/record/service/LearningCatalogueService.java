@@ -40,9 +40,10 @@ public class LearningCatalogueService {
         List<Course> courses = new ArrayList<>();
         if(responseBody.containsKey("results")) {
             List<Map<String, Object>> results = (List<Map<String, Object>> ) responseBody.get("results");
-            for (Map<String, Object> r: results){
+            for (Map<String, Object> result: results){
                 Course course = new Course();
-                course.setId((String) r.get("id"));
+                course.setId((String) result.get("id"));
+                course.setName((String) result.get("name"));
                 courses.add(course);
             }
         }

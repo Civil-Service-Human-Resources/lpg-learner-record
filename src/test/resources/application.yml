@@ -19,3 +19,11 @@ oauth:
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
+
+csrs:
+  getByUidUrl: "http://localhost:9002/civilServants/"
+
+govNotify:
+  key: ${GOV_NOTIFY_API_KEY:key}
+  template:
+    requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}

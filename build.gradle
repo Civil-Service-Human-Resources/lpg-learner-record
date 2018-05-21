@@ -23,6 +23,10 @@ bootJar {
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
 
+repositories {
+    jcenter()
+}
+
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web') {
         exclude module: 'spring-boot-starter-tomcat'
@@ -46,6 +50,7 @@ dependencies {
     compile 'org.codehaus.janino:janino:3.0.8'
     compile 'org.reflections:reflections:0.9.11'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
+    compile('uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE')
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
