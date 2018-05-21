@@ -1,24 +1,40 @@
 package uk.gov.cslearning.record.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableCollection;
 
+@Entity
 public class CourseRecord {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
     private String courseId;
 
+    @Column(nullable = false)
     private String userId;
 
+    @Enumerated(EnumType.STRING)
     private State state;
 
     private String preference;
 
+    @OneToMany
     private Collection<ModuleRecord> moduleRecords;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime lastUpdated;
 
     public CourseRecord(String courseId, String userId) {
         checkArgument(courseId != null);
@@ -26,6 +42,18 @@ public class CourseRecord {
         this.courseId = courseId;
         this.userId = userId;
         this.moduleRecords = new HashSet<>();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public LocalDateTime getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     public String getCourseId() {
