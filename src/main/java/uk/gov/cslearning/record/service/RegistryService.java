@@ -27,6 +27,7 @@ public class RegistryService {
 
     public CivilServant getCivilServantByUid(String uid) {
         LOGGER.debug("Getting profile details for civil servant with UID {}", uid);
+        LOGGER.debug("URL {}", String.format(findByUidUrlFormat, uid));
 
         Map response = restTemplate.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
 

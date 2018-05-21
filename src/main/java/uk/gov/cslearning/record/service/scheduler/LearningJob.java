@@ -53,6 +53,7 @@ public class LearningJob {
         for (Identity identity: identities){
             LOGGER.info("Got identity with uid {} and username {}", identity.getUid(), identity.getUsername());
             CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
+
             List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
 
             List<Course> incompleteCourses = new ArrayList<>();
@@ -75,7 +76,7 @@ public class LearningJob {
             if (!incompleteCourses.isEmpty()) {
                 StringBuilder requiredLearning = new StringBuilder();
                 for (Course c: incompleteCourses){
-                    requiredLearning.append(c.getTitle() + " ");
+                    requiredLearning.append(c.getTitle() + "\n");
                 }
                 notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId);
             }
