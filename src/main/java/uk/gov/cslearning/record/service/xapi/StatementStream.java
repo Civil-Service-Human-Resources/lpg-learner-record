@@ -13,15 +13,21 @@ import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
+        return replay(statements, id, Collections.emptySet());
+    }
+
+    public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id, Collection<CourseRecord> existingCourseRecords) {
 
         Map<String, List<Statement>> groups = new HashMap<>();
-        Map<String, CourseRecord> records = new HashMap<>();
+        Map<String, CourseRecord> records = existingCourseRecords.stream()
+                .collect(toMap(CourseRecord::getCourseId, c -> c));
 
         List<Statement> sortedStatements = new ArrayList<>(statements);
         sortedStatements.sort(Comparator.comparing(Statement::getTimestamp));

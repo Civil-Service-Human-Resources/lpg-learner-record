@@ -13,10 +13,12 @@ import uk.gov.cslearning.record.config.XApiProperties;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -42,8 +44,8 @@ public class XApiService implements Serializable {
         this.xApiProperties = xApiProperties;
     }
 
-    public Collection<Statement> getStatements(String userId, String activityId) throws IOException {
-        LOGGER.debug("Getting xAPI statements for user {} and activity {}", userId, activityId);
+    public Collection<Statement> getStatements(String userId, String activityId, LocalDateTime since) throws IOException {
+        LOGGER.debug("Getting xAPI statements for user {} and activity {} since {}", userId, activityId, since);
 
         StatementClient statementClient = new StatementClient(xApiProperties.getUrl(), xApiProperties.getUsername(),
                 xApiProperties.getPassword());
@@ -57,6 +59,10 @@ public class XApiService implements Serializable {
             statementClient = statementClient
                     .filterByActivity(activityId)
                     .includeRelatedActivities(true);
+        }
+        if (since != null) {
+            statementClient = statementClient
+                    .filterBySince(DATE_FORMATTER.format(since));
         }
 
         StatementResult result = statementClient.getStatements();

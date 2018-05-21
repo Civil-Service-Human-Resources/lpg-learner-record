@@ -31,6 +31,12 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jersey'
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.boot:spring-boot-configuration-processor'
+    compile 'org.springframework.data:spring-data-jpa:2.0.5.RELEASE'
+
+    compile 'com.h2database:h2:1.4.197'
+    compile 'org.hibernate:hibernate-core:5.2.16.Final'
+    compile 'org.hibernate:hibernate-entitymanager:5.2.16.Final'
+    compile 'mysql:mysql-connector-java:8.0.8-dmr'
 
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.google.guava:guava:23.5-jre'
