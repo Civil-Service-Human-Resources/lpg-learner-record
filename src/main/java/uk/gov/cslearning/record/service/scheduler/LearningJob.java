@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.*;
+import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
