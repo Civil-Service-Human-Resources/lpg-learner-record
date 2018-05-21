@@ -29,13 +29,7 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private IdentityService identityService;
-
-    @Autowired
-    private XApiService xApiService;
 
     @Bean
     public LearningJob learningJob() {
@@ -45,11 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
-    }
-
-    @Bean
-    public UserRecordService userRecordService(){
-        return new UserRecordService(xApiService);
     }
 
     @Override
