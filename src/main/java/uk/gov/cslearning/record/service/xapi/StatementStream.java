@@ -26,7 +26,7 @@ public class StatementStream {
         List<Statement> sortedStatements = new ArrayList<>(statements);
         sortedStatements.sort(Comparator.comparing(Statement::getTimestamp));
 
-        for (Statement statement : statements) {
+        for (Statement statement : sortedStatements) {
             String groupId = id.get(statement);
             if (!groups.containsKey(groupId)) {
                 groups.put(groupId, new ArrayList<>());
