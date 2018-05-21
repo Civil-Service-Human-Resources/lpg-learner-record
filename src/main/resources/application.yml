@@ -26,3 +26,13 @@ oauth:
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
+
+registry:
+  serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
+  findByUidUrlFormat: "${registry.serviceUrl}/civilServants/%s"
+
+catalogue:
+  username: ${LEARNING_CATALOGUE_USERNAME:user}
+  password: ${LEARNING_CATALOGUE_PASSWORD:password}
+  serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
+  requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
