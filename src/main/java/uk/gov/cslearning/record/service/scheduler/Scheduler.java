@@ -21,7 +21,7 @@ public class Scheduler {
     public void learningJob() throws Exception{
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
-        learningJob.getIdentityListFromResponse();
+        learningJob.sendNotificationForIncompleteCourses();
 
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
