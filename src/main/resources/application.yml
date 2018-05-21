@@ -16,4 +16,4 @@ server:
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
   password: ${XAPI_PASSWORD:1c0e1b6827606d7efed71e204939d048f94f842b}
-  url: ${XAPI_URL:http://test-xapi.cshr.digital/data/xAPI}
+  url: ${XAPI_URL:http://localhost:8083/data/xAPI}
