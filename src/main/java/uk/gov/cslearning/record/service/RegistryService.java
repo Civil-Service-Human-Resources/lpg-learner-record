@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -15,13 +14,13 @@ public class RegistryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ActivityRecordService.class);
 
-    private RestTemplate restTemplate;
+    private OAuth2RestOperations restOperations;
 
     private String findByUidUrlFormat;
 
     @Autowired
-    public RegistryService(RestTemplate restTemplate, @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
-        this.restTemplate = restTemplate;
+    public RegistryService(OAuth2RestOperations restOperations, @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
+        this.restOperations = restOperations;
         this.findByUidUrlFormat = findByUidUrlFormat;
     }
 
@@ -29,7 +28,7 @@ public class RegistryService {
         LOGGER.debug("Getting profile details for civil servant with UID {}", uid);
         LOGGER.debug("URL {}", String.format(findByUidUrlFormat, uid));
 
-        Map response = restTemplate.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
+        Map response = restOperations.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
 
         CivilServant civilServant = new CivilServant();
         civilServant.setAreaOfWork(getProperty(response, "profession.name"));
