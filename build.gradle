@@ -28,6 +28,9 @@ repositories {
 }
 
 dependencies {
+    compile 'com.sun.xml.bind:jaxb-impl:2.1.2'
+    compile 'javax.activation:activation:1.1'
+
     compile('org.springframework.boot:spring-boot-starter-web') {
         exclude module: 'spring-boot-starter-tomcat'
     }

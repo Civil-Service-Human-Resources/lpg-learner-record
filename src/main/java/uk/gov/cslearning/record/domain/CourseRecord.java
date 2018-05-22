@@ -96,4 +96,16 @@ public class CourseRecord {
                 .findFirst()
                 .orElse(null);
     }
+
+    public LocalDateTime getCompletionDate() {
+        LocalDateTime mostRecentCompletionDate = null;
+        for (ModuleRecord moduleRecord : moduleRecords) {
+            if (mostRecentCompletionDate == null ||
+                    moduleRecord.getCompletionDate() != null
+                            && mostRecentCompletionDate.isBefore(moduleRecord.getCompletionDate())) {
+                mostRecentCompletionDate = moduleRecord.getCompletionDate();
+            }
+        }
+        return mostRecentCompletionDate;
+    }
 }
