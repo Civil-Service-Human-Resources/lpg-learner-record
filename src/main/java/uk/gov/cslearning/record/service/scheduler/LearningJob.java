@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import jdk.vm.ci.meta.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.State;
-import uk.gov.cslearning.record.service.*;
+import uk.gov.cslearning.record.service.CivilServant;
+import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.RegistryService;
+import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
@@ -28,7 +29,7 @@ public class LearningJob {
 
     private static final String COURSE_URI_FORMAT = "http://cslearning.gov.uk/courses/%s";
 
-    private static final long[] NOTIFICATION_PERIODS = new long[] { 30, 7, 1 };
+    private static final long[] NOTIFICATION_PERIODS = new long[]{30, 7, 1};
 
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
@@ -52,10 +53,10 @@ public class LearningJob {
         this.notifyService = notifyService;
     }
 
-    public void sendNotificationForIncompleteCourses() throws NotificationClientException{
+    public void sendNotificationForIncompleteCourses() throws NotificationClientException {
         Collection<Identity> identities = identityService.listAll();
 
-        for (Identity identity: identities){
+        for (Identity identity : identities) {
             LOGGER.info("Got identity with uid {} and username {}", identity.getUid(), identity.getUsername());
             CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
 
@@ -90,7 +91,7 @@ public class LearningJob {
             }
             if (!incompleteCourses.isEmpty()) {
                 StringBuilder requiredLearning = new StringBuilder();
-                for (Course c: incompleteCourses){
+                for (Course c : incompleteCourses) {
                     requiredLearning.append(c.getTitle() + "\n");
                 }
                 notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId);
