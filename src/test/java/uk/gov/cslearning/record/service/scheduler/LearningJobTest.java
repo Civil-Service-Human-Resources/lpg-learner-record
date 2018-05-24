@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.RegistryService;
+import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
@@ -16,13 +17,8 @@ import uk.gov.cslearning.record.service.identity.IdentityService;
 public class LearningJobTest {
 
     @Autowired
-    private IdentityService identityService;
-    @Autowired
-    private RegistryService registryService;
-    @Autowired
-    private LearningCatalogueService learningCatalogueService;
-    @Autowired
-    private NotifyService notifyService;
+    private LearningJob learningJob;
+
 
     @Before
     public void setUp() throws Exception {
@@ -30,8 +26,6 @@ public class LearningJobTest {
 
     @Test
     public void sendNotificationForIncompleteCourses() throws Exception {
-        LearningJob learningJob = new LearningJob(identityService, registryService, learningCatalogueService, notifyService);
-
         learningJob.sendNotificationForIncompleteCourses();
     }
 }
