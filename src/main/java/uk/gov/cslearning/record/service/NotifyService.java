@@ -16,14 +16,18 @@ public class NotifyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
     private static final String EMAIL_PERMISSION = "email";
     private static final String REQUIRED_LEARNING_PERMISSION = "requiredLearning";
+    private static final String PERIOD_PERMISSION = "periodPermission";
 
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public void notify(String email, String requiredLearning, String templateId) throws NotificationClientException {
+    public void notify(String email, String requiredLearning, String templateId, String period) throws NotificationClientException {
+        LOGGER.debug(period);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
         personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
+        personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
+        personalisation.put(PERIOD_PERMISSION, period);
 
         NotificationClient client = new NotificationClient(govNotifyKey);
         SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");

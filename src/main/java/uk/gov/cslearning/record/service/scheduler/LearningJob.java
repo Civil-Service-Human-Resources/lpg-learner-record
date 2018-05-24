@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
+import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.RegistryService;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class LearningJob {
@@ -42,15 +45,18 @@ public class LearningJob {
 
     private NotifyService notifyService;
 
+    private NotificationRepository notificationRepository;
+
     @Autowired
     private UserRecordService userRecordService;
 
     @Autowired
-    public LearningJob(IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService) {
+    public LearningJob(IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService, NotificationRepository notificationRepository) {
         this.identityService = identityService;
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
         this.notifyService = notifyService;
+        this.notificationRepository = notificationRepository;
     }
 
     public void sendNotificationForIncompleteCourses() throws NotificationClientException {
@@ -61,7 +67,9 @@ public class LearningJob {
             CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
 
             List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
-            List<Course> incompleteCourses = new ArrayList<>();
+            List<Course> incompleteCoursesDay = new ArrayList<>();
+            List<Course> incompleteCoursesWeek = new ArrayList<>();
+            List<Course> incompleteCoursesMonth = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
 
             for (Course c : courses) {
@@ -76,26 +84,60 @@ public class LearningJob {
                 }
 
                 LocalDateTime nextRequiredBy = c.getNextRequiredBy(civilServant, mostRecentlyCompleted);
-
+                LOGGER.debug("Next required by for course is {}", nextRequiredBy);
                 if (nextRequiredBy != null) {
-                    Notification notification = null; // TODO: load most recent notification for this user / course
-
-                    for (long days : NOTIFICATION_PERIODS) {
-                        // TODO: check against last notification send date
-                        if (now.plusDays(days).isAfter(nextRequiredBy)) {
-                            incompleteCourses.add(c);
-                            break;
+                    Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), c.getId());
+                    if (optionalNotification.isPresent()) {
+                        Notification notification = optionalNotification.get();
+                        if (notification.getNotificationType() == NotificationType.DAY) {
+                            if (notification.getSent().isBefore(LocalDateTime.now().minusDays(1))) {
+                                incompleteCoursesDay.add(c);
+                            }
+                        } else if (notification.getNotificationType() == NotificationType.WEEK) {
+                            if (notification.getSent().isBefore(LocalDateTime.now().minusDays(7))) {
+                                incompleteCoursesWeek.add(c);
+                            }
+                        }
+                        if (notification.getNotificationType() == NotificationType.MONTH) {
+                            if (notification.getSent().isBefore(LocalDateTime.now().minusDays(30))) {
+                                incompleteCoursesMonth.add(c);
+                            }
+                        }
+                    } else {
+                        for (long days : NOTIFICATION_PERIODS) {
+                            if (now.plusDays(days).isAfter(nextRequiredBy)) {
+                                if (days == 1) {
+                                    incompleteCoursesDay.add(c);
+                                }
+                                if (days == 7) {
+                                    incompleteCoursesWeek.add(c);
+                                }
+                                if (days == 30) {
+                                    incompleteCoursesMonth.add(c);
+                                }
+                            }
                         }
                     }
                 }
             }
-            if (!incompleteCourses.isEmpty()) {
-                StringBuilder requiredLearning = new StringBuilder();
-                for (Course c : incompleteCourses) {
-                    requiredLearning.append(c.getTitle() + "\n");
-                }
-                notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId);
+
+            if (!incompleteCoursesDay.isEmpty()) {
+                sendNotifiyForPeriod(identity, incompleteCoursesDay, "1 day");
+            }
+            if (!incompleteCoursesWeek.isEmpty()) {
+                sendNotifiyForPeriod(identity, incompleteCoursesWeek, "1 week");
+            }
+            if (!incompleteCoursesMonth.isEmpty()) {
+                sendNotifiyForPeriod(identity, incompleteCoursesMonth, "1 month");
             }
         }
+    }
+
+    private void sendNotifiyForPeriod(Identity identity, List<Course> incompleteCourses, String period) throws NotificationClientException {
+        StringBuilder requiredLearning = new StringBuilder();
+        for (Course c : incompleteCourses) {
+            requiredLearning.append(c.getTitle() + "\n");
+        }
+        notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, period);
     }
 }
