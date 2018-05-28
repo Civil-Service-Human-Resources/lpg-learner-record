@@ -12,6 +12,7 @@ import uk.gov.cslearning.record.service.identity.Identity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -54,9 +55,9 @@ public class NotificationRepositoryTest {
 
         assertThat(notificationRepository.count(), equalTo(initialCount+3));
 
-        Notification notification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(IDENTITY_UID, COURSE_ID);
-        assertThat(notification.getCourseId(), equalTo(COURSE_ID));
-        assertThat(notification.getNotificationType(), equalTo(NotificationType.MONTH));
+        Optional<Notification> notification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(IDENTITY_UID, COURSE_ID);
+        assertThat(notification.get().getCourseId(), equalTo(COURSE_ID));
+        assertThat(notification.get().getNotificationType(), equalTo(NotificationType.MONTH));
     }
 
     private Notification createNotification(String courseId, LocalDateTime localDateTime, NotificationType notificationType, String identityUid){
