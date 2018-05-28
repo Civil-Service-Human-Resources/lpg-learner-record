@@ -6,15 +6,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -55,5 +56,11 @@ public class UserRecordService {
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Iterable<CourseRecord> listAllRecords() {
+        LOGGER.debug("Retrieving all records");
+        return courseRecordRepository.findAll();
     }
 }

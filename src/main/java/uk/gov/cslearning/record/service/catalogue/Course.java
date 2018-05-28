@@ -51,4 +51,8 @@ public class Course {
         }
         return nextRequiredBy;
     }
+
+    public Module getModule(String moduleId) {
+        return modules.stream().filter(module -> moduleId.equals(module.getId())).findFirst().orElse(null);
+    }
 }

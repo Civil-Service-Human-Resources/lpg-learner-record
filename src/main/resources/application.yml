@@ -35,6 +35,7 @@ catalogue:
   username: ${LEARNING_CATALOGUE_USERNAME:user}
   password: ${LEARNING_CATALOGUE_PASSWORD:password}
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
+  courseUrlFormat: "${catalogue.serviceUrl}/courses/%s"
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
 
 govNotify:
