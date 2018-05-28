@@ -18,6 +18,8 @@ public class LearningCatalogueService {
 
     private RestTemplate restTemplate;
 
+    private String courseUrlFormat;
+
     private String requiredLearningUrlFormat;
 
     private String credentials;
@@ -25,6 +27,7 @@ public class LearningCatalogueService {
     public LearningCatalogueService(RestTemplate restTemplate,
                                     @Value("${catalogue.username}") String username,
                                     @Value("${catalogue.password}") String password,
+                                    @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,
                                     @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat) {
         this.restTemplate = restTemplate;
         this.requiredLearningUrlFormat = requiredLearningUrlFormat;
@@ -36,7 +39,7 @@ public class LearningCatalogueService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic " + credentials);
 
-        HttpEntity<String> request = new HttpEntity<String>(headers);
+        HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<Results> responseEntity = restTemplate.exchange(
                 String.format(requiredLearningUrlFormat, departmentId),
                 HttpMethod.GET, request, Results.class);
@@ -47,6 +50,19 @@ public class LearningCatalogueService {
             return results.getResults();
         }
         return emptyList();
+    }
+
+    public Course getCourse(String courseId) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Basic " + credentials);
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<Course> responseEntity = restTemplate.exchange(
+                String.format(courseUrlFormat, courseId),
+                HttpMethod.GET, request, Course.class);
+
+        return responseEntity.getBody();
     }
 
     public static class Results {

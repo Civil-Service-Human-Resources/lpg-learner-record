@@ -3,7 +3,6 @@ package uk.gov.cslearning.record.service.catalogue;
 import uk.gov.cslearning.record.service.CivilServant;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class Module {
@@ -11,6 +10,10 @@ public class Module {
     private String id;
 
     private String title;
+
+    private String moduleType;
+
+    private Long duration;
 
     private Collection<Audience> audiences;
 
@@ -36,6 +39,22 @@ public class Module {
 
     public void setAudiences(Collection<Audience> audiences) {
         this.audiences = audiences;
+    }
+
+    public String getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(String moduleType) {
+        this.moduleType = moduleType;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 
     public LocalDate getNextRequiredBy(CivilServant civilServant, LocalDate completionDate) {
