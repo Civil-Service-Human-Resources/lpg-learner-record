@@ -26,7 +26,6 @@ public class NotifyService {
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
         personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
-        personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
         personalisation.put(PERIOD_PERMISSION, period);
 
         NotificationClient client = new NotificationClient(govNotifyKey);

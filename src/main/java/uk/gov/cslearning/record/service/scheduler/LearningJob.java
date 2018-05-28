@@ -28,12 +28,15 @@ import java.util.Optional;
 @Component
 public class LearningJob {
 
+    public static final String DAY_PERIOD = "1 day";
+    public static final String WEEK_PERIOD = "1 week";
+    public static final String MONTH_PERIOD = "1 month";
+    public static final int WEEK_IN_DAYS = 7;
+    public static final int MONTH_IN_DAYS = 30;
+    public static final int DAY_IN_DAYS = 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(LearningJob.class);
-
     private static final String COURSE_URI_FORMAT = "http://cslearning.gov.uk/courses/%s";
-
-    private static final long[] NOTIFICATION_PERIODS = new long[]{30, 7, 1};
-
+    private static final long[] NOTIFICATION_PERIODS = new long[]{1, 7, 30};
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
 
@@ -86,58 +89,102 @@ public class LearningJob {
                 LocalDateTime nextRequiredBy = c.getNextRequiredBy(civilServant, mostRecentlyCompleted);
                 LOGGER.debug("Next required by for course is {}", nextRequiredBy);
                 if (nextRequiredBy != null) {
+                    /*
+                     * Matt - If a notification has been sent before,
+                     * look at the last notification sent for this identity/course and add courses to notify list accordingly
+                     */
                     Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), c.getId());
                     if (optionalNotification.isPresent()) {
                         Notification notification = optionalNotification.get();
-                        if (notification.getNotificationType() == NotificationType.DAY) {
-                            if (notification.getSent().isBefore(LocalDateTime.now().minusDays(1))) {
-                                incompleteCoursesDay.add(c);
-                            }
-                        } else if (notification.getNotificationType() == NotificationType.WEEK) {
-                            if (notification.getSent().isBefore(LocalDateTime.now().minusDays(7))) {
-                                incompleteCoursesWeek.add(c);
-                            }
-                        }
-                        if (notification.getNotificationType() == NotificationType.MONTH) {
-                            if (notification.getSent().isBefore(LocalDateTime.now().minusDays(30))) {
-                                incompleteCoursesMonth.add(c);
-                            }
-                        }
+                        addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, c, notification, now);
                     } else {
-                        for (long days : NOTIFICATION_PERIODS) {
-                            if (now.plusDays(days).isAfter(nextRequiredBy)) {
-                                if (days == 1) {
-                                    incompleteCoursesDay.add(c);
-                                }
-                                if (days == 7) {
-                                    incompleteCoursesWeek.add(c);
-                                }
-                                if (days == 30) {
-                                    incompleteCoursesMonth.add(c);
-                                }
-                            }
-                        }
+                        addToIncompleteCoursesIfNotificationIsNew(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, now, c, nextRequiredBy);
                     }
                 }
             }
+            sendNotifyForIncompleteCourses(identity, incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth);
+        }
+    }
 
-            if (!incompleteCoursesDay.isEmpty()) {
-                sendNotifiyForPeriod(identity, incompleteCoursesDay, "1 day");
+    /*
+     * Matt - This will be called when a notification already exists for this identity/course.
+     * Currently we have 3 notification types, day/week/month,
+     * what happens if a course is due within a day, and in this case they complete it. Then next year when the course is due again,
+     * The notification for this course will currently show of type DAY, even though it is from last years reminder.
+     * So we either need to set another type or
+     * we can use this method to ensure we are send the correct notification.
+     *
+     * It will also be used for helping to manage when a course passes the month notification point, into the week or day period.
+     * For example in the type == NotificationType.WEEK block, if the last notification has been sent after now.minusDays(1),
+     * it is ready for the DAY notification, so we should add it to the incompleteCoursesDay list.
+     *
+     */
+    protected void addIncompleteCoursesToList(List<Course> incompleteCoursesDay, List<Course> incompleteCoursesWeek, List<Course> incompleteCoursesMonth, Course c, Notification notification, LocalDateTime now) {
+        if (notification.getNotificationType() == NotificationType.DAY) {
+            if (notification.getSent().isBefore(now.minusDays(DAY_IN_DAYS))) {
+                incompleteCoursesDay.add(c);
             }
-            if (!incompleteCoursesWeek.isEmpty()) {
-                sendNotifiyForPeriod(identity, incompleteCoursesWeek, "1 week");
+        } else if (notification.getNotificationType() == NotificationType.WEEK) {
+            if (notification.getSent().isBefore(now.minusDays(WEEK_IN_DAYS))) {
+                incompleteCoursesWeek.add(c);
+            } else if (notification.getSent().isAfter(now.minusDays(DAY_IN_DAYS))) {
+                incompleteCoursesDay.add(c);
             }
-            if (!incompleteCoursesMonth.isEmpty()) {
-                sendNotifiyForPeriod(identity, incompleteCoursesMonth, "1 month");
+        } else if (notification.getNotificationType() == NotificationType.MONTH) {
+            if (notification.getSent().isBefore(now.minusDays(MONTH_IN_DAYS))) {
+                incompleteCoursesMonth.add(c);
+            } else if (notification.getSent().isAfter(now.minusDays(DAY_IN_DAYS))) {
+                incompleteCoursesDay.add(c);
+            } else if (notification.getSent().isAfter(now.minusDays(WEEK_IN_DAYS))) {
+                incompleteCoursesWeek.add(c);
             }
         }
     }
 
-    private void sendNotifiyForPeriod(Identity identity, List<Course> incompleteCourses, String period) throws NotificationClientException {
+    /*
+    * Matt - Just extracting this out to a testable method
+    */
+    protected void sendNotifyForIncompleteCourses(Identity identity, List<Course> incompleteCoursesDay, List<Course> incompleteCoursesWeek, List<Course> incompleteCoursesMonth) throws NotificationClientException {
+        if (!incompleteCoursesDay.isEmpty()) {
+            sendNotifiyForPeriod(identity, incompleteCoursesDay, DAY_PERIOD);
+        }
+        if (!incompleteCoursesWeek.isEmpty()) {
+            sendNotifiyForPeriod(identity, incompleteCoursesWeek, WEEK_PERIOD);
+        }
+        if (!incompleteCoursesMonth.isEmpty()) {
+            sendNotifiyForPeriod(identity, incompleteCoursesMonth, MONTH_PERIOD);
+        }
+    }
+
+    /*
+    * Matt - This block gets called if a notification has never existed for this identity/course.
+    * Think of it as the first time a user gets reminded of a course.
+    * Adding breaks to ensure that the user doesn't get 3 emails for the same course.
+    * I know we spoke to Rich about this,
+    * but i figured it shouldnt be too much work just to get the one email per period logic worked out
+    * */
+    public void addToIncompleteCoursesIfNotificationIsNew(List<Course> incompleteCoursesDay, List<Course> incompleteCoursesWeek, List<Course> incompleteCoursesMonth, LocalDateTime now, Course c, LocalDateTime nextRequiredBy) {
+        for (long days : NOTIFICATION_PERIODS) {
+            if (now.plusDays(days).isAfter(nextRequiredBy)) {
+                if (days == 1) {
+                    incompleteCoursesDay.add(c);
+                    break;
+                } else if (days == 7) {
+                    incompleteCoursesWeek.add(c);
+                    break;
+                } else if (days == 30) {
+                    incompleteCoursesMonth.add(c);
+                }
+            }
+        }
+    }
+
+    protected void sendNotifiyForPeriod(Identity identity, List<Course> incompleteCourses, String period) throws NotificationClientException {
         StringBuilder requiredLearning = new StringBuilder();
         for (Course c : incompleteCourses) {
             requiredLearning.append(c.getTitle() + "\n");
         }
         notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, period);
+        // Matt - need to update db as well
     }
 }
