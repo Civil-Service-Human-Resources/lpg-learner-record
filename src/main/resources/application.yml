@@ -5,10 +5,6 @@ spring:
       write_dates_as_timestamps: false
   resources:
     add-mappings: false
-  security:
-    user:
-      name: ${AUTH_USER:user}
-      password: ${AUTH_PASSWORD:password}
 
 server:
   port: 9000
@@ -19,9 +15,10 @@ xapi:
   url: ${XAPI_URL:http://localhost:8083/data/xAPI}
 
 oauth:
+  serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
   clientSecret: ${CLIENT_SECRET:test}
-  serviceUrl: ${OAUTH_SERVICE_URL:https://dev-identity.cshr.digital}
+  checkTokenUrl: "${oauth.serviceUrl}/oauth/check_token"
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
 
 identity:
@@ -29,7 +26,7 @@ identity:
 
 registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
-  findByUidUrlFormat: "${registry.serviceUrl}/civilServants/%s"
+  findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s"
 
 catalogue:
   username: ${LEARNING_CATALOGUE_USERNAME:user}
