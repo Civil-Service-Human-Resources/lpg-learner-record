@@ -13,10 +13,11 @@ import org.springframework.security.oauth2.client.token.AccessTokenRequest;
 import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
-import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
+@EnableResourceServer
 @EnableWebSecurity
 @EnableOAuth2Client
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -29,13 +30,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        BasicAuthenticationEntryPoint entryPoint = new BasicAuthenticationEntryPoint();
-        entryPoint.setRealmName("LPG");
-
         http.csrf().disable().authorizeRequests()
-                .anyRequest().authenticated()
-                .and().httpBasic()
-                .authenticationEntryPoint(entryPoint);
+                .anyRequest().authenticated();
     }
 
     @Bean
