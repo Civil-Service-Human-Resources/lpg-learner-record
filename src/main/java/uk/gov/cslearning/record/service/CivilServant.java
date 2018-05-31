@@ -6,7 +6,7 @@ public class CivilServant {
 
     private String gradeCode;
 
-    private String areaOfWork;
+    private String profession;
 
     public String getDepartmentCode() {
         return departmentCode;
@@ -24,11 +24,11 @@ public class CivilServant {
         this.gradeCode = gradeCode;
     }
 
-    public String getAreaOfWork() {
-        return areaOfWork;
+    public String getProfession() {
+        return profession;
     }
 
-    public void setAreaOfWork(String areaOfWork) {
-        this.areaOfWork = areaOfWork;
+    public void setProfession(String profession) {
+        this.profession = profession;
     }
 }
