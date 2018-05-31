@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service.catalogue;
 
 import uk.gov.cslearning.record.service.CivilServant;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -37,7 +38,7 @@ public class Module {
         this.audiences = audiences;
     }
 
-    public LocalDateTime getNextRequiredBy(CivilServant civilServant, LocalDateTime completionDate) {
+    public LocalDate getNextRequiredBy(CivilServant civilServant, LocalDate completionDate) {
         Audience audience = getMostRelevantAudienceFor(civilServant);
         if (audience != null) {
             return audience.getNextRequiredBy(completionDate);

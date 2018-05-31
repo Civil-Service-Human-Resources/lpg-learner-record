@@ -20,18 +20,12 @@ public class Notification {
 
     private LocalDateTime sent;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationType notificationType;
-
-    public Notification(String courseId, LocalDateTime sent, NotificationType notificationType, String identityUid) {
+    public Notification(String courseId, String identityUid) {
         checkArgument(courseId != null);
-        checkArgument(sent != null);
-        checkArgument(notificationType != null);
         checkArgument(identityUid != null);
 
         this.courseId = courseId;
-        this.sent = sent;
-        this.notificationType = notificationType;
+        this.sent = LocalDateTime.now();
         this.identityUid = identityUid;
     }
 
@@ -61,13 +55,5 @@ public class Notification {
 
     public String getIdentityUid() {
         return identityUid;
-    }
-
-    public NotificationType getNotificationType() {
-        return notificationType;
-    }
-
-    public void setNotificationType(NotificationType notificationType) {
-        this.notificationType = notificationType;
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service.catalogue;
 
 import uk.gov.cslearning.record.service.CivilServant;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -37,11 +38,11 @@ public class Course {
         this.modules = modules;
     }
 
-    public LocalDateTime getNextRequiredBy(CivilServant civilServant, LocalDateTime completionDate) {
-        LocalDateTime nextRequiredBy = null;
+    public LocalDate getNextRequiredBy(CivilServant civilServant, LocalDate completionDate) {
+        LocalDate nextRequiredBy = null;
 
         for (Module module : modules) {
-            LocalDateTime moduleNextRequiredBy = module.getNextRequiredBy(civilServant, completionDate);
+            LocalDate moduleNextRequiredBy = module.getNextRequiredBy(civilServant, completionDate);
             if (nextRequiredBy == null) {
                 nextRequiredBy = moduleNextRequiredBy;
             } else if (moduleNextRequiredBy != null && moduleNextRequiredBy.isBefore(nextRequiredBy)) {
