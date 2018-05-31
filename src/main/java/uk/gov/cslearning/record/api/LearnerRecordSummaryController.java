@@ -35,7 +35,7 @@ public class LearnerRecordSummaryController {
 
     private static final String CSHR_REPORTER = "CSHR_REPORTER";
 
-    private static final String DEPARTMENT_REPORTER = "DEPARTMENT_REPORTER";
+    private static final String ORGANISATION_REPORTER = "ORGANISATION_REPORTER";
 
     private static final String PROFESSION_REPORTER = "PROFESSION_REPORTER";
 
@@ -127,7 +127,7 @@ public class LearnerRecordSummaryController {
             return courseRecordRepository.findByProfession(civilServant.getProfession());
         }
 
-        if (SecurityUtil.hasAuthority(DEPARTMENT_REPORTER)) {
+        if (SecurityUtil.hasAuthority(ORGANISATION_REPORTER)) {
             return courseRecordRepository.findByDepartment(civilServant.getDepartmentCode());
         }
         return null;
