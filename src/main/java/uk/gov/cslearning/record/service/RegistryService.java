@@ -12,7 +12,7 @@ import java.util.Map;
 @Service
 public class RegistryService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityRecordService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryService.class);
 
     private OAuth2RestOperations restOperations;
 

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.service.CivilServant;
+import uk.gov.cslearning.record.service.RegistryService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -24,7 +26,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/summaries")
-@PreAuthorize("hasAuthority('CLIENT')")
+@PreAuthorize("hasAnyAuthority('ORGANISATION_REPORTER', 'PROFESSION_REPORTER', 'CSHR_REPORTER')")
 public class LearnerRecordSummaryController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordSummaryController.class);
@@ -33,17 +35,24 @@ public class LearnerRecordSummaryController {
 
     private LearningCatalogueService learningCatalogueService;
 
+    private RegistryService registryService;
+
     @Autowired
     public LearnerRecordSummaryController(UserRecordService userRecordService,
-                                          LearningCatalogueService learningCatalogueService) {
+                                          LearningCatalogueService learningCatalogueService,
+                                          RegistryService registryService) {
         checkArgument(userRecordService != null);
         checkArgument(learningCatalogueService != null);
+        checkArgument(registryService != null);
         this.userRecordService = userRecordService;
         this.learningCatalogueService = learningCatalogueService;
+        this.registryService = registryService;
     }
 
     @GetMapping
     public ResponseEntity<Collection<LearnerRecordSummary>> list() {
+
+        CivilServant civilServant = registryService.getCurrent();
 
         Iterable<CourseRecord> records = userRecordService.listAllRecords();
 
