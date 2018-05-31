@@ -15,7 +15,6 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -28,12 +27,16 @@ public class UserRecordService {
 
     private XApiService xApiService;
 
+    private RegistryService registryService;
+
     @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService) {
+    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService, RegistryService registryService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
+        checkArgument(registryService != null);
         this.courseRecordRepository = courseRecordRepository;
         this.xApiService = xApiService;
+        this.registryService = registryService;
     }
 
     @Transactional
@@ -51,6 +54,9 @@ public class UserRecordService {
 
             StatementStream stream = new StatementStream();
             Collection<CourseRecord> latestCourseRecords = stream.replay(statements, statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
+
+            setUserDepartmentAndProfession(userId, latestCourseRecords);
+
             courseRecordRepository.saveAll(latestCourseRecords);
             return latestCourseRecords;
         } catch (IOException e) {
@@ -58,9 +64,14 @@ public class UserRecordService {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Iterable<CourseRecord> listAllRecords() {
-        LOGGER.debug("Retrieving all records");
-        return courseRecordRepository.findAll();
+    private void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
+        if (!courseRecords.isEmpty()) {
+            LOGGER.debug("Updating course records with additional user information.");
+            CivilServant civilServant = registryService.getCivilServantByUid(userId);
+            for (CourseRecord courseRecord : courseRecords) {
+                courseRecord.setDepartment(civilServant.getDepartmentCode());
+                courseRecord.setProfession(civilServant.getProfession());
+            }
+        }
     }
 }

@@ -4,15 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.security.SecurityUtil;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.RegistryService;
-import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.catalogue.Module;
@@ -31,30 +33,38 @@ public class LearnerRecordSummaryController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordSummaryController.class);
 
-    private UserRecordService userRecordService;
+    private static final String CSHR_REPORTER = "CSHR_REPORTER";
+
+    private static final String DEPARTMENT_REPORTER = "DEPARTMENT_REPORTER";
+
+    private static final String PROFESSION_REPORTER = "PROFESSION_REPORTER";
 
     private LearningCatalogueService learningCatalogueService;
 
     private RegistryService registryService;
 
+    private CourseRecordRepository courseRecordRepository;
+
     @Autowired
-    public LearnerRecordSummaryController(UserRecordService userRecordService,
-                                          LearningCatalogueService learningCatalogueService,
-                                          RegistryService registryService) {
-        checkArgument(userRecordService != null);
+    public LearnerRecordSummaryController(LearningCatalogueService learningCatalogueService,
+                                          RegistryService registryService,
+                                          CourseRecordRepository courseRecordRepository) {
         checkArgument(learningCatalogueService != null);
         checkArgument(registryService != null);
-        this.userRecordService = userRecordService;
+        checkArgument(courseRecordRepository != null);
         this.learningCatalogueService = learningCatalogueService;
         this.registryService = registryService;
+        this.courseRecordRepository = courseRecordRepository;
     }
 
     @GetMapping
     public ResponseEntity<Collection<LearnerRecordSummary>> list() {
 
-        CivilServant civilServant = registryService.getCurrent();
-
-        Iterable<CourseRecord> records = userRecordService.listAllRecords();
+        Iterable<CourseRecord> records = getRecords();
+        if (records == null) {
+            LOGGER.info("No course records returned for user, may have no department or profession set.");
+            return ResponseEntity.badRequest().build();
+        }
 
         Map<String, LearnerRecordSummary> summaries = new HashMap<>();
 
@@ -99,5 +109,27 @@ public class LearnerRecordSummaryController {
             }
         }
         return new ResponseEntity<>(summaries.values(), OK);
+    }
+
+    private Iterable<CourseRecord> getRecords() {
+
+        if (SecurityUtil.hasAuthority(CSHR_REPORTER)) {
+            return courseRecordRepository.findAll();
+        }
+
+        CivilServant civilServant = registryService.getCurrent();
+
+        if (civilServant == null) {
+            throw new AccessDeniedException("No civil servant details found.");
+        }
+
+        if (SecurityUtil.hasAuthority(PROFESSION_REPORTER)) {
+            return courseRecordRepository.findByProfession(civilServant.getProfession());
+        }
+
+        if (SecurityUtil.hasAuthority(DEPARTMENT_REPORTER)) {
+            return courseRecordRepository.findByDepartment(civilServant.getDepartmentCode());
+        }
+        return null;
     }
 }

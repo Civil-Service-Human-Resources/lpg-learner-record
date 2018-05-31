@@ -10,4 +10,8 @@ import java.util.Collection;
 public interface CourseRecordRepository extends CrudRepository<CourseRecord, Long> {
 
     Collection<CourseRecord> findByUserId(String userId);
+
+    Iterable<CourseRecord> findByProfession(String profession);
+
+    Iterable<CourseRecord> findByDepartment(String department);
 }

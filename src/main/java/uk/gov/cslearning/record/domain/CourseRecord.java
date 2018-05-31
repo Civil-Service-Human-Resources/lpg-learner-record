@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -29,6 +30,12 @@ public class CourseRecord {
     private State state;
 
     private String preference;
+
+    @JsonIgnore
+    private String profession;
+
+    @JsonIgnore
+    private String department;
 
     @OneToMany
     private Collection<ModuleRecord> moduleRecords;
@@ -78,6 +85,22 @@ public class CourseRecord {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     @JsonProperty("modules")
