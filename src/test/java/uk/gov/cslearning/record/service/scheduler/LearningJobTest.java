@@ -7,41 +7,39 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.service.notify.NotificationClientException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
 public class LearningJobTest {
 
-    public static final String COURSE_ID = "id123";
-    public static final String COURSE_TITLE_1 = "Title 1";
-    public static final String COURSE_TITLE_2 = "Title 2";
-    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    public static final String EMAIL = "test@example.com";
-    public static final String DAY_PERIOD = "1 day";
-    public static final String WEEK_PERIOD = "1 week";
-    public static final String MONTH_PERIOD = "1 month";
-    public static final String IDENTITY_UID = "identity123";
+    private static final String COURSE_ID = "id123";
+    private static final String COURSE_TITLE_1 = "Title 1";
+    private static final String COURSE_TITLE_2 = "Title 2";
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final String EMAIL = "test@example.com";
+    private static final String MONTH_PERIOD = "1 month";
+    private static final String IDENTITY_UID = "identity123";
 
     @Spy
     @InjectMocks
@@ -50,35 +48,51 @@ public class LearningJobTest {
     @Mock
     private NotifyService notifyService;
 
-    @Autowired
-    private ConfigurableApplicationContext c;
+    @Mock
+    private NotificationRepository notificationRepository;
 
     private List<Course> incompleteCoursesDay;
     private List<Course> incompleteCoursesWeek;
     private List<Course> incompleteCoursesMonth;
 
+    private Map<Long, List<Course>> incompleteCourses;
+
+    private Identity identity;
+
     @Before
     public void setUp() {
-        this.incompleteCoursesDay = new ArrayList<>();
-        this.incompleteCoursesWeek = new ArrayList<>();
-        this.incompleteCoursesMonth = new ArrayList<>();
+        incompleteCoursesDay = new ArrayList<>();
+        incompleteCoursesWeek = new ArrayList<>();
+        incompleteCoursesMonth = new ArrayList<>();
+        incompleteCourses = new HashMap<>();
+
+        incompleteCourses.put(1L, incompleteCoursesDay);
+        incompleteCourses.put(7L, incompleteCoursesWeek);
+        incompleteCourses.put(30L, incompleteCoursesMonth);
+
+        identity = new Identity();
+        identity.setUid("uid");
+
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(anyString(), anyString()))
+                .thenReturn(Optional.empty());
     }
 
     @Test
     public void incompleteCoursesDayShouldContainCourseIfDueWithinDay() {
+
         Course course = new Course();
         course.setId(COURSE_ID);
 
-        LocalDateTime nextRequiredBy = LocalDateTime.parse("2018-01-31 00:00", FORMATTER);
-        LocalDateTime now = LocalDateTime.parse("2018-01-31 00:00", FORMATTER);
+        LocalDate nextRequiredBy = LocalDate.parse("2018-01-31", FORMATTER);
+        LocalDate now = LocalDate.parse("2018-01-31", FORMATTER);
 
-        learningJob.addToIncompleteCoursesIfNotificationIsNew(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, now, course, nextRequiredBy);
+        learningJob.checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+
         assertThat(incompleteCoursesWeek.size(), equalTo(0));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
 
         assertThat(incompleteCoursesDay.size(), equalTo(1));
         assertThat(incompleteCoursesDay.get(0).getId(), equalTo(COURSE_ID));
-
     }
 
     @Test
@@ -86,10 +100,11 @@ public class LearningJobTest {
         Course course = new Course();
         course.setId(COURSE_ID);
 
-        LocalDateTime nextRequiredBy = LocalDateTime.parse("2018-01-31 00:00", FORMATTER);
-        LocalDateTime now = LocalDateTime.parse("2018-01-25 00:00", FORMATTER);
+        LocalDate nextRequiredBy = LocalDate.parse("2018-01-31", FORMATTER);
+        LocalDate now = LocalDate.parse("2018-01-25", FORMATTER);
 
-        learningJob.addToIncompleteCoursesIfNotificationIsNew(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, now, course, nextRequiredBy);
+        learningJob.checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+
         assertThat(incompleteCoursesDay.size(), equalTo(0));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
 
@@ -103,10 +118,11 @@ public class LearningJobTest {
         Course course = new Course();
         course.setId(COURSE_ID);
 
-        LocalDateTime nextRequiredBy = LocalDateTime.parse("2018-01-31 00:00", FORMATTER);
-        LocalDateTime now = LocalDateTime.parse("2018-01-08 00:00", FORMATTER);
+        LocalDate nextRequiredBy = LocalDate.parse("2018-01-31", FORMATTER);
+        LocalDate now = LocalDate.parse("2018-01-08", FORMATTER);
 
-        learningJob.addToIncompleteCoursesIfNotificationIsNew(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, now, course, nextRequiredBy);
+        learningJob.checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+
         assertThat(incompleteCoursesDay.size(), equalTo(0));
         assertThat(incompleteCoursesWeek.size(), equalTo(0));
 
@@ -119,10 +135,11 @@ public class LearningJobTest {
         Course course = new Course();
         course.setId(COURSE_ID);
 
-        LocalDateTime nextRequiredBy = LocalDateTime.parse("2018-02-20 00:00", FORMATTER);
-        LocalDateTime now = LocalDateTime.parse("2018-01-01 00:00", FORMATTER);
+        LocalDate nextRequiredBy = LocalDate.parse("2018-02-20", FORMATTER);
+        LocalDate now = LocalDate.parse("2018-01-01", FORMATTER);
 
-        learningJob.addToIncompleteCoursesIfNotificationIsNew(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, now, course, nextRequiredBy);
+        learningJob.checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+
         assertThat(incompleteCoursesDay.size(), equalTo(0));
         assertThat(incompleteCoursesWeek.size(), equalTo(0));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
@@ -131,16 +148,19 @@ public class LearningJobTest {
     @Test
     public void testArgumentsOfLearningNotifications() throws NotificationClientException {
         Identity identity = new Identity();
+        identity.setUid("uid");
         identity.setUsername(EMAIL);
 
         Course course1 = new Course();
+        course1.setId("1");
         course1.setTitle(COURSE_TITLE_1);
         Course course2 = new Course();
+        course2.setId("2");
         course2.setTitle(COURSE_TITLE_2);
         incompleteCoursesMonth.add(course1);
         incompleteCoursesMonth.add(course2);
 
-        learningJob.sendNotifiyForPeriod(identity, incompleteCoursesMonth, MONTH_PERIOD);
+        learningJob.sendNotificationForPeriod(identity, 30L, incompleteCoursesMonth);
 
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> requiredLearningCaptor = ArgumentCaptor.forClass(String.class);
@@ -157,134 +177,52 @@ public class LearningJobTest {
     }
 
     @Test
-    public void testSendNotifyForIncompleteCoursesForDay() throws NotificationClientException {
-        Identity identity = new Identity();
-        identity.setUsername(EMAIL);
+    public void shouldNotBeAddedToDayListIfDayNotificationRecentlySent() {
 
         Course course = new Course();
+        course.setId(COURSE_ID);
         course.setTitle(COURSE_TITLE_1);
-        incompleteCoursesDay.add(course);
 
-        learningJob.sendNotifyForIncompleteCourses(identity, incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth);
-        ArgumentCaptor<String> periodCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<Identity> identityCaptor = ArgumentCaptor.forClass(Identity.class);
+        LocalDateTime sent = LocalDate.parse("2018-05-21", FORMATTER).atStartOfDay();
 
-        ArgumentCaptor<List<Course>> incompleteCoursesDayCaptor = ArgumentCaptor.forClass(List.class);
+        Notification notification = new Notification(COURSE_ID, IDENTITY_UID);
+        notification.setSent(sent);
 
-        verify(learningJob).sendNotifiyForPeriod(identityCaptor.capture(), incompleteCoursesDayCaptor.capture(), periodCaptor.capture());
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), COURSE_ID))
+                .thenReturn(Optional.of(notification));
 
-        List<Course> expectedIncompleteCoursesDay = incompleteCoursesDayCaptor.getValue();
-        assertThat(expectedIncompleteCoursesDay.size(), equalTo(1));
-        assertThat(expectedIncompleteCoursesDay.get(0).getTitle(), equalTo(COURSE_TITLE_1));
+        LocalDate now = LocalDate.parse("2018-05-22", FORMATTER);
+        LocalDate requiredBy = LocalDate.parse("2018-05-22", FORMATTER);
 
-        assertThat(periodCaptor.getValue(), equalTo(DAY_PERIOD));
+        learningJob.checkAndAdd(course, identity, requiredBy, now, incompleteCourses);
 
-        assertThat(incompleteCoursesDay.size(), equalTo(1));
+        assertThat(incompleteCoursesDay.size(), equalTo(0));
         assertThat(incompleteCoursesWeek.size(), equalTo(0));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
-
     }
 
     @Test
-    public void courseShouldBeAddedToWeekListIfMonthNotificationSentOver23Days() {
+    public void shouldBeAddedToWeekListIfDueInLessThanAWeekAndNotificationIsForMonth() {
+
         Course course = new Course();
+        course.setId(COURSE_ID);
         course.setTitle(COURSE_TITLE_1);
 
-        LocalDateTime sent = LocalDateTime.parse("2018-05-20 00:00", FORMATTER);
-        Notification notification = new Notification(COURSE_ID, sent, NotificationType.MONTH, IDENTITY_UID);
+        LocalDateTime sent = LocalDate.parse("2018-05-10", FORMATTER).atStartOfDay();
 
-        LocalDateTime now = LocalDateTime.parse("2018-05-22 00:00", FORMATTER);
+        Notification notification = new Notification(COURSE_ID, IDENTITY_UID);
+        notification.setSent(sent);
 
-        learningJob.addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, course, notification, now);
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), COURSE_ID))
+                .thenReturn(Optional.of(notification));
+
+        LocalDate now = LocalDate.parse("2018-05-22", FORMATTER);
+        LocalDate requiredBy = LocalDate.parse("2018-05-25", FORMATTER);
+
+        learningJob.checkAndAdd(course, identity, requiredBy, now, incompleteCourses);
 
         assertThat(incompleteCoursesDay.size(), equalTo(0));
         assertThat(incompleteCoursesWeek.size(), equalTo(1));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
     }
-
-    @Test
-    public void courseShouldBeAddedToDayListIfMonthNotificationSentOver23Days() {
-        Course course = new Course();
-        course.setTitle(COURSE_TITLE_1);
-
-        LocalDateTime sent = LocalDateTime.parse("2018-05-29 05:00", FORMATTER);
-        Notification notification = new Notification(COURSE_ID, sent, NotificationType.MONTH, IDENTITY_UID);
-
-        LocalDateTime now = LocalDateTime.parse("2018-05-30 00:00", FORMATTER);
-
-        learningJob.addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, course, notification, now);
-
-        assertThat(incompleteCoursesDay.size(), equalTo(1));
-        assertThat(incompleteCoursesWeek.size(), equalTo(0));
-        assertThat(incompleteCoursesMonth.size(), equalTo(0));
-    }
-
-    @Test
-    public void courseShouldBeAddedIfNotificationOld() {
-        Course course = new Course();
-        course.setTitle(COURSE_TITLE_1);
-
-        LocalDateTime sent = LocalDateTime.parse("2017-05-20 00:00", FORMATTER);
-        Notification notification = new Notification(COURSE_ID, sent, NotificationType.MONTH, IDENTITY_UID);
-
-        LocalDateTime now = LocalDateTime.parse("2018-05-22 00:00", FORMATTER);
-
-        learningJob.addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, course, notification, now);
-
-        assertThat(incompleteCoursesDay.size(), equalTo(0));
-        assertThat(incompleteCoursesWeek.size(), equalTo(0));
-        assertThat(incompleteCoursesMonth.size(), equalTo(1));
-    }
-
-    @Test
-    public void shouldBeAddedToDayListIfDayNotificationNotSent(){
-        Course course = new Course();
-        course.setTitle(COURSE_TITLE_1);
-
-        LocalDateTime sent = LocalDateTime.parse("2018-05-19 00:00", FORMATTER);
-        Notification notification = new Notification(COURSE_ID, sent, NotificationType.DAY, IDENTITY_UID);
-
-        LocalDateTime now = LocalDateTime.parse("2018-05-22 00:00", FORMATTER);
-
-        learningJob.addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, course, notification, now);
-
-        assertThat(incompleteCoursesDay.size(), equalTo(1));
-        assertThat(incompleteCoursesWeek.size(), equalTo(0));
-        assertThat(incompleteCoursesMonth.size(), equalTo(0));
-    }
-
-    @Test
-    public void shouldNotBeAddedToDayListIfDayNotificationRecentlySent(){
-        Course course = new Course();
-        course.setTitle(COURSE_TITLE_1);
-
-        LocalDateTime sent = LocalDateTime.parse("2018-05-22 00:00", FORMATTER);
-        Notification notification = new Notification(COURSE_ID, sent, NotificationType.DAY, IDENTITY_UID);
-
-        LocalDateTime now = LocalDateTime.parse("2018-05-22 03:00", FORMATTER);
-
-        learningJob.addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, course, notification, now);
-
-        assertThat(incompleteCoursesDay.size(), equalTo(0));
-        assertThat(incompleteCoursesWeek.size(), equalTo(0));
-        assertThat(incompleteCoursesMonth.size(), equalTo(0));
-    }
-
-    @Test
-    public void shouldBeAddedToWeekListIfDueInLessThanAWeek(){
-        Course course = new Course();
-        course.setTitle(COURSE_TITLE_1);
-
-        LocalDateTime sent = LocalDateTime.parse("2018-05-10 00:00", FORMATTER);
-        Notification notification = new Notification(COURSE_ID, sent, NotificationType.WEEK, IDENTITY_UID);
-
-        LocalDateTime now = LocalDateTime.parse("2018-05-22 00:00", FORMATTER);
-
-        learningJob.addIncompleteCoursesToList(incompleteCoursesDay, incompleteCoursesWeek, incompleteCoursesMonth, course, notification, now);
-
-        assertThat(incompleteCoursesDay.size(), equalTo(0));
-        assertThat(incompleteCoursesWeek.size(), equalTo(1));
-        assertThat(incompleteCoursesMonth.size(), equalTo(0));
-    }
-
 }

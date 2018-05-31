@@ -22,9 +22,10 @@ import static org.junit.Assert.*;
 @SpringBootTest
 @Transactional
 public class NotificationRepositoryTest {
-    public static final String COURSE_ID = "course123";
-    public static final String USERNAME = "test@example.org";
-    public static final String IDENTITY_UID = "123abc";
+
+    private static final String COURSE_ID = "course123";
+
+    private static final String IDENTITY_UID = "123abc";
 
     @Autowired
     private NotificationRepository notificationRepository;
@@ -33,7 +34,7 @@ public class NotificationRepositoryTest {
     public void notificationRepositoryShouldSave() {
         Long initialCount = notificationRepository.count();
 
-        notificationRepository.save(createNotification(COURSE_ID, LocalDateTime.now(), NotificationType.MONTH, IDENTITY_UID));
+        notificationRepository.save(createNotification(COURSE_ID, LocalDateTime.now(), IDENTITY_UID));
 
         assertThat(notificationRepository.count(), equalTo(initialCount+1));
     }
@@ -49,19 +50,19 @@ public class NotificationRepositoryTest {
         LocalDateTime dt3 = LocalDateTime.parse("2018-05-10 10:30", formatter);
 
 
-        notificationRepository.save(createNotification(COURSE_ID, dt1, NotificationType.MONTH, IDENTITY_UID)); // this is most recent and should be returned
-        notificationRepository.save(createNotification(COURSE_ID, dt2, NotificationType.WEEK, IDENTITY_UID));
-        notificationRepository.save(createNotification(COURSE_ID, dt3, NotificationType.DAY, IDENTITY_UID));
+        notificationRepository.save(createNotification(COURSE_ID, dt1, IDENTITY_UID)); // this is most recent and should be returned
+        notificationRepository.save(createNotification(COURSE_ID, dt2, IDENTITY_UID));
+        notificationRepository.save(createNotification(COURSE_ID, dt3, IDENTITY_UID));
 
         assertThat(notificationRepository.count(), equalTo(initialCount+3));
 
         Optional<Notification> notification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(IDENTITY_UID, COURSE_ID);
         assertThat(notification.get().getCourseId(), equalTo(COURSE_ID));
-        assertThat(notification.get().getNotificationType(), equalTo(NotificationType.MONTH));
     }
 
-    private Notification createNotification(String courseId, LocalDateTime localDateTime, NotificationType notificationType, String identityUid){
-        Notification notification = new Notification(courseId, localDateTime, notificationType, identityUid);
+    private Notification createNotification(String courseId, LocalDateTime localDateTime, String identityUid){
+        Notification notification = new Notification(courseId, identityUid);
+        notification.setSent(localDateTime);
         return notification;
     }
 }

@@ -1,9 +1,11 @@
 package uk.gov.cslearning.record.service.catalogue;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import uk.gov.cslearning.record.service.CivilServant;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,8 +21,8 @@ public class Audience {
 
     private boolean mandatory;
 
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime requiredBy;
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate requiredBy;
 
     public List<String> getAreasOfWork() {
         return areasOfWork;
@@ -62,11 +64,11 @@ public class Audience {
         this.mandatory = mandatory;
     }
 
-    public LocalDateTime getRequiredBy() {
+    public LocalDate getRequiredBy() {
         return requiredBy;
     }
 
-    public void setRequiredBy(LocalDateTime requiredBy) {
+    public void setRequiredBy(LocalDate requiredBy) {
         this.requiredBy = requiredBy;
     }
 
@@ -84,16 +86,16 @@ public class Audience {
         return relevance;
     }
 
-    public LocalDateTime getNextRequiredBy(LocalDateTime completionDate) {
+    public LocalDate getNextRequiredBy(LocalDate completionDate) {
         if (frequency == null || requiredBy == null) {
             return null;
         }
-        LocalDateTime today = LocalDateTime.now();
-        LocalDateTime nextRequiredBy = requiredBy;
+        LocalDate today = LocalDate.now();
+        LocalDate nextRequiredBy = requiredBy;
         while (nextRequiredBy.isBefore(today)) {
             nextRequiredBy = increment(nextRequiredBy, frequency);
         }
-        LocalDateTime lastRequiredBy = decrement(nextRequiredBy, frequency);
+        LocalDate lastRequiredBy = decrement(nextRequiredBy, frequency);
 
         if (completionDate != null && completionDate.isAfter(lastRequiredBy)) {
             return increment(nextRequiredBy, frequency);
@@ -101,11 +103,11 @@ public class Audience {
         return nextRequiredBy;
     }
 
-    private LocalDateTime decrement(LocalDateTime dateTime, String frequency) {
+    private LocalDate decrement(LocalDate dateTime, String frequency) {
         return dateTime.minusYears(getYears(frequency));
     }
 
-    private LocalDateTime increment(LocalDateTime dateTime, String frequency) {
+    private LocalDate increment(LocalDate dateTime, String frequency) {
         return dateTime.plusYears(getYears(frequency));
     }
 
