@@ -4,24 +4,63 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.util.Map;
 
 @Service
 public class RegistryService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActivityRecordService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryService.class);
 
     private OAuth2RestOperations restOperations;
 
     private String findByUidUrlFormat;
 
+    private URI getCurrentUrl;
+
     @Autowired
-    public RegistryService(OAuth2RestOperations restOperations, @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
+    public RegistryService(OAuth2RestOperations restOperations,
+                           @Value("${registry.getCurrentUrl}") URI getCurrentUrl,
+                           @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
         this.restOperations = restOperations;
         this.findByUidUrlFormat = findByUidUrlFormat;
+        this.getCurrentUrl = getCurrentUrl;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public CivilServant getCurrent() {
+        LOGGER.debug("Getting profile details for authenticated user");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + details.getTokenValue());
+
+        RequestEntity requestEntity = new RequestEntity(headers, HttpMethod.GET, getCurrentUrl);
+
+        ResponseEntity<Map> response = restOperations.exchange(requestEntity, Map.class);
+
+        if (response.hasBody()) {
+            Map data = response.getBody();
+            CivilServant civilServant = new CivilServant();
+            civilServant.setProfession(getProperty(data, "profession.name"));
+            civilServant.setDepartmentCode(getProperty(data, "organisation.department.code"));
+            civilServant.setGradeCode(getProperty(data, "grade.code"));
+            return civilServant;
+        }
+        return null;
     }
 
     public CivilServant getCivilServantByUid(String uid) {
@@ -31,7 +70,7 @@ public class RegistryService {
         Map response = restOperations.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
 
         CivilServant civilServant = new CivilServant();
-        civilServant.setAreaOfWork(getProperty(response, "profession.name"));
+        civilServant.setProfession(getProperty(response, "profession.name"));
         civilServant.setDepartmentCode(getProperty(response, "organisation.department.code"));
         civilServant.setGradeCode(getProperty(response, "grade.code"));
 

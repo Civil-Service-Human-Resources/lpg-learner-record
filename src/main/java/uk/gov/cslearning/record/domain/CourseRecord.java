@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -30,11 +31,20 @@ public class CourseRecord {
 
     private String preference;
 
-    @OneToMany
+    @JsonIgnore
+    private String profession;
+
+    @JsonIgnore
+    private String department;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private Collection<ModuleRecord> moduleRecords;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
+
+    public CourseRecord() {
+    }
 
     public CourseRecord(String courseId, String userId) {
         checkArgument(courseId != null);
@@ -78,6 +88,22 @@ public class CourseRecord {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     @JsonProperty("modules")

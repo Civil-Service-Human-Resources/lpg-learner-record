@@ -6,12 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -27,12 +27,16 @@ public class UserRecordService {
 
     private XApiService xApiService;
 
+    private RegistryService registryService;
+
     @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService) {
+    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService, RegistryService registryService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
+        checkArgument(registryService != null);
         this.courseRecordRepository = courseRecordRepository;
         this.xApiService = xApiService;
+        this.registryService = registryService;
     }
 
     @Transactional
@@ -50,10 +54,24 @@ public class UserRecordService {
 
             StatementStream stream = new StatementStream();
             Collection<CourseRecord> latestCourseRecords = stream.replay(statements, statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
+
+            setUserDepartmentAndProfession(userId, latestCourseRecords);
+
             courseRecordRepository.saveAll(latestCourseRecords);
             return latestCourseRecords;
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);
+        }
+    }
+
+    private void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
+        if (!courseRecords.isEmpty()) {
+            LOGGER.debug("Updating course records with additional user information.");
+            CivilServant civilServant = registryService.getCivilServantByUid(userId);
+            for (CourseRecord courseRecord : courseRecords) {
+                courseRecord.setDepartment(civilServant.getDepartmentCode());
+                courseRecord.setProfession(civilServant.getProfession());
+            }
         }
     }
 }

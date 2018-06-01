@@ -1,21 +1,20 @@
 #! /usr/bin/env bash
 
-docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-docker pull cshr/lpg-learner-record || true
-./gradlew init
+SERVICE_NAME=lpg-learner-record
+
+BRANCH_TAG=`echo ${TRAVIS_PULL_REQUEST_BRANCH:-${TRAVIS_BRANCH}} | sed 's/\//-/g'`
+COMMIT_TAG="${TRAVIS_COMMIT}"
+
 ./gradlew build
-docker build -t cshr/lpg-learner-record:latest .
-docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-docker tag cshr/lpg-learner-record:latest cshr/lpg-learner-record:${TRAVIS_COMMIT}
-docker push cshr/lpg-learner-record
 
-export PATH="`pwd`/pyhome/bin:${PATH}"
-export PYTHONPATH="`pwd`/pyhome/lib/python/site-packages:${PYTHONPATH}"
-export PYTHONPATH="`pwd`/pyhome/lib/python2.7/site-packages:${PYTHONPATH}"
-python -c "import ansible, sys; sys.exit(0) if ansible.__version__ == '2.4.3.0' else sys.exit(1)"
-if [ $? -ne 0 ]; then
-  rm -rf pyhome
-  PYTHONUSERBASE=pyhome pip install --user ansible==2.4.3.0
-fi
+docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
 
-./environ/deploy dev ${TRAVIS_COMMIT}
+docker pull cshr/${SERVICE_NAME} || true
+
+docker build --cache-from cshr/${SERVICE_NAME}:latest -t cshr/${SERVICE_NAME}:latest .
+
+docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}
+docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}-${TRAVIS_BUILD_NUMBER}
+docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${COMMIT_TAG}
+
+docker push cshr/${SERVICE_NAME}
