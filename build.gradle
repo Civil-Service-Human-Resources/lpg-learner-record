@@ -52,8 +52,8 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'org.codehaus.janino:janino:3.0.8'
     compile 'org.reflections:reflections:0.9.11'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
-    compile('uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE')
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
+    compile 'uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
