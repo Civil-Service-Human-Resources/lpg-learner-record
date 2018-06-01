@@ -1,18 +1,21 @@
 #! /usr/bin/env bash
 
+SERVICE_NAME=lpg-learner-record
+
+BRANCH_TAG=`echo ${TRAVIS_PULL_REQUEST_BRANCH:-${TRAVIS_BRANCH}} | sed 's/\//-/g'`
+COMMIT_TAG="${TRAVIS_COMMIT}"
+
 ./gradlew init
 ./gradlew build
-./gradlew test
 
 docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
 
-docker pull cshr/lpg-learner-record || true
+docker pull cshr/${SERVICE_NAME} || true
 
-docker build --cache-from cshr/lpg-learner-record:latest -t cshr/lpg-learner-record:${TRAVIS_COMMIT} .
+docker build --cache-from cshr/${SERVICE_NAME}:latest -t cshr/${SERVICE_NAME}:latest .
 
-export BRANCH_TAG=`echo ${TRAVIS_PULL_REQUEST_BRANCH:-TRAVIS_BRANCH} | sed 's/\//-/g'`
+docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}
+docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}-${TRAVIS_BUILD_NUMBER}
+docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${COMMIT_TAG}
 
-docker tag cshr/lpg-learner-record:${TRAVIS_COMMIT} cshr/lpg-learner-record:${BRANCH_TAG}
-docker tag cshr/lpg-learner-record:${TRAVIS_COMMIT} cshr/lpg-learner-record:latest
-
-docker push cshr/lpg-learner-record
+docker push cshr/${SERVICE_NAME}
