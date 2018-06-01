@@ -37,7 +37,7 @@ public class CourseRecord {
     @JsonIgnore
     private String department;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private Collection<ModuleRecord> moduleRecords;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
