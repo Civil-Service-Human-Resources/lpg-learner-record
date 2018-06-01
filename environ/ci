@@ -5,7 +5,6 @@ SERVICE_NAME=lpg-learner-record
 BRANCH_TAG=`echo ${TRAVIS_PULL_REQUEST_BRANCH:-${TRAVIS_BRANCH}} | sed 's/\//-/g'`
 COMMIT_TAG="${TRAVIS_COMMIT}"
 
-./gradlew init
 ./gradlew build
 
 docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";

@@ -7,6 +7,7 @@ plugins {
 repositories {
     mavenCentral()
     maven { url "https://clojars.org/repo" }
+    jcenter()
 }
 
 apply plugin: 'java'
@@ -21,10 +22,6 @@ version = '0.1.0-' + (System.getenv('TRAVIS_COMMIT') ?: 'local')
 bootJar {
     archiveName = 'learner-record.jar'
     mainClassName = 'uk.gov.cslearning.record.Application'
-}
-
-repositories {
-    jcenter()
 }
 
 dependencies {
