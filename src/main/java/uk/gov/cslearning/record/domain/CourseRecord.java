@@ -43,6 +43,9 @@ public class CourseRecord {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
 
+    public CourseRecord() {
+    }
+
     public CourseRecord(String courseId, String userId) {
         checkArgument(courseId != null);
         checkArgument(userId != null);
