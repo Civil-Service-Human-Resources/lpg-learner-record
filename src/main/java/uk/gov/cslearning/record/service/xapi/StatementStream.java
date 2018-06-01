@@ -9,6 +9,7 @@ import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
@@ -116,6 +117,7 @@ public class StatementStream {
         } else {
             LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
         }
+        courseRecord.setLastUpdated(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
     }
 
     public interface GroupId {
