@@ -7,8 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.NotificationType;
-import uk.gov.cslearning.record.service.identity.Identity;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +14,6 @@ import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -36,7 +33,7 @@ public class NotificationRepositoryTest {
 
         notificationRepository.save(createNotification(COURSE_ID, LocalDateTime.now(), IDENTITY_UID));
 
-        assertThat(notificationRepository.count(), equalTo(initialCount+1));
+        assertThat(notificationRepository.count(), equalTo(initialCount + 1));
     }
 
     @Test
@@ -54,13 +51,13 @@ public class NotificationRepositoryTest {
         notificationRepository.save(createNotification(COURSE_ID, dt2, IDENTITY_UID));
         notificationRepository.save(createNotification(COURSE_ID, dt3, IDENTITY_UID));
 
-        assertThat(notificationRepository.count(), equalTo(initialCount+3));
+        assertThat(notificationRepository.count(), equalTo(initialCount + 3));
 
         Optional<Notification> notification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(IDENTITY_UID, COURSE_ID);
         assertThat(notification.get().getCourseId(), equalTo(COURSE_ID));
     }
 
-    private Notification createNotification(String courseId, LocalDateTime localDateTime, String identityUid){
+    private Notification createNotification(String courseId, LocalDateTime localDateTime, String identityUid) {
         Notification notification = new Notification(courseId, identityUid);
         notification.setSent(localDateTime);
         return notification;

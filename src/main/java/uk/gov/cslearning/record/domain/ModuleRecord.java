@@ -34,6 +34,9 @@ public class ModuleRecord {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
+    public ModuleRecord() {
+    }
+
     public ModuleRecord(String moduleId) {
         checkArgument(moduleId != null);
         this.moduleId = moduleId;
