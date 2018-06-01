@@ -26,6 +26,7 @@ identity:
 
 registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
+  getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s"
 
 catalogue:
