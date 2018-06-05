@@ -73,13 +73,16 @@ public class LearningJob {
 
             CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
             List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+            Boolean notCompleted = false;
             for (Course course : courses) {
                 Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
                 // okay we do not want to find a course without a completed record or without a record at all
-                if (courseRecords.)
-                for (CourseRecord courseRecord : courseRecords) {
+                if (courseRecords.size() != 0) {
+                    for (CourseRecord courseRecord : courseRecords) {
 
+                    }
                 }
+                notCompleted = true;
             }
         }
 
