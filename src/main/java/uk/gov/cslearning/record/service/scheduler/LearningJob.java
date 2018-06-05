@@ -126,6 +126,29 @@ public class LearningJob {
     }
 
     @Transactional
+    public void sendNotificationForCompletedLearning() throws NotificationClientException {
+        Collection<Identity> identities = identityService.listAll();
+
+        for (Identity identity : identities) {
+            LOGGER.debug("Got identity with uid {}", identity.getUid());
+
+            CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
+            List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+            Boolean notCompleted = false;
+            for (Course course : courses) {
+                Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                // okay we do not want to find a course without a completed record or without a record at all
+                if (courseRecords.size() != 0) {
+                    for (CourseRecord courseRecord : courseRecords) {
+
+                    }
+                }
+                notCompleted = true;
+            }
+        }
+
+    }
+
     public void sendNotificationForIncompleteCourses() throws NotificationClientException {
         Collection<Identity> identities = identityService.listAll();
 
