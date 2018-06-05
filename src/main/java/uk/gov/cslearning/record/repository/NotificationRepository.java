@@ -8,6 +8,7 @@ import java.util.Optional;
 public interface NotificationRepository extends CrudRepository<Notification, Long> {
 
     Optional<Notification> findFirstByIdentityUidAndCourseIdOrderBySentDesc(String identityUid, String courseId);
+    Optional<Notification> findFirstByIdentityUidAndCourseIdAndNotificationType(String identityUid, String courseId, String notificationType);
 
     Boolean existsByIdentityUidAndCourseId(String identityUid, String courseId);
 }

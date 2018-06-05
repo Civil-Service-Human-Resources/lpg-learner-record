@@ -1,11 +1,13 @@
 package uk.gov.cslearning.record.api;
 
+import org.h2.util.New;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
+import uk.gov.cslearning.record.service.scheduler.LearningJob;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +43,21 @@ public class LearnerRecordController {
                                               @RequestParam(name = "activityId", required = false) String activityId) {
         Collection<CourseRecord> records = userRecordService.getUserRecord(userId, activityId);
         return new ResponseEntity<>(new Records(records), OK);
+    }
+
+    @Autowired
+    private LearningJob learningJob;
+
+    @GetMapping(path = "/notify")
+    public ResponseEntity notifyme() {
+        try {
+            learningJob.sendNotificationForCompletedLearning();
+        } catch (Exception e) {
+            System.out.println(e);
+
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     public static final class Records {

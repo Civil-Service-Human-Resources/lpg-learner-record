@@ -4,10 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -54,6 +57,8 @@ public class LearningJob {
 
     private UserRecordService userRecordService;
 
+    private static final String COMPLETED = "COMPLETED";
+
     @Autowired
     public LearningJob(UserRecordService userRecordService, IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService, NotificationRepository notificationRepository) {
         this.userRecordService = userRecordService;
@@ -64,7 +69,80 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
     }
 
-    @Transactional
+    private void CheckAndNotifyLineManager(CivilServant civilServant, Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
+        Boolean sendMail = false;
+
+        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(course.getId(),identity.getUid(),COMPLETED);
+        LOGGER.debug("Searching for notification: {}",optionalNotification.isPresent());
+        if (!optionalNotification.isPresent()) {
+            sendMail = true;
+        } else {
+            Notification notification = optionalNotification.get();
+            if (notification.getSent().isBefore(completedDate)){
+                sendMail = true;
+            }
+
+        }
+
+        if (sendMail) {
+            notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, civilServant.getFullName(),"manager");
+            Notification notification = new Notification(course.getId(),identity.getUid(),COMPLETED);
+            notificationRepository.save(notification);
+        }
+
+    }
+
+    public void sendNotificationForCompletedLearning() throws NotificationClientException  {
+
+        Collection<Identity> identities = identityService.listAll();
+
+        for (Identity identity : identities) {
+
+            LOGGER.debug("Got identity with uid {} ({})", identity.getUsername(), identities.size());
+            try {
+                Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
+
+                if (optionalCivilServant.isPresent()) {
+                    CivilServant civilServant = optionalCivilServant.get();
+                    LOGGER.debug("FULLNAME " +civilServant.getFullName());
+                    List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+                    LOGGER.debug("courses {}",courses.size());
+                    for (Course course : courses) {
+                        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                        // okay we do not want to find a course without a completed record or without a record at all
+
+                        try {
+                            CheckAndNotifyLineManager(civilServant, identity, course, null);
+                        } catch (NotificationClientException nce) {
+                            LOGGER.error("Error notifying line manger about course completion");
+                            throw nce;
+                        }
+
+                        if (courseRecords.size() != 0) {
+                            for (CourseRecord courseRecord : courseRecords) {
+                                LOGGER.debug("course is " + courseRecord.getState());
+                                if (courseRecord.getState() == State.COMPLETED) {
+                                    LOGGER.debug("course is COMPLETED");
+                                    try {
+                                        CheckAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
+                                    } catch (NotificationClientException nce) {
+                                        LOGGER.error("Error notifying line manger about course completion");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+            } catch (HttpClientErrorException hce) {
+                LOGGER.debug("Error getting details for {}",identity.getUid());
+            }
+        }
+
+    }
+
+
     public void sendNotificationForIncompleteCourses() throws NotificationClientException {
         Collection<Identity> identities = identityService.listAll();
 
