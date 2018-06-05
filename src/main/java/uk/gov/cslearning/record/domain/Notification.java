@@ -11,8 +11,7 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
+    
     private String courseId;
 
     @Column(nullable = false)
@@ -20,7 +19,19 @@ public class Notification {
 
     private LocalDateTime sent;
 
-    public Notification() {
+    private String notificationType;
+
+    private static final String COMPLETED = "COMPLETED";
+
+
+    public Notification(String courseId, String identityUid, String notificationType) {
+        checkArgument(courseId != null);
+        checkArgument(identityUid != null);
+
+        this.courseId = courseId;
+        this.sent = LocalDateTime.now();
+        this.identityUid = identityUid;
+        this.notificationType = notificationType;
     }
 
     public Notification(String courseId, String identityUid) {
@@ -58,5 +69,13 @@ public class Notification {
 
     public String getIdentityUid() {
         return identityUid;
+    }
+
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        notificationType = notificationType;
     }
 }

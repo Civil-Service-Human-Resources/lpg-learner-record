@@ -71,6 +71,7 @@ public class RegistryService {
         CivilServant civilServant = new CivilServant();
         try {
             Map response = restOperations.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
+            civilServant.setFullName(getProperty(response, "fullName"));
             civilServant.setProfession(getProperty(response, "profession.name"));
             civilServant.setDepartmentCode(getProperty(response, "organisation.department.code"));
             civilServant.setGradeCode(getProperty(response, "grade.code"));
