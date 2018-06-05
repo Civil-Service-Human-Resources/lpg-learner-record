@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.repository.NotificationRepository;
@@ -62,6 +63,26 @@ public class LearningJob {
         this.learningCatalogueService = learningCatalogueService;
         this.notifyService = notifyService;
         this.notificationRepository = notificationRepository;
+    }
+
+    public void sendNotificationForCompletedLearning() throws NotificationClientException {
+        Collection<Identity> identities = identityService.listAll();
+
+        for (Identity identity : identities) {
+            LOGGER.debug("Got identity with uid {}", identity.getUid());
+
+            CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
+            List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+            for (Course course : courses) {
+                Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                // okay we do not want to find a course without a completed record or without a record at all
+                if (courseRecords.)
+                for (CourseRecord courseRecord : courseRecords) {
+
+                }
+            }
+        }
+
     }
 
     @Transactional
