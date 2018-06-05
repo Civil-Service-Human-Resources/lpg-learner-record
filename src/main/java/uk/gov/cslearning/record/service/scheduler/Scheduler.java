@@ -17,7 +17,8 @@ public class Scheduler {
     @Autowired
     private LearningJob learningJob;
 
-    @Scheduled(cron = "0 * * * * *")
+    // cron to run every day at 02:00
+    @Scheduled(cron = "0 0 2 * * *")
     public void learningJob() throws Exception{
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
