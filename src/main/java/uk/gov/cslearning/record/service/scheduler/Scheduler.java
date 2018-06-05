@@ -26,6 +26,4 @@ public class Scheduler {
 
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
-
-    @
 }
