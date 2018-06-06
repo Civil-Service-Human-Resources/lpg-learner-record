@@ -47,6 +47,10 @@ public class CourseRecord {
         this.moduleRecords = new HashSet<>();
     }
 
+    public CourseRecordIdentity getIdentity() {
+        return identity;
+    }
+
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
