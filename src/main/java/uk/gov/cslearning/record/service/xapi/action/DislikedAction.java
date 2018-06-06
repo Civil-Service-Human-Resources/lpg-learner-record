@@ -13,6 +13,7 @@ public class DislikedAction extends Action {
         Action.register(DislikedAction.class, ActivityType.ELEARNING, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.VIDEO, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.LINK, Verb.DISLIKED);
+        Action.register(DislikedAction.class, ActivityType.FILE, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.COURSE, Verb.DISLIKED);
         Action.register(DislikedAction.class, ActivityType.EVENT, Verb.DISLIKED);
     }
