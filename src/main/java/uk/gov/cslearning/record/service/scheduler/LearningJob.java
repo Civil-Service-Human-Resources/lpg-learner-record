@@ -56,6 +56,8 @@ public class LearningJob {
 
     private UserRecordService userRecordService;
 
+    private static final String COMPLETED = "COMPLETED";
+
     @Autowired
     public LearningJob(UserRecordService userRecordService, IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService, NotificationRepository notificationRepository) {
         this.userRecordService = userRecordService;
@@ -95,9 +97,29 @@ public class LearningJob {
             }
 
             if (completed) {
-                System.out.println(identity.getUid() + " not completed");
-            } else {
                 System.out.println(identity.getUid() + " COMPLETED!");
+
+            } else {
+                System.out.println(identity.getUid() + " NOT COMPLETED!");
+
+                Boolean sendMail = false
+
+
+                Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndNotificationType(identity.getUid(),COMPLETED);
+                if (!optionalNotification.isPresent()) {
+                    sendMail = true;
+                } else {
+                    if (notfication sent before completed date) {
+                        sendMail = true;
+                    }
+
+                }
+
+                if (sendMail) {
+                    notifyService.notify("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, "");
+                    Notification notification = new Notification(identity.getUid());
+                    notificationRepository.save(notification);
+                }
             }
         }
 
