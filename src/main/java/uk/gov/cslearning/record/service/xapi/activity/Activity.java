@@ -14,9 +14,9 @@ import static java.util.Collections.emptyList;
 
 public abstract class Activity {
 
-    protected static final String COURSE_ID_PREFIX = "http://cslearning.gov.uk/courses";
+    public static final String COURSE_ID_PREFIX = "http://cslearning.gov.uk/courses";
 
-    protected static final String MODULE_ID_PREFIX = "http://cslearning.gov.uk/modules";
+    public static final String MODULE_ID_PREFIX = "http://cslearning.gov.uk/modules";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Activity.class);
 

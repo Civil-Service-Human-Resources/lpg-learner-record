@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -44,13 +45,7 @@ public class UserRecordService {
     public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
 
-        Collection<CourseRecord> existingCourseRecords;
-
-        if (activityId != null) {
-            existingCourseRecords = courseRecordRepository.findByUserIdAndCourseId(userId, activityId);
-        } else {
-            existingCourseRecords = courseRecordRepository.findByUserId(userId);
-        }
+        Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
 
         LocalDateTime since = existingCourseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
@@ -59,7 +54,7 @@ public class UserRecordService {
                 .orElse(null);
 
         try {
-            Collection<Statement> statements = xApiService.getStatements(userId, activityId, since);
+            Collection<Statement> statements = xApiService.getStatements(userId, null, since);
 
             StatementStream stream = new StatementStream();
             Collection<CourseRecord> latestCourseRecords = stream.replay(statements, statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
@@ -67,6 +62,12 @@ public class UserRecordService {
             setUserDepartmentAndProfession(userId, latestCourseRecords);
 
             courseRecordRepository.saveAll(latestCourseRecords);
+
+            if (activityId != null) {
+                return latestCourseRecords.stream()
+                        .filter(courseRecord -> courseRecord.matchesActivityId(activityId))
+                        .collect(Collectors.toSet());
+            }
             return latestCourseRecords;
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);

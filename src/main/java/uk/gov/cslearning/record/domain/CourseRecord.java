@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import uk.gov.cslearning.record.service.xapi.activity.Activity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -128,5 +129,17 @@ public class CourseRecord {
             }
         }
         return mostRecentCompletionDate;
+    }
+
+    public boolean matchesActivityId(String activityId) {
+        if (activityId.startsWith(Activity.COURSE_ID_PREFIX)) {
+            return activityId.endsWith(getCourseId());
+        }
+        for (ModuleRecord moduleRecord : moduleRecords) {
+            if (activityId.endsWith(moduleRecord.getModuleId())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
