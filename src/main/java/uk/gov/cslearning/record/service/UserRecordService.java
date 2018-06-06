@@ -44,7 +44,14 @@ public class UserRecordService {
     public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
 
-        Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
+        Collection<CourseRecord> existingCourseRecords;
+
+        if (activityId != null) {
+            existingCourseRecords = courseRecordRepository.findByUserIdAndCourseId(userId, activityId);
+        } else {
+            existingCourseRecords = courseRecordRepository.findByUserId(userId);
+        }
+
         LocalDateTime since = existingCourseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
                 .filter(Objects::nonNull)
