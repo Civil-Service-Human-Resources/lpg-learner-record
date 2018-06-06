@@ -16,15 +16,9 @@ import static java.util.Collections.unmodifiableCollection;
 @Entity
 public class CourseRecord {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String courseId;
-
-    @Column(nullable = false)
-    private String userId;
+    @JsonIgnore
+    @EmbeddedId
+    private CourseRecordIdentity identity;
 
     @Enumerated(EnumType.STRING)
     private State state;
@@ -49,13 +43,8 @@ public class CourseRecord {
     public CourseRecord(String courseId, String userId) {
         checkArgument(courseId != null);
         checkArgument(userId != null);
-        this.courseId = courseId;
-        this.userId = userId;
+        this.identity = new CourseRecordIdentity(courseId, userId);
         this.moduleRecords = new HashSet<>();
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public LocalDateTime getLastUpdated() {
@@ -66,12 +55,14 @@ public class CourseRecord {
         this.lastUpdated = lastUpdated;
     }
 
+    @JsonProperty("courseId")
     public String getCourseId() {
-        return courseId;
+        return identity.getCourseId();
     }
 
+    @JsonProperty("userId")
     public String getUserId() {
-        return userId;
+        return identity.getUserId();
     }
 
     public String getPreference() {
