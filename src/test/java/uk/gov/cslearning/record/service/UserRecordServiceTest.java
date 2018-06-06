@@ -86,7 +86,6 @@ public class UserRecordServiceTest {
         activityDefinition.setType(ActivityType.COURSE.getUri());
 
         Activity activity = new Activity(activityId, activityDefinition);
-
         Statement statement = new Statement(null, new Verb(verb.getUri()), activity);
         statement.setTimestamp(XApiService.DATE_FORMATTER.format(LocalDateTime.now()));
 

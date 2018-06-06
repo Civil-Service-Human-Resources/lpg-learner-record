@@ -12,8 +12,7 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
+    
     private String courseId;
 
     @Column(nullable = false)
