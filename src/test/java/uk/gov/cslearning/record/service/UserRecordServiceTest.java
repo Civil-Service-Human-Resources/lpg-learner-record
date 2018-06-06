@@ -65,7 +65,7 @@ public class UserRecordServiceTest {
 
         Statement statement = createStatement(activityId, uk.gov.cslearning.record.service.xapi.Verb.ARCHIVED);
 
-        when(xApiService.getStatements(eq(userId), eq(activityId), any())).thenReturn(ImmutableSet.of(statement));
+        when(xApiService.getStatements(eq(userId), eq(null), any())).thenReturn(ImmutableSet.of(statement));
         when(registryService.getCivilServantByUid(userId)).thenReturn(new CivilServant());
 
         Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, activityId);
