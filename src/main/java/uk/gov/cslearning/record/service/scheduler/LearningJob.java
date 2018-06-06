@@ -103,9 +103,67 @@ public class LearningJob {
         }
 
     }
-    
-    public void sendNotificationForCompletedLearning() throws NotificationClientException  {
+    public void sendNotificationForCompletedLearning() throws NotificationClientException {
+        Collection<Identity> identities = identityService.listAll();
 
+        for (Identity identity : identities) {
+            Boolean completed = false;
+
+            LOGGER.debug("Got identity with uid {} ({})", identity.getUsername(), identities.size());
+            try {
+                CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
+                System.out.println(civilServant.getDepartmentCode());
+                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+                LOGGER.debug("courses {}",courses.size());
+                for (Course course : courses) {
+                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                    // okay we do not want to find a course without a completed record or without a record at all
+                    if (courseRecords.size() != 0) {
+                        for (CourseRecord courseRecord : courseRecords) {
+                            LOGGER.debug("course is "+ courseRecord.getState());
+                            if (courseRecord.getState() ==  State.COMPLETED) {
+                                LOGGER.debug("course is COMPLETED");
+                            }
+                        }
+                    }
+                }
+            } catch (HttpClientErrorException hce) {
+                LOGGER.debug("Error getting details for {}",identity.getUid());
+            }
+
+            if (completed) {
+                System.out.println(identity.getUid() + " COMPLETED!");
+
+            } else {
+                System.out.println(identity.getUid() + " NOT COMPLETED!");
+
+                Boolean sendMail = false
+
+
+                Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndNotificationType(identity.getUid(),COMPLETED);
+                if (!optionalNotification.isPresent()) {
+                    sendMail = true;
+                } else {
+                    if (notfication sent before completed date) {
+                        sendMail = true;
+                    }
+
+                    }
+                }
+
+                if (sendMail) {
+                    notifyService.notify("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, "");
+                    Notification notification = new Notification(identity.getUid());
+                    notificationRepository.save(notification);
+                }
+            }
+        }
+
+    }
+
+    @Transactional
+    public void sendNotificationForIncompleteCourses() throws NotificationClientException {
+>>>>>>> 7e5cce7... Utility
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
