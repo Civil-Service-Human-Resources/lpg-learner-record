@@ -13,6 +13,7 @@ public class LikedAction extends Action {
         Action.register(LikedAction.class, ActivityType.ELEARNING, Verb.LIKED);
         Action.register(LikedAction.class, ActivityType.VIDEO, Verb.LIKED);
         Action.register(LikedAction.class, ActivityType.LINK, Verb.LIKED);
+        Action.register(LikedAction.class, ActivityType.FILE, Verb.LIKED);
         Action.register(LikedAction.class, ActivityType.COURSE, Verb.LIKED);
         Action.register(LikedAction.class, ActivityType.EVENT, Verb.LIKED);
     }

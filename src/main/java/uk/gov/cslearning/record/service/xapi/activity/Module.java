@@ -8,6 +8,7 @@ public class Module extends Activity {
     static {
         Activity.register(Module.class, ActivityType.FACETOFACE);
         Activity.register(Module.class, ActivityType.LINK);
+        Activity.register(Module.class, ActivityType.FILE);
         Activity.register(Module.class, ActivityType.ELEARNING);
         Activity.register(Module.class, ActivityType.VIDEO);
     }

@@ -11,6 +11,7 @@ public class RatedAction extends Action {
 
     static {
         Action.register(RatedAction.class, ActivityType.LINK, Verb.RATED);
+        Action.register(RatedAction.class, ActivityType.FILE, Verb.RATED);
         Action.register(RatedAction.class, ActivityType.EVENT, Verb.RATED);
         Action.register(RatedAction.class, ActivityType.VIDEO, Verb.RATED);
         Action.register(RatedAction.class, ActivityType.ELEARNING, Verb.RATED);

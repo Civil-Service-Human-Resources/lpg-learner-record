@@ -16,6 +16,7 @@ public class CompletedAction extends Action {
         Action.register(CompletedAction.class, ActivityType.ELEARNING, Verb.COMPLETED);
         Action.register(CompletedAction.class, ActivityType.VIDEO, Verb.COMPLETED);
         Action.register(CompletedAction.class, ActivityType.LINK, Verb.EXPERIENCED);
+        Action.register(CompletedAction.class, ActivityType.FILE, Verb.EXPERIENCED);
     }
 
     CompletedAction(Statement statement) {

@@ -15,6 +15,7 @@ public class ArchivedAction extends Action {
         Action.register(ArchivedAction.class, ActivityType.FACETOFACE, Verb.UNREGISTERED);
         Action.register(ArchivedAction.class, ActivityType.ELEARNING, Verb.ARCHIVED);
         Action.register(ArchivedAction.class, ActivityType.LINK, Verb.ARCHIVED);
+        Action.register(ArchivedAction.class, ActivityType.FILE, Verb.ARCHIVED);
         Action.register(ArchivedAction.class, ActivityType.VIDEO, Verb.ARCHIVED);
     }
 

@@ -2,12 +2,13 @@ package uk.gov.cslearning.record.service.xapi;
 
 public enum ActivityType {
 
-    FACETOFACE("http://cslearning.gov.uk/activities/face-to-face"),
     COURSE("http://adlnet.gov/expapi/activities/course"),
     ELEARNING("http://cslearning.gov.uk/activities/elearning"),
     EVENT("http://adlnet.gov/expapi/activities/event"),
-    VIDEO("https://w3id.org/xapi/acrossx/activities/video"),
-    LINK("http://adlnet.gov/expapi/activities/link");
+    FACETOFACE("http://cslearning.gov.uk/activities/face-to-face"),
+    FILE("http://adlnet.gov/expapi/activities/file"),
+    LINK("http://adlnet.gov/expapi/activities/link"),
+    VIDEO("https://w3id.org/xapi/acrossx/activities/video");
 
     public static ActivityType fromUri(String uri) {
         for (ActivityType type : values()) {
