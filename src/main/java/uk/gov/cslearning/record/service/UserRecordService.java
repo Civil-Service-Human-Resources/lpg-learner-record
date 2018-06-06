@@ -15,6 +15,7 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -46,6 +47,7 @@ public class UserRecordService {
         Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
         LocalDateTime since = existingCourseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
+                .filter(Objects::nonNull)
                 .reduce((a, b) -> a.isAfter(b) ? a : b)
                 .orElse(null);
 
