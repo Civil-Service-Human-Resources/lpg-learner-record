@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.cslearning.record.service.xapi.activity.Activity.COURSE_ID_PREFIX;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -56,13 +57,13 @@ public class UserRecordServiceTest {
     public void shouldUpdateExistingRecord() throws Exception {
 
         final String userId = "userId";
-        final String activityId = "activityId";
-        final String courseId = "courseId";
+        final String courseId = COURSE_ID_PREFIX + "/courseId";
+        final String activityId = courseId;
 
         CourseRecord courseRecord = new CourseRecord(courseId, "userId");
         courseRecordRepository.save(courseRecord);
 
-        Statement statement = createStatement(courseId, uk.gov.cslearning.record.service.xapi.Verb.ARCHIVED);
+        Statement statement = createStatement(activityId, uk.gov.cslearning.record.service.xapi.Verb.ARCHIVED);
 
         when(xApiService.getStatements(eq(userId), eq(activityId), any())).thenReturn(ImmutableSet.of(statement));
         when(registryService.getCivilServantByUid(userId)).thenReturn(new CivilServant());
@@ -78,12 +79,12 @@ public class UserRecordServiceTest {
         assertThat(updatedCourseRecord.getState(), equalTo(State.ARCHIVED));
     }
 
-    private Statement createStatement(String courseId, uk.gov.cslearning.record.service.xapi.Verb verb) {
+    private Statement createStatement(String activityId, uk.gov.cslearning.record.service.xapi.Verb verb) {
 
         ActivityDefinition activityDefinition = new ActivityDefinition();
         activityDefinition.setType(ActivityType.COURSE.getUri());
 
-        Activity activity = new Activity(courseId, activityDefinition);
+        Activity activity = new Activity(activityId, activityDefinition);
 
         Statement statement = new Statement(null, new Verb(verb.getUri()), activity);
         statement.setTimestamp(XApiService.DATE_FORMATTER.format(LocalDateTime.now()));
