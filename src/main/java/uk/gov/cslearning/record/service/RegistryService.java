@@ -14,9 +14,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class RegistryService {
@@ -63,18 +65,20 @@ public class RegistryService {
         return null;
     }
 
-    public CivilServant getCivilServantByUid(String uid) {
+    public Optional<CivilServant> getCivilServantByUid(String uid) {
         LOGGER.debug("Getting profile details for civil servant with UID {}", uid);
         LOGGER.debug("URL {}", String.format(findByUidUrlFormat, uid));
-
-        Map response = restOperations.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
-
         CivilServant civilServant = new CivilServant();
-        civilServant.setProfession(getProperty(response, "profession.name"));
-        civilServant.setDepartmentCode(getProperty(response, "organisation.department.code"));
-        civilServant.setGradeCode(getProperty(response, "grade.code"));
+        try {
+            Map response = restOperations.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
+            civilServant.setProfession(getProperty(response, "profession.name"));
+            civilServant.setDepartmentCode(getProperty(response, "organisation.department.code"));
+            civilServant.setGradeCode(getProperty(response, "grade.code"));
 
-        return civilServant;
+        } catch (HttpClientErrorException ex){
+            LOGGER.error(ex.getMessage());
+        }
+        return Optional.of(civilServant);
     }
 
     private String getProperty(Map data, String path) {

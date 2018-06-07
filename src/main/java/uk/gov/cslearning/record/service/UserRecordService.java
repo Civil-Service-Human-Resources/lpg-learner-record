@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -42,7 +43,7 @@ public class UserRecordService {
     }
 
     @Transactional
-    public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
+    public Collection<CourseRecord>  getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
 
         Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
@@ -77,10 +78,10 @@ public class UserRecordService {
     private void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
         if (!courseRecords.isEmpty()) {
             LOGGER.debug("Updating course records with additional user information.");
-            CivilServant civilServant = registryService.getCivilServantByUid(userId);
+            Optional<CivilServant> civilServant = registryService.getCivilServantByUid(userId);
             for (CourseRecord courseRecord : courseRecords) {
-                courseRecord.setDepartment(civilServant.getDepartmentCode());
-                courseRecord.setProfession(civilServant.getProfession());
+                courseRecord.setDepartment(civilServant.get().getDepartmentCode());
+                courseRecord.setProfession(civilServant.get().getProfession());
             }
         }
     }

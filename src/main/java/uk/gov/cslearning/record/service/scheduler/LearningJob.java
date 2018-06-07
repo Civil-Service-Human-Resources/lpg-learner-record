@@ -69,41 +69,47 @@ public class LearningJob {
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
-            LOGGER.debug("Got identity with uid {}", identity.getUid());
+            LOGGER.debug("Got identity with uid {} and email {}", identity.getUid(), identity.getUsername());
 
-            CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
+            Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
+            if (optionalCivilServant.isPresent()){
+                CivilServant civilServant = optionalCivilServant.get();
+                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+                Map<Long, List<Course>> incompleteCourses = new HashMap<>();
+                LocalDate now = LocalDate.now();
 
-            List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
-            Map<Long, List<Course>> incompleteCourses = new HashMap<>();
-            LocalDate now = LocalDate.now();
+                for (Course course : courses) {
+                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                    LocalDate mostRecentlyCompleted = null;
 
-            for (Course course : courses) {
-                Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
-                LocalDate mostRecentlyCompleted = null;
+                    for (CourseRecord courseRecord : courseRecords) {
+                        LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
+                        if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
+                            mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+                        }
+                    }
 
-                for (CourseRecord courseRecord : courseRecords) {
-                    LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                    if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
-                        mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+                    LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant, mostRecentlyCompleted);
+                    LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
+
+                    if (nextRequiredBy != null) {
+                        checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
                     }
                 }
-
-                LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant, mostRecentlyCompleted);
-                LOGGER.debug("Next required by for course is {}", nextRequiredBy);
-
-                if (nextRequiredBy != null) {
-                    checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+                for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
+                    sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
                 }
-            }
-            for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
-                sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
             }
         }
     }
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
+        if(nextRequiredBy.isBefore(now)){
+            return;
+        }
         for (long notificationPeriod : NOTIFICATION_PERIODS) {
-            if (now.plusDays(notificationPeriod).isAfter(nextRequiredBy)) {
+            LocalDate nowPlusNotificationPeriod = now.plusDays(notificationPeriod);
+            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy) ) {
                 Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), course.getId());
                 if (!optionalNotification.isPresent() || Period.between(optionalNotification.get().getSent().toLocalDate(), now).getDays() > notificationPeriod) {
                     List<Course> incompleteCoursesForPeriod = incompleteCourses.computeIfAbsent(notificationPeriod, key -> new ArrayList<>());

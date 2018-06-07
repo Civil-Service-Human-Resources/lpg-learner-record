@@ -20,6 +20,9 @@ public class Notification {
 
     private LocalDateTime sent;
 
+    public Notification() {
+    }
+
     public Notification(String courseId, String identityUid) {
         checkArgument(courseId != null);
         checkArgument(identityUid != null);

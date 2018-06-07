@@ -73,8 +73,12 @@ public class Module {
             int audienceRelevance = audience.getRelevance(civilServant);
             if (audienceRelevance > highestRelevance) {
                 mostRelevantAudience = audience;
+                highestRelevance = audienceRelevance;
             }
         }
-        return mostRelevantAudience;
+        if (highestRelevance > -1) {
+            return mostRelevantAudience;
+        }
+        return null;
     }
 }

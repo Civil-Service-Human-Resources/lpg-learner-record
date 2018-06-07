@@ -85,10 +85,16 @@ public class Audience {
     }
 
     public LocalDate getNextRequiredBy(LocalDate completionDate) {
-        if (frequency == null || requiredBy == null) {
+        LocalDate today = LocalDate.now();
+        if (requiredBy == null) {
             return null;
         }
-        LocalDate today = LocalDate.now();
+        if (frequency == null) {
+            if (requiredBy.isAfter(today) || requiredBy.isEqual(today)){
+               return requiredBy;
+            }
+            return null;
+        }
         LocalDate nextRequiredBy = requiredBy;
         while (nextRequiredBy.isBefore(today)) {
             nextRequiredBy = increment(nextRequiredBy, frequency);
