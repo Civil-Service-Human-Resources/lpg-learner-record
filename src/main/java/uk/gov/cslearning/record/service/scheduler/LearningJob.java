@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -92,40 +93,44 @@ public class LearningJob {
     }
 
     public void sendNotificationForCompletedLearning()  {
+
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
 
             LOGGER.debug("Got identity with uid {} ({})", identity.getUsername(), identities.size());
             try {
-                CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
-                System.out.println(civilServant.getDepartmentCode());
-                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
-                LOGGER.debug("courses {}",courses.size());
-                for (Course course : courses) {
-                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
-                    // okay we do not want to find a course without a completed record or without a record at all
+                Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
+                if (optionalCivilServant.isPresent()) {
+                    CivilServant civilServant = optionalCivilServant.get();
+                    List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+                    LOGGER.debug("courses {}",courses.size());
+                    for (Course course : courses) {
+                        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                        // okay we do not want to find a course without a completed record or without a record at all
 
-                    try {
-                        CheckAndNotifyLineManager(identity, course,null);
-                    } catch(NotificationClientException nce) {
-                        LOGGER.error("Error notifying line manger about course completion");
-                    }
+                        try {
+                            CheckAndNotifyLineManager(identity, course, null);
+                        } catch (NotificationClientException nce) {
+                            LOGGER.error("Error notifying line manger about course completion");
+                        }
 
-
-                    if (courseRecords.size() != 0) {
-                        for (CourseRecord courseRecord : courseRecords) {
-                            LOGGER.debug("course is "+ courseRecord.getState());
-                            if (courseRecord.getState() ==  State.COMPLETED) {
-                                LOGGER.debug("course is COMPLETED");
-                                try {
-                                    CheckAndNotifyLineManager(identity, course,courseRecord.getCompletionDate());
-                                } catch(NotificationClientException nce) {
-                                    LOGGER.error("Error notifying line manger about course completion");
+                        if (courseRecords.size() != 0) {
+                            for (CourseRecord courseRecord : courseRecords) {
+                                LOGGER.debug("course is " + courseRecord.getState());
+                                if (courseRecord.getState() == State.COMPLETED) {
+                                    LOGGER.debug("course is COMPLETED");
+                                    try {
+                                        CheckAndNotifyLineManager(identity, course, courseRecord.getCompletionDate());
+                                    } catch (NotificationClientException nce) {
+                                        LOGGER.error("Error notifying line manger about course completion");
+                                    }
                                 }
                             }
                         }
                     }
+                } else {
+                    throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             } catch (HttpClientErrorException hce) {
                 LOGGER.debug("Error getting details for {}",identity.getUid());
@@ -134,30 +139,6 @@ public class LearningJob {
 
     }
 
-
-    @Transactional
-    public void sendNotificationForCompletedLearning() throws NotificationClientException {
-        Collection<Identity> identities = identityService.listAll();
-
-        for (Identity identity : identities) {
-            LOGGER.debug("Got identity with uid {}", identity.getUid());
-
-            CivilServant civilServant = registryService.getCivilServantByUid(identity.getUid());
-            List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
-            Boolean notCompleted = false;
-            for (Course course : courses) {
-                Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
-                // okay we do not want to find a course without a completed record or without a record at all
-                if (courseRecords.size() != 0) {
-                    for (CourseRecord courseRecord : courseRecords) {
-
-                    }
-                }
-                notCompleted = true;
-            }
-        }
-
-    }
 
     public void sendNotificationForIncompleteCourses() throws NotificationClientException {
         Collection<Identity> identities = identityService.listAll();
