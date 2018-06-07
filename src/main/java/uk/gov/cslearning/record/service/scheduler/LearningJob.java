@@ -69,10 +69,10 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
     }
 
-    private void CheckAndNotifyLineManager(Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
+    private void CheckAndNotifyLineManager(CivilServant civilServant, Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
         Boolean sendMail = false;
 
-        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(course.getId(),identity.getUid(),null);
+        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(course.getId(),identity.getUid(),COMPLETED);
         LOGGER.debug("Searching for notification: {}",optionalNotification.isPresent());
         if (!optionalNotification.isPresent()) {
             sendMail = true;
@@ -85,14 +85,14 @@ public class LearningJob {
         }
 
         if (sendMail) {
-            notifyService.notify("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, "");
+            notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, civilServant.getFullName(),"manager");
             Notification notification = new Notification(course.getId(),identity.getUid(),COMPLETED);
             notificationRepository.save(notification);
         }
 
     }
 
-    public void sendNotificationForCompletedLearning()  {
+    public void sendNotificationForCompletedLearning() throws NotificationClientException  {
 
         Collection<Identity> identities = identityService.listAll();
 
@@ -101,8 +101,10 @@ public class LearningJob {
             LOGGER.debug("Got identity with uid {} ({})", identity.getUsername(), identities.size());
             try {
                 Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
+
                 if (optionalCivilServant.isPresent()) {
                     CivilServant civilServant = optionalCivilServant.get();
+                    LOGGER.debug("FULLNAME " +civilServant.getFullName());
                     List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
                     LOGGER.debug("courses {}",courses.size());
                     for (Course course : courses) {
@@ -110,9 +112,10 @@ public class LearningJob {
                         // okay we do not want to find a course without a completed record or without a record at all
 
                         try {
-                            CheckAndNotifyLineManager(identity, course, null);
+                            CheckAndNotifyLineManager(civilServant, identity, course, null);
                         } catch (NotificationClientException nce) {
                             LOGGER.error("Error notifying line manger about course completion");
+                            throw nce;
                         }
 
                         if (courseRecords.size() != 0) {
@@ -121,7 +124,7 @@ public class LearningJob {
                                 if (courseRecord.getState() == State.COMPLETED) {
                                     LOGGER.debug("course is COMPLETED");
                                     try {
-                                        CheckAndNotifyLineManager(identity, course, courseRecord.getCompletionDate());
+                                        CheckAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
                                     } catch (NotificationClientException nce) {
                                         LOGGER.error("Error notifying line manger about course completion");
                                     }

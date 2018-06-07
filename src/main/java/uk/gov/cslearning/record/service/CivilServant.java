@@ -4,6 +4,8 @@ public class CivilServant {
 
     private String departmentCode;
 
+    private String fullName;
+
     private String gradeCode;
 
     private String profession;
@@ -30,5 +32,13 @@ public class CivilServant {
 
     public void setProfession(String profession) {
         this.profession = profession;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }
