@@ -68,11 +68,33 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
     }
 
-    public void sendNotificationForCompletedLearning() throws NotificationClientException {
+    private void CheckAndNotifyLineManager(Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
+        Boolean sendMail = false;
+
+        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(course.getId(),identity.getUid(),null);
+        LOGGER.debug("Searching for notification: {}",optionalNotification.isPresent());
+        if (!optionalNotification.isPresent()) {
+            sendMail = true;
+        } else {
+            Notification notification = optionalNotification.get();
+            if (notification.getSent().isBefore(completedDate)){
+                sendMail = true;
+            }
+
+        }
+
+        if (sendMail) {
+            notifyService.notify("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, "");
+            Notification notification = new Notification(course.getId(),identity.getUid(),COMPLETED);
+            notificationRepository.save(notification);
+        }
+
+    }
+
+    public void sendNotificationForCompletedLearning()  {
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
-            Boolean completed = false;
 
             LOGGER.debug("Got identity with uid {} ({})", identity.getUsername(), identities.size());
             try {
@@ -83,11 +105,24 @@ public class LearningJob {
                 for (Course course : courses) {
                     Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
                     // okay we do not want to find a course without a completed record or without a record at all
+
+                    try {
+                        CheckAndNotifyLineManager(identity, course,null);
+                    } catch(NotificationClientException nce) {
+                        LOGGER.error("Error notifying line manger about course completion");
+                    }
+
+
                     if (courseRecords.size() != 0) {
                         for (CourseRecord courseRecord : courseRecords) {
                             LOGGER.debug("course is "+ courseRecord.getState());
                             if (courseRecord.getState() ==  State.COMPLETED) {
                                 LOGGER.debug("course is COMPLETED");
+                                try {
+                                    CheckAndNotifyLineManager(identity, course,courseRecord.getCompletionDate());
+                                } catch(NotificationClientException nce) {
+                                    LOGGER.error("Error notifying line manger about course completion");
+                                }
                             }
                         }
                     }
@@ -95,35 +130,10 @@ public class LearningJob {
             } catch (HttpClientErrorException hce) {
                 LOGGER.debug("Error getting details for {}",identity.getUid());
             }
-
-            if (completed) {
-                System.out.println(identity.getUid() + " COMPLETED!");
-
-            } else {
-                System.out.println(identity.getUid() + " NOT COMPLETED!");
-
-                Boolean sendMail = false
-
-
-                Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndNotificationType(identity.getUid(),COMPLETED);
-                if (!optionalNotification.isPresent()) {
-                    sendMail = true;
-                } else {
-                    if (notfication sent before completed date) {
-                        sendMail = true;
-                    }
-
-                }
-
-                if (sendMail) {
-                    notifyService.notify("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, "");
-                    Notification notification = new Notification(identity.getUid());
-                    notificationRepository.save(notification);
-                }
-            }
         }
 
     }
+
 
     @Transactional
     public void sendNotificationForCompletedLearning() throws NotificationClientException {

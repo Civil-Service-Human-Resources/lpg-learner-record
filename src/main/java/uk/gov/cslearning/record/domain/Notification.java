@@ -25,11 +25,14 @@ public class Notification {
     private static final String COMPLETED = "COMPLETED";
 
 
-    public Notification( String identityUid) {
+    public Notification(String courseId, String identityUid, String notificationType) {
+        checkArgument(courseId != null);
         checkArgument(identityUid != null);
+
+        this.courseId = courseId;
         this.sent = LocalDateTime.now();
         this.identityUid = identityUid;
-        this.notificationType = COMPLETED;
+        this.notificationType = notificationType;
     }
 
     public Notification(String courseId, String identityUid) {
