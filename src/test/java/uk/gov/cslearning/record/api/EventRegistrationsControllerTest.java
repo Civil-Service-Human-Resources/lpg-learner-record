@@ -40,7 +40,7 @@ public class EventRegistrationsControllerTest {
     @Test
     public void shouldReturnZeroIfNoRegistrations() throws Exception {
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/registrations/abc/count")
+                MockMvcRequestBuilders.get("/registrations/count?eventId=abc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -53,7 +53,7 @@ public class EventRegistrationsControllerTest {
         when(courseRecordRepository.countRegisteredForEvent("abc")).thenReturn(5);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/registrations/abc/count")
+                MockMvcRequestBuilders.get("/registrations/count?eventId=abc")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
