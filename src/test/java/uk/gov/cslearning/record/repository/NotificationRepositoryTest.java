@@ -58,7 +58,7 @@ public class NotificationRepositoryTest {
     }
 
     private Notification createNotification(String courseId, LocalDateTime localDateTime, String identityUid) {
-        Notification notification = new Notification(courseId, identityUid, null);
+        Notification notification = new Notification(courseId, identityUid);
         notification.setSent(localDateTime);
         return notification;
     }

@@ -25,7 +25,7 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public void notify(String email, String requiredLearning, String templateId, Strring period) throws NotificationClientException {
+    public void notify(String email, String requiredLearning, String templateId, String period) throws NotificationClientException {
         LOGGER.debug(period);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
