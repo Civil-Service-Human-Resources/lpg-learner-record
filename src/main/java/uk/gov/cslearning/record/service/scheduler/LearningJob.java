@@ -95,9 +95,15 @@ public class LearningJob {
             }
 
             if (sendMail) {
-                notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(), civilServant.getLineManagerEmail(),course.getTitle());
-                notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
-                notificationRepository.save(notification);
+                Optional<CivilServant> optionalLineManager = registryService.getCivilServantByUid(civilServant.getLineManagerUid());
+                if (optionalLineManager.isPresent()) {
+                    CivilServant lineManager = optionalLineManager.get();
+                    notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+                    notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
+                    notificationRepository.save(notification);
+                } else {
+                    LOGGER.error("User has line manager but line manager does not exist!");
+                }
             }
 
         }
