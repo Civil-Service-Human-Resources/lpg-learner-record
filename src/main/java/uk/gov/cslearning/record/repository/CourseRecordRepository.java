@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.CourseRecord;
 
@@ -16,4 +17,7 @@ public interface CourseRecordRepository extends CrudRepository<CourseRecord, Lon
     Iterable<CourseRecord> findByProfession(String profession);
 
     Iterable<CourseRecord> findByDepartment(String department);
+
+    @Query("SELECT COUNT(mr) FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1 and mr.state = 'REGISTERED'")
+    Integer countRegisteredForEvent(@Param("eventId") String eventId);
 }
