@@ -57,6 +57,7 @@ public class RegistryService {
         if (response.hasBody()) {
             Map data = response.getBody();
             CivilServant civilServant = new CivilServant();
+            civilServant.setName(getProperty(data, "profession.fullName"));
             civilServant.setProfession(getProperty(data, "profession.name"));
             civilServant.setDepartmentCode(getProperty(data, "organisation.department.code"));
             civilServant.setGradeCode(getProperty(data, "grade.code"));
