@@ -73,64 +73,66 @@ public class LearningJob {
     }
 
     private void CheckAndNotifyLineManager(CivilServant civilServant, Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
-        Boolean sendMail = false;
 
-        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(course.getId(),identity.getUid(),COMPLETED);
-        LOGGER.debug("Searching for notification: {}",optionalNotification.isPresent());
-
-        if (!optionalNotification.isPresent()) {
-            sendMail = true;
+        if (civilServant.getLineManagerEmail() == null) {
+            LOGGER.error("User has no line manager!");
         } else {
-            Notification notification = optionalNotification.get();
-            if (notification.getSent().isBefore(completedDate)){
+            Boolean sendMail = false;
+            Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(identity.getUid(),course.getId(),COMPLETED);
+            System.out.println(course.getId()+" "+identity.getUid()+" "+COMPLETED);
+            Notification notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
+            System.out.println(notification.toString());
+
+            if (!optionalNotification.isPresent()) {
                 sendMail = true;
+            } else {
+                notification = optionalNotification.get();
+                System.out.println("NOTIFICATION FOUND: "+notification.toString());
+                if (notification.getSent().isBefore(completedDate)) {
+                    sendMail = true;
+                }
+
+            }
+
+            if (sendMail) {
+                notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(), civilServant.getLineManagerEmail(),course.getTitle());
+                notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
+                notificationRepository.save(notification);
             }
 
         }
 
-        if (sendMail) {
-            notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(),civilServant.getLineManagerEmail());
-            Notification notification = new Notification(course.getId(),identity.getUid(),COMPLETED);
-            notificationRepository.save(notification);
-        }
-
     }
-
+    
     public void sendNotificationForCompletedLearning() throws NotificationClientException  {
 
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
 
-            LOGGER.debug("Got identity with uid {} ({})", identity.getUsername(), identities.size());
+            LOGGER.info("Got identity with uid {} ({})", identity.getUsername(), identities.size());
             try {
                 Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
 
                 if (optionalCivilServant.isPresent()) {
                     CivilServant civilServant = optionalCivilServant.get();
-                    LOGGER.debug("FULLNAME " +civilServant.getFullName());
                     List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
-                    LOGGER.debug("courses {}",courses.size());
+                    LOGGER.info("Got courses  ({})", courses.size());
+
                     for (Course course : courses) {
                         Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
                         // okay we do not want to find a course without a completed record or without a record at all
 
-                        try {
-                            CheckAndNotifyLineManager(civilServant, identity, course, null);
-                        } catch (NotificationClientException nce) {
-                            LOGGER.error("Error notifying line manger about course completion");
-                            throw nce;
-                        }
-
                         if (courseRecords.size() != 0) {
                             for (CourseRecord courseRecord : courseRecords) {
-                                LOGGER.debug("course is " + courseRecord.getState());
-                                if (courseRecord.getState() == State.COMPLETED) {
-                                    LOGGER.debug("course is COMPLETED");
+                                LOGGER.info("course completed  " + courseRecord.getCompletionDate());
+                                if (courseRecord.getCompletionDate() != null) {
+                                    LOGGER.info("course is COMPLETED");
                                     try {
                                         CheckAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
                                     } catch (NotificationClientException nce) {
                                         LOGGER.error("Error notifying line manger about course completion");
+                                        throw nce;
                                     }
                                 }
                             }
@@ -143,7 +145,6 @@ public class LearningJob {
                 LOGGER.debug("Error getting details for {}",identity.getUid());
             }
         }
-
     }
 
 
@@ -226,7 +227,7 @@ public class LearningJob {
         notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {
-            Notification notification = new Notification(course.getId(), identity.getUid());
+            Notification notification = new Notification(course.getId(), identity.getUid(), null);
             notificationRepository.save(notification);
         }
     }
