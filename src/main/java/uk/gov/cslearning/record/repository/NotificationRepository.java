@@ -10,5 +10,7 @@ public interface NotificationRepository extends CrudRepository<Notification, Lon
     Optional<Notification> findFirstByIdentityUidAndCourseIdOrderBySentDesc(String identityUid, String courseId);
     Optional<Notification> findFirstByIdentityUidAndCourseIdAndNotificationType(String identityUid, String courseId, String notificationType);
 
+    Optional<Notification> findFirstByIdentityUidAndCourseIdAndNotificationType(String identityUid, String courseId, String notificationType);
+
     Boolean existsByIdentityUidAndCourseId(String identityUid, String courseId);
 }

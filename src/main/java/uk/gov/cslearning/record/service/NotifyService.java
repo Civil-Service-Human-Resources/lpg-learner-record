@@ -19,12 +19,13 @@ public class NotifyService {
     private static final String COMPLETED_COURSE_PERMISSION = "completedCourse";
     private static final String LEARNER_PERMISSION = "learner";
     private static final String MANAGER_PERMISSION = "manager";
+    private static final String COURSETITLE_PERMISSION = "courseTitle";
     private static final String PERIOD_PERMISSION = "periodPermission";
 
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public void notify(String email, String requiredLearning, String templateId, String period) throws NotificationClientException {
+    public void notify(String email, String requiredLearning, String templateId, Strring period) throws NotificationClientException {
         LOGGER.debug(period);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
@@ -38,12 +39,13 @@ public class NotifyService {
     }
 
 
-    public void notifyOnComplete(String email, String completedCourse, String templateId,String learner, String manager) throws NotificationClientException {
+    public void notifyOnComplete(String email, String completedCourse, String templateId,String learner, String manager, String courseTitle) throws NotificationClientException {
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
         personalisation.put(COMPLETED_COURSE_PERMISSION, completedCourse);
         personalisation.put(LEARNER_PERMISSION, learner);
         personalisation.put(MANAGER_PERMISSION, manager);
+        personalisation.put(COURSETITLE_PERMISSION, courseTitle);
 
         NotificationClient client = new NotificationClient(govNotifyKey);
         LOGGER.debug(personalisation.toString());

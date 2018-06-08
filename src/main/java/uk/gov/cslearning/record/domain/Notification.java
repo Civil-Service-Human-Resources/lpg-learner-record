@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.domain;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
@@ -11,7 +12,8 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String courseId;
 
     @Column(nullable = false)
@@ -24,9 +26,13 @@ public class Notification {
     private static final String COMPLETED = "COMPLETED";
 
 
+    public Notification() {
+    }
+
     public Notification(String courseId, String identityUid, String notificationType) {
         checkArgument(courseId != null);
         checkArgument(identityUid != null);
+        checkArgument(notificationType != null);
 
         this.courseId = courseId;
         this.sent = LocalDateTime.now();
@@ -34,14 +40,6 @@ public class Notification {
         this.notificationType = notificationType;
     }
 
-    public Notification(String courseId, String identityUid) {
-        checkArgument(courseId != null);
-        checkArgument(identityUid != null);
-
-        this.courseId = courseId;
-        this.sent = LocalDateTime.now();
-        this.identityUid = identityUid;
-    }
 
     public String getCourseId() {
         return courseId;
@@ -77,5 +75,14 @@ public class Notification {
 
     public void setNotificationType(String notificationType) {
         notificationType = notificationType;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("courseId", courseId)
+                .append("identityId", identityUid)
+                .append("notificationType", notificationType)
+                .toString();
     }
 }

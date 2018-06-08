@@ -57,7 +57,8 @@ public class RegistryService {
         if (response.hasBody()) {
             Map data = response.getBody();
             CivilServant civilServant = new CivilServant();
-            civilServant.setName(getProperty(data, "profession.fullName"));
+            civilServant.setFullName(getProperty(data, "fullName"));
+            civilServant.setLineManagerEmail(getProperty(data, "lineManagerEmail"));
             civilServant.setProfession(getProperty(data, "profession.name"));
             civilServant.setDepartmentCode(getProperty(data, "organisation.department.code"));
             civilServant.setGradeCode(getProperty(data, "grade.code"));
@@ -73,6 +74,7 @@ public class RegistryService {
         try {
             Map response = restOperations.getForObject(String.format(findByUidUrlFormat, uid), Map.class);
             civilServant.setFullName(getProperty(response, "fullName"));
+            civilServant.setLineManagerEmail(getProperty(response, "lineManagerEmail"));
             civilServant.setProfession(getProperty(response, "profession.name"));
             civilServant.setDepartmentCode(getProperty(response, "organisation.department.code"));
             civilServant.setGradeCode(getProperty(response, "grade.code"));
