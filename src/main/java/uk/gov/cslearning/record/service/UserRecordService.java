@@ -78,10 +78,13 @@ public class UserRecordService {
     private void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
         if (!courseRecords.isEmpty()) {
             LOGGER.debug("Updating course records with additional user information.");
-            Optional<CivilServant> civilServant = registryService.getCivilServantByUid(userId);
-            for (CourseRecord courseRecord : courseRecords) {
-                courseRecord.setDepartment(civilServant.get().getDepartmentCode());
-                courseRecord.setProfession(civilServant.get().getProfession());
+            Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(userId);
+            if (optionalCivilServant.isPresent()) {
+                CivilServant civilServant = optionalCivilServant.get();
+                for (CourseRecord courseRecord : courseRecords) {
+                    courseRecord.setDepartment(civilServant.getDepartmentCode());
+                    courseRecord.setProfession(civilServant.getProfession());
+                }
             }
         }
     }

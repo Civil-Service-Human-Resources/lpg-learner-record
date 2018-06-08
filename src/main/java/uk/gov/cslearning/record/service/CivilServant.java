@@ -10,6 +10,8 @@ public class CivilServant {
 
     private String lineManagerEmail;
 
+    private String lineManagerUid;
+
     private String profession;
 
     public String getDepartmentCode() {
@@ -50,6 +52,14 @@ public class CivilServant {
 
     public void setLineManagerEmail(String lineManagerEmail) {
         this.lineManagerEmail = lineManagerEmail;
+    }
+
+    public String getLineManagerUid() {
+        return lineManagerUid;
+    }
+
+    public void setLineManagerUid(String lineManagerUid) {
+        this.lineManagerUid = lineManagerUid;
     }
 
 }
