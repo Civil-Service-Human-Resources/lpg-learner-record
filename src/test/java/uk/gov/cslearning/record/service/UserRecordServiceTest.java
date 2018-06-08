@@ -21,6 +21,7 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -66,7 +67,7 @@ public class UserRecordServiceTest {
         Statement statement = createStatement(activityId, uk.gov.cslearning.record.service.xapi.Verb.ARCHIVED);
 
         when(xApiService.getStatements(eq(userId), eq(null), any())).thenReturn(ImmutableSet.of(statement));
-        when(registryService.getCivilServantByUid(userId)).thenReturn(new CivilServant());
+        when(registryService.getCivilServantByUid(userId)).thenReturn(Optional.of(new CivilServant()));
 
         Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, activityId);
 

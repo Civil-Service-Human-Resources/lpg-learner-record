@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
 
+import javax.ws.rs.QueryParam;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -27,8 +28,8 @@ public class EventRegistrationsController {
         this.courseRecordRepository = courseRecordRepository;
     }
 
-    @GetMapping("/{eventId}/count")
-    public ResponseEntity<Count> activityRecord(@PathVariable String eventId) {
+    @GetMapping("/count")
+    public ResponseEntity<Count> activityRecord(@QueryParam("eventId") String eventId) {
         Integer count = courseRecordRepository.countRegisteredForEvent(eventId);
         return new ResponseEntity<>(new Count(count), OK);
     }
