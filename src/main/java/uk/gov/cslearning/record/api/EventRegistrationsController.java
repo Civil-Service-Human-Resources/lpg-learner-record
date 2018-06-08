@@ -2,18 +2,16 @@ package uk.gov.cslearning.record.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.cslearning.record.domain.CourseRecord;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.service.ActivityRecordService;
-import uk.gov.cslearning.record.service.UserRecordService;
 
-import javax.ws.rs.QueryParam;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.unmodifiableCollection;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -29,19 +27,30 @@ public class EventRegistrationsController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Count> activityRecord(@QueryParam("eventId") String eventId) {
-        Integer count = courseRecordRepository.countRegisteredForEvent(eventId);
-        return new ResponseEntity<>(new Count(count), OK);
+    public ResponseEntity<List<Count>> activityRecord(@RequestParam("eventId") String[] eventIds) {
+        List<Count> counts = new ArrayList<>();
+        for (String eventId : eventIds) {
+            Integer count = courseRecordRepository.countRegisteredForEvent(eventId);
+            counts.add(new Count(eventId, count));
+        }
+        return new ResponseEntity<>(counts, OK);
     }
 
     public static final class Count {
 
+        private String eventId;
+
         private int value;
 
-        public Count(Integer value) {
+        public Count(String eventId, Integer value) {
+            this.eventId = eventId;
             if (value != null) {
                 this.value = value;
             }
+        }
+
+        public String getEventId() {
+            return eventId;
         }
 
         public int getValue() {
