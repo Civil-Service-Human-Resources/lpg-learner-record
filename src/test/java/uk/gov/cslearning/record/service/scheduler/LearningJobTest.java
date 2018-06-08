@@ -185,7 +185,7 @@ public class LearningJobTest {
 
         LocalDateTime sent = LocalDate.parse("2018-05-21", FORMATTER).atStartOfDay();
 
-        Notification notification = new Notification(COURSE_ID, IDENTITY_UID, null);
+        Notification notification = new Notification(COURSE_ID, IDENTITY_UID);
         notification.setSent(sent);
 
         when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), COURSE_ID))
@@ -210,7 +210,7 @@ public class LearningJobTest {
 
         LocalDateTime sent = LocalDate.parse("2018-05-10", FORMATTER).atStartOfDay();
 
-        Notification notification = new Notification(COURSE_ID, IDENTITY_UID, null);
+        Notification notification = new Notification(COURSE_ID, IDENTITY_UID);
         notification.setSent(sent);
 
         when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), COURSE_ID))

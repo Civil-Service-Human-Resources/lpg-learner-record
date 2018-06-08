@@ -25,7 +25,6 @@ public class CompletedAction extends Action {
 
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
-        System.out.println("Reached");
         courseRecord.setState(null);
         moduleRecord.setState(State.COMPLETED);
         moduleRecord.setCompletionDate(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));

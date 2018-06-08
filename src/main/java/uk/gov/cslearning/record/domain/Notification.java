@@ -24,6 +24,8 @@ public class Notification {
 
     private static final String COMPLETED = "COMPLETED";
 
+    private static final String NO_TYPE = "";
+
 
     public Notification() {
     }
@@ -37,6 +39,16 @@ public class Notification {
         this.sent = LocalDateTime.now();
         this.identityUid = identityUid;
         this.notificationType = notificationType;
+    }
+
+    public Notification(String courseId, String identityUid) {
+        checkArgument(courseId != null);
+        checkArgument(identityUid != null);
+
+        this.courseId = courseId;
+        this.sent = LocalDateTime.now();
+        this.identityUid = identityUid;
+        this.notificationType = NO_TYPE;
     }
 
 
