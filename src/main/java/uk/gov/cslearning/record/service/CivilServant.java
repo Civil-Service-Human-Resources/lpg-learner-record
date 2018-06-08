@@ -8,6 +8,8 @@ public class CivilServant {
 
     private String gradeCode;
 
+    private String lineManagerEmail;
+
     private String profession;
 
     public String getDepartmentCode() {
@@ -41,4 +43,13 @@ public class CivilServant {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
+
+    public String getLineManagerEmail() {
+        return lineManagerEmail;
+    }
+
+    public void setLineManagerEmail(String lineManagerEmail) {
+        this.lineManagerEmail = lineManagerEmail;
+    }
+
 }

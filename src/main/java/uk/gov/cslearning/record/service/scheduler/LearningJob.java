@@ -45,6 +45,9 @@ public class LearningJob {
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
 
+    @Value("${govNotify.template.completedLearning}")
+    private String govNotifyCompletedLearningTemplateId;
+
     private IdentityService identityService;
 
     private RegistryService registryService;
@@ -74,6 +77,7 @@ public class LearningJob {
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(course.getId(),identity.getUid(),COMPLETED);
         LOGGER.debug("Searching for notification: {}",optionalNotification.isPresent());
+
         if (!optionalNotification.isPresent()) {
             sendMail = true;
         } else {
@@ -85,7 +89,7 @@ public class LearningJob {
         }
 
         if (sendMail) {
-            notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyRequiredLearningDueTemplateId, civilServant.getFullName(),"manager");
+            notifyService.notifyOnComplete("alan.work@teamsmog.com", "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(),civilServant.getLineManagerEmail());
             Notification notification = new Notification(course.getId(),identity.getUid(),COMPLETED);
             notificationRepository.save(notification);
         }
