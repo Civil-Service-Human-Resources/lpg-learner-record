@@ -8,7 +8,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -39,5 +41,32 @@ public class CourseRepositoryTest {
 
         assertThat(courseRecord.getIdentity(), notNullValue());
         assertThat(courseRecord.getModuleRecord("moduleId").getId(), notNullValue());
+    }
+
+    @Test
+    public void shouldLoadCountOfRegstrationsForAnEvent() {
+
+        final String eventId = "eventId";
+        final int registrations = 3;
+
+        for (int i = 0; i < registrations; i++) {
+            createRegistration("user" + i, eventId);
+        }
+
+        Integer count = courseRecordRepository.countRegisteredForEvent(eventId);
+
+        assertThat(count, is(registrations));
+    }
+
+    private void createRegistration(String userId, String eventId) {
+
+        ModuleRecord moduleRecord = new ModuleRecord("moduleId");
+        moduleRecord.setEventId(eventId);
+        moduleRecord.setState(State.REGISTERED);
+
+        CourseRecord courseRecord = new CourseRecord("courseId", userId);
+        courseRecord.addModuleRecord(moduleRecord);
+
+        courseRecordRepository.save(courseRecord);
     }
 }
