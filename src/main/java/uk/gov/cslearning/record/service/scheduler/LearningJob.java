@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -73,22 +72,18 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
     }
 
-    private void CheckAndNotifyLineManager(CivilServant civilServant, Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
+     void CheckAndNotifyLineManager(CivilServant civilServant, Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
 
         if (civilServant.getLineManagerEmail() == null) {
             LOGGER.error("User has no line manager!");
         } else {
             boolean sendMail = false;
-            Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(identity.getUid(),course.getId(),COMPLETED);
-            System.out.println(course.getId()+" "+identity.getUid()+" "+COMPLETED);
-            Notification notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
-            System.out.println(notification.toString());
+            Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationTypeOrderBySentDesc(identity.getUid(),course.getId(),COMPLETED);
 
             if (!optionalNotification.isPresent()) {
                 sendMail = true;
             } else {
-                notification = optionalNotification.get();
-                System.out.println("NOTIFICATION FOUND: "+notification.toString());
+                Notification notification = optionalNotification.get();
                 if (notification.getSent().isBefore(completedDate)) {
                     sendMail = true;
                 }
@@ -99,8 +94,8 @@ public class LearningJob {
                 Optional<CivilServant> optionalLineManager = registryService.getCivilServantByUid(civilServant.getLineManagerUid());
                 if (optionalLineManager.isPresent()) {
                     CivilServant lineManager = optionalLineManager.get();
-                    notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
-                    notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
+                    notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+                    Notification notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
                     notificationRepository.save(notification);
                 } else {
                     LOGGER.error("User has line manager but line manager does not exist!");

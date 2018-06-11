@@ -12,10 +12,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.repository.NotificationRepository;
+import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.cslearning.record.service.RegistryService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,6 +40,7 @@ public class LearningJobTest {
     private static final String COURSE_TITLE_2 = "Title 2";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final String EMAIL = "test@example.com";
+    private static final String MANAGER_EMAIL = "test@example.com";
     private static final String MONTH_PERIOD = "1 month";
     private static final String IDENTITY_UID = "identity123";
 
@@ -47,6 +50,9 @@ public class LearningJobTest {
 
     @Mock
     private NotifyService notifyService;
+
+    @Mock
+    private RegistryService registryService;
 
     @Mock
     private NotificationRepository notificationRepository;
@@ -75,6 +81,10 @@ public class LearningJobTest {
 
         when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(anyString(), anyString()))
                 .thenReturn(Optional.empty());
+
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationTypeOrderBySentDesc(anyString(), anyString(), anyString()))
+                .thenReturn(Optional.empty());
+
     }
 
     @Test
@@ -176,6 +186,47 @@ public class LearningJobTest {
         assertThat(periodCaptor.getValue(), equalTo(MONTH_PERIOD));
     }
 
+
+    @Test
+    public void testArgumentsOfLearningNotificationsForCompletedCourses() throws NotificationClientException {
+        Identity identity = new Identity();
+        identity.setUid("uid");
+
+        Course course1 = new Course();
+        course1.setId("1");
+        course1.setTitle(COURSE_TITLE_1);
+
+
+        CivilServant civilServant = new CivilServant();
+        civilServant.setFullName("test user");
+        civilServant.setLineManagerUid("managerUid");
+        civilServant.setLineManagerEmail(MANAGER_EMAIL);
+
+
+        CivilServant managerCivilServant = new CivilServant();
+        managerCivilServant.setFullName("manager");
+
+        when(registryService.getCivilServantByUid("managerUid"))
+                .thenReturn(Optional.of(managerCivilServant));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        learningJob.CheckAndNotifyLineManager(civilServant, identity, course1, now );
+
+        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> courseCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> templateIdCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> learnerCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> managerCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(notifyService).notifyOnComplete(emailCaptor.capture(), templateIdCaptor.capture(), learnerCaptor.capture(), managerCaptor.capture(), courseCaptor.capture());
+
+        assertThat(emailCaptor.getValue(), equalTo(MANAGER_EMAIL));
+        assertThat(courseCaptor.getValue(), equalTo(COURSE_TITLE_1));
+        assertThat(learnerCaptor.getValue(), equalTo("test user"));
+        assertThat(managerCaptor.getValue(), equalTo("manager"));
+    }
+
     @Test
     public void shouldNotBeAddedToDayListIfDayNotificationRecentlySent() {
 
@@ -225,4 +276,6 @@ public class LearningJobTest {
         assertThat(incompleteCoursesWeek.size(), equalTo(1));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
     }
+
+
 }

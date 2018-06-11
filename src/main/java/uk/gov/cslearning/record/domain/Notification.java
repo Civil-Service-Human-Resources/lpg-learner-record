@@ -85,7 +85,7 @@ public class Notification {
     }
 
     public void setNotificationType(String notificationType) {
-        notificationType = notificationType;
+        this.notificationType = notificationType;
     }
 
     @Override
