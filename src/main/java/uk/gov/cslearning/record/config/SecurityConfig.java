@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/notifications");
+        web.ignoring().antMatchers("/notifications/**");
     }
 
     @Bean
