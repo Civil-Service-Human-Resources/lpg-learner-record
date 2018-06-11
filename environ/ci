@@ -1,6 +1,5 @@
 #! /usr/bin/env bash
 
-
 SERVICE_NAME=lpg-learner-record
 
 BRANCH_TAG=`echo ${TRAVIS_PULL_REQUEST_BRANCH:-${TRAVIS_BRANCH}} | sed 's/\//-/g'`
@@ -19,22 +18,3 @@ docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}-${TRAV
 docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${COMMIT_TAG}
 
 docker push cshr/${SERVICE_NAME}
-./gradlew init
-./gradlew build
-
-docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-
-docker pull cshr/${SERVICE_NAME} || true
-
-docker build --cache-from cshr/${SERVICE_NAME}:latest -t cshr/${SERVICE_NAME}:latest .
-
-docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}
-docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${BRANCH_TAG}-${TRAVIS_BUILD_NUMBER}
-docker tag cshr/${SERVICE_NAME}:latest cshr/${SERVICE_NAME}:${COMMIT_TAG}
-
-<<<<<<< HEAD
-docker push cshr/lpg-learner-record
->>>>>>> 7cf473a... Updating CI.
-=======
-docker push cshr/${SERVICE_NAME}
->>>>>>> fab5d43... Missing configuration

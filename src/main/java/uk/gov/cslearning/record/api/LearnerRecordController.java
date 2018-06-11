@@ -27,7 +27,7 @@ public class LearnerRecordController {
 
     private UserRecordService userRecordService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordSummaryController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordController.class);
 
     @Autowired
     public LearnerRecordController(ActivityRecordService activityRecordService, UserRecordService userRecordService) {
