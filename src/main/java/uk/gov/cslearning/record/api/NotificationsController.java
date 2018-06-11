@@ -27,6 +27,7 @@ public class NotificationsController {
     @GetMapping
     public ResponseEntity runNotifications() throws NotificationClientException {
         learningJob.sendNotificationForIncompleteCourses();
+        learningJob.sendNotificationForCompletedLearning();
         return new ResponseEntity<>("Notifications job manually executed.", HttpStatus.OK);
     }
 }
