@@ -50,21 +50,6 @@ public class LearnerRecordController {
         return new ResponseEntity<>(new Records(records), OK);
     }
 
-    @Autowired
-    private LearningJob learningJob;
-
-    @GetMapping(path = "/notify")
-    public ResponseEntity notifyme() {
-        try {
-            learningJob.sendNotificationForCompletedLearning();
-        } catch (Exception e) {
-            LOGGER.error("Manual notification by URL failed.");
-
-        }
-
-        return ResponseEntity.ok().build();
-    }
-
     public static final class Records {
 
         private Collection<CourseRecord> records;
