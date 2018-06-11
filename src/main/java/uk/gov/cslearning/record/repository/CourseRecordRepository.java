@@ -1,16 +1,19 @@
 package uk.gov.cslearning.record.repository;
 
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.CourseRecord;
 
+import javax.persistence.LockModeType;
 import java.util.Collection;
 
 @Repository
 public interface CourseRecordRepository extends CrudRepository<CourseRecord, Long> {
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM CourseRecord r WHERE r.identity.userId = ?1")
     Collection<CourseRecord> findByUserId(String userId);
 

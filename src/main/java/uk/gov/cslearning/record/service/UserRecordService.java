@@ -43,7 +43,7 @@ public class UserRecordService {
     }
 
     @Transactional
-    public Collection<CourseRecord>  getUserRecord(String userId, String activityId) {
+    public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
 
         Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
