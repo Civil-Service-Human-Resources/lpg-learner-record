@@ -76,7 +76,7 @@ public class RegistryService {
             civilServant.setGradeCode(getProperty(response, "grade.code"));
 
         } catch (HttpClientErrorException ex){
-            LOGGER.error(ex.getMessage());
+            LOGGER.info("Profile does not exist in CSRS with UID {}", uid);
         }
         return Optional.of(civilServant);
     }

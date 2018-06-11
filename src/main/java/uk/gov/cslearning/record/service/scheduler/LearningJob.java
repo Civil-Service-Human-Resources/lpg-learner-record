@@ -66,13 +66,14 @@ public class LearningJob {
 
     @Transactional
     public void sendNotificationForIncompleteCourses() throws NotificationClientException {
+        LOGGER.info("Sending notification for incomplete courses");
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
-            LOGGER.debug("Got identity with uid {} and email {}", identity.getUid(), identity.getUsername());
+            LOGGER.info("Got identity with uid {} and email {}", identity.getUid(), identity.getUsername());
 
             Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
-            if (optionalCivilServant.isPresent()){
+            if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
                 List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
                 Map<Long, List<Course>> incompleteCourses = new HashMap<>();
@@ -90,7 +91,7 @@ public class LearningJob {
                     }
 
                     LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant, mostRecentlyCompleted);
-                    LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
+                    LOGGER.info("Next required by for course {} is {}", course, nextRequiredBy);
 
                     if (nextRequiredBy != null) {
                         checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
@@ -101,17 +102,20 @@ public class LearningJob {
                 }
             }
         }
+        LOGGER.info("Sending notifications complete");
     }
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
-        if(nextRequiredBy.isBefore(now)){
+        LOGGER.info("Checking and adding for course {}", course);
+        if (nextRequiredBy.isBefore(now)) {
             return;
         }
         for (long notificationPeriod : NOTIFICATION_PERIODS) {
             LocalDate nowPlusNotificationPeriod = now.plusDays(notificationPeriod);
-            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy) ) {
+            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy)) {
                 Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), course.getId());
                 if (!optionalNotification.isPresent() || Period.between(optionalNotification.get().getSent().toLocalDate(), now).getDays() > notificationPeriod) {
+                    LOGGER.info("Course to be added to incomplete courses {}", course);
                     List<Course> incompleteCoursesForPeriod = incompleteCourses.computeIfAbsent(notificationPeriod, key -> new ArrayList<>());
                     incompleteCoursesForPeriod.add(course);
                 }
