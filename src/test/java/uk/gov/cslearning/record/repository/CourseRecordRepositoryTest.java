@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-public class CourseRepositoryTest {
+public class CourseRecordRepositoryTest {
 
     @Autowired
     private CourseRecordRepository courseRecordRepository;
