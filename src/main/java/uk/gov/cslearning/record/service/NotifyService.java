@@ -30,7 +30,12 @@ public class NotifyService {
         personalisation.put(PERIOD_PERMISSION, period);
 
         NotificationClient client = new NotificationClient(govNotifyKey);
-        SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
+        SendEmailResponse response = null;
+        try {
+            response = client.sendEmail(templateId, email, personalisation, "");
+        } catch (NotificationClientException e) {
+            LOGGER.info("Notify email can not be sent to the following address {}, with error: {}", email, e.getMessage());
+        }
 
         LOGGER.info("Notify email sent: {}", response.getBody());
     }
