@@ -73,7 +73,7 @@ public class LearningJob {
             LOGGER.info("Got identity with uid {} and email {}", identity.getUid(), identity.getUsername());
 
             Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
-            if (optionalCivilServant.isPresent()){
+            if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
                 List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
                 Map<Long, List<Course>> incompleteCourses = new HashMap<>();
@@ -107,12 +107,12 @@ public class LearningJob {
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
         LOGGER.info("Checking and adding for course {}", course);
-        if(nextRequiredBy.isBefore(now)){
+        if (nextRequiredBy.isBefore(now)) {
             return;
         }
         for (long notificationPeriod : NOTIFICATION_PERIODS) {
             LocalDate nowPlusNotificationPeriod = now.plusDays(notificationPeriod);
-            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy) ) {
+            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy)) {
                 Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), course.getId());
                 if (!optionalNotification.isPresent() || Period.between(optionalNotification.get().getSent().toLocalDate(), now).getDays() > notificationPeriod) {
                     LOGGER.info("Course to be added to incomplete courses {}", course);
