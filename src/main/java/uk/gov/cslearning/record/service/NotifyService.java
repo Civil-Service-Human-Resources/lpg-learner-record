@@ -22,7 +22,7 @@ public class NotifyService {
     private String govNotifyKey;
 
     public void notify(String email, String requiredLearning, String templateId, String period) throws NotificationClientException {
-        LOGGER.info("Sending {} notification to {}, with required learning", period, email, requiredLearning);
+        LOGGER.info("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
 
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
