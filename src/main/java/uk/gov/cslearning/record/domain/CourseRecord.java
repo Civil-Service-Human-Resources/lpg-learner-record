@@ -142,4 +142,8 @@ public class CourseRecord {
         }
         return false;
     }
+
+    public boolean isComplete() {
+        return getCompletionDate() != null;
+    }
 }

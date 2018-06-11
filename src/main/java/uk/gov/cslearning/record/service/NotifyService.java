@@ -16,9 +16,10 @@ public class NotifyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
     private static final String EMAIL_PERMISSION = "email";
     private static final String REQUIRED_LEARNING_PERMISSION = "requiredLearning";
+    private static final String COMPLETED_COURSE_PERMISSION = "completedCourse";
     private static final String LEARNER_PERMISSION = "learner";
     private static final String MANAGER_PERMISSION = "manager";
-    private static final String COURSETITLE_PERMISSION = "courseTitle";
+    private static final String COURSE_TITLE_PERMISSION = "courseTitle";
     private static final String PERIOD_PERMISSION = "periodPermission";
 
     @Value("${govNotify.key}")
@@ -34,22 +35,21 @@ public class NotifyService {
         NotificationClient client = new NotificationClient(govNotifyKey);
         SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-        LOGGER.info("Notify email sent: {}", response.getBody());
+        LOGGER.debug("Reminder notify email sent: {}", response.getBody());
     }
 
-
-    public void notifyOnComplete(String email, String templateId,String learner, String manager, String courseTitle) throws NotificationClientException {
+    public void notifyOnComplete(String email, String completedCourse, String templateId,String learner, String manager, String courseTitle) throws NotificationClientException {
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
+        personalisation.put(COMPLETED_COURSE_PERMISSION, completedCourse);
         personalisation.put(LEARNER_PERMISSION, learner);
         personalisation.put(MANAGER_PERMISSION, manager);
-        personalisation.put(COURSETITLE_PERMISSION, courseTitle);
+        personalisation.put(COURSE_TITLE_PERMISSION, courseTitle);
 
         NotificationClient client = new NotificationClient(govNotifyKey);
-        LOGGER.debug(personalisation.toString());
         SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-        LOGGER.info("Notify email sent: {}", response.getBody());
+        LOGGER.debug("Complete notify email sent: {}", response.getBody());
     }
 
 }
