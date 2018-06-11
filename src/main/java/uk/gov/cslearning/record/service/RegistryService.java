@@ -82,7 +82,7 @@ public class RegistryService {
             civilServant.setGradeCode(getProperty(response, "grade.code"));
 
         } catch (HttpClientErrorException ex){
-            LOGGER.error(ex.getMessage());
+            LOGGER.error("Cannot find profile details for civil servant with UID {}, with cause {}", uid, ex.getMessage());
         }
         return Optional.of(civilServant);
     }

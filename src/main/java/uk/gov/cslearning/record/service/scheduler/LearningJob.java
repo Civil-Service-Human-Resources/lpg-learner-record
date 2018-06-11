@@ -70,7 +70,7 @@ public class LearningJob {
     }
 
     @Transactional
-    public void sendLineManagerNotificationForCompletedLearning() throws NotificationClientException, HttpClientErrorException {
+    public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
 
         Collection<Identity> identities = identityService.listAll();
@@ -107,7 +107,7 @@ public class LearningJob {
         }
     }
 
-    void checkAndNotifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) throws NotificationClientException {
+    void checkAndNotifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) {
         LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", identity, course);
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.COMPLETE);
@@ -132,14 +132,14 @@ public class LearningJob {
     }
 
     @Transactional
-    public void sendReminderNotificationForIncompleteCourses() throws NotificationClientException {
+    public void sendReminderNotificationForIncompleteCourses() {
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
             LOGGER.debug("Got identity with uid {} and email {}", identity.getUid(), identity.getUsername());
 
             Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
-            if (optionalCivilServant.isPresent()){
+            if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
                 List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
                 Map<Long, List<Course>> incompleteCourses = new HashMap<>();
@@ -168,15 +168,16 @@ public class LearningJob {
                 }
             }
         }
+        LOGGER.info("Sending notifications complete");
     }
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
-        if(nextRequiredBy.isBefore(now)){
+        if (nextRequiredBy.isBefore(now)) {
             return;
         }
         for (long notificationPeriod : NOTIFICATION_PERIODS) {
             LocalDate nowPlusNotificationPeriod = now.plusDays(notificationPeriod);
-            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy) ) {
+            if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy)) {
                 Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.REMINDER);
                 if (!optionalNotification.isPresent() || Period.between(optionalNotification.get().getSent().toLocalDate(), now).getDays() > notificationPeriod) {
                     List<Course> incompleteCoursesForPeriod = incompleteCourses.computeIfAbsent(notificationPeriod, key -> new ArrayList<>());
@@ -187,7 +188,7 @@ public class LearningJob {
         }
     }
 
-    void sendNotificationForPeriod(Identity identity, Long period, List<Course> courses) throws NotificationClientException {
+    void sendNotificationForPeriod(Identity identity, Long period, List<Course> courses) {
         StringBuilder requiredLearning = new StringBuilder();
         for (Course c : courses) {
             requiredLearning
@@ -208,7 +209,7 @@ public class LearningJob {
                 break;
         }
 
-        notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
+        notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {
             Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
