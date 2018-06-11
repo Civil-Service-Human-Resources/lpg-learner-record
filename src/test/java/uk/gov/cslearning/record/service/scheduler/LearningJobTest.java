@@ -175,7 +175,7 @@ public class LearningJobTest {
         ArgumentCaptor<String> templateIdCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> periodCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(notifyService).notify(emailCaptor.capture(), requiredLearningCaptor.capture(), templateIdCaptor.capture(), periodCaptor.capture());
+        verify(notifyService).notifyForIncompleteCourses(emailCaptor.capture(), requiredLearningCaptor.capture(), templateIdCaptor.capture(), periodCaptor.capture());
         assertThat(emailCaptor.getValue(), equalTo(EMAIL));
 
         String expectedRequiredLearning = COURSE_TITLE_1 + "\n" + COURSE_TITLE_2 + "\n";

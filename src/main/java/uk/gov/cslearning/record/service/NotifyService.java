@@ -24,31 +24,40 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public void notify(String email, String requiredLearning, String templateId, String period) throws NotificationClientException {
-        LOGGER.debug(period);
+    public void notifyForIncompleteCourses(String email, String requiredLearning, String templateId, String period) {
+        LOGGER.debug("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
         personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
         personalisation.put(PERIOD_PERMISSION, period);
 
-        NotificationClient client = new NotificationClient(govNotifyKey);
-        SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
+        try {
+            NotificationClient client = new NotificationClient(govNotifyKey);
+            SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-        LOGGER.debug("Reminder notify email sent: {}", response.getBody());
+            LOGGER.debug("Reminder notify email sent: {}", response.getBody());
+        } catch (NotificationClientException e) {
+            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
+        }
     }
 
-    public void notifyOnComplete(String email, String templateId,String learner, String manager, String courseTitle) throws NotificationClientException {
+    public void notifyOnComplete(String email, String templateId, String learner, String manager, String courseTitle) {
+        LOGGER.debug("Sending completion notification to {}, for course {}", email, courseTitle);
+
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
         personalisation.put(LEARNER_PERMISSION, learner);
         personalisation.put(MANAGER_PERMISSION, manager);
         personalisation.put(COURSE_TITLE_PERMISSION, courseTitle);
 
-        NotificationClient client = new NotificationClient(govNotifyKey);
-        SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
+        try {
+            NotificationClient client = new NotificationClient(govNotifyKey);
+            SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-        LOGGER.debug("Complete notify email sent: {}", response.getBody());
+            LOGGER.debug("Complete notify email sent: {}", response.getBody());
+        } catch (NotificationClientException e) {
+            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
+        }
     }
-
 }
 
