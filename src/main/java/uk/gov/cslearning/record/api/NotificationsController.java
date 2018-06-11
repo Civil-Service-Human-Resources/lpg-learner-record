@@ -24,10 +24,15 @@ public class NotificationsController {
     @Autowired
     private LearningJob learningJob;
 
-    @GetMapping
-    public ResponseEntity runNotifications() throws NotificationClientException {
-        learningJob.sendNotificationForIncompleteCourses();
-        learningJob.sendNotificationForCompletedLearning();
-        return new ResponseEntity<>("Notifications job manually executed.", HttpStatus.OK);
+    @GetMapping("/reminder")
+    public ResponseEntity runIncompleteNotifications() throws NotificationClientException {
+        learningJob.sendReminderNotificationForIncompleteCourses();
+        return new ResponseEntity<>("Reminder notifications job manually executed.", HttpStatus.OK);
+    }
+
+    @GetMapping("/linemanager")
+    public ResponseEntity runCompleteNotifications() throws NotificationClientException {
+        learningJob.sendLineManagerNotificationForCompletedLearning();
+        return new ResponseEntity<>("Line manager notifications job manually executed.", HttpStatus.OK);
     }
 }

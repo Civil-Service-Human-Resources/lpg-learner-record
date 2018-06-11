@@ -209,7 +209,7 @@ public class LearningJobTest {
 
         LocalDateTime now = LocalDateTime.now();
 
-        learningJob.notifyLineManager(civilServant, identity, course1, now );
+        learningJob.checkAndNotifyLineManager(civilServant, identity, course1, now );
 
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> courseCaptor = ArgumentCaptor.forClass(String.class);

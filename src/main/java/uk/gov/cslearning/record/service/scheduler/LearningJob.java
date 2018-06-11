@@ -70,7 +70,7 @@ public class LearningJob {
     }
 
     @Transactional
-    public void sendNotificationForCompletedLearning() throws NotificationClientException, HttpClientErrorException {
+    public void sendLineManagerNotificationForCompletedLearning() throws NotificationClientException, HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
 
         Collection<Identity> identities = identityService.listAll();
@@ -97,7 +97,7 @@ public class LearningJob {
                     for (CourseRecord courseRecord : courseRecords) {
                         LOGGER.debug("Course complete: {}", courseRecord.isComplete());
                         if (courseRecord.isComplete()) {
-                            notifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
+                            checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
                         }
                     }
                 }
@@ -107,7 +107,7 @@ public class LearningJob {
         }
     }
 
-    void notifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) throws NotificationClientException {
+    void checkAndNotifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) throws NotificationClientException {
         LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", identity, course);
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.COMPLETE);
@@ -132,7 +132,7 @@ public class LearningJob {
     }
 
     @Transactional
-    public void sendNotificationForIncompleteCourses() throws NotificationClientException {
+    public void sendReminderNotificationForIncompleteCourses() throws NotificationClientException {
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
