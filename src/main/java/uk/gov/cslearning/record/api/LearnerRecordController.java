@@ -9,6 +9,9 @@ import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.scheduler.LearningJob;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -23,6 +26,8 @@ public class LearnerRecordController {
     private ActivityRecordService activityRecordService;
 
     private UserRecordService userRecordService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordSummaryController.class);
 
     @Autowired
     public LearnerRecordController(ActivityRecordService activityRecordService, UserRecordService userRecordService) {
@@ -53,7 +58,7 @@ public class LearnerRecordController {
         try {
             learningJob.sendNotificationForCompletedLearning();
         } catch (Exception e) {
-            System.out.println(e);
+            LOGGER.error("Manual notification by URL failed.");
 
         }
 
