@@ -22,18 +22,18 @@ public class Scheduler {
     public void learningJob() throws Exception{
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
-        learningJob.sendNotificationForIncompleteCourses();
+        learningJob.sendReminderNotificationForIncompleteCourses();
 
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
     @Scheduled(cron = "0 0 3 * * *")
     public void sendNotificationForCompletedLearning() throws Exception{
-        LOGGER.info("Executing  sendNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
+        LOGGER.info("Executing  sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
-        learningJob.sendNotificationForCompletedLearning();
+        learningJob.sendLineManagerNotificationForCompletedLearning();
 
-        LOGGER.info("sendNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
+        LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }
 
 }
