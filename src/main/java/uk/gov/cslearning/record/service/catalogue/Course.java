@@ -1,9 +1,9 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import uk.gov.cslearning.record.service.CivilServant;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 public class Course {
@@ -54,5 +54,12 @@ public class Course {
 
     public Module getModule(String moduleId) {
         return modules.stream().filter(module -> moduleId.equals(module.getId())).findFirst().orElse(null);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .toString();
     }
 }

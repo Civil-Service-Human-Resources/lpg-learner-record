@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.Notification;
+import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -26,6 +27,7 @@ import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -79,12 +81,8 @@ public class LearningJobTest {
         identity = new Identity();
         identity.setUid("uid");
 
-        when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(anyString(), anyString()))
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(anyString(), anyString(), any()))
                 .thenReturn(Optional.empty());
-
-        when(notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationTypeOrderBySentDesc(anyString(), anyString(), anyString()))
-                .thenReturn(Optional.empty());
-
     }
 
     @Test
@@ -211,7 +209,7 @@ public class LearningJobTest {
 
         LocalDateTime now = LocalDateTime.now();
 
-        learningJob.CheckAndNotifyLineManager(civilServant, identity, course1, now );
+        learningJob.notifyLineManager(civilServant, identity, course1, now );
 
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> courseCaptor = ArgumentCaptor.forClass(String.class);
@@ -219,7 +217,7 @@ public class LearningJobTest {
         ArgumentCaptor<String> learnerCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> managerCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(notifyService).notifyOnComplete(emailCaptor.capture(), templateIdCaptor.capture(), learnerCaptor.capture(), managerCaptor.capture(), courseCaptor.capture());
+        verify(notifyService).notifyOnComplete(emailCaptor.capture(), anyString(), templateIdCaptor.capture(), learnerCaptor.capture(), managerCaptor.capture(), courseCaptor.capture());
 
         assertThat(emailCaptor.getValue(), equalTo(MANAGER_EMAIL));
         assertThat(courseCaptor.getValue(), equalTo(COURSE_TITLE_1));
@@ -236,10 +234,10 @@ public class LearningJobTest {
 
         LocalDateTime sent = LocalDate.parse("2018-05-21", FORMATTER).atStartOfDay();
 
-        Notification notification = new Notification(COURSE_ID, IDENTITY_UID);
+        Notification notification = new Notification(COURSE_ID, IDENTITY_UID, NotificationType.REMINDER);
         notification.setSent(sent);
 
-        when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), COURSE_ID))
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), COURSE_ID, NotificationType.REMINDER))
                 .thenReturn(Optional.of(notification));
 
         LocalDate now = LocalDate.parse("2018-05-22", FORMATTER);
@@ -261,10 +259,10 @@ public class LearningJobTest {
 
         LocalDateTime sent = LocalDate.parse("2018-05-10", FORMATTER).atStartOfDay();
 
-        Notification notification = new Notification(COURSE_ID, IDENTITY_UID);
+        Notification notification = new Notification(COURSE_ID, IDENTITY_UID, NotificationType.REMINDER);
         notification.setSent(sent);
 
-        when(notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), COURSE_ID))
+        when(notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), COURSE_ID, NotificationType.REMINDER))
                 .thenReturn(Optional.of(notification));
 
         LocalDate now = LocalDate.parse("2018-05-22", FORMATTER);

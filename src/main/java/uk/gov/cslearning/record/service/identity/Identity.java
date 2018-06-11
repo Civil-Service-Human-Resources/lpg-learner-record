@@ -1,5 +1,7 @@
 package uk.gov.cslearning.record.service.identity;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class Identity {
 
     private String uid;
@@ -20,5 +22,12 @@ public class Identity {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("uid", uid)
+                .toString();
     }
 }

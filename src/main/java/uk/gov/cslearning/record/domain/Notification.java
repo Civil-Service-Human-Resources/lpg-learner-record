@@ -1,8 +1,9 @@
 package uk.gov.cslearning.record.domain;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
@@ -12,52 +13,34 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String courseId;
 
     @Column(nullable = false)
     private String identityUid;
 
+    @Column(nullable = false)
     private LocalDateTime sent;
 
-    private String notificationType;
-
-    private static final String COMPLETED = "COMPLETED";
-
-    private static final String NO_TYPE = "";
-
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
 
     public Notification() {
     }
 
-    public Notification(String courseId, String identityUid, String notificationType) {
+    public Notification(String courseId, String identityUid, NotificationType type) {
         checkArgument(courseId != null);
         checkArgument(identityUid != null);
-        checkArgument(notificationType != null);
-
+        checkArgument(type != null);
         this.courseId = courseId;
         this.sent = LocalDateTime.now();
         this.identityUid = identityUid;
-        this.notificationType = notificationType;
+        this.type = type;
     }
-
-    public Notification(String courseId, String identityUid) {
-        checkArgument(courseId != null);
-        checkArgument(identityUid != null);
-
-        this.courseId = courseId;
-        this.sent = LocalDateTime.now();
-        this.identityUid = identityUid;
-        this.notificationType = NO_TYPE;
-    }
-
 
     public String getCourseId() {
         return courseId;
-    }
-
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
     }
 
     public LocalDateTime getSent() {
@@ -72,20 +55,12 @@ public class Notification {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getIdentityUid() {
         return identityUid;
     }
 
-    public String getNotificationType() {
-        return notificationType;
-    }
-
-    public void setNotificationType(String notificationType) {
-        this.notificationType = notificationType;
+    public NotificationType getType() {
+        return type;
     }
 
     @Override
@@ -93,7 +68,11 @@ public class Notification {
         return new ToStringBuilder(this)
                 .append("courseId", courseId)
                 .append("identityId", identityUid)
-                .append("notificationType", notificationType)
+                .append("type", type)
                 .toString();
+    }
+
+    public boolean sentBefore(LocalDateTime date) {
+        return sent.isBefore(date);
     }
 }

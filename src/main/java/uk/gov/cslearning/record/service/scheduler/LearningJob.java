@@ -4,12 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
+import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -35,8 +35,6 @@ public class LearningJob {
 
     private static final String MONTH_PERIOD = "1 month";
 
-    private static final String COMPLETED = "COMPLETED";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LearningJob.class);
 
     private static final String COURSE_URI_FORMAT = "http://cslearning.gov.uk/courses/%s";
@@ -61,7 +59,6 @@ public class LearningJob {
 
     private UserRecordService userRecordService;
 
-
     @Autowired
     public LearningJob(UserRecordService userRecordService, IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService, NotificationRepository notificationRepository) {
         this.userRecordService = userRecordService;
@@ -72,79 +69,65 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
     }
 
-     void CheckAndNotifyLineManager(CivilServant civilServant, Identity identity,Course course, LocalDateTime completedDate) throws NotificationClientException {
-
-        if (civilServant.getLineManagerEmail() == null) {
-            LOGGER.error("User has no line manager!");
-        } else {
-            boolean sendMail = false;
-            Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationTypeOrderBySentDesc(identity.getUid(),course.getId(),COMPLETED);
-
-            if (!optionalNotification.isPresent()) {
-                sendMail = true;
-            } else {
-                Notification notification = optionalNotification.get();
-                if (notification.getSent().isBefore(completedDate)) {
-                    sendMail = true;
-                }
-
-            }
-
-            if (sendMail) {
-                Optional<CivilServant> optionalLineManager = registryService.getCivilServantByUid(civilServant.getLineManagerUid());
-                if (optionalLineManager.isPresent()) {
-                    CivilServant lineManager = optionalLineManager.get();
-                    notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
-                    Notification notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
-                    notificationRepository.save(notification);
-                } else {
-                    LOGGER.error("User has line manager but line manager does not exist!");
-                }
-            }
-
-        }
-
-    }
-    public void sendNotificationForCompletedLearning() throws NotificationClientException {
+    @Transactional
+    public void sendNotificationForCompletedLearning() throws NotificationClientException, HttpClientErrorException {
+        LOGGER.info("Sending notifications for complete learning.");
 
         Collection<Identity> identities = identityService.listAll();
 
         for (Identity identity : identities) {
+            LOGGER.debug("Got identity {}", identity);
+            Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
 
-            LOGGER.info("Got identity with uid {} ({})", identity.getUsername(), identities.size());
-            try {
-                Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
+            if (optionalCivilServant.isPresent()) {
 
-                if (optionalCivilServant.isPresent()) {
-                    CivilServant civilServant = optionalCivilServant.get();
-                    List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
-                    LOGGER.info("Got courses  ({})", courses.size());
+                CivilServant civilServant = optionalCivilServant.get();
 
-                    for (Course course : courses) {
-                        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
-                        // okay we do not want to find a course without a completed record or without a record at all
+                if (civilServant.getLineManagerUid() == null) {
+                    LOGGER.debug("User {} has no line manager, skipping", identity);
+                    continue;
+                }
 
-                        if (courseRecords.size() != 0) {
-                            for (CourseRecord courseRecord : courseRecords) {
-                                LOGGER.info("course completed  " + courseRecord.getCompletionDate());
-                                if (courseRecord.getCompletionDate() != null) {
-                                    LOGGER.info("course is COMPLETED");
-                                    try {
-                                        CheckAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
-                                    } catch (NotificationClientException nce) {
-                                        LOGGER.error("Error notifying line manger about course completion");
-                                        throw nce;
-                                    }
-                                }
-                            }
+                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+
+                LOGGER.debug("Found {} required courses", courses.size());
+
+                for (Course course : courses) {
+                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                    for (CourseRecord courseRecord : courseRecords) {
+                        LOGGER.debug("Course complete: {}", courseRecord.isComplete());
+                        if (courseRecord.isComplete()) {
+                            notifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
                         }
                     }
-                } else {
-                    throw new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY);
                 }
-            } catch (HttpClientErrorException hce) {
-                LOGGER.debug("Error getting details for {}",identity.getUid());
+            } else {
+                LOGGER.info("Identity {} has no profile, skipping", identity);
             }
+        }
+    }
+
+    void notifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) throws NotificationClientException {
+        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", identity, course);
+
+        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.COMPLETE);
+        boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
+                .orElse(true);
+
+        if (shouldSendNotification) {
+            Optional<CivilServant> optionalLineManager = registryService.getCivilServantByUid(civilServant.getLineManagerUid());
+            if (optionalLineManager.isPresent()) {
+                CivilServant lineManager = optionalLineManager.get();
+
+                notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+
+                Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
+                notificationRepository.save(notification);
+            } else {
+                LOGGER.error("User has line manager but line manager does not exist!");
+            }
+        } else {
+            LOGGER.debug("Notification already sent.");
         }
     }
 
@@ -194,7 +177,7 @@ public class LearningJob {
         for (long notificationPeriod : NOTIFICATION_PERIODS) {
             LocalDate nowPlusNotificationPeriod = now.plusDays(notificationPeriod);
             if (nowPlusNotificationPeriod.isAfter(nextRequiredBy) || nowPlusNotificationPeriod.isEqual(nextRequiredBy) ) {
-                Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdOrderBySentDesc(identity.getUid(), course.getId());
+                Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.REMINDER);
                 if (!optionalNotification.isPresent() || Period.between(optionalNotification.get().getSent().toLocalDate(), now).getDays() > notificationPeriod) {
                     List<Course> incompleteCoursesForPeriod = incompleteCourses.computeIfAbsent(notificationPeriod, key -> new ArrayList<>());
                     incompleteCoursesForPeriod.add(course);
@@ -228,7 +211,7 @@ public class LearningJob {
         notifyService.notify(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {
-            Notification notification = new Notification(course.getId(), identity.getUid());
+            Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
             notificationRepository.save(notification);
         }
     }

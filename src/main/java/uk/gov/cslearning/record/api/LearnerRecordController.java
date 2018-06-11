@@ -1,13 +1,11 @@
 package uk.gov.cslearning.record.api;
 
-import org.h2.util.New;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
-import uk.gov.cslearning.record.service.scheduler.LearningJob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
