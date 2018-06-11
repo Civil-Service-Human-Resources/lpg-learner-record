@@ -36,6 +36,8 @@ public class LearningJob {
 
     private static final String MONTH_PERIOD = "1 month";
 
+    private static final String COMPLETED = "COMPLETED";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LearningJob.class);
 
     private static final String COURSE_URI_FORMAT = "http://cslearning.gov.uk/courses/%s";
@@ -60,7 +62,6 @@ public class LearningJob {
 
     private UserRecordService userRecordService;
 
-    private static final String COMPLETED = "COMPLETED";
 
     @Autowired
     public LearningJob(UserRecordService userRecordService, IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService, NotificationRepository notificationRepository) {
@@ -77,7 +78,7 @@ public class LearningJob {
         if (civilServant.getLineManagerEmail() == null) {
             LOGGER.error("User has no line manager!");
         } else {
-            Boolean sendMail = false;
+            boolean sendMail = false;
             Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndNotificationType(identity.getUid(),course.getId(),COMPLETED);
             System.out.println(course.getId()+" "+identity.getUid()+" "+COMPLETED);
             Notification notification = new Notification(course.getId(), identity.getUid(), COMPLETED);
