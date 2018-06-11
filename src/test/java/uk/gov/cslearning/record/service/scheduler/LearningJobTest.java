@@ -217,7 +217,7 @@ public class LearningJobTest {
         ArgumentCaptor<String> learnerCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> managerCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(notifyService).notifyOnComplete(emailCaptor.capture(), anyString(), templateIdCaptor.capture(), learnerCaptor.capture(), managerCaptor.capture(), courseCaptor.capture());
+        verify(notifyService).notifyOnComplete(emailCaptor.capture(), templateIdCaptor.capture(), learnerCaptor.capture(), managerCaptor.capture(), courseCaptor.capture());
 
         assertThat(emailCaptor.getValue(), equalTo(MANAGER_EMAIL));
         assertThat(courseCaptor.getValue(), equalTo(COURSE_TITLE_1));
