@@ -119,7 +119,7 @@ public class LearningJob {
             if (optionalLineManager.isPresent()) {
                 CivilServant lineManager = optionalLineManager.get();
 
-                notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), "", govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+                notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
 
                 Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
                 notificationRepository.save(notification);
