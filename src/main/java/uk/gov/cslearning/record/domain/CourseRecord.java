@@ -136,8 +136,15 @@ public class CourseRecord {
             return activityId.endsWith(getCourseId());
         }
         for (ModuleRecord moduleRecord : moduleRecords) {
-            if (activityId.endsWith(moduleRecord.getModuleId())) {
-                return true;
+            if (activityId.startsWith(Activity.MODULE_ID_PREFIX)) {
+                if (activityId.endsWith(moduleRecord.getModuleId())) {
+                    return true;
+                }
+            } else {
+                String eventId = moduleRecord.getEventId();
+                if (eventId != null && activityId.endsWith(eventId)) {
+                    return true;
+                }
             }
         }
         return false;
