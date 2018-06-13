@@ -14,6 +14,7 @@ public class CompletedAction extends Action {
 
     static {
         Action.register(CompletedAction.class, ActivityType.ELEARNING, Verb.COMPLETED);
+        Action.register(CompletedAction.class, ActivityType.EVENT, Verb.COMPLETED);
         Action.register(CompletedAction.class, ActivityType.VIDEO, Verb.COMPLETED);
         Action.register(CompletedAction.class, ActivityType.LINK, Verb.EXPERIENCED);
         Action.register(CompletedAction.class, ActivityType.FILE, Verb.EXPERIENCED);
@@ -25,7 +26,6 @@ public class CompletedAction extends Action {
 
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
-        System.out.println("Reached");
         courseRecord.setState(null);
         moduleRecord.setState(State.COMPLETED);
         moduleRecord.setCompletionDate(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));

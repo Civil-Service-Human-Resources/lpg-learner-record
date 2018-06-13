@@ -5,5 +5,6 @@ public enum State {
     COMPLETED,
     IN_PROGRESS,
     REGISTERED,
+    SKIPPED,
     UNREGISTERED
 }
