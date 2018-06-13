@@ -41,13 +41,6 @@ public class ModuleRecord {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updatedAt;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
-    private String purchaseOrderNumber;
-
-    private String fapApproverEmail;
-
     public ModuleRecord() {
     }
 
