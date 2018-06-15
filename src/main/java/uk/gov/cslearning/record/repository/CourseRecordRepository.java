@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.State;
 
 import javax.persistence.LockModeType;
 import java.util.Collection;
@@ -23,4 +24,6 @@ public interface CourseRecordRepository extends CrudRepository<CourseRecord, Lon
 
     @Query("SELECT COUNT(mr) FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1 and mr.state = 'REGISTERED'")
     Integer countRegisteredForEvent(@Param("eventId") String eventId);
+
+    Iterable<CourseRecord> findByState(State state);
 }

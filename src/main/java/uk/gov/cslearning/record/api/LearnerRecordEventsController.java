@@ -9,8 +9,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.security.SecurityUtil;
 import uk.gov.cslearning.record.service.CivilServant;
@@ -84,36 +86,25 @@ public class LearnerRecordEventsController {
 
                 LearnerRecordEvents event = events.computeIfAbsent(key, s -> {
                     LearnerRecordEvents newEvent = new LearnerRecordEvents();
-                    newEvent.setBookingReference("BookingRef");
+                    newEvent.setBookingReference("BookingRef123");
+                    newEvent.setCourseName(course.getTitle());
+                    newEvent.setCourseIdentifier(course.getId());
+                    newEvent.setBookingStatus(BookingStatus.REQUESTED);
+
+
                     return newEvent;
                 });
             }
         }
-        LearnerRecordEvents newEvent = new LearnerRecordEvents();
-        newEvent.setBookingReference("BookingRef");
-        events.put("test", newEvent);
         return new ResponseEntity<>(events.values(), OK);
     }
 
     private Iterable<CourseRecord> getRecords() {
 
         if (SecurityUtil.hasAuthority(CSHR_REPORTER)) {
-            return courseRecordRepository.findAll();
+            return courseRecordRepository.findByState(State.REGISTERED);
         }
 
-        CivilServant civilServant = registryService.getCurrent();
-
-        if (civilServant == null) {
-            throw new AccessDeniedException("No civil servant details found.");
-        }
-
-        if (SecurityUtil.hasAuthority(PROFESSION_REPORTER)) {
-            return courseRecordRepository.findByProfession(civilServant.getProfession());
-        }
-
-        if (SecurityUtil.hasAuthority(ORGANISATION_REPORTER)) {
-            return courseRecordRepository.findByDepartment(civilServant.getDepartmentCode());
-        }
         return null;
     }
 }
