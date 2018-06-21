@@ -59,8 +59,8 @@ public class UserRecordServiceTest {
     public void shouldUpdateExistingRecord() throws Exception {
 
         final String userId = "userId";
-        final String courseId = COURSE_ID_PREFIX + "/courseId";
-        final String activityId = courseId;
+        final String courseId = "courseId";
+        final String activityId = COURSE_ID_PREFIX + "/" + courseId;
 
         CourseRecord courseRecord = new CourseRecord(courseId, "userId");
         courseRecordRepository.save(courseRecord);

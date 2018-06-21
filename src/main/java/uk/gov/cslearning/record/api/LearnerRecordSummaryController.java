@@ -75,11 +75,16 @@ public class LearnerRecordSummaryController {
                 String key = String.format("%s-%s", courseRecord.getCourseId(), moduleRecord.getModuleId());
 
                 Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
-                Module module = course.getModule(moduleRecord.getModuleId());
+                if (course == null) {
+                    LOGGER.warn("Course not found for courseId {}.", courseRecord.getCourseId());
+                    continue;
+                }
 
-                if (course == null || module == null) {
-                    LOGGER.warn("Course or module not found for courseId {}, moduleId {}.", courseRecord.getCourseId(),
+                Module module = course.getModule(moduleRecord.getModuleId());
+                if (module == null) {
+                    LOGGER.warn("Module not found for courseId {}, moduleId {}.", courseRecord.getCourseId(),
                             moduleRecord.getModuleId());
+                    continue;
                 }
 
                 LearnerRecordSummary summary = summaries.computeIfAbsent(key, s -> {
