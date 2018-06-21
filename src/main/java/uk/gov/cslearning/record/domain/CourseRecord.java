@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import uk.gov.cslearning.record.service.xapi.activity.Activity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -136,15 +135,12 @@ public class CourseRecord {
             return true;
         }
         for (ModuleRecord moduleRecord : moduleRecords) {
-            if (activityId.startsWith(Activity.MODULE_ID_PREFIX)) {
-                if (activityId.endsWith(moduleRecord.getModuleId())) {
-                    return true;
-                }
-            } else {
-                String eventId = moduleRecord.getEventId();
-                if (eventId != null && activityId.endsWith(eventId)) {
-                    return true;
-                }
+            if (activityId.endsWith(moduleRecord.getModuleId())) {
+                return true;
+            }
+            String eventId = moduleRecord.getEventId();
+            if (eventId != null && activityId.endsWith(eventId)) {
+                return true;
             }
         }
         return false;

@@ -32,6 +32,7 @@ public class LearningCatalogueService {
         this.restTemplate = restTemplate;
         this.requiredLearningUrlFormat = requiredLearningUrlFormat;
         this.credentials = Base64.encodeBase64String((username + ":" + password).getBytes());
+        this.courseUrlFormat = courseUrlFormat;
     }
 
     public List<Course> getRequiredCoursesByDepartmentCode(String departmentId) {
