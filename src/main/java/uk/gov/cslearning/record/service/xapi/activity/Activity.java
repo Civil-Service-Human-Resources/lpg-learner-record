@@ -10,6 +10,7 @@ import uk.gov.cslearning.record.service.xapi.ActivityType;
 
 import java.util.*;
 
+import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.emptyList;
 
 public abstract class Activity {
@@ -69,7 +70,7 @@ public abstract class Activity {
             LOGGER.warn("Statement has no activity ID", statement);
             return null;
         }
-        return activity.getId();
+        return stripPrefix(activity.getId());
     }
 
     String getParent(String idPrefix) {
@@ -91,11 +92,15 @@ public abstract class Activity {
                 .findFirst();
 
         return parent
-                .map(gov.adlnet.xapi.model.Activity::getId)
+                .map(activity -> stripPrefix(activity.getId()))
                 .orElseGet(() -> {
                     LOGGER.debug("No parent found in statement {} for prefix {}", statement.getId(), idPrefix);
                     return null;
                 });
+    }
+
+    String stripPrefix(String activityId) {
+        return activityId.substring(activityId.lastIndexOf('/') + 1);
     }
 
     public abstract String getCourseId();
