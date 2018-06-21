@@ -5,6 +5,11 @@ spring:
       write_dates_as_timestamps: false
   resources:
     add-mappings: false
+  flyway:
+    locations: classpath:db/migration/{vendor}
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
   port: 9000
@@ -41,3 +46,16 @@ govNotify:
   template:
     requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}
     completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:template}
+
+---
+
+spring:
+  profiles: production
+  datasource:
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
