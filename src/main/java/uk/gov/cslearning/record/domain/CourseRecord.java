@@ -132,8 +132,8 @@ public class CourseRecord {
     }
 
     public boolean matchesActivityId(String activityId) {
-        if (activityId.startsWith(Activity.COURSE_ID_PREFIX)) {
-            return activityId.endsWith(getCourseId());
+        if (activityId.endsWith(getCourseId())) {
+            return true;
         }
         for (ModuleRecord moduleRecord : moduleRecords) {
             if (activityId.startsWith(Activity.MODULE_ID_PREFIX)) {
