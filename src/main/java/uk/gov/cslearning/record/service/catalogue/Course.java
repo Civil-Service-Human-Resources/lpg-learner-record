@@ -87,10 +87,6 @@ public class Course {
     public Boolean checkModuleStates(Collection<CourseRecord> courseRecords, CivilServant civilServant, Collection<State> states, Boolean mustHave, Boolean onlyMandatory)     {
         Boolean hasModuleRecord = false;
 
-        for (CourseRecord courseRecord : courseRecords) {
-            LOGGER.info("checking {} against {}", courseRecord.get(), this.get());
-        }
-
         Optional<CourseRecord> optionalCourseRecord = courseRecords.stream().filter(a -> a.getCourseId().equals(this.getId())).findFirst(); // get courseRecord
 
         if (optionalCourseRecord.isPresent()) {
@@ -99,9 +95,9 @@ public class Course {
             Collection<Module> modules = getModulesForUser(civilServant);
 
             for ( Module module : modules) {
-                LOGGER.info("Checking  module {} state", module.getId());
                 Audience audience = module.getMostRelevantAudienceFor(civilServant);
                 Boolean mandatory = audience.isMandatory();
+                LOGGER.info("Checking  module {} which is  {}.", module.getId(), mandatory ? "MANDATORY" : "NOT MANDATORY");
 
                 ModuleRecord moduleRecord = courseRecord.getModuleRecord(module.getId());
 
@@ -123,11 +119,12 @@ public class Course {
                 }
             }
             if (hasModuleRecord) {
-                LOGGER.info("PASS: At least one module had a record in state check");
+                LOGGER.info("PASS: No fails in mandatory modules or none pristine optional course.");
                 return true;
             }
 
         }
+
         LOGGER.info("FAIL");
         return false;
     }
