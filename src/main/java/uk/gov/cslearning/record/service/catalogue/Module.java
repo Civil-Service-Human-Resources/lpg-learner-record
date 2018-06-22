@@ -65,7 +65,7 @@ public class Module {
         return null;
     }
 
-    private Audience getMostRelevantAudienceFor(CivilServant civilServant) {
+    protected Audience getMostRelevantAudienceFor(CivilServant civilServant) {
         int highestRelevance = -1;
         Audience mostRelevantAudience = null;
 
