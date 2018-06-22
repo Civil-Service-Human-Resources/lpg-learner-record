@@ -147,20 +147,22 @@ public class LearningJob {
 
                 for (Course course : courses) {
                     Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
-                    LocalDate mostRecentlyCompleted = null;
+                    if (!course.isComplete(courseRecords, civilServant)) {
+                        LocalDate mostRecentlyCompleted = null;
 
-                    for (CourseRecord courseRecord : courseRecords) {
-                        LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                        if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
-                            mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+                        for (CourseRecord courseRecord : courseRecords) {
+                            LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
+                            if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
+                                mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+                            }
                         }
-                    }
 
-                    LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant, mostRecentlyCompleted);
-                    LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
+                        LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant, mostRecentlyCompleted);
+                        LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
 
-                    if (nextRequiredBy != null) {
-                        checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+                        if (nextRequiredBy != null) {
+                            checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+                        }
                     }
                 }
                 for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
@@ -170,6 +172,7 @@ public class LearningJob {
         }
         LOGGER.info("Sending notifications complete");
     }
+
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
         if (nextRequiredBy.isBefore(now)) {
