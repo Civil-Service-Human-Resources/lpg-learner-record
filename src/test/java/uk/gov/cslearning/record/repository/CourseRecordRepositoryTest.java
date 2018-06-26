@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.repository;
 
+import com.google.common.collect.Iterables;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class CourseRecordRepositoryTest {
     }
 
     @Test
-    public void shouldLoadCountOfRegstrationsForAnEvent() {
+    public void shouldLoadCountOfRegistrationsForAnEvent() {
 
         final String eventId = "eventId";
         final int registrations = 3;
@@ -56,6 +57,25 @@ public class CourseRecordRepositoryTest {
         Integer count = courseRecordRepository.countRegisteredForEvent(eventId);
 
         assertThat(count, is(registrations));
+    }
+
+    @Test
+    public void shouldReturnAllCourseRecordsContainingAnEvent() {
+
+        // Add a non-event record for good measure
+        CourseRecord courseRecord = new CourseRecord("courseId", "userId");
+        courseRecordRepository.save(courseRecord);
+
+        final String eventId = "eventId";
+        final int registrations = 3;
+
+        for (int i = 0; i < registrations; i++) {
+            createRegistration("user" + i, eventId);
+        }
+
+        Iterable<CourseRecord> records = courseRecordRepository.listEventRecords();
+
+        assertThat(Iterables.size(records), is(registrations));
     }
 
     private void createRegistration(String userId, String eventId) {
