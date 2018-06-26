@@ -41,6 +41,10 @@ public class ModuleRecord {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updatedAt;
 
+    private String paymentMethod;
+
+    private String paymentDetails;
+
     public ModuleRecord() {
     }
 
@@ -107,6 +111,22 @@ public class ModuleRecord {
 
     public void setRated(Boolean rated) {
         this.rated = rated;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public void setPaymentDetails(String paymentDetails) {
+        this.paymentDetails = paymentDetails;
     }
 
     @Override

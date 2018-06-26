@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.api;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,16 @@ import uk.gov.cslearning.record.security.SecurityUtil;
 import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.RegistryService;
 import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.catalogue.Event;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.catalogue.Module;
+import uk.gov.cslearning.record.service.identity.Identity;
+import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.springframework.http.HttpStatus.OK;
@@ -39,13 +44,23 @@ public class LearnerRecordEventsController {
 
     private CourseRecordRepository courseRecordRepository;
 
+    private IdentityService identityService;
+
+    private RegistryService registryService;
+
     @Autowired
     public LearnerRecordEventsController(LearningCatalogueService learningCatalogueService,
-                                         CourseRecordRepository courseRecordRepository) {
+                                         CourseRecordRepository courseRecordRepository,
+                                         IdentityService identityService,
+                                         RegistryService registryService) {
         checkArgument(learningCatalogueService != null);
         checkArgument(courseRecordRepository != null);
+        checkArgument(identityService != null);
+        checkArgument(registryService != null);
         this.learningCatalogueService = learningCatalogueService;
         this.courseRecordRepository = courseRecordRepository;
+        this.identityService = identityService;
+        this.registryService = registryService;
     }
 
     @GetMapping
@@ -63,26 +78,58 @@ public class LearnerRecordEventsController {
 
             for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
 
-                String key = String.format("%s-%s", courseRecord.getCourseId(), moduleRecord.getModuleId());
+                String key = String.format("%s-%s", courseRecord.getUserId(), moduleRecord.getModuleId());
 
-                Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
-                Module module = course.getModule(moduleRecord.getModuleId());
+                LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                if (course == null || module == null) {
-                    LOGGER.warn("Course or module not found for courseId {}, moduleId {}.", courseRecord.getCourseId(),
-                            moduleRecord.getModuleId());
-                }
+                    Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
+                    if (course == null) {
+                        LOGGER.warn("Course not found for courseId {}.", courseRecord.getCourseId());
+                        return null;
+                    }
 
-                LearnerRecordEvents event = events.computeIfAbsent(key, s -> {
+                    Module module = course.getModule(moduleRecord.getModuleId());
+                    if (module == null) {
+                        LOGGER.warn("Module not found for courseId {}, moduleId {}.", courseRecord.getCourseId(),
+                                moduleRecord.getModuleId());
+                        return null;
+                    }
+
+                    Event event = module.getEvent(moduleRecord.getEventId());
+                    if (event == null) {
+                        LOGGER.warn("Event not found for courseId {}, moduleId {}, eventId {}.", courseRecord.getCourseId(),
+                                moduleRecord.getModuleId(), moduleRecord.getEventId());
+                        return null;
+                    }
+
+                    Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
+
+                    if (!civilServant.isPresent()) {
+                        LOGGER.warn("Civil servant not found for uid {}.", courseRecord.getUserId());
+                        return null;
+                    }
+
+                    String emailAddress = identityService.getEmailAddress(courseRecord.getUserId());
+
                     LearnerRecordEvents newEvent = new LearnerRecordEvents();
-                    newEvent.setBookingReference("BookingRef123");
+                    newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6)));
                     newEvent.setCourseName(course.getTitle());
                     newEvent.setCourseId(course.getId());
-                    newEvent.setStatus(BookingStatus.REQUESTED);
-
-
+                    newEvent.setModuleId(module.getId());
+                    newEvent.setModuleName(module.getTitle());
+                    newEvent.setCost(module.getPrice());
+                    newEvent.setDate(event.getDate());
+                    newEvent.setDelegateEmailAddress(emailAddress);
+                    newEvent.setDelegateName(civilServant.get().getFullName());
                     return newEvent;
                 });
+
+                if (eventSummary != null) {
+                    eventSummary.setUpdatedAt(courseRecord.getLastUpdated());
+                    eventSummary.setStatus(BookingStatus.REQUESTED);
+                    eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
+                    eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
+                }
             }
         }
         return new ResponseEntity<>(events.values(), OK);

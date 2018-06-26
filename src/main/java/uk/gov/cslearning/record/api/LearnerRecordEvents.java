@@ -5,6 +5,7 @@ import uk.gov.cslearning.record.domain.PaymentMethod;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class LearnerRecordEvents {
@@ -21,7 +22,7 @@ public class LearnerRecordEvents {
 
     private String eventId;
 
-    private Double cost;
+    private BigDecimal cost;
 
     private LocalDateTime date;
 
@@ -87,11 +88,11 @@ public class LearnerRecordEvents {
         this.eventId = eventId;
     }
 
-    public Double getCost() {
+    public BigDecimal getCost() {
         return cost;
     }
 
-    public void setCost(Double cost) {
+    public void setCost(BigDecimal cost) {
         this.cost = cost;
     }
 

@@ -36,6 +36,7 @@ oauth:
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
+  identityAPIUrl: "${oauth.serviceUrl}/api/identities"
 
 registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
