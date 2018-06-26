@@ -5,10 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.service.CivilServant;
 
 import java.net.URL;
 import java.util.Collection;
@@ -24,11 +28,15 @@ public class IdentityService {
     private OAuth2RestOperations restOperations;
 
     private String listAllIdentitiesUrl;
+    private String identityAPIUrl;
 
     @Autowired
-    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.listAllUrl}") String listAllIdentitiesUrl) {
+    public IdentityService(OAuth2RestOperations restOperations,
+                           @Value("${identity.listAllUrl}") String listAllIdentitiesUrl,
+                           @Value("${identity.identityAPIUrl}") String identityAPIUrl) {
         this.restOperations = restOperations;
         this.listAllIdentitiesUrl = listAllIdentitiesUrl;
+        this.identityAPIUrl = identityAPIUrl;
     }
 
     public OAuth2AccessToken getAccessToken() {
@@ -42,5 +50,29 @@ public class IdentityService {
             return Sets.newHashSet(identities);
         }
         return emptySet();
+    }
+
+    public String getEmailAddress(String uid) {
+
+        LOGGER.debug("Getting email address for civil servant {}", uid);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
+                .queryParam("uid", uid);
+
+        Identity identity;
+
+        try {
+            identity = restOperations.getForObject(builder.toUriString(), Identity.class);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return null;
+            }
+            throw new RuntimeException(e);
+        }
+
+        if (identity != null) {
+            return identity.getUsername();
+        }
+        return null;
     }
 }

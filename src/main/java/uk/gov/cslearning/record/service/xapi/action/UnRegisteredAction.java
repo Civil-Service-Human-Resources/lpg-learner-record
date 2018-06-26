@@ -26,5 +26,7 @@ public class UnRegisteredAction extends Action {
         moduleRecord.setResult(null);
         moduleRecord.setScore(null);
         moduleRecord.setCompletionDate(null);
+        moduleRecord.setPaymentMethod(null);
+        moduleRecord.setPaymentDetails(null);
     }
 }

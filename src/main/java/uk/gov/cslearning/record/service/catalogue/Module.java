@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service.catalogue;
 
 import uk.gov.cslearning.record.service.CivilServant;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 
@@ -15,7 +16,31 @@ public class Module {
 
     private Long duration;
 
+    private BigDecimal price;
+
     private Collection<Audience> audiences;
+
+    private Collection<Event> events;
+
+    public Event getEvent(String eventId) {
+        return events.stream().filter(event -> eventId.equals(event.getId())).findFirst().orElse(null);
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Collection<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Collection<Event> events) {
+        this.events = events;
+    }
 
     public String getId() {
         return id;
