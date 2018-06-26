@@ -30,41 +30,30 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/events")
-@PreAuthorize("hasAnyAuthority('ORGANISATION_REPORTER', 'PROFESSION_REPORTER', 'CSHR_REPORTER')")
+//@PreAuthorize("hasAnyAuthority('DOWNLOAD_BOOKING_FEED')")
 public class LearnerRecordEventsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordEventsController.class);
 
-    private static final String CSHR_REPORTER = "CSHR_REPORTER";
-
-    private static final String ORGANISATION_REPORTER = "ORGANISATION_REPORTER";
-
-    private static final String PROFESSION_REPORTER = "PROFESSION_REPORTER";
-
     private LearningCatalogueService learningCatalogueService;
-
-    private RegistryService registryService;
 
     private CourseRecordRepository courseRecordRepository;
 
     @Autowired
     public LearnerRecordEventsController(LearningCatalogueService learningCatalogueService,
-                                         RegistryService registryService,
                                          CourseRecordRepository courseRecordRepository) {
         checkArgument(learningCatalogueService != null);
-        checkArgument(registryService != null);
         checkArgument(courseRecordRepository != null);
         this.learningCatalogueService = learningCatalogueService;
-        this.registryService = registryService;
         this.courseRecordRepository = courseRecordRepository;
     }
 
     @GetMapping
     public ResponseEntity<Collection<LearnerRecordEvents>> list() {
 
-        Iterable<CourseRecord> records = getRecords();
+        Iterable<CourseRecord> records = courseRecordRepository.listEventRecords();
         if (records == null) {
-            LOGGER.info("No course records returned for user, may have no department or profession set.");
+            LOGGER.info("No event records returned.");
             return ResponseEntity.badRequest().build();
         }
 
@@ -88,8 +77,8 @@ public class LearnerRecordEventsController {
                     LearnerRecordEvents newEvent = new LearnerRecordEvents();
                     newEvent.setBookingReference("BookingRef123");
                     newEvent.setCourseName(course.getTitle());
-                    newEvent.setCourseIdentifier(course.getId());
-                    newEvent.setBookingStatus(BookingStatus.REQUESTED);
+                    newEvent.setCourseId(course.getId());
+                    newEvent.setStatus(BookingStatus.REQUESTED);
 
 
                     return newEvent;
@@ -97,14 +86,5 @@ public class LearnerRecordEventsController {
             }
         }
         return new ResponseEntity<>(events.values(), OK);
-    }
-
-    private Iterable<CourseRecord> getRecords() {
-
-        if (SecurityUtil.hasAuthority(CSHR_REPORTER)) {
-            return courseRecordRepository.findByState(State.REGISTERED);
-        }
-
-        return null;
     }
 }

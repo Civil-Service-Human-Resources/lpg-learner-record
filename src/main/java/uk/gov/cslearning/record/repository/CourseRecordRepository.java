@@ -25,5 +25,6 @@ public interface CourseRecordRepository extends CrudRepository<CourseRecord, Lon
     @Query("SELECT COUNT(mr) FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1 and mr.state = 'REGISTERED'")
     Integer countRegisteredForEvent(@Param("eventId") String eventId);
 
-    Iterable<CourseRecord> findByState(State state);
+    @Query("SELECT cr FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId is not null")
+    Iterable<CourseRecord> listEventRecords();
 }

@@ -11,103 +11,33 @@ public class LearnerRecordEvents {
 
     private String bookingReference;
 
-    private String courseIdentifier;
+    private String courseId;
 
     private String courseName;
 
-    private String courseCost;
+    private String moduleId;
+
+    private String moduleName;
 
     private String eventId;
 
-    private LocalDateTime eventDate;
+    private Double cost;
+
+    private LocalDateTime date;
 
     private String delegateName;
 
-    private String delegateEmail;
+    private String delegateEmailAddress;
 
-    private BookingStatus bookingStatus;
+    private BookingStatus status;
 
-    private LocalDateTime bookingStatusDate;
+    private LocalDateTime createdAt;
 
-    public String getEventId() {
-        return eventId;
-    }
+    private LocalDateTime updatedAt;
 
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
+    private String paymentMethod;
 
-    public LocalDateTime getEventDate() {
-        return eventDate;
-    }
-
-    public void setEventDate(LocalDateTime eventDate) {
-        this.eventDate = eventDate;
-    }
-
-    public String getDelegateName() {
-        return delegateName;
-    }
-
-    public void setDelegateName(String delegateName) {
-        this.delegateName = delegateName;
-    }
-
-    public String getDelegateEmail() {
-        return delegateEmail;
-    }
-
-    public void setDelegateEmail(String delegateEmail) {
-        this.delegateEmail = delegateEmail;
-    }
-
-    public BookingStatus getBookingStatus() {
-        return bookingStatus;
-    }
-
-    public void setBookingStatus(BookingStatus bookingStatus) {
-        this.bookingStatus = bookingStatus;
-    }
-
-    public LocalDateTime getBookingStatusDate() {
-        return bookingStatusDate;
-    }
-
-    public void setBookingStatusDate(LocalDateTime bookingStatusDate) {
-        this.bookingStatusDate = bookingStatusDate;
-    }
-
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public String getPurchaseOrderNumber() {
-        return purchaseOrderNumber;
-    }
-
-    public void setPurchaseOrderNumber(String purchaseOrderNumber) {
-        this.purchaseOrderNumber = purchaseOrderNumber;
-    }
-
-    public String getFapApproverEmail() {
-        return fapApproverEmail;
-    }
-
-    public void setFapApproverEmail(String fapApproverEmail) {
-        this.fapApproverEmail = fapApproverEmail;
-    }
-
-    @Enumerated(EnumType.STRING)
-
-    private PaymentMethod paymentMethod;
-
-    private String purchaseOrderNumber;
-
-    private String fapApproverEmail;
+    private String paymentDetails;
 
     public String getBookingReference() {
         return bookingReference;
@@ -117,12 +47,12 @@ public class LearnerRecordEvents {
         this.bookingReference = bookingReference;
     }
 
-    public String getCourseIdentifier() {
-        return courseIdentifier;
+    public String getCourseId() {
+        return courseId;
     }
 
-    public void setCourseIdentifier(String courseIdentifier) {
-        this.courseIdentifier = courseIdentifier;
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 
     public String getCourseName() {
@@ -133,11 +63,99 @@ public class LearnerRecordEvents {
         this.courseName = courseName;
     }
 
-    public String getCourseCost() {
-        return courseCost;
+    public String getModuleId() {
+        return moduleId;
     }
 
-    public void setCourseCost(String courseCost) {
-        this.courseCost = courseCost;
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public Double getCost() {
+        return cost;
+    }
+
+    public void setCost(Double cost) {
+        this.cost = cost;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public String getDelegateName() {
+        return delegateName;
+    }
+
+    public void setDelegateName(String delegateName) {
+        this.delegateName = delegateName;
+    }
+
+    public String getDelegateEmailAddress() {
+        return delegateEmailAddress;
+    }
+
+    public void setDelegateEmailAddress(String delegateEmailAddress) {
+        this.delegateEmailAddress = delegateEmailAddress;
+    }
+
+    public BookingStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(BookingStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public String getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public void setPaymentDetails(String paymentDetails) {
+        this.paymentDetails = paymentDetails;
     }
 }
