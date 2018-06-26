@@ -14,6 +14,12 @@ spring:
 server:
   port: 9000
 
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: ${ROOT_LOGGING_LEVEL:INFO}
+
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
   password: ${XAPI_PASSWORD:1c0e1b6827606d7efed71e204939d048f94f842b}
