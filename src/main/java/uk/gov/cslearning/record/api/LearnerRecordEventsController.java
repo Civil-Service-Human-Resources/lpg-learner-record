@@ -35,7 +35,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/events")
-//@PreAuthorize("hasAnyAuthority('DOWNLOAD_BOOKING_FEED')")
+@PreAuthorize("hasAnyAuthority('DOWNLOAD_BOOKING_FEED')")
 public class LearnerRecordEventsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordEventsController.class);
@@ -77,7 +77,6 @@ public class LearnerRecordEventsController {
         for (CourseRecord courseRecord : records) {
 
             for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
-
                 String key = String.format("%s-%s", courseRecord.getUserId(), moduleRecord.getModuleId());
 
                 LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
