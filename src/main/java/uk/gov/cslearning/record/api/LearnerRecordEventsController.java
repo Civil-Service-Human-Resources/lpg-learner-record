@@ -25,6 +25,7 @@ import uk.gov.cslearning.record.service.catalogue.Module;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,6 +99,11 @@ public class LearnerRecordEventsController {
                     if (event == null) {
                         LOGGER.warn("Event not found for courseId {}, moduleId {}, eventId {}.", courseRecord.getCourseId(),
                                 moduleRecord.getModuleId(), moduleRecord.getEventId());
+                        return null;
+                    }
+
+                    if (event.getDate().isAfter(LocalDateTime.now())) {
+                        LOGGER.debug("Event date is after today, ignoring.");
                         return null;
                     }
 
