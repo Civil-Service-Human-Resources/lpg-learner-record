@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.service.xapi.action;
 
 import gov.adlnet.xapi.model.Statement;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
@@ -28,5 +29,6 @@ public class UnRegisteredAction extends Action {
         moduleRecord.setCompletionDate(null);
         moduleRecord.setPaymentMethod(null);
         moduleRecord.setPaymentDetails(null);
+        moduleRecord.setBookingStatus(BookingStatus.CANCELLED);
     }
 }

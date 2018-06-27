@@ -111,7 +111,7 @@ public class LearnerRecordEventsController {
                     String emailAddress = identityService.getEmailAddress(courseRecord.getUserId());
 
                     LearnerRecordEvents newEvent = new LearnerRecordEvents();
-                    newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6)));
+                    newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6, '0')));
                     newEvent.setCourseName(course.getTitle());
                     newEvent.setCourseId(course.getId());
                     newEvent.setModuleId(module.getId());
@@ -124,10 +124,15 @@ public class LearnerRecordEventsController {
                 });
 
                 if (eventSummary != null) {
-                    eventSummary.setUpdatedAt(courseRecord.getLastUpdated());
-                    eventSummary.setStatus(BookingStatus.REQUESTED);
+                    eventSummary.setCreatedAt(moduleRecord.getCreatedAt());
+                    eventSummary.setUpdatedAt(moduleRecord.getUpdatedAt());
                     eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
                     eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
+
+                    // FIXME: status
+                    eventSummary.setStatus(BookingStatus.REQUESTED);
+
+
                 }
             }
         }

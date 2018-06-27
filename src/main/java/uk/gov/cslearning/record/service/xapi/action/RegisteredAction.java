@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service.xapi.action;
 import gov.adlnet.xapi.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
@@ -38,6 +39,7 @@ public class RegisteredAction extends Action {
             Event event = (Event) activity;
             moduleRecord.setPaymentMethod(event.getPaymentMethod());
             moduleRecord.setPaymentDetails(event.getPaymentDetails());
+            moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
         } else {
             LOGGER.warn("Registered action taken on module that is not an event. Course ID: {}, module ID: {}",
                     courseRecord.getCourseId(), moduleRecord.getModuleId());
