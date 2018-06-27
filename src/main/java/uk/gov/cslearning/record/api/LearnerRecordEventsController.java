@@ -128,11 +128,7 @@ public class LearnerRecordEventsController {
                     eventSummary.setUpdatedAt(moduleRecord.getUpdatedAt());
                     eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
                     eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
-
-                    // FIXME: status
-                    eventSummary.setStatus(BookingStatus.REQUESTED);
-
-
+                    eventSummary.setStatus(moduleRecord.getBookingStatus());
                 }
             }
         }
