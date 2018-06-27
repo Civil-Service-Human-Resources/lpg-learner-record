@@ -19,6 +19,8 @@ public class IdentityServiceTest {
 
     private static final String LIST_ALL_URL = "http://localhost/identities";
 
+    private static final String API_URL = "http://localhost/api/identities";
+
     private IdentityService identityService;
 
     @Mock
@@ -27,7 +29,7 @@ public class IdentityServiceTest {
     @Before
     public void setup() {
         initMocks(this);
-        identityService = new IdentityService(restOperations, LIST_ALL_URL);
+        identityService = new IdentityService(restOperations, LIST_ALL_URL, API_URL);
     }
 
     @Test

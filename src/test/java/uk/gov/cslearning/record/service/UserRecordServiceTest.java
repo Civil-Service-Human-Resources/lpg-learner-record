@@ -56,7 +56,7 @@ public class UserRecordServiceTest {
         userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService);
     }
 
-    @Ignore
+    @Test
     public void shouldUpdateExistingRecord() throws Exception {
 
         final String userId = "userId";
