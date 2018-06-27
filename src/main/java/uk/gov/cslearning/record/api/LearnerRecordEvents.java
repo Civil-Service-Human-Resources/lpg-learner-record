@@ -1,10 +1,7 @@
 package uk.gov.cslearning.record.api;
 
 import uk.gov.cslearning.record.domain.BookingStatus;
-import uk.gov.cslearning.record.domain.PaymentMethod;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
