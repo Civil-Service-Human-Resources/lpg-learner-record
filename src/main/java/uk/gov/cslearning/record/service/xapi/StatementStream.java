@@ -87,6 +87,7 @@ public class StatementStream {
                         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
                         if (moduleRecord == null) {
                             moduleRecord = new ModuleRecord(moduleId);
+                            moduleRecord.setCreatedAt(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
                             courseRecord.addModuleRecord(moduleRecord);
                         }
 
@@ -118,6 +119,10 @@ public class StatementStream {
             LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
         }
         courseRecord.setLastUpdated(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
+
+        if (moduleRecord != null) {
+            moduleRecord.setUpdatedAt(courseRecord.getLastUpdated());
+        }
     }
 
     public interface GroupId {

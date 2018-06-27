@@ -45,6 +45,8 @@ public class ModuleRecord {
 
     private String paymentDetails;
 
+    private BookingStatus bookingStatus;
+
     public ModuleRecord() {
     }
 
@@ -127,6 +129,30 @@ public class ModuleRecord {
 
     public void setPaymentDetails(String paymentDetails) {
         this.paymentDetails = paymentDetails;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
+    }
+
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
     }
 
     @Override
