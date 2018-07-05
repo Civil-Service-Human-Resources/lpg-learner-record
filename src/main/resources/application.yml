@@ -19,8 +19,7 @@ logging:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
     root: ${ROOT_LOGGING_LEVEL:INFO}
-    org.eclipse.jetty: WARN
-    org.apache.http: WARN
+    com.zaxxer.hikari: ERROR
 
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
