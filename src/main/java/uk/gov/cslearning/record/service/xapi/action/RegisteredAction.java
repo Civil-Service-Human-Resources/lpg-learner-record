@@ -39,7 +39,12 @@ public class RegisteredAction extends Action {
             Event event = (Event) activity;
             moduleRecord.setPaymentMethod(event.getPaymentMethod());
             moduleRecord.setPaymentDetails(event.getPaymentDetails());
-            moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
+
+            if (event.getPaymentDetails().startsWith("Call off")) {
+                moduleRecord.setBookingStatus(BookingStatus.APPROVED);
+            } else {
+                moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
+            }
         } else {
             LOGGER.warn("Registered action taken on module that is not an event. Course ID: {}, module ID: {}",
                     courseRecord.getCourseId(), moduleRecord.getModuleId());
