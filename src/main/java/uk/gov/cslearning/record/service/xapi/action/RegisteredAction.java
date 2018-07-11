@@ -40,7 +40,7 @@ public class RegisteredAction extends Action {
             moduleRecord.setPaymentMethod(event.getPaymentMethod());
             moduleRecord.setPaymentDetails(event.getPaymentDetails());
 
-            if (event.getPaymentDetails().startsWith("Call off")) {
+            if (event.getPaymentDetails() != null && event.getPaymentDetails().startsWith("Call off")) {
                 moduleRecord.setBookingStatus(BookingStatus.APPROVED);
             } else {
                 moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
