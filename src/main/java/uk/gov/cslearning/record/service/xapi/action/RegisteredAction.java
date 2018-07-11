@@ -16,6 +16,8 @@ public class RegisteredAction extends Action {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisteredAction.class);
 
+    private static final String CALL_OFF_PREFIX = "Call off";
+
     static {
         Action.register(RegisteredAction.class, ActivityType.EVENT, Verb.REGISTERED);
     }
@@ -40,7 +42,7 @@ public class RegisteredAction extends Action {
             moduleRecord.setPaymentMethod(event.getPaymentMethod());
             moduleRecord.setPaymentDetails(event.getPaymentDetails());
 
-            if (event.getPaymentDetails() != null && event.getPaymentDetails().startsWith("Call off")) {
+            if (event.getPaymentDetails() != null && event.getPaymentDetails().startsWith(CALL_OFF_PREFIX)) {
                 moduleRecord.setBookingStatus(BookingStatus.APPROVED);
             } else {
                 moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
