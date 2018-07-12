@@ -19,7 +19,11 @@ public class SkippedAction extends Action {
 
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
+        if (courseRecord.getState() == State.REGISTERED) {
+            courseRecord.setState(State.SKIPPED);
+        }
         moduleRecord.setState(State.SKIPPED);
+        moduleRecord.setBookingStatus(null);
         moduleRecord.setResult(null);
         moduleRecord.setScore(null);
         moduleRecord.setCompletionDate(null);
