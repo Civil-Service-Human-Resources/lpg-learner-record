@@ -102,8 +102,8 @@ public class LearnerRecordEventsController {
                         return null;
                     }
 
-                    if (event.getDate().isAfter(LocalDateTime.now())) {
-                        LOGGER.debug("Event date is after today, ignoring.");
+                    if (event.getDate().isBefore(LocalDateTime.now())) {
+                        LOGGER.debug("Event date is before today, ignoring.");
                         return null;
                     }
 
@@ -121,6 +121,7 @@ public class LearnerRecordEventsController {
                     newEvent.setCourseName(course.getTitle());
                     newEvent.setCourseId(course.getId());
                     newEvent.setModuleId(module.getId());
+                    newEvent.setEventId(event.getId());
                     newEvent.setModuleName(module.getTitle());
                     newEvent.setCost(module.getPrice());
                     newEvent.setDate(event.getDate());
