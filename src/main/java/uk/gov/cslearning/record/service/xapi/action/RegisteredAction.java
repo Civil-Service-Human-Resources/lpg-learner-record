@@ -44,6 +44,9 @@ public class RegisteredAction extends Action {
 
             if (event.getPaymentDetails() != null && event.getPaymentDetails().startsWith(CALL_OFF_PREFIX)) {
                 moduleRecord.setBookingStatus(BookingStatus.APPROVED);
+                if (courseRecord.getState() == State.REGISTERED) {
+                    courseRecord.setState(State.APPROVED);
+                }
             } else {
                 moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
             }

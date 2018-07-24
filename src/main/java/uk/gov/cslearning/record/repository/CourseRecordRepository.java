@@ -6,7 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.State;
 
 import javax.persistence.LockModeType;
 import java.util.Collection;
