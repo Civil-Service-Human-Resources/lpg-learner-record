@@ -5,18 +5,22 @@ import gov.adlnet.xapi.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import javax.transaction.TransactionScoped;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -42,7 +46,7 @@ public class UserRecordService {
         this.registryService = registryService;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
         LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
 
@@ -62,8 +66,6 @@ public class UserRecordService {
 
             setUserDepartmentAndProfession(userId, latestCourseRecords);
 
-            courseRecordRepository.saveAll(latestCourseRecords);
-
             if (activityId != null) {
                 return latestCourseRecords.stream()
                         .filter(courseRecord -> courseRecord.matchesActivityId(activityId))
@@ -75,7 +77,9 @@ public class UserRecordService {
         }
     }
 
-    private void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
         if (!courseRecords.isEmpty()) {
             LOGGER.debug("Updating course records with additional user information.");
             Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(userId);
@@ -85,6 +89,7 @@ public class UserRecordService {
                     courseRecord.setDepartment(civilServant.getDepartmentCode());
                     courseRecord.setProfession(civilServant.getProfession());
                 }
+                courseRecordRepository.saveAll(courseRecords);
             }
         }
     }
