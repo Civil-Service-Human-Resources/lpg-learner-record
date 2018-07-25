@@ -24,9 +24,56 @@ bootJar {
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
 
+configurations {
+    ajc
+    aspects
+    compile {
+        extendsFrom aspects
+    }
+}
+
+def aspectj = { destDir, aspectPath, inpath, classpath ->
+    ant.taskdef(resource: "org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties",
+            classpath: configurations.ajc.asPath)
+
+    ant.iajc(
+            maxmem: "1024m", fork: "true", Xlint: "ignore",
+            destDir: destDir,
+            aspectPath: aspectPath,
+            inpath: inpath,
+            classpath: classpath,
+            source: project.sourceCompatibility,
+            target: project.targetCompatibility
+    )
+}
+
+compileJava {
+    doLast {
+        aspectj project.sourceSets.main.output.classesDir.absolutePath,
+                configurations.aspects.asPath,
+                project.sourceSets.main.output.classesDir.absolutePath,
+                project.sourceSets.main.runtimeClasspath.asPath
+    }
+}
+
+compileTestJava {
+    doLast {
+        aspectj project.sourceSets.test.output.classesDir.absolutePath,
+                configurations.aspects.asPath,
+                project.sourceSets.test.output.classesDir.absolutePath,
+                project.sourceSets.test.runtimeClasspath.asPath
+    }
+}
+
 dependencies {
+
+    ajc 'org.aspectj:aspectjtools:1.9.1'
+    aspects 'org.springframework:spring-aspects:5.0.5.RELEASE'
+
     compile 'com.sun.xml.bind:jaxb-impl:2.1.2'
     compile 'javax.activation:activation:1.1'
+    compile 'org.aspectj:aspectjrt:1.9.1'
+    compile 'org.aspectj:aspectjweaver:1.9.1'
 
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jersey'
