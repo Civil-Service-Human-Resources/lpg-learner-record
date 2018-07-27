@@ -9,8 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.State;
-import uk.gov.cslearning.record.service.ActivityRecordService;
 import uk.gov.cslearning.record.service.UserRecordService;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -27,9 +25,6 @@ public class LearnerRecordControllerTest {
 
     @InjectMocks
     private LearnerRecordController controller;
-
-    @Mock
-    private ActivityRecordService activityRecordService;
 
     @Mock
     private UserRecordService userRecordService;

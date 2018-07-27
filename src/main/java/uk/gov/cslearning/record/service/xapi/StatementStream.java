@@ -5,6 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.service.catalogue.Event;
+import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
+import uk.gov.cslearning.record.service.catalogue.Module;
 import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
@@ -12,6 +16,7 @@ import uk.gov.cslearning.record.service.xapi.activity.Course;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -19,6 +24,13 @@ import static java.util.stream.Collectors.toMap;
 public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
+
+    private LearningCatalogueService learningCatalogueService;
+
+    public StatementStream(LearningCatalogueService learningCatalogueService) {
+        checkArgument(learningCatalogueService != null);
+        this.learningCatalogueService = learningCatalogueService;
+    }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
         return replay(statements, id, Collections.emptySet());
@@ -29,6 +41,8 @@ public class StatementStream {
         Map<String, List<Statement>> groups = new HashMap<>();
         Map<String, CourseRecord> records = existingCourseRecords.stream()
                 .collect(toMap(CourseRecord::getCourseId, c -> c));
+
+        Map<String, CourseRecord> updatedRecords = new HashMap<>();
 
         List<Statement> sortedStatements = new ArrayList<>(statements);
         sortedStatements.sort(Comparator.comparing(Statement::getTimestamp));
@@ -63,6 +77,14 @@ public class StatementStream {
                         continue;
                     }
                     CourseRecord courseRecord = records.get(courseId);
+                    uk.gov.cslearning.record.service.catalogue.Course catalogueCourse
+                            = learningCatalogueService.getCourse(courseId);
+
+                    if (catalogueCourse == null) {
+                        LOGGER.info("Ignoring statement with no catalogue course, courseId: {}", courseId);
+                        continue;
+                    }
+
                     if (courseRecord == null) {
                         String userId = group.get(0).getActor().getAccount().getName();
                         if (userId == null) {
@@ -70,8 +92,10 @@ public class StatementStream {
                             continue;
                         }
                         courseRecord = new CourseRecord(courseId, userId);
+                        courseRecord.setCourseTitle(catalogueCourse.getTitle());
                         records.put(courseId, courseRecord);
                     }
+                    updatedRecords.put(courseId, courseRecord);
 
                     if (activity instanceof Course) {
                         replay(statement, courseRecord, null);
@@ -84,20 +108,64 @@ public class StatementStream {
                             LOGGER.info("Ignoring statement with no module ID {}", statement);
                             continue;
                         }
+
                         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
+                        Module catalogueModule = catalogueCourse.getModule(moduleId);
+
+                        if (catalogueModule == null) {
+                            LOGGER.info("Ignoring statement with no catalogue module, courseId: {}, moduleId: {}",
+                                    courseId, moduleId);
+                            continue;
+                        }
+
                         if (moduleRecord == null) {
                             moduleRecord = new ModuleRecord(moduleId);
                             moduleRecord.setCreatedAt(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
+
+                            moduleRecord.setModuleTitle(catalogueModule.getTitle());
+                            moduleRecord.setCost(catalogueModule.getPrice());
+                            moduleRecord.setOptional(catalogueModule.getOptional());
+                            moduleRecord.setModuleType(catalogueModule.getModuleType());
+                            moduleRecord.setDuration(catalogueModule.getDuration());
+
                             courseRecord.addModuleRecord(moduleRecord);
                         }
 
-                        moduleRecord.setEventId(activity.getEventId());
+                        String eventId = activity.getEventId();
+                        if (eventId != null) {
+                            moduleRecord.setEventId(eventId);
+
+                            Event catalogueEvent = catalogueModule.getEvent(eventId);
+                            if (catalogueEvent == null) {
+                                LOGGER.info("Ignoring statement with no catalogue event, courseId: {}, moduleId: {}, eventId: {}",
+                                        courseId, moduleId, eventId);
+                                continue;
+                            }
+
+                            moduleRecord.setEventDate(catalogueEvent.getDate());
+                        }
                         replay(statement, courseRecord, moduleRecord);
+
+                        if (checkComplete(courseRecord, catalogueCourse)) {
+                            courseRecord.setState(State.COMPLETED);
+                        }
                     }
                 }
             }
         }
-        return records.values();
+        return updatedRecords.values();
+    }
+
+    private boolean checkComplete(CourseRecord courseRecord, uk.gov.cslearning.record.service.catalogue.Course catalogueCourse) {
+        for (Module module : catalogueCourse.getModules()) {
+            if (!module.getOptional()) {
+                ModuleRecord record = courseRecord.getModuleRecord(module.getId());
+                if (record == null || record.getState() != State.COMPLETED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private List<String> getParents(Statement statement) {

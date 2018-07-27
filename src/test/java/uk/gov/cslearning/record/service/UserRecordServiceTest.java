@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import gov.adlnet.xapi.model.*;
+import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
@@ -43,6 +46,9 @@ public class UserRecordServiceTest {
     private UserRecordService userRecordService;
 
     @Mock
+    private LearningCatalogueService learningCatalogueService;
+
+    @Mock
     private XApiService xApiService;
 
     @Mock
@@ -53,7 +59,8 @@ public class UserRecordServiceTest {
 
     @Before
     public void setup() {
-        userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService);
+        userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService,
+                learningCatalogueService);
     }
 
     @Test
@@ -68,10 +75,11 @@ public class UserRecordServiceTest {
 
         Statement statement = createStatement(activityId, uk.gov.cslearning.record.service.xapi.Verb.ARCHIVED);
 
+        when(learningCatalogueService.getCourse(eq(courseId))).thenReturn(createCourse(courseId));
         when(xApiService.getStatements(eq(userId), eq(null), any())).thenReturn(ImmutableSet.of(statement));
         when(registryService.getCivilServantByUid(userId)).thenReturn(Optional.of(new CivilServant()));
 
-        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, activityId);
+        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, Lists.newArrayList(activityId));
 
         assertThat(courseRecords.size(), is(1));
 
@@ -80,6 +88,12 @@ public class UserRecordServiceTest {
         assertThat(updatedCourseRecord.getCourseId(), equalTo(courseId));
         assertThat(updatedCourseRecord.getUserId(), equalTo(userId));
         assertThat(updatedCourseRecord.getState(), equalTo(State.ARCHIVED));
+    }
+
+    private Course createCourse(String courseId) {
+        Course course = new Course();
+        course.setId(courseId);
+        return course;
     }
 
     private Statement createStatement(String activityId, uk.gov.cslearning.record.service.xapi.Verb verb) {

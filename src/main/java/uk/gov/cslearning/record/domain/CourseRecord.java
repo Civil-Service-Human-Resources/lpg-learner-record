@@ -20,6 +20,8 @@ public class CourseRecord {
     @EmbeddedId
     private CourseRecordIdentity identity;
 
+    private String courseTitle;
+
     @Enumerated(EnumType.STRING)
     private State state;
 
@@ -45,6 +47,14 @@ public class CourseRecord {
         checkArgument(userId != null);
         this.identity = new CourseRecordIdentity(courseId, userId);
         this.moduleRecords = new HashSet<>();
+    }
+
+    public String getCourseTitle() {
+        return courseTitle;
+    }
+
+    public void setCourseTitle(String courseTitle) {
+        this.courseTitle = courseTitle;
     }
 
     public CourseRecordIdentity getIdentity() {
@@ -147,6 +157,6 @@ public class CourseRecord {
     }
 
     public boolean isComplete() {
-        return getCompletionDate() != null;
+        return this.state == State.COMPLETED;
     }
 }
