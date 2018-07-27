@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import com.google.common.collect.Iterables;
 import uk.gov.cslearning.record.service.CivilServant;
 
 import java.math.BigDecimal;
@@ -105,5 +106,14 @@ public class Module {
             return mostRelevantAudience;
         }
         return null;
+    }
+
+    public boolean getOptional() {
+        if (audiences.size() > 0) {
+            // TODO: this will be redundant when we move to audience being at a course level so not doing a proper
+            // lookup.
+            return !Iterables.get(audiences, 0).isMandatory();
+        }
+        return Boolean.FALSE;
     }
 }
