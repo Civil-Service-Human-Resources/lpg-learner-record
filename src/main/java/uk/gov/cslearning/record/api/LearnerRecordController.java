@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.UserRecordService;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableCollection;
@@ -31,9 +33,22 @@ public class LearnerRecordController {
 
     @GetMapping(path = "/{userId}")
     public ResponseEntity<Records> userRecord(@PathVariable("userId") String userId,
-                                              @RequestParam(name = "activityId", required = false) List<String> activityIds) {
+                                              @RequestParam(name = "activityId", required = false) List<String> activityIds,
+                                              @RequestParam(name = "includeState", required = false) State includeState,
+                                              @RequestParam(name = "ignoreState", required = false) State ignoreState) {
         LOGGER.debug("Getting user record for {}", userId);
         Collection<CourseRecord> records = userRecordService.getUserRecord(userId, activityIds);
+
+        if (includeState != null) {
+            records = records.stream()
+                    .filter(courseRecord -> courseRecord.getState() == includeState)
+                    .collect(Collectors.toList());
+        } else if (ignoreState != null) {
+            records = records.stream()
+                    .filter(courseRecord -> courseRecord.getState() != ignoreState)
+                    .collect(Collectors.toList());
+        }
+
         return new ResponseEntity<>(new Records(records), OK);
     }
 
