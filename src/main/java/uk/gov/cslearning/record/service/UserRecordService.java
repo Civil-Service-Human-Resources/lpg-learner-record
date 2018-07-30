@@ -53,7 +53,7 @@ public class UserRecordService {
         this.learningCatalogueService = learningCatalogueService;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
         LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 
