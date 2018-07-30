@@ -59,12 +59,16 @@ public class LearningCatalogueService {
         headers.add("Authorization", "Basic " + credentials);
 
         HttpEntity<String> request = new HttpEntity<>(headers);
-        String foo = String.format(courseUrlFormat, courseId);
-        ResponseEntity<Course> responseEntity = restTemplate.exchange(
-                String.format(courseUrlFormat, courseId),
-                HttpMethod.GET, request, Course.class);
 
-        return responseEntity.getBody();
+        try {
+            ResponseEntity<Course> responseEntity = restTemplate.exchange(
+                    String.format(courseUrlFormat, courseId),
+                    HttpMethod.GET, request, Course.class);
+
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static class Results {
