@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableCollection;
+import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -34,19 +35,19 @@ public class LearnerRecordController {
     @GetMapping(path = "/{userId}")
     public ResponseEntity<Records> userRecord(@PathVariable("userId") String userId,
                                               @RequestParam(name = "activityId", required = false) List<String> activityIds,
-                                              @RequestParam(name = "includeState", required = false) State includeState,
-                                              @RequestParam(name = "ignoreState", required = false) State ignoreState) {
+                                              @RequestParam(name = "includeState", required = false) List<State> includeStates,
+                                              @RequestParam(name = "ignoreState", required = false) List<State> ignoreStates) {
         LOGGER.debug("Getting user record for {}", userId);
         Collection<CourseRecord> records = userRecordService.getUserRecord(userId, activityIds);
 
-        if (includeState != null) {
+        if (includeStates != null && !includeStates.isEmpty()) {
             records = records.stream()
-                    .filter(courseRecord -> courseRecord.getState() == includeState)
-                    .collect(Collectors.toList());
-        } else if (ignoreState != null) {
+                    .filter(courseRecord -> includeStates.contains(courseRecord.getState()))
+                    .collect(toList());
+        } else if (ignoreStates != null && !ignoreStates.isEmpty()) {
             records = records.stream()
-                    .filter(courseRecord -> courseRecord.getState() != ignoreState)
-                    .collect(Collectors.toList());
+                    .filter(courseRecord -> !ignoreStates.contains(courseRecord.getState()))
+                    .collect(toList());
         }
 
         return new ResponseEntity<>(new Records(records), OK);
