@@ -74,9 +74,15 @@ public class UserRecordService {
                     statement -> ((Activity) statement.getObject()).getId(),
                     courseRecords);
 
+            courseRecordRepository.saveAll(updatedCourseRecords);
+
             setUserDepartmentAndProfession(userId, updatedCourseRecords);
 
-            courseRecords.addAll(updatedCourseRecords);
+            for (CourseRecord courseRecord : updatedCourseRecords) {
+                if (!courseRecords.contains(courseRecord)) {
+                    courseRecords.add(courseRecord);
+                }
+            }
 
             if (activityIds != null && !activityIds.isEmpty()) {
                 return courseRecords.stream()
