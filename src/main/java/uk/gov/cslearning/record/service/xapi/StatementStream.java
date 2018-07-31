@@ -157,8 +157,12 @@ public class StatementStream {
     }
 
     private boolean checkComplete(CourseRecord courseRecord, uk.gov.cslearning.record.service.catalogue.Course catalogueCourse) {
+
+        boolean hasRequired = catalogueCourse.getModules().stream()
+                .anyMatch(module -> !module.getOptional());
+
         for (Module module : catalogueCourse.getModules()) {
-            if (!module.getOptional()) {
+            if (!hasRequired || !module.getOptional()) {
                 ModuleRecord record = courseRecord.getModuleRecord(module.getId());
                 if (record == null || record.getState() != State.COMPLETED) {
                     return false;
