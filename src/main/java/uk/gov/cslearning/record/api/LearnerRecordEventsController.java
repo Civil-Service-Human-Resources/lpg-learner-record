@@ -77,7 +77,7 @@ public class LearnerRecordEventsController {
 
                 LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                    if (moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
+                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
                         LOGGER.debug("Event date is before today, ignoring.");
                         return null;
                     }
