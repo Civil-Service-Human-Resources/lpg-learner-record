@@ -41,8 +41,6 @@ public class LearnerRecordEventsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordEventsController.class);
 
-    private LearningCatalogueService learningCatalogueService;
-
     private CourseRecordRepository courseRecordRepository;
 
     private IdentityService identityService;
@@ -50,15 +48,12 @@ public class LearnerRecordEventsController {
     private RegistryService registryService;
 
     @Autowired
-    public LearnerRecordEventsController(LearningCatalogueService learningCatalogueService,
-                                         CourseRecordRepository courseRecordRepository,
+    public LearnerRecordEventsController(CourseRecordRepository courseRecordRepository,
                                          IdentityService identityService,
                                          RegistryService registryService) {
-        checkArgument(learningCatalogueService != null);
         checkArgument(courseRecordRepository != null);
         checkArgument(identityService != null);
         checkArgument(registryService != null);
-        this.learningCatalogueService = learningCatalogueService;
         this.courseRecordRepository = courseRecordRepository;
         this.identityService = identityService;
         this.registryService = registryService;
@@ -82,27 +77,7 @@ public class LearnerRecordEventsController {
 
                 LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                    Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
-                    if (course == null) {
-                        LOGGER.warn("Course not found for courseId {}.", courseRecord.getCourseId());
-                        return null;
-                    }
-
-                    Module module = course.getModule(moduleRecord.getModuleId());
-                    if (module == null) {
-                        LOGGER.warn("Module not found for courseId {}, moduleId {}.", courseRecord.getCourseId(),
-                                moduleRecord.getModuleId());
-                        return null;
-                    }
-
-                    Event event = module.getEvent(moduleRecord.getEventId());
-                    if (event == null) {
-                        LOGGER.warn("Event not found for courseId {}, moduleId {}, eventId {}.", courseRecord.getCourseId(),
-                                moduleRecord.getModuleId(), moduleRecord.getEventId());
-                        return null;
-                    }
-
-                    if (event.getDate().isBefore(LocalDateTime.now())) {
+                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
                         LOGGER.debug("Event date is before today, ignoring.");
                         return null;
                     }
@@ -118,13 +93,13 @@ public class LearnerRecordEventsController {
 
                     LearnerRecordEvents newEvent = new LearnerRecordEvents();
                     newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6, '0')));
-                    newEvent.setCourseName(course.getTitle());
-                    newEvent.setCourseId(course.getId());
-                    newEvent.setModuleId(module.getId());
-                    newEvent.setEventId(event.getId());
-                    newEvent.setModuleName(module.getTitle());
-                    newEvent.setCost(module.getPrice());
-                    newEvent.setDate(event.getDate());
+                    newEvent.setCourseName(courseRecord.getCourseTitle());
+                    newEvent.setCourseId(courseRecord.getCourseId());
+                    newEvent.setModuleId(moduleRecord.getModuleId());
+                    newEvent.setEventId(moduleRecord.getEventId());
+                    newEvent.setModuleName(moduleRecord.getModuleTitle());
+                    newEvent.setCost(moduleRecord.getCost());
+                    newEvent.setDate(moduleRecord.getEventDate());
                     newEvent.setDelegateEmailAddress(emailAddress);
                     newEvent.setDelegateName(civilServant.get().getFullName());
                     return newEvent;

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
@@ -20,7 +21,20 @@ public class ModuleRecord {
     @Column(nullable = false)
     private String moduleId;
 
+    private String moduleTitle;
+
+    private String moduleType;
+
+    private Long duration;
+
     private String eventId;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime eventDate;
+
+    private Boolean optional = Boolean.FALSE;
+
+    private BigDecimal cost;
 
     @Enumerated(EnumType.STRING)
     private State state;
@@ -61,10 +75,6 @@ public class ModuleRecord {
 
     public String getModuleId() {
         return moduleId;
-    }
-
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
     }
 
     public String getEventId() {
@@ -153,6 +163,54 @@ public class ModuleRecord {
 
     public BookingStatus getBookingStatus() {
         return bookingStatus;
+    }
+
+    public String getModuleTitle() {
+        return moduleTitle;
+    }
+
+    public void setModuleTitle(String moduleTitle) {
+        this.moduleTitle = moduleTitle;
+    }
+
+    public LocalDateTime getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(LocalDateTime eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
+    }
+
+    public Boolean getOptional() {
+        return optional;
+    }
+
+    public void setOptional(Boolean optional) {
+        this.optional = optional;
+    }
+
+    public String getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(String moduleType) {
+        this.moduleType = moduleType;
+    }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 
     @Override
