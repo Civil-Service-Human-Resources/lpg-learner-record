@@ -80,18 +80,22 @@ public class LearnerRecordSummaryController {
                     return newSummary;
                 });
 
-                switch (moduleRecord.getState()) {
-                    case COMPLETED:
-                        summary.incrementCompleted();
-                        break;
-                    case IN_PROGRESS:
-                        summary.incrementInProgress();
-                        break;
-                    case ARCHIVED:
-                    case UNREGISTERED:
-                        break;
-                    default:
-                        summary.incrementNotStarted();
+                if (moduleRecord.getState() != null) {
+                    switch (moduleRecord.getState()) {
+                        case COMPLETED:
+                            summary.incrementCompleted();
+                            break;
+                        case IN_PROGRESS:
+                            summary.incrementInProgress();
+                            break;
+                        case ARCHIVED:
+                        case UNREGISTERED:
+                            break;
+                        default:
+                            summary.incrementNotStarted();
+                    }
+                } else {
+                    summary.incrementNotStarted();
                 }
             }
         }
