@@ -123,8 +123,8 @@ public class StatementStream {
                             moduleRecord.setCreatedAt(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
 
                             moduleRecord.setModuleTitle(catalogueModule.getTitle());
-                            moduleRecord.setCost(catalogueModule.getPrice());
-                            moduleRecord.setOptional(catalogueModule.getOptional());
+                            moduleRecord.setCost(catalogueModule.getCost());
+                            moduleRecord.setOptional(catalogueModule.isOptional());
                             moduleRecord.setModuleType(catalogueModule.getModuleType());
                             moduleRecord.setDuration(catalogueModule.getDuration());
 
@@ -159,10 +159,10 @@ public class StatementStream {
     private boolean checkComplete(CourseRecord courseRecord, uk.gov.cslearning.record.service.catalogue.Course catalogueCourse) {
 
         boolean hasRequired = catalogueCourse.getModules().stream()
-                .anyMatch(module -> !module.getOptional());
+                .anyMatch(module -> !module.isOptional());
 
         for (Module module : catalogueCourse.getModules()) {
-            if (!hasRequired || !module.getOptional()) {
+            if (!hasRequired || !module.isOptional()) {
                 ModuleRecord record = courseRecord.getModuleRecord(module.getId());
                 if (record == null || record.getState() != State.COMPLETED) {
                     return false;

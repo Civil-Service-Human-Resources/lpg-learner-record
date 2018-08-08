@@ -20,7 +20,6 @@ import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
-import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -148,7 +147,7 @@ public class LearningJob {
 
                 for (Course course : courses) {
                     Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-                    if (!course.isComplete(courseRecords, civilServant)) {
+                    if (!course.isComplete(courseRecords)) {
                         LocalDate mostRecentlyCompleted = null;
 
                         for (CourseRecord courseRecord : courseRecords) {

@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -26,38 +25,35 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Transactional
 public class CourseTest {
 
-    @Autowired
-    private CourseRecordRepository courseRecordRepository;
-
-    final String courseId ="courseId";
+    final String courseId = "courseId";
     final String userId = "userId";
     final String moduleId = "moduleId";
     final String department = "dep";
-
+    @Autowired
+    private CourseRecordRepository courseRecordRepository;
 
     @Test
     public void shouldShowCourseAsCompletedIfAllModulesComplete() {
-
-        List<String> departments = new ArrayList<String>();
+        List<String> departments = new ArrayList<>();
         departments.add(department);
 
         Audience audience = new Audience();
         audience.setDepartments(departments);
         audience.setMandatory(true);
 
-        Collection<Audience> audiences =new HashSet<Audience>();
+        Collection<Audience> audiences = new HashSet<Audience>();
         audiences.add(audience);
 
         Module module = new Module();
         module.setId(moduleId);
-        module.setAudiences(audiences);
 
         Collection<Module> modules = new HashSet<>();
         modules.add(module);
 
-        Course course =new Course();
+        Course course = new Course();
         course.setId(courseId);
         course.setModules(modules);
+        course.setAudiences(audiences);
 
         CivilServant civilServant = new CivilServant();
         civilServant.setDepartmentCode(department);
@@ -71,12 +67,11 @@ public class CourseTest {
         Collection<CourseRecord> courseRecords = new HashSet<>();
         courseRecords.add(courseRecord);
 
-        assertThat(course.isComplete(courseRecords,civilServant), is(true));
+        assertThat(course.isComplete(courseRecords), is(true));
     }
 
     @Test
     public void shouldNotShowCourseAsCompletedIfNotAllModulesComplete() {
-
         List<String> departments = new ArrayList<String>();
         departments.add(department);
 
@@ -84,19 +79,19 @@ public class CourseTest {
         audience.setDepartments(departments);
         audience.setMandatory(true);
 
-        Collection<Audience> audiences =new HashSet<Audience>();
+        Collection<Audience> audiences = new HashSet<Audience>();
         audiences.add(audience);
 
         Module module = new Module();
         module.setId(moduleId);
-        module.setAudiences(audiences);
 
         Collection<Module> modules = new HashSet<>();
         modules.add(module);
 
-        Course course =new Course();
+        Course course = new Course();
         course.setId(courseId);
         course.setModules(modules);
+        course.setAudiences(audiences);
 
         CivilServant civilServant = new CivilServant();
         civilServant.setDepartmentCode(department);
@@ -110,7 +105,7 @@ public class CourseTest {
         Collection<CourseRecord> courseRecords = new HashSet<>();
         courseRecords.add(courseRecord);
 
-        assertThat(course.isComplete(courseRecords,civilServant), is(false));
+        assertThat(course.isComplete(courseRecords), is(false));
     }
 
 }
