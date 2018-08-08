@@ -17,22 +17,22 @@ public class Module {
 
     private Long duration;
 
-    private BigDecimal price;
-
-    private Collection<Audience> audiences;
+    private BigDecimal cost;
 
     private Collection<Event> events;
+
+    private boolean optional;
 
     public Event getEvent(String eventId) {
         return events.stream().filter(event -> eventId.equals(event.getId())).findFirst().orElse(null);
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getCost() {
+        return cost;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
     }
 
     public Collection<Event> getEvents() {
@@ -59,14 +59,6 @@ public class Module {
         this.title = title;
     }
 
-    public Collection<Audience> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(Collection<Audience> audiences) {
-        this.audiences = audiences;
-    }
-
     public String getModuleType() {
         return moduleType;
     }
@@ -83,37 +75,13 @@ public class Module {
         this.duration = duration;
     }
 
-    public LocalDate getNextRequiredBy(CivilServant civilServant, LocalDate completionDate) {
-        Audience audience = getMostRelevantAudienceFor(civilServant);
-        if (audience != null) {
-            return audience.getNextRequiredBy(completionDate);
-        }
-        return null;
+
+
+    public boolean isOptional() {
+        return optional;
     }
 
-    protected Audience getMostRelevantAudienceFor(CivilServant civilServant) {
-        int highestRelevance = -1;
-        Audience mostRelevantAudience = null;
-
-        for (Audience audience : audiences) {
-            int audienceRelevance = audience.getRelevance(civilServant);
-            if (audienceRelevance > highestRelevance) {
-                mostRelevantAudience = audience;
-                highestRelevance = audienceRelevance;
-            }
-        }
-        if (highestRelevance > -1) {
-            return mostRelevantAudience;
-        }
-        return null;
-    }
-
-    public boolean getOptional() {
-        if (audiences.size() > 0) {
-            // TODO: this will be redundant when we move to audience being at a course level so not doing a proper
-            // lookup.
-            return !Iterables.get(audiences, 0).isMandatory();
-        }
-        return Boolean.FALSE;
+    public void setOptional(boolean optional) {
+        this.optional = optional;
     }
 }
