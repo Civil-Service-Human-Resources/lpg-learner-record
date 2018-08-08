@@ -9,13 +9,9 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class DislikedAction extends Action {
 
     static {
-        Action.register(DislikedAction.class, ActivityType.FACETOFACE, Verb.DISLIKED);
-        Action.register(DislikedAction.class, ActivityType.ELEARNING, Verb.DISLIKED);
-        Action.register(DislikedAction.class, ActivityType.VIDEO, Verb.DISLIKED);
-        Action.register(DislikedAction.class, ActivityType.LINK, Verb.DISLIKED);
-        Action.register(DislikedAction.class, ActivityType.FILE, Verb.DISLIKED);
-        Action.register(DislikedAction.class, ActivityType.COURSE, Verb.DISLIKED);
-        Action.register(DislikedAction.class, ActivityType.EVENT, Verb.DISLIKED);
+        for (ActivityType type : ActivityType.values()) {
+            Action.register(DislikedAction.class, type, Verb.DISLIKED);
+        }
     }
 
     DislikedAction(Statement statement) {

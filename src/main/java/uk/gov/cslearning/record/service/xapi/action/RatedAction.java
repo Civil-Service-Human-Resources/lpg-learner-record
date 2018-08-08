@@ -10,11 +10,9 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class RatedAction extends Action {
 
     static {
-        Action.register(RatedAction.class, ActivityType.LINK, Verb.RATED);
-        Action.register(RatedAction.class, ActivityType.FILE, Verb.RATED);
-        Action.register(RatedAction.class, ActivityType.EVENT, Verb.RATED);
-        Action.register(RatedAction.class, ActivityType.VIDEO, Verb.RATED);
-        Action.register(RatedAction.class, ActivityType.ELEARNING, Verb.RATED);
+        for (ActivityType type : ActivityType.values()) {
+            Action.register(RatedAction.class, type, Verb.RATED);
+        }
     }
 
     RatedAction(Statement statement) {
@@ -23,6 +21,8 @@ public class RatedAction extends Action {
 
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
-        moduleRecord.setRated(true);
+        if (moduleRecord != null) {
+            moduleRecord.setRated(true);
+        }
     }
 }
