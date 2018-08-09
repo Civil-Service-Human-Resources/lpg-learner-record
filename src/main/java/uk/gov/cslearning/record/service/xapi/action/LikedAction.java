@@ -9,13 +9,9 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class LikedAction extends Action {
 
     static {
-        Action.register(LikedAction.class, ActivityType.FACETOFACE, Verb.LIKED);
-        Action.register(LikedAction.class, ActivityType.ELEARNING, Verb.LIKED);
-        Action.register(LikedAction.class, ActivityType.VIDEO, Verb.LIKED);
-        Action.register(LikedAction.class, ActivityType.LINK, Verb.LIKED);
-        Action.register(LikedAction.class, ActivityType.FILE, Verb.LIKED);
-        Action.register(LikedAction.class, ActivityType.COURSE, Verb.LIKED);
-        Action.register(LikedAction.class, ActivityType.EVENT, Verb.LIKED);
+        for (ActivityType type : ActivityType.values()) {
+            Action.register(LikedAction.class, type, Verb.LIKED);
+        }
     }
 
     LikedAction(Statement statement) {

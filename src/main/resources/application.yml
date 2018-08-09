@@ -1,6 +1,7 @@
 
 spring:
   jackson:
+    default-property-inclusion: non_null
     serialization:
       write_dates_as_timestamps: false
   resources:
@@ -10,6 +11,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+
 
 server:
   port: 9000

@@ -10,13 +10,10 @@ import uk.gov.cslearning.record.service.xapi.Verb;
 public class ArchivedAction extends Action {
 
     static {
-        Action.register(ArchivedAction.class, ActivityType.COURSE, Verb.ARCHIVED);
-        Action.register(ArchivedAction.class, ActivityType.FACETOFACE, Verb.ARCHIVED);
+        for (ActivityType type : ActivityType.values()) {
+            Action.register(ArchivedAction.class, type, Verb.ARCHIVED);
+        }
         Action.register(ArchivedAction.class, ActivityType.FACETOFACE, Verb.UNREGISTERED);
-        Action.register(ArchivedAction.class, ActivityType.ELEARNING, Verb.ARCHIVED);
-        Action.register(ArchivedAction.class, ActivityType.LINK, Verb.ARCHIVED);
-        Action.register(ArchivedAction.class, ActivityType.FILE, Verb.ARCHIVED);
-        Action.register(ArchivedAction.class, ActivityType.VIDEO, Verb.ARCHIVED);
     }
 
     ArchivedAction(Statement statement) {

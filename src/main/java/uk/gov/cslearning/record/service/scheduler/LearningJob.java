@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +94,7 @@ public class LearningJob {
                 LOGGER.debug("Found {} required courses", courses.size());
 
                 for (Course course : courses) {
-                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
                     for (CourseRecord courseRecord : courseRecords) {
                         LOGGER.debug("Course complete: {}", courseRecord.isComplete());
                         if (courseRecord.isComplete()) {
@@ -146,7 +147,7 @@ public class LearningJob {
                 LocalDate now = LocalDate.now();
 
                 for (Course course : courses) {
-                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), String.format(COURSE_URI_FORMAT, course.getId()));
+                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
                     if (!course.isComplete(courseRecords, civilServant)) {
                         LocalDate mostRecentlyCompleted = null;
 

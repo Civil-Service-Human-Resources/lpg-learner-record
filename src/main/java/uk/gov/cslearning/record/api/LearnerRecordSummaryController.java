@@ -39,20 +39,15 @@ public class LearnerRecordSummaryController {
 
     private static final String PROFESSION_REPORTER = "PROFESSION_REPORTER";
 
-    private LearningCatalogueService learningCatalogueService;
-
     private RegistryService registryService;
 
     private CourseRecordRepository courseRecordRepository;
 
     @Autowired
-    public LearnerRecordSummaryController(LearningCatalogueService learningCatalogueService,
-                                          RegistryService registryService,
+    public LearnerRecordSummaryController(RegistryService registryService,
                                           CourseRecordRepository courseRecordRepository) {
-        checkArgument(learningCatalogueService != null);
         checkArgument(registryService != null);
         checkArgument(courseRecordRepository != null);
-        this.learningCatalogueService = learningCatalogueService;
         this.registryService = registryService;
         this.courseRecordRepository = courseRecordRepository;
     }
@@ -74,42 +69,33 @@ public class LearnerRecordSummaryController {
 
                 String key = String.format("%s-%s", courseRecord.getCourseId(), moduleRecord.getModuleId());
 
-                Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
-                if (course == null) {
-                    LOGGER.warn("Course not found for courseId {}.", courseRecord.getCourseId());
-                    continue;
-                }
-
-                Module module = course.getModule(moduleRecord.getModuleId());
-                if (module == null) {
-                    LOGGER.warn("Module not found for courseId {}, moduleId {}.", courseRecord.getCourseId(),
-                            moduleRecord.getModuleId());
-                    continue;
-                }
-
                 LearnerRecordSummary summary = summaries.computeIfAbsent(key, s -> {
                     LearnerRecordSummary newSummary = new LearnerRecordSummary();
                     newSummary.setCourseIdentifier(courseRecord.getCourseId());
-                    newSummary.setCourseName(course.getTitle());
+                    newSummary.setCourseName(courseRecord.getCourseTitle());
                     newSummary.setModuleIdentifier(moduleRecord.getModuleId());
-                    newSummary.setModuleName(module.getTitle());
-                    newSummary.setType(module.getModuleType());
-                    newSummary.setTimeTaken(module.getDuration());
+                    newSummary.setModuleName(moduleRecord.getModuleTitle());
+                    newSummary.setType(moduleRecord.getModuleType());
+                    newSummary.setTimeTaken(moduleRecord.getDuration());
                     return newSummary;
                 });
 
-                switch (moduleRecord.getState()) {
-                    case COMPLETED:
-                        summary.incrementCompleted();
-                        break;
-                    case IN_PROGRESS:
-                        summary.incrementInProgress();
-                        break;
-                    case ARCHIVED:
-                    case UNREGISTERED:
-                        break;
-                    default:
-                        summary.incrementNotStarted();
+                if (moduleRecord.getState() != null) {
+                    switch (moduleRecord.getState()) {
+                        case COMPLETED:
+                            summary.incrementCompleted();
+                            break;
+                        case IN_PROGRESS:
+                            summary.incrementInProgress();
+                            break;
+                        case ARCHIVED:
+                        case UNREGISTERED:
+                            break;
+                        default:
+                            summary.incrementNotStarted();
+                    }
+                } else {
+                    summary.incrementNotStarted();
                 }
             }
         }

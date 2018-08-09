@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
@@ -18,6 +19,7 @@ import javax.transaction.TransactionScoped;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -36,23 +38,28 @@ public class UserRecordService {
 
     private RegistryService registryService;
 
+    private LearningCatalogueService learningCatalogueService;
+
     @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService, RegistryService registryService) {
+    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
+        checkArgument(learningCatalogueService != null);
         this.courseRecordRepository = courseRecordRepository;
         this.xApiService = xApiService;
         this.registryService = registryService;
+        this.learningCatalogueService = learningCatalogueService;
     }
 
-    @Transactional(readOnly = true)
-    public Collection<CourseRecord> getUserRecord(String userId, String activityId) {
-        LOGGER.debug("Retrieving user record for user {}, activity {} and state {}", userId, activityId);
+    @Transactional
+    public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
+        LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 
-        Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
+        Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
 
-        LocalDateTime since = existingCourseRecords.stream()
+        LocalDateTime since = courseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
                 .filter(Objects::nonNull)
                 .reduce((a, b) -> a.isAfter(b) ? a : b)
@@ -61,17 +68,28 @@ public class UserRecordService {
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, null, since);
 
-            StatementStream stream = new StatementStream();
-            Collection<CourseRecord> latestCourseRecords = stream.replay(statements, statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
+            StatementStream stream = new StatementStream(learningCatalogueService);
 
-            setUserDepartmentAndProfession(userId, latestCourseRecords);
+            Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,
+                    statement -> ((Activity) statement.getObject()).getId(),
+                    courseRecords);
 
-            if (activityId != null) {
-                return latestCourseRecords.stream()
-                        .filter(courseRecord -> courseRecord.matchesActivityId(activityId))
+            courseRecordRepository.saveAll(updatedCourseRecords);
+
+            setUserDepartmentAndProfession(userId, updatedCourseRecords);
+
+            for (CourseRecord courseRecord : updatedCourseRecords) {
+                if (!courseRecords.contains(courseRecord)) {
+                    courseRecords.add(courseRecord);
+                }
+            }
+
+            if (activityIds != null && !activityIds.isEmpty()) {
+                return courseRecords.stream()
+                        .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
                         .collect(Collectors.toSet());
             }
-            return latestCourseRecords;
+            return courseRecords;
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);
         }
@@ -89,8 +107,8 @@ public class UserRecordService {
                     courseRecord.setDepartment(civilServant.getDepartmentCode());
                     courseRecord.setProfession(civilServant.getProfession());
                 }
-                courseRecordRepository.saveAll(courseRecords);
             }
+            courseRecordRepository.saveAll(courseRecords);
         }
     }
 }
