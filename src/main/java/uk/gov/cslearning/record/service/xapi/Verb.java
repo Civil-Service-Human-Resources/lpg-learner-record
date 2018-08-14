@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service.xapi;
 public enum Verb {
 
     ARCHIVED("https://w3id.org/xapi/dod-isd/verbs/archived"),
+    ATTEMPTED("http://adlnet.gov/expapi/verbs/attempted"),
     COMPLETED("http://adlnet.gov/expapi/verbs/completed"),
     DISLIKED("https://w3id.org/xapi/acrossx/verbs/disliked"),
     EXPERIENCED("http://adlnet.gov/expapi/verbs/experienced"),
