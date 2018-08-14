@@ -12,6 +12,8 @@ public class InitialisedAction extends Action {
     static {
         Action.register(InitialisedAction.class, ActivityType.ELEARNING, Verb.INITIALISED);
         Action.register(InitialisedAction.class, ActivityType.ELEARNING, Verb.LAUNCHED);
+        Action.register(InitialisedAction.class, ActivityType.ELEARNING, Verb.EXPERIENCED);
+        Action.register(InitialisedAction.class, ActivityType.ELEARNING, Verb.ATTEMPTED);
         Action.register(InitialisedAction.class, ActivityType.VIDEO, Verb.INITIALISED);
     }
 
