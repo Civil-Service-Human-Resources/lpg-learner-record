@@ -29,8 +29,8 @@ pipeline {
                 unstash 'workspace'
                 script {
                     docker.withRegistry("${env.DOCKER_REGISTRY_URL}", 'docker_registry_credentials') {
-                        def customImage = docker.build("lpg-learner-record:${env.BUILD_ID}")
-                        customImage.push()
+                        def customImage = docker.build("lpg-learner-record")
+                        customImage.push("${env.BRANCH_NAME}-${env.BUILD_ID}")
                     }
                 }
                 stash 'workspace'
