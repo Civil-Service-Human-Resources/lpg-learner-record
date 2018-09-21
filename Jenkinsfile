@@ -64,8 +64,8 @@ pipeline {
                         sh "terraform --version"
                         sh "terraform init"
                         sh "terraform validate"
-                        sh "terraform plan -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
-                        sh "terraform apply -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
+                        sh "terraform plan -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BRANCH_NAME}-${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
+                        sh "terraform apply -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BRANCH_NAME}-${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
                     }
                 }
             }
@@ -99,8 +99,8 @@ pipeline {
                         sh "terraform --version"
                         sh "terraform init"
                         sh "terraform validate"
-                        sh "terraform plan -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
-                        sh "terraform apply -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
+                        sh "terraform plan -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BRANCH_NAME}-${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
+                        sh "terraform apply -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BRANCH_NAME}-${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
                     }
                 }
             }
@@ -133,8 +133,8 @@ pipeline {
                         sh "terraform --version"
                         sh "terraform init"
                         sh "terraform validate"
-                        sh "terraform plan -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
-                        sh "terraform apply -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
+                        sh "terraform plan -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BRANCH_NAME}-${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
+                        sh "terraform apply -target=module.lpg-learner-record -var 'lpg_learner_record_docker_tag=${env.BRANCH_NAME}-${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
                     }
                 }
             }
