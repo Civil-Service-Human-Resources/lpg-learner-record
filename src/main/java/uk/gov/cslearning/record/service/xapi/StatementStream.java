@@ -144,7 +144,10 @@ public class StatementStream {
 
                             moduleRecord.setEventDate(catalogueEvent.getDate());
                         }
-                        replay(statement, courseRecord, moduleRecord);
+
+                        if(moduleRecord.getState() != State.COMPLETED) {
+                            replay(statement, courseRecord, moduleRecord);
+                        }
 
                         if (checkComplete(courseRecord, catalogueCourse)) {
                             courseRecord.setState(State.COMPLETED);
