@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
@@ -68,6 +66,26 @@ public class LearnerRecordEventsController {
             return ResponseEntity.badRequest().build();
         }
 
+        Map<String, LearnerRecordEvents> events = getEvents(records);
+
+        return new ResponseEntity<>(events.values(), OK);
+    }
+
+    @GetMapping ("/{eventId}")
+    public ResponseEntity<Collection<LearnerRecordEvents>> listById(@PathVariable("eventId") String eventId) {
+
+        Iterable<CourseRecord> records = courseRecordRepository.listEventRecordsById(eventId);
+        if (records == null) {
+            LOGGER.info("No event records returned.");
+            return ResponseEntity.badRequest().build();
+        }
+
+        Map<String, LearnerRecordEvents> events = getEvents(records);
+
+        return new ResponseEntity<>(events.values(), OK);
+    }
+
+    private Map<String, LearnerRecordEvents> getEvents(Iterable<CourseRecord> records){
         Map<String, LearnerRecordEvents> events = new HashMap<>();
 
         for (CourseRecord courseRecord : records) {
@@ -77,10 +95,10 @@ public class LearnerRecordEventsController {
 
                 LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
-                        LOGGER.debug("Event date is before today, ignoring.");
-                        return null;
-                    }
+//                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
+//                        LOGGER.debug("Event date is before today, ignoring.");
+//                        return null;
+//                    }
 
                     Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
 
@@ -114,6 +132,10 @@ public class LearnerRecordEventsController {
                 }
             }
         }
-        return new ResponseEntity<>(events.values(), OK);
+
+        return events;
     }
 }
+
+
+

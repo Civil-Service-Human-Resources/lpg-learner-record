@@ -26,4 +26,7 @@ public interface CourseRecordRepository extends CrudRepository<CourseRecord, Lon
 
     @Query("SELECT cr FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId is not null")
     Iterable<CourseRecord> listEventRecords();
+
+    @Query("SELECT cr FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1")
+    Iterable<CourseRecord> listEventRecordsById(String eventId);
 }
