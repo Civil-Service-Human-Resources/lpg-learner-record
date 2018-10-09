@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Event {
 
@@ -14,6 +16,8 @@ public class Event {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime date;
+
+    private List<DateRange> dateRanges = new ArrayList<>();
 
     private String location;
 
@@ -25,13 +29,9 @@ public class Event {
         this.id = id;
     }
 
-    public LocalDateTime getDate() {
-        return date;
-    }
+    public LocalDateTime getDate() { return date; }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
+    public void setDate(LocalDateTime date) { this.date = date; }
 
     public String getLocation() {
         return location;
@@ -39,5 +39,13 @@ public class Event {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public List<DateRange> getDateRanges() {
+        return dateRanges;
+    }
+
+    public void setDateRanges(List<DateRange> dateRanges) {
+        this.dateRanges = dateRanges;
     }
 }

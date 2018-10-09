@@ -66,7 +66,7 @@ public class LearnerRecordEventsController {
             return ResponseEntity.badRequest().build();
         }
 
-        Map<String, LearnerRecordEvents> events = getEvents(records);
+        Map<String, LearnerRecordEvents> events = getEvents(records, "");
 
         return new ResponseEntity<>(events.values(), OK);
     }
@@ -80,55 +80,57 @@ public class LearnerRecordEventsController {
             return ResponseEntity.badRequest().build();
         }
 
-        Map<String, LearnerRecordEvents> events = getEvents(records);
+        Map<String, LearnerRecordEvents> events = getEvents(records, eventId);
 
         return new ResponseEntity<>(events.values(), OK);
     }
 
-    private Map<String, LearnerRecordEvents> getEvents(Iterable<CourseRecord> records){
+    private Map<String, LearnerRecordEvents> getEvents(Iterable<CourseRecord> records, String eventId){
         Map<String, LearnerRecordEvents> events = new HashMap<>();
 
         for (CourseRecord courseRecord : records) {
 
             for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
-                String key = String.format("%s-%s", courseRecord.getUserId(), moduleRecord.getModuleId());
+                if(moduleRecord.getEventId().equals(eventId) || eventId.equals("")) {
+                    String key = String.format("%s-%s", courseRecord.getUserId(), moduleRecord.getModuleId());
 
-                LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
+                    LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-//                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
-//                        LOGGER.debug("Event date is before today, ignoring.");
-//                        return null;
-//                    }
+                        //                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
+                        //                        LOGGER.debug("Event date is before today, ignoring.");
+                        //                        return null;
+                        //                    }
 
-                    Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
+                        Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
 
-                    if (!civilServant.isPresent()) {
-                        LOGGER.warn("Civil servant not found for uid {}.", courseRecord.getUserId());
-                        return null;
+                        if (!civilServant.isPresent()) {
+                            LOGGER.warn("Civil servant not found for uid {}.", courseRecord.getUserId());
+                            return null;
+                        }
+
+                        String emailAddress = identityService.getEmailAddress(courseRecord.getUserId());
+
+                        LearnerRecordEvents newEvent = new LearnerRecordEvents();
+                        newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6, '0')));
+                        newEvent.setCourseName(courseRecord.getCourseTitle());
+                        newEvent.setCourseId(courseRecord.getCourseId());
+                        newEvent.setModuleId(moduleRecord.getModuleId());
+                        newEvent.setEventId(moduleRecord.getEventId());
+                        newEvent.setModuleName(moduleRecord.getModuleTitle());
+                        newEvent.setCost(moduleRecord.getCost());
+                        newEvent.setDate(moduleRecord.getEventDate());
+                        newEvent.setDelegateEmailAddress(emailAddress);
+                        newEvent.setDelegateName(civilServant.get().getFullName());
+                        return newEvent;
+                    });
+
+                    if (eventSummary != null) {
+                        eventSummary.setCreatedAt(moduleRecord.getCreatedAt());
+                        eventSummary.setUpdatedAt(moduleRecord.getUpdatedAt());
+                        eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
+                        eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
+                        eventSummary.setStatus(moduleRecord.getBookingStatus());
                     }
-
-                    String emailAddress = identityService.getEmailAddress(courseRecord.getUserId());
-
-                    LearnerRecordEvents newEvent = new LearnerRecordEvents();
-                    newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6, '0')));
-                    newEvent.setCourseName(courseRecord.getCourseTitle());
-                    newEvent.setCourseId(courseRecord.getCourseId());
-                    newEvent.setModuleId(moduleRecord.getModuleId());
-                    newEvent.setEventId(moduleRecord.getEventId());
-                    newEvent.setModuleName(moduleRecord.getModuleTitle());
-                    newEvent.setCost(moduleRecord.getCost());
-                    newEvent.setDate(moduleRecord.getEventDate());
-                    newEvent.setDelegateEmailAddress(emailAddress);
-                    newEvent.setDelegateName(civilServant.get().getFullName());
-                    return newEvent;
-                });
-
-                if (eventSummary != null) {
-                    eventSummary.setCreatedAt(moduleRecord.getCreatedAt());
-                    eventSummary.setUpdatedAt(moduleRecord.getUpdatedAt());
-                    eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
-                    eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
-                    eventSummary.setStatus(moduleRecord.getBookingStatus());
                 }
             }
         }

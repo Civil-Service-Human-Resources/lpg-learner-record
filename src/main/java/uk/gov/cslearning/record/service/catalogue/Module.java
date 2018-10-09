@@ -1,10 +1,7 @@
 package uk.gov.cslearning.record.service.catalogue;
 
-import com.google.common.collect.Iterables;
-import uk.gov.cslearning.record.service.CivilServant;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collection;
 
 public class Module {
