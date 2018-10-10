@@ -96,10 +96,10 @@ public class LearnerRecordEventsController {
 
                     LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                        //                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
-                        //                        LOGGER.debug("Event date is before today, ignoring.");
-                        //                        return null;
-                        //                    }
+                        //if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
+                        //  LOGGER.debug("Event date is before today, ignoring.");
+                        //  return null;
+                        //}
 
                         Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
 
