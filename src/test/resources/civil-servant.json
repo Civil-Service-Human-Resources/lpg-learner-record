@@ -1,0 +1,45 @@
+{
+  "fullName" : "John Smith",
+  "grade" : {
+    "code" : "PB3",
+    "name" : "Senior Civil Service - Director General"
+  },
+  "organisationalUnit" : {
+    "code" : "co",
+    "name" : "Cabinet Office",
+    "paymentMethods" : [ "PURCHASE_ORDER" ]
+  },
+  "profession" : {
+    "name" : "Digital"
+  },
+  "jobRole" : {
+    "name" : "Commercial Specialist",
+    "hasChildren" : false
+  },
+  "otherAreasOfWork" : [ {
+    "name" : "Corporate finance"
+  } ],
+  "interests" : [ {
+    "name" : "Contract management"
+  } ],
+  "lineManagerName" : "Johnny Bananas",
+  "lineManagerEmailAddress" : "line-manager@domain.com",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:9002/civilServants/1{?projection}",
+      "templated" : true
+    },
+    "organisationUnit" : {
+      "href" : "http://localhost:9002/civilServants/1/organisationalUnit"
+    },
+    "grade" : {
+      "href" : "http://localhost:9002/civilServants/1/grade"
+    },
+    "profession" : {
+      "href" : "http://localhost:9002/civilServants/1/profession"
+    },
+    "jobRole" : {
+      "href" : "http://localhost:9002/civilServants/1/jobRole"
+    }
+  }
+}

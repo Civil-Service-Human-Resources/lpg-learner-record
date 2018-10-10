@@ -3,10 +3,10 @@ package uk.gov.cslearning.record.service.catalogue;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
-import uk.gov.cslearning.record.service.CivilServant;
 
 import java.time.LocalDate;
 import java.util.Collection;

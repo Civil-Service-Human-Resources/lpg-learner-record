@@ -2,7 +2,7 @@ package uk.gov.cslearning.record.service.catalogue;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import uk.gov.cslearning.record.service.CivilServant;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -72,13 +72,13 @@ public class Audience {
 
     public int getRelevance(CivilServant civilServant) {
         int relevance = 0;
-        if (areasOfWork != null && areasOfWork.contains(civilServant.getProfession())) {
+        if (areasOfWork != null && areasOfWork.contains(civilServant.getProfession().getName())) {
             relevance += 1;
         }
-        if (departments != null && departments.contains(civilServant.getDepartmentCode())) {
+        if (departments != null && departments.contains(civilServant.getOrganisationalUnit().getCode())) {
             relevance += 1;
         }
-        if (grades != null && grades.contains(civilServant.getGradeCode())) {
+        if (grades != null && grades.contains(civilServant.getGrade().getCode())) {
             relevance += 1;
         }
         return relevance;
