@@ -14,15 +14,15 @@ import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 
-import javax.transaction.TransactionScoped;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -104,8 +104,8 @@ public class UserRecordService {
             if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
                 for (CourseRecord courseRecord : courseRecords) {
-                    courseRecord.setDepartment(civilServant.getDepartmentCode());
-                    courseRecord.setProfession(civilServant.getProfession());
+                    courseRecord.setDepartment(civilServant.getOrganisationalUnit().getCode());
+                    courseRecord.setProfession(civilServant.getProfession().getName());
                 }
             }
             courseRecordRepository.saveAll(courseRecords);
