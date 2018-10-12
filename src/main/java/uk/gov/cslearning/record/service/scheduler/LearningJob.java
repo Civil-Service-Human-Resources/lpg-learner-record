@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.NotificationRepository;
-import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.RegistryService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -88,7 +88,7 @@ public class LearningJob {
                     continue;
                 }
 
-                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
 
                 LOGGER.debug("Found {} required courses", courses.size());
 
@@ -119,7 +119,7 @@ public class LearningJob {
             if (optionalLineManager.isPresent()) {
                 CivilServant lineManager = optionalLineManager.get();
 
-                notifyService.notifyOnComplete(civilServant.getLineManagerEmail(), govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+                notifyService.notifyOnComplete(civilServant.getLineManagerEmailAddress(), govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
 
                 Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
                 notificationRepository.save(notification);
@@ -141,7 +141,7 @@ public class LearningJob {
             Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
             if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
-                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getDepartmentCode());
+                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
                 Map<Long, List<Course>> incompleteCourses = new HashMap<>();
                 LocalDate now = LocalDate.now();
 

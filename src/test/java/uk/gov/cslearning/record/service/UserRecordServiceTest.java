@@ -2,15 +2,15 @@ package uk.gov.cslearning.record.service;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import gov.adlnet.xapi.model.*;
+import gov.adlnet.xapi.model.Activity;
+import gov.adlnet.xapi.model.ActivityDefinition;
+import gov.adlnet.xapi.model.Statement;
+import gov.adlnet.xapi.model.Verb;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -23,10 +23,11 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -35,7 +36,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.cslearning.record.service.xapi.activity.Activity.COURSE_ID_PREFIX;
 
 @RunWith(SpringRunner.class)

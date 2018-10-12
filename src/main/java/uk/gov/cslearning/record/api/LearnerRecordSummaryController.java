@@ -9,19 +9,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.security.SecurityUtil;
-import uk.gov.cslearning.record.service.CivilServant;
-import uk.gov.cslearning.record.service.RegistryService;
-import uk.gov.cslearning.record.service.catalogue.Course;
-import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
-import uk.gov.cslearning.record.service.catalogue.Module;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.springframework.http.HttpStatus.OK;
@@ -108,18 +106,18 @@ public class LearnerRecordSummaryController {
             return courseRecordRepository.findAll();
         }
 
-        CivilServant civilServant = registryService.getCurrent();
+        Optional<CivilServant> optionalCivilServant = registryService.getCurrent();
 
-        if (civilServant == null) {
+        if (!optionalCivilServant.isPresent()) {
             throw new AccessDeniedException("No civil servant details found.");
         }
 
         if (SecurityUtil.hasAuthority(PROFESSION_REPORTER)) {
-            return courseRecordRepository.findByProfession(civilServant.getProfession());
+            return courseRecordRepository.findByProfession(optionalCivilServant.get().getProfession().getName());
         }
 
         if (SecurityUtil.hasAuthority(ORGANISATION_REPORTER)) {
-            return courseRecordRepository.findByDepartment(civilServant.getDepartmentCode());
+            return courseRecordRepository.findByDepartment(optionalCivilServant.get().getOrganisationalUnit().getCode());
         }
         return null;
     }

@@ -10,15 +10,15 @@ import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.NotificationRepository;
-import uk.gov.cslearning.record.service.CivilServant;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.service.notify.NotificationClientException;
-import uk.gov.cslearning.record.service.RegistryService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -198,8 +198,7 @@ public class LearningJobTest {
         CivilServant civilServant = new CivilServant();
         civilServant.setFullName("test user");
         civilServant.setLineManagerUid("managerUid");
-        civilServant.setLineManagerEmail(MANAGER_EMAIL);
-
+        civilServant.setLineManagerEmailAddress(MANAGER_EMAIL);
 
         CivilServant managerCivilServant = new CivilServant();
         managerCivilServant.setFullName("manager");
