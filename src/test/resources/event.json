@@ -1,0 +1,17 @@
+{
+  "id": "3rgoUVHdRryHYHLm-FNQSQ",
+  "joiningInstructions": null,
+  "venue": {
+    "location": "London",
+    "address": "Victoria Street",
+    "capacity": 10,
+    "minCapacity": 5
+  },
+  "dateRanges": [
+    {
+      "date": "2019-03-31",
+      "startTime": "09:00:00",
+      "endTime": "17:00:00"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
@@ -7,6 +8,7 @@ import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import java.time.LocalDate;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Audience {
 
     private List<String> areasOfWork;
