@@ -16,6 +16,7 @@ import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -68,7 +69,7 @@ public class LearnerRecordEventsController {
 
                 LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
+                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDate.now())) {
                         LOGGER.debug("Event date is before today, ignoring.");
                         return null;
                     }

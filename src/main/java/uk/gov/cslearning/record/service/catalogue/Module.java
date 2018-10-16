@@ -1,12 +1,11 @@
 package uk.gov.cslearning.record.service.catalogue;
 
-import com.google.common.collect.Iterables;
-import uk.gov.cslearning.record.service.CivilServant;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collection;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Module {
 
     private String id;

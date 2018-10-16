@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.api;
 import uk.gov.cslearning.record.domain.BookingStatus;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class LearnerRecordEvents {
@@ -21,7 +22,7 @@ public class LearnerRecordEvents {
 
     private BigDecimal cost;
 
-    private LocalDateTime date;
+    private LocalDate date;
 
     private String delegateName;
 
@@ -93,11 +94,11 @@ public class LearnerRecordEvents {
         this.cost = cost;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Course {
     private static final Logger LOGGER = LoggerFactory.getLogger(Course.class);
 

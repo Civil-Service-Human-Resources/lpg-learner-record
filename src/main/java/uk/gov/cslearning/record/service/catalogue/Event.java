@@ -1,21 +1,19 @@
 package uk.gov.cslearning.record.service.catalogue;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Event {
 
     private String id;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime date;
+    private List<DateRange> dateRanges = new ArrayList<>();
 
-    private String location;
+    private Venue venue;
 
     public String getId() {
         return id;
@@ -25,19 +23,19 @@ public class Event {
         this.id = id;
     }
 
-    public LocalDateTime getDate() {
-        return date;
+    public Venue getVenue() {
+        return venue;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
+    public void setVenue(Venue venue) {
+        this.venue = venue;
     }
 
-    public String getLocation() {
-        return location;
+    public List<DateRange> getDateRanges() {
+        return Collections.unmodifiableList(dateRanges);
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setDateRanges(List<DateRange> dateRanges) {
+        this.dateRanges = Collections.unmodifiableList(dateRanges);
     }
 }

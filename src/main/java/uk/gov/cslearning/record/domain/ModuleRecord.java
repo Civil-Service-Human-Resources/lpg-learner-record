@@ -1,12 +1,14 @@
 package uk.gov.cslearning.record.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
@@ -29,8 +31,8 @@ public class ModuleRecord {
 
     private String eventId;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime eventDate;
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate eventDate;
 
     private Boolean optional = Boolean.FALSE;
 
@@ -173,11 +175,11 @@ public class ModuleRecord {
         this.moduleTitle = moduleTitle;
     }
 
-    public LocalDateTime getEventDate() {
+    public LocalDate getEventDate() {
         return eventDate;
     }
 
-    public void setEventDate(LocalDateTime eventDate) {
+    public void setEventDate(LocalDate eventDate) {
         this.eventDate = eventDate;
     }
 

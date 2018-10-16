@@ -142,7 +142,9 @@ public class StatementStream {
                                 continue;
                             }
 
-                            moduleRecord.setEventDate(catalogueEvent.getDate());
+                            if (!catalogueEvent.getDateRanges().isEmpty()) {
+                                moduleRecord.setEventDate(catalogueEvent.getDateRanges().get(0).getDate());
+                            }
                         }
 
                         if(moduleRecord.getState() != State.COMPLETED) {
