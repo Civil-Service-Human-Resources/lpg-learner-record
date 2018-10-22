@@ -1,15 +1,12 @@
 package uk.gov.cslearning.record.service.catalogue;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.cslearning.record.csrs.service.RequestEntityFactory;
 
 import java.util.List;
 
@@ -18,35 +15,30 @@ import static java.util.Collections.emptyList;
 @Service
 public class LearningCatalogueService {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    private String courseUrlFormat;
+    private final RequestEntityFactory requestEntityFactory;
 
-    private String requiredLearningUrlFormat;
+    private final String courseUrlFormat;
 
-    private HttpHeaders headers;
+    private final String requiredLearningUrlFormat;
 
-    public LearningCatalogueService(RestTemplate restTemplate,
+
+    public LearningCatalogueService(RestTemplate restTemplate, RequestEntityFactory requestEntityFactory,
                                     @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,
                                     @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat) {
 
         this.restTemplate = restTemplate;
+        this.requestEntityFactory = requestEntityFactory;
         this.requiredLearningUrlFormat = requiredLearningUrlFormat;
         this.courseUrlFormat = courseUrlFormat;
     }
 
     public List<Course> getRequiredCoursesByDepartmentCode(String departmentId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
+        RequestEntity requestEntity =
+                requestEntityFactory.createGetRequest(String.format(requiredLearningUrlFormat, departmentId));
 
-        headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + details.getTokenValue());
-
-        HttpEntity<String> request = new HttpEntity<>(headers);
-
-        ResponseEntity<Results> responseEntity = restTemplate.exchange(
-                String.format(requiredLearningUrlFormat, departmentId),
-                HttpMethod.GET, request, Results.class);
+        ResponseEntity<Results> responseEntity = restTemplate.exchange(requestEntity, Results.class);
 
         Results results = responseEntity.getBody();
 
@@ -56,24 +48,11 @@ public class LearningCatalogueService {
         return emptyList();
     }
 
+    @Cacheable("courseId")
     public Course getCourse(String courseId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authentication.getDetails();
-
-        headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + details.getTokenValue());
-
-        HttpEntity<String> request = new HttpEntity<>(headers);
-
-        try {
-            ResponseEntity<Course> responseEntity = restTemplate.exchange(
-                    String.format(courseUrlFormat, courseId),
-                    HttpMethod.GET, request, Course.class);
-
-            return responseEntity.getBody();
-        } catch (Exception e) {
-            return null;
-        }
+        RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(courseUrlFormat, courseId));
+        ResponseEntity<Course> responseEntity = restTemplate.exchange(requestEntity, Course.class);
+        return responseEntity.getBody();
     }
 
     public static class Results {
