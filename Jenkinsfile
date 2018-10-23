@@ -150,6 +150,9 @@ pipeline {
                 always {
                     junit 'build/test-results/**/TEST-*.xml'
                 }
+                cleanup {
+                    deleteDir()
+                }
             }
         }
     }
