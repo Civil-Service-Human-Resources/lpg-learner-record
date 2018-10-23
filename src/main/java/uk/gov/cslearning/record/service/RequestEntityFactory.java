@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.csrs.service;
+package uk.gov.cslearning.record.service;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 @Component
 public class RequestEntityFactory {
@@ -19,5 +20,13 @@ public class RequestEntityFactory {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + details.getTokenValue());
         return new RequestEntity(headers, HttpMethod.GET, uri);
+    }
+
+    public RequestEntity createGetRequest(String uri) {
+        try {
+            return createGetRequest(new URI(uri));
+        } catch (URISyntaxException e) {
+            throw new RequestEntityException(e);
+        }
     }
 }

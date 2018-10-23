@@ -83,6 +83,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jersey'
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.boot:spring-boot-starter-jdbc'
+    compile 'org.springframework.boot:spring-boot-starter-cache'
     compile 'org.springframework.boot:spring-boot-configuration-processor'
     compile 'org.springframework.data:spring-data-jpa:2.0.5.RELEASE'
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE'
@@ -102,6 +103,8 @@ dependencies {
     compile 'org.reflections:reflections:0.9.11'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
     compile 'uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE'
+
+    compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.powermock:powermock-api-mockito2:1.7.4'

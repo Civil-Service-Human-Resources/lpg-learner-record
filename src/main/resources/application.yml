@@ -11,7 +11,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-
+  cache:
+    cache-names: courseId
+    caffeine:
+      spec:
+        - maximumSize: 500
+        - expireAfterAccess: 1d
 
 server:
   port: 9000

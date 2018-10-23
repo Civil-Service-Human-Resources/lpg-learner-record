@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.csrs.service;
+package uk.gov.cslearning.record.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,11 +11,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import uk.gov.cslearning.record.service.RequestEntityException;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @RunWith(PowerMockRunner.class)
@@ -35,8 +39,6 @@ public class RequestEntityFactoryTest {
         OAuth2AuthenticationDetails oAuth2AuthenticationDetails = mock(OAuth2AuthenticationDetails.class);
         String tokenValue = "token-value";
 
-
-
         when(SecurityContextHolder.getContext()).thenReturn(securityContext);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getDetails()).thenReturn(oAuth2AuthenticationDetails);
@@ -48,5 +50,42 @@ public class RequestEntityFactoryTest {
         assertEquals(HttpMethod.GET, requestEntity.getMethod());
         assertEquals("Bearer token-value", requestEntity.getHeaders().get("Authorization").get(0));
         assertEquals(uri, requestEntity.getUrl());
+    }
+
+
+    @Test
+    public void createGetRequestSetsAuthenticationHeadersWithUriString() throws URISyntaxException {
+        String uri = "http://localhost";
+
+        mockStatic(SecurityContextHolder.class);
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        OAuth2AuthenticationDetails oAuth2AuthenticationDetails = mock(OAuth2AuthenticationDetails.class);
+        String tokenValue = "token-value";
+
+        when(SecurityContextHolder.getContext()).thenReturn(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getDetails()).thenReturn(oAuth2AuthenticationDetails);
+        when(oAuth2AuthenticationDetails.getTokenValue()).thenReturn(tokenValue);
+
+
+        RequestEntity requestEntity = requestEntityFactory.createGetRequest(uri);
+
+        assertEquals(HttpMethod.GET, requestEntity.getMethod());
+        assertEquals("Bearer token-value", requestEntity.getHeaders().get("Authorization").get(0));
+        assertEquals(new URI(uri), requestEntity.getUrl());
+    }
+
+    @Test
+    public void createGetRequestCatchesUriSyntaxException() throws URISyntaxException {
+        String uri = "httpåå://localhost";
+
+        try {
+            requestEntityFactory.createGetRequest(uri);
+            fail("Expected RequestEntityException");
+        } catch (RequestEntityException e) {
+            assertTrue(e.getCause() instanceof URISyntaxException);
+        }
     }
 }
