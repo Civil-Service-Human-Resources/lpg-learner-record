@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.csrs.service;
+package uk.gov.cslearning.record.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
+import uk.gov.cslearning.record.service.RequestEntityException;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -1,11 +1,10 @@
 package uk.gov.cslearning.record.service.catalogue;
 
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cslearning.record.csrs.service.RequestEntityFactory;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.util.Collections;
 import java.util.List;

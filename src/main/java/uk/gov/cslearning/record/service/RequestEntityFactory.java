@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.csrs.service;
+package uk.gov.cslearning.record.service;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

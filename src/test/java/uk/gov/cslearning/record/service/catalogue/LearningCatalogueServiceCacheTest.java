@@ -9,7 +9,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cslearning.record.csrs.service.RequestEntityFactory;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;

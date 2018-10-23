@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.net.URI;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.csrs.service;
+package uk.gov.cslearning.record.service;
 
 public class RequestEntityException extends RuntimeException {
     public RequestEntityException(Throwable cause) {
