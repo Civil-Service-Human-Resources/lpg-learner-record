@@ -9,23 +9,23 @@ public class Learner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(nullable = false)
     private String uuid;
 
     public Learner() {}
 
-    public Learner(Long id){
+    public Learner(int id){
         checkArgument(id >= 0);
         this.id = id;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -22,7 +22,7 @@ public class LearnerRepositoryTest {
 
     @Test
     public void shouldSaveLearner(){
-        Learner learner = new Learner(new Long(1));
+        Learner learner = new Learner();
         learner.setUuid("test-uuid");
         learnerRepository.save(learner);
 

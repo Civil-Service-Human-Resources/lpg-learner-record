@@ -41,10 +41,10 @@ public class BookingRepositoryTest {
         learnerRepository.save(learner);
         eventRepository.save(event);
 
-        Booking booking = new Booking(new Long(1));
-        booking.setEventId(new Long(1));
-        booking.setLearnerId(new Long(1));
-        booking.setStatus("Confirmed");
+        Booking booking = new Booking(1);
+        booking.setEventId(1);
+        booking.setLearnerId(1);
+        booking.setStatus("CONFIRMED");
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(LocalDateTime.now());
 

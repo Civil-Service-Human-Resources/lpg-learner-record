@@ -11,13 +11,13 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(nullable = false)
-    private Long learnerId;
+    private int learnerId;
 
     @Column(nullable = false)
-    private Long eventId;
+    private int eventId;
 
     @Column
     private String paymentDetails;
@@ -30,31 +30,31 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(Long id){
+    public Booking(int id){
         this.id = id;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Long getEventId() {
+    public int getEventId() {
         return eventId;
     }
 
-    public void setEventId(Long eventId) {
+    public void setEventId(int eventId) {
         this.eventId = eventId;
     }
 
-    public Long getLearnerId() {
+    public int getLearnerId() {
         return learnerId;
     }
 
-    public void setLearnerId(Long learnerId) {
+    public void setLearnerId(int learnerId) {
         this.learnerId = learnerId;
     }
 

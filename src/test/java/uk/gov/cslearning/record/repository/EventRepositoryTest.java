@@ -22,7 +22,7 @@ public class EventRepositoryTest {
 
     @Test
     public void shouldSaveEvent(){
-        Event event = new Event(new Long(1));
+        Event event = new Event();
         event.setPath("test/path");
         eventRepository.save(event);
 
