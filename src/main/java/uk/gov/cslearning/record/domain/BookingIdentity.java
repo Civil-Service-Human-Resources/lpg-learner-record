@@ -16,7 +16,7 @@ public class BookingIdentity implements Serializable {
 
     public BookingIdentity() {}
 
-    public BookingIdentity(Long eventId, Long learnerId){
+    public BookingIdentity(Long learnerId, Long eventId){
         this.eventId = eventId;
         this.learnerId = learnerId;
     }
