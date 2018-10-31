@@ -14,7 +14,7 @@ public class Learner {
     @Column(nullable = false)
     private String uuid;
 
-    public Learner(){}
+    public Learner() {}
 
     public Learner(Long id){
         checkArgument(id >= 0);

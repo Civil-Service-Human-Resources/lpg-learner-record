@@ -2,7 +2,6 @@ package uk.gov.cslearning.record.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -10,10 +9,16 @@ import java.time.LocalDateTime;
 @Entity
 public class Booking {
 
-    @JsonIgnore
-    @EmbeddedId
-    private BookingIdentity identity;
+    @Id
+    private Long id;
 
+    @Column(nullable = false)
+    private Long learnerId;
+
+    @Column(nullable = false)
+    private Long eventId;
+
+    @Column
     private String paymentDetails;
 
     @Column(nullable = false)
@@ -24,16 +29,32 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(Long learnerId, Long eventId){
-        this.identity = new BookingIdentity(learnerId, eventId);
+    public Booking(Long id){
+        this.id = id;
     }
 
-    public BookingIdentity getIdentity() {
-        return identity;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdentity(BookingIdentity identity) {
-        this.identity = identity;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public Long getLearnerId() {
+        return learnerId;
+    }
+
+    public void setLearnerId(Long learnerId) {
+        this.learnerId = learnerId;
     }
 
     public String getPaymentDetails() {
@@ -56,17 +77,19 @@ public class Booking {
         return bookingTime;
     }
 
-    public void setBookingTime(LocalDateTime bookingTime) {
-        this.bookingTime = bookingTime;
+    public void setBookingTime(LocalDateTime booking_time) {
+        this.bookingTime = booking_time;
     }
 
     @Override
     public String toString() {
         return "Booking{" +
-                "identity=" + identity +
+                "id=" + id +
+                ", eventId=" + eventId +
+                ", learnerId=" + learnerId +
                 ", paymentDetails='" + paymentDetails + '\'' +
                 ", status='" + status + '\'' +
-                ", bookingTime=" + bookingTime +
+                ", booking_time=" + bookingTime +
                 '}';
     }
 }

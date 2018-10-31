@@ -23,6 +23,7 @@ public class EventRepositoryTest {
     @Test
     public void shouldSaveEvent(){
         Event event = new Event(new Long(1));
+        event.setPath("test/path");
         eventRepository.save(event);
 
         assertThat(event.getId(), notNullValue());

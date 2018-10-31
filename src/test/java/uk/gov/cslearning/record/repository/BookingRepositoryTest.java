@@ -9,6 +9,8 @@ import uk.gov.cslearning.record.domain.Booking;
 
 import javax.transaction.Transactional;
 
+import java.time.LocalDateTime;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
@@ -22,10 +24,15 @@ public class BookingRepositoryTest {
 
     @Test
     public void shouldSaveBooking() {
-        Booking booking = new Booking(new Long(1), new Long(2));
+        Booking booking = new Booking(new Long(1));
+        booking.setEventId(new Long(1));
+        booking.setLearnerId(new Long(2));
+        booking.setStatus("Confirmed");
+        booking.setPaymentDetails("payment/details");
+        booking.setBookingTime(LocalDateTime.now());
+
         bookingRepository.save(booking);
 
-        assertThat(booking.getLearnerId(), notNullValue());
-        assertThat(booking.getEventId(), notNullValue());
+        assertThat(booking.getId(), notNullValue());
     }
 }
