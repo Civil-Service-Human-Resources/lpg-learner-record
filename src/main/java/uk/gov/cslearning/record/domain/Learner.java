@@ -1,8 +1,6 @@
 package uk.gov.cslearning.record.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
@@ -10,6 +8,7 @@ import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 public class Learner {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

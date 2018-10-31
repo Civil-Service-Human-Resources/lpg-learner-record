@@ -19,7 +19,6 @@ public class Event {
     }
 
     public Event(Long id){
-        checkArgument(id >= 0);
         this.id = id;
     }
 

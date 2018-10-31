@@ -2,19 +2,17 @@ package uk.gov.cslearning.record.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 public class Booking {
 
-    @Column(nullable = false)
-    private Long learnerId;
-
-    @Column(nullable = false)
-    private Long eventId;
+    @JsonIgnore
+    @EmbeddedId
+    private BookingIdentity identity;
 
     private String paymentDetails;
 
@@ -27,24 +25,15 @@ public class Booking {
     public Booking() {}
 
     public Booking(Long learnerId, Long eventId){
-        this.learnerId = learnerId;
-        this.eventId = eventId;
+        this.identity = new BookingIdentity(learnerId, eventId);
     }
 
-    public Long getLearnerId() {
-        return learnerId;
+    public BookingIdentity getIdentity() {
+        return identity;
     }
 
-    public void setLearnerId(Long learnerId) {
-        this.learnerId = learnerId;
-    }
-
-    public Long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(Long eventId) {
-        this.eventId = eventId;
+    public void setIdentity(BookingIdentity identity) {
+        this.identity = identity;
     }
 
     public String getPaymentDetails() {
@@ -74,8 +63,7 @@ public class Booking {
     @Override
     public String toString() {
         return "Booking{" +
-                "learnerId=" + learnerId +
-                ", eventId=" + eventId +
+                "identity=" + identity +
                 ", paymentDetails='" + paymentDetails + '\'' +
                 ", status='" + status + '\'' +
                 ", bookingTime=" + bookingTime +
