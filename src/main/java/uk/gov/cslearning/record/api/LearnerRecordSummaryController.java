@@ -45,23 +45,13 @@ public class LearnerRecordSummaryController {
 
     private CourseRecordRepository courseRecordRepository;
 
-    private EventRepository eventRepository;
-    private LearnerRepository learnerRepository;
-    private BookingRepository bookingRepository;
-
     @Autowired
     public LearnerRecordSummaryController(RegistryService registryService,
-                                          CourseRecordRepository courseRecordRepository,
-                                          EventRepository eventRepository,
-                                          LearnerRepository learnerRepository,
-                                          BookingRepository bookingRepository) {
+                                          CourseRecordRepository courseRecordRepository) {
         checkArgument(registryService != null);
         checkArgument(courseRecordRepository != null);
         this.registryService = registryService;
         this.courseRecordRepository = courseRecordRepository;
-        this.eventRepository = eventRepository;
-        this.learnerRepository = learnerRepository;
-        this.bookingRepository = bookingRepository;
     }
 
     @GetMapping
@@ -112,31 +102,6 @@ public class LearnerRecordSummaryController {
             }
         }
         return new ResponseEntity<>(summaries.values(), OK);
-    }
-
-    @PostMapping
-    public void test(){
-        Learner learner = new Learner();
-        learner.setUuid("75c2c3b3-722f-4ffb-aec9-3d743a2d5330");
-
-        Event event = new Event();
-        event.setPath("test/path");
-
-        learnerRepository.save(learner);
-        eventRepository.save(event);
-
-        Booking booking = new Booking();
-        booking.setLearnerId(new Long(1));
-        booking.setEventId(new Long(1));
-        booking.setPaymentDetails("payment/details");
-        booking.setBookingTime(LocalDateTime.now());
-        booking.setStatus("Confirmed");
-
-        bookingRepository.save(booking);
-
-        bookingRepository.findAll();
-        eventRepository.findAll();
-        learnerRepository.findAll();
     }
 
     private Iterable<CourseRecord> getRecords() {
