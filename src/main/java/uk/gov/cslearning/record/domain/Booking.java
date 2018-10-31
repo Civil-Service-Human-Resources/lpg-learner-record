@@ -26,6 +26,11 @@ public class Booking {
 
     public Booking() {}
 
+    public Booking(Long learnerId, Long eventId){
+        this.learnerId = learnerId;
+        this.eventId = eventId;
+    }
+
     public Long getLearnerId() {
         return learnerId;
     }
