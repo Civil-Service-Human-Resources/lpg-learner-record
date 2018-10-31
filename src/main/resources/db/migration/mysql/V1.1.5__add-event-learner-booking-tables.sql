@@ -1,19 +1,19 @@
 CREATE TABLE `event` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `path` varchar(255) NOT NULL,
   PRIMARY KEY(`id`)
 );
 
 CREATE TABLE `learner` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `uuid` varchar(60) NOT NULL,
   PRIMARY KEY(`id`)
 );
 
 CREATE TABLE `booking` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `learner_id` int NOT NULL,
-  `event_id` int NOT NULL,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `learner_id` UNSIGNED int NOT NULL,
+  `event_id` UNSIGNED int NOT NULL,
   `booking_time` datetime NOT NULL,
   `status` enum('REQUESTED', 'CONFIRMED'),
   `payment_details` varchar(255),
