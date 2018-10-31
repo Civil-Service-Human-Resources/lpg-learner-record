@@ -2,8 +2,6 @@ package uk.gov.cslearning.record.domain;
 
 import javax.persistence.*;
 
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
-
 @Entity
 public class Event {
 
@@ -14,9 +12,7 @@ public class Event {
     @Column(nullable = false)
     private String path;
 
-    public Event(){
-
-    }
+    public Event() {}
 
     public Event(Long id){
         this.id = id;
