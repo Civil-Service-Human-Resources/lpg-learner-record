@@ -11,7 +11,7 @@ CREATE TABLE `learner` (
 );
 
 CREATE TABLE `booking` (
-  `id` bigint NOT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `learner_id` bigint NOT NULL,
   `event_id` bigint NOT NULL,
   `payment_details` varchar(255),
@@ -21,4 +21,5 @@ CREATE TABLE `booking` (
   CONSTRAINT `FK_booking_learnerId_learner_id` FOREIGN KEY(`learner_id`) REFERENCES `learner`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_booking_eventId_event_id` FOREIGN KEY(`event_id`) REFERENCES  `event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY(`id`)
-);
+);'' ||
+ ''

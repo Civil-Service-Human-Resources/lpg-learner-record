@@ -7,15 +7,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.*;
+import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.EventRepository;
+import uk.gov.cslearning.record.repository.LearnerRepository;
 import uk.gov.cslearning.record.security.SecurityUtil;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,13 +45,23 @@ public class LearnerRecordSummaryController {
 
     private CourseRecordRepository courseRecordRepository;
 
+    private EventRepository eventRepository;
+    private LearnerRepository learnerRepository;
+    private BookingRepository bookingRepository;
+
     @Autowired
     public LearnerRecordSummaryController(RegistryService registryService,
-                                          CourseRecordRepository courseRecordRepository) {
+                                          CourseRecordRepository courseRecordRepository,
+                                          EventRepository eventRepository,
+                                          LearnerRepository learnerRepository,
+                                          BookingRepository bookingRepository) {
         checkArgument(registryService != null);
         checkArgument(courseRecordRepository != null);
         this.registryService = registryService;
         this.courseRecordRepository = courseRecordRepository;
+        this.eventRepository = eventRepository;
+        this.learnerRepository = learnerRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     @GetMapping
@@ -98,6 +112,31 @@ public class LearnerRecordSummaryController {
             }
         }
         return new ResponseEntity<>(summaries.values(), OK);
+    }
+
+    @PostMapping
+    public void test(){
+        Learner learner = new Learner();
+        learner.setUuid("75c2c3b3-722f-4ffb-aec9-3d743a2d5330");
+
+        Event event = new Event();
+        event.setPath("test/path");
+
+        learnerRepository.save(learner);
+        eventRepository.save(event);
+
+        Booking booking = new Booking();
+        booking.setLearnerId(new Long(1));
+        booking.setEventId(new Long(1));
+        booking.setPaymentDetails("payment/details");
+        booking.setBookingTime(LocalDateTime.now());
+        booking.setStatus("Confirmed");
+
+        bookingRepository.save(booking);
+
+        bookingRepository.findAll();
+        eventRepository.findAll();
+        learnerRepository.findAll();
     }
 
     private Iterable<CourseRecord> getRecords() {
