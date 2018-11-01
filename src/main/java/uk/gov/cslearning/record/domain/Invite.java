@@ -1,5 +1,7 @@
 package uk.gov.cslearning.record.domain;
 
+import uk.gov.cslearning.record.service.catalogue.Event;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,8 +11,8 @@ public class Invite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
-    private int eventId;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Event event;
 
     @Column(nullable = false)
     private String learnerEmail;
@@ -29,12 +31,12 @@ public class Invite {
         this.id = id;
     }
 
-    public int getEventId() {
-        return eventId;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     public String getLearnerEmail() {
@@ -49,7 +51,7 @@ public class Invite {
     public String toString() {
         return "Invite{" +
                 "id=" + id +
-                ", eventId=" + eventId +
+                ", event=" + event.toString() +
                 ", learnerEmail='" + learnerEmail + '\'' +
                 '}';
     }

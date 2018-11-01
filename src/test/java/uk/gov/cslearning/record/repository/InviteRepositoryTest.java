@@ -23,7 +23,7 @@ public class InviteRepositoryTest {
     @Test
     public void shouldSaveInvite() {
         Invite invite = new Invite();
-        invite.setEventId(1);
+        invite.setEvent(new Event());
         invite.setLearnerEmail("test@test.com");
 
         inviteRepository.save(invite);
