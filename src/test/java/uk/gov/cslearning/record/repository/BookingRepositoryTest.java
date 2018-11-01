@@ -51,8 +51,6 @@ public class BookingRepositoryTest {
 
         bookingRepository.save(booking);
 
-        Optional<Booking> rBooking = bookingRepository.findById(booking.getId());
-
         assertThat(booking.getId(), notNullValue());
     }
 }
