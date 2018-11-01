@@ -1,26 +1,45 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.repository.BookingRepository;
+import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.Optional;
 
 @Service
 public class DefaultBookingService implements BookingService {
-    private final BookingRepository bookingRepository;
 
-    public DefaultBookingService(BookingRepository bookingRepository) {
+    private final BookingFactory bookingFactory;
+    private final BookingDtoFactory bookingDtoFactory;
+    private final BookingRepository bookingRepository;
+    private final XApiService xApiService;
+
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, XApiService xApiService) {
+        this.bookingFactory = bookingFactory;
+        this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
+        this.xApiService = xApiService;
     }
 
     @Override
     public Optional<BookingDto> find(long bookingId) {
-        throw new RuntimeException("Unimplemented");
+
+        BookingDto bookingDto = bookingRepository.findById(bookingId).map(
+                bookingDtoFactory::create
+        ).orElse(null);
+
+        return Optional.ofNullable(bookingDto);
     }
 
     @Override
-    public BookingDto save(BookingDto booking) {
-        throw new RuntimeException("Unimplemented");
+    public BookingDto register(BookingDto bookingDto) {
+        // call xapi with register statement
+
+//        xApiService.register(bookingDto.getLearner(), bookingDto.getEvent());
+
+        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
     }
 }
