@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Booking;
 
 @Repository
-public interface BookingRepository extends CrudRepository<Booking, Long> {
+public interface BookingRepository extends CrudRepository<Booking, Integer> {
 }
