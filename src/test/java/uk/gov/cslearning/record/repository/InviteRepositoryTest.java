@@ -69,7 +69,7 @@ public class InviteRepositoryTest {
 
         inviteRepository.save(invite);
 
-        Optional<Invite> result = inviteRepository.findById(1);
+        Optional<Invite> result = inviteRepository.findById(invite.getId());
         Invite repositoryInvite = result.get();
 
         assertThat(repositoryInvite.getEvent(), is(equalTo(event)));

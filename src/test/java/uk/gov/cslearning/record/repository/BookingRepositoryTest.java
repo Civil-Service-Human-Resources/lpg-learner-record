@@ -42,8 +42,8 @@ public class BookingRepositoryTest {
         eventRepository.save(event);
 
         Booking booking = new Booking(1);
-        booking.setEventId(1);
-        booking.setLearnerId(1);
+        booking.setEventId(event.getId());
+        booking.setLearnerId(learner.getId());
         booking.setStatus("CONFIRMED");
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(LocalDateTime.now());
