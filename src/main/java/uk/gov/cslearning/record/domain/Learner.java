@@ -12,7 +12,7 @@ public class Learner {
     private int id;
 
     @Column(nullable = false)
-    private String uuid;
+    private String uid;
 
     public Learner() {}
 
@@ -29,19 +29,19 @@ public class Learner {
         this.id = id;
     }
 
-    public String getUuid() {
-        return uuid;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     @Override
     public String toString() {
         return "Learner{" +
                 "id=" + id +
-                ", uuid='" + uuid + '\'' +
+                ", uid='" + uid + '\'' +
                 '}';
     }
 }

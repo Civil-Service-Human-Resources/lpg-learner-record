@@ -6,7 +6,7 @@ CREATE TABLE `event` (
 
 CREATE TABLE `learner` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(60) NOT NULL,
+  `uid` varchar(60) NOT NULL,
   PRIMARY KEY(`id`)
 );
 
