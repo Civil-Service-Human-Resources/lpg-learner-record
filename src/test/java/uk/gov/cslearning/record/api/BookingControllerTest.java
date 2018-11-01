@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
-import uk.gov.cslearning.record.dto.ValidationError;
 import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
 import uk.gov.cslearning.record.service.BookingService;
 
@@ -23,9 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.stringContainsInOrder;
 import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -125,7 +122,7 @@ public class BookingControllerTest {
 
         String json = objectMapper.writeValueAsString(booking);
 
-        when(bookingService.save(eq(booking))).thenReturn(savedBooking);
+        when(bookingService.register(eq(booking))).thenReturn(savedBooking);
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())

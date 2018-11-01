@@ -22,4 +22,8 @@ public class Learner {
     @ToString.Exclude
     @OneToMany(mappedBy = "learner")
     private List<Booking> bookings = new ArrayList<>();
+
+    public void addToBookings(Booking booking) {
+        this.bookings.add(booking);
+    }
 }
