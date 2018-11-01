@@ -1,7 +1,5 @@
 package uk.gov.cslearning.record.domain;
 
-import uk.gov.cslearning.record.service.catalogue.Event;
-
 import javax.persistence.*;
 
 @Entity

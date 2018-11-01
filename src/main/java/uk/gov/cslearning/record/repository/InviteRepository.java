@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Invite;
 
 @Repository
-public interface InviteRepository extends CrudRepository<Invite, Long> {
+public interface InviteRepository extends CrudRepository<Invite, Integer> {
 
 }
