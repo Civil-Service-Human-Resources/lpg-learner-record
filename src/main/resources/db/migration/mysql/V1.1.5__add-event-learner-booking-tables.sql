@@ -1,5 +1,6 @@
 CREATE TABLE `event` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `catalogue_id` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
   PRIMARY KEY(`id`)
 );

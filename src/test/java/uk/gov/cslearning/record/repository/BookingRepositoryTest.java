@@ -38,6 +38,7 @@ public class BookingRepositoryTest {
 
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("SSB");
 
         learnerRepository.save(learner);
         eventRepository.save(event);

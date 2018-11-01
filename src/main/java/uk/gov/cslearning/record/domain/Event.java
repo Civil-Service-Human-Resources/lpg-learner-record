@@ -10,6 +10,9 @@ public class Event {
     private int id;
 
     @Column(nullable = false)
+    private String catalogueId;
+
+    @Column(nullable = false)
     private String path;
 
     public Event() {}
@@ -34,10 +37,19 @@ public class Event {
         this.path = path;
     }
 
+    public String getCatalogueId() {
+        return catalogueId;
+    }
+
+    public void setCatalogueId(String catalogueId) {
+        this.catalogueId = catalogueId;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
                 "id=" + id +
+                ", catalogueId='" + catalogueId + '\'' +
                 ", path='" + path + '\'' +
                 '}';
     }
