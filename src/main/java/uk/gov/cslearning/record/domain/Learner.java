@@ -1,47 +1,25 @@
 package uk.gov.cslearning.record.domain;
 
-import javax.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Data
+@NoArgsConstructor
 public class Learner {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false)
     private String uuid;
 
-    public Learner() {}
-
-    public Learner(int id){
-        checkArgument(id >= 0);
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    @Override
-    public String toString() {
-        return "Learner{" +
-                "id=" + id +
-                ", uuid='" + uuid + '\'' +
-                '}';
-    }
+    @ToString.Exclude
+    @OneToMany(mappedBy = "learner")
+    private List<Booking> bookings = new ArrayList<>();
 }
