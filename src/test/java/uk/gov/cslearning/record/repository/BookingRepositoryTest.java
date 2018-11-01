@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.repository;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,13 @@ import uk.gov.cslearning.record.domain.Learner;
 import javax.transaction.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -38,18 +43,32 @@ public class BookingRepositoryTest {
         Event event = new Event();
         event.setPath("test/path");
 
-        learnerRepository.save(learner);
-        eventRepository.save(event);
+        learner = learnerRepository.save(learner);
+        event = eventRepository.save(event);
 
-        Booking booking = new Booking(1);
-        booking.setEventId(1);
-        booking.setLearnerId(1);
+        Booking booking = new Booking();
+        booking.setEvent(event);
+        booking.setLearner(learner);
         booking.setStatus("CONFIRMED");
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(LocalDateTime.now());
 
-        bookingRepository.save(booking);
+        booking = bookingRepository.save(booking);
 
-        assertThat(booking.getId(), notNullValue());
+        event.setBookings(Lists.newArrayList(booking));
+        learner.setBookings(Lists.newArrayList(booking));
+
+        eventRepository.save(event);
+        learnerRepository.save(learner);
+
+        Booking savedBooking = bookingRepository.findById(booking.getId()).get();
+        Learner savedLearner = learnerRepository.findById(learner.getId()).get();
+        Event savedEvent = eventRepository.findById(event.getId()).get();
+
+        assertEquals(event, savedBooking.getEvent());
+        assertEquals(learner, savedBooking.getLearner());
+
+        assertEquals(Collections.singletonList(booking), savedLearner.getBookings());
+        assertEquals(Collections.singletonList(booking), savedEvent.getBookings());
     }
 }

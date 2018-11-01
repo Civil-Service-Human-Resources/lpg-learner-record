@@ -17,6 +17,7 @@ public class BookingDto {
     @NotBlank(message = "{booking.event.required}")
     private String event;
     private BookingStatus status;
+
     private LocalDateTime bookingTime;
     private String paymentDetails;
 }
