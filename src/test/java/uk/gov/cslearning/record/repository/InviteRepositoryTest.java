@@ -30,6 +30,7 @@ public class InviteRepositoryTest {
     public void shouldSaveInvite() {
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("SSI");
 
         Invite invite = new Invite();
         invite.setEvent(event);
@@ -44,6 +45,7 @@ public class InviteRepositoryTest {
     public void shouldFindInviteById() {
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("SFIBI");
 
         Invite invite = new Invite();
         invite.setEvent(event);
@@ -62,6 +64,7 @@ public class InviteRepositoryTest {
     public void shouldContainCorrectEvent(){
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("SCCE");
 
         Invite invite = new Invite();
         invite.setEvent(event);
