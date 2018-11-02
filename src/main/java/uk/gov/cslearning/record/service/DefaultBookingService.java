@@ -7,6 +7,7 @@ import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -36,9 +37,7 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto register(BookingDto bookingDto) {
-        // call xapi with register statement
-
-//        xApiService.register(bookingDto.getLearner(), bookingDto.getEvent());
+        xApiService.register(bookingDto);
 
         return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
     }

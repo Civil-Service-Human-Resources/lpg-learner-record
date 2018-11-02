@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -14,8 +15,9 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -69,5 +71,10 @@ public class DefaultBookingServiceTest {
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
+
+        InOrder order = inOrder(xApiService, bookingRepository);
+
+        order.verify(xApiService).register(unsavedBookingDto);
+        order.verify(bookingRepository).save(unsavedBooking);
     }
 }
