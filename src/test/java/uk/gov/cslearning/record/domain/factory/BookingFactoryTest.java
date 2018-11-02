@@ -9,6 +9,8 @@ import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -28,12 +30,12 @@ public class BookingFactoryTest {
     private BookingFactory bookingFactory;
 
     @Test
-    public void shouldReturnBooking() {
+    public void shouldReturnBooking() throws URISyntaxException {
         long id = 99L;
-        String paymentDetails = "payment-details";
+        URI paymentDetails = new URI("http://csrs/payment-details");
         LocalDateTime bookingTime = LocalDateTime.now();
         String learnerUuid = "learner-uuid";
-        String eventPath = "event-path";
+        URI event = new URI("http://learning-catalogue/event-path");
 
         BookingDto bookingDto = new BookingDto();
 
@@ -41,17 +43,17 @@ public class BookingFactoryTest {
         bookingDto.setPaymentDetails(paymentDetails);
         bookingDto.setBookingTime(bookingTime);
         bookingDto.setLearner(learnerUuid);
-        bookingDto.setEvent(eventPath);
+        bookingDto.setEvent(event);
         bookingDto.setStatus(BookingStatus.CONFIRMED);
 
         Booking booking = bookingFactory.create(bookingDto);
 
         assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
-        assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails()));
+        assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
         assertThat(booking.getId(), equalTo(bookingDto.getId()));
 
         verify(learnerFactory).create(learnerUuid, booking);
-        verify(eventFactory).create(eventPath, booking);
+        verify(eventFactory).create(event.getPath(), booking);
     }
 }

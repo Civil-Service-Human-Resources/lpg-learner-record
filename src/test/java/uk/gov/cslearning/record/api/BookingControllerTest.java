@@ -18,6 +18,8 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
 import uk.gov.cslearning.record.service.BookingService;
 
+import java.net.URI;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -57,9 +59,9 @@ public class BookingControllerTest {
         long bookingId = 99;
         String learner = "_learner";
         BookingStatus status = BookingStatus.CONFIRMED;
-        String event = "_event";
+        URI event = new URI("_event");
         LocalDateTime bookingTime = LocalDateTime.now();
-        String paymentDetails = "payment-details";
+        URI paymentDetails = new URI("payment-details");
 
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(bookingId);
@@ -78,8 +80,8 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.id", equalTo((int)bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learner)))
                 .andExpect(jsonPath("$.status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$.event", equalTo(event)))
-                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails)))
+                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
                         equalTo(bookingTime.format(DateTimeFormatter.ISO_DATE_TIME))));
     }
@@ -101,9 +103,9 @@ public class BookingControllerTest {
         long bookingId = 99;
         String learner = "_learner";
         BookingStatus status = BookingStatus.CONFIRMED;
-        String event = "_event";
+        URI event = new URI("http://event");
         LocalDateTime bookingTime = LocalDateTime.now();
-        String paymentDetails = "payment-details";
+        URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
@@ -137,7 +139,7 @@ public class BookingControllerTest {
     public void shouldReturnBadRequestIfLearnerOrEventIsMissing() throws Exception {
         BookingStatus status = BookingStatus.CONFIRMED;
         LocalDateTime bookingTime = LocalDateTime.now();
-        String paymentDetails = "payment-details";
+        URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
         booking.setStatus(status);
