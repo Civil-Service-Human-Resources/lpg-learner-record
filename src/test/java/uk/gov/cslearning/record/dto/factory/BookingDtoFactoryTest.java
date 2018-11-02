@@ -18,7 +18,7 @@ public class BookingDtoFactoryTest {
     @Test
     public void shouldReturnBookingDto() {
         long bookingId = 99L;
-        String status = "Approved";
+        String status = "Confirmed";
         String paymentDetails = "payment-details";
         LocalDateTime bookingTime = LocalDateTime.now();
 

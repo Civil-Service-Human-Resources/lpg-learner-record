@@ -17,7 +17,6 @@ public class IStatementObjectFactory {
 
         Activity activity = new Activity();
         activity.setDefinition(definition);
-
         activity.setId(eventId);
 
         return activity;

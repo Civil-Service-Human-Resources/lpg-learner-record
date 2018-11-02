@@ -1,24 +1,19 @@
 package uk.gov.cslearning.record.domain.factory;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BookingFactoryTest {
@@ -47,7 +42,7 @@ public class BookingFactoryTest {
         bookingDto.setBookingTime(bookingTime);
         bookingDto.setLearner(learnerUuid);
         bookingDto.setEvent(eventPath);
-        bookingDto.setStatus(BookingStatus.APPROVED);
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
 
         Booking booking = bookingFactory.create(bookingDto);
 

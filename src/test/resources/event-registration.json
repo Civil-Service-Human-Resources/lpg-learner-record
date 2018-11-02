@@ -1,4 +1,10 @@
 {
+  "verb": {
+    "id": "http://adlnet.gov/expapi/verbs/registered",
+    "display": {
+      "en": "registered"
+    }
+  },
   "actor": {
     "account": {
       "homePage": "https://cslearning.gov.uk/",
@@ -7,20 +13,14 @@
     "objectType": "Agent"
   },
   "object": {
+    "id": "http://cslearning.gov.uk/events/xfksY467RbCNu20_EdLtrg",
     "definition": {
+      "type": "http://adlnet.gov/expapi/activities/event",
       "name": {
         "en": "Face to Face Module"
-      },
-      "type": "http://adlnet.gov/expapi/activities/event"
+      }
     },
-    "id": "http://cslearning.gov.uk/events/xfksY467RbCNu20_EdLtrg",
     "objectType": "Activity"
-  },
-  "verb": {
-    "display": {
-      "en": "registered"
-    },
-    "id": "http://adlnet.gov/expapi/verbs/registered"
   },
   "context": {
     "contextActivities": {
