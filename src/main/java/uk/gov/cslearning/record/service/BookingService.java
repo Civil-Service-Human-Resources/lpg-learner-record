@@ -10,5 +10,5 @@ public interface BookingService {
     Optional<BookingDto> find(long bookingId);
 
     @Transactional
-    BookingDto register(BookingDto booking);
+    BookingDto save(BookingDto booking);
 }
