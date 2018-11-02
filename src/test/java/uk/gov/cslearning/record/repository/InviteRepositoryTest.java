@@ -30,6 +30,7 @@ public class InviteRepositoryTest {
     public void shouldSaveInvite() {
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
@@ -44,6 +45,7 @@ public class InviteRepositoryTest {
     public void shouldFindInviteById() {
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
@@ -51,7 +53,7 @@ public class InviteRepositoryTest {
 
         inviteRepository.save(invite);
 
-        Optional<Invite> result = inviteRepository.findById(1);
+        Optional<Invite> result = inviteRepository.findById(invite.getId());
         Invite repositoryInvite = result.get();
 
         assertThat(repositoryInvite, is(equalTo(invite)));
@@ -62,6 +64,7 @@ public class InviteRepositoryTest {
     public void shouldContainCorrectEvent(){
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);

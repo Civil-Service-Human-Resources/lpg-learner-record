@@ -5,9 +5,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Event;
 
+import java.util.Optional;
+
 @Repository
 public interface EventRepository extends CrudRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e WHERE e.catalogueId = ?1")
-    Iterable<Event> findByCatalogueId(String catalogueId);
+    Optional<Event> findByCatalogueId(String catalogueId);
 }

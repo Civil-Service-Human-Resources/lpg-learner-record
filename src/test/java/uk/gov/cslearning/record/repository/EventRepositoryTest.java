@@ -40,10 +40,8 @@ public class EventRepositoryTest {
 
         eventRepository.save(event);
 
-        Iterable<Event> result = eventRepository.findByCatalogueId("SBATFEBC");
+        Event repositoryEvent = eventRepository.findByCatalogueId("SBATFEBC").get();
 
-        for(Event e : result){
-            assertThat(e, is(equalTo(event)));
-        }
+        assertThat(repositoryEvent, is(equalTo(event)));
     }
 }
