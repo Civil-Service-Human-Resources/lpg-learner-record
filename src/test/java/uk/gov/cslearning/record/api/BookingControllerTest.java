@@ -56,7 +56,7 @@ public class BookingControllerTest {
     public void shouldReturnBookingIfFound() throws Exception {
         long bookingId = 99;
         String learner = "_learner";
-        BookingStatus status = BookingStatus.APPROVED;
+        BookingStatus status = BookingStatus.CONFIRMED;
         String event = "_event";
         LocalDateTime bookingTime = LocalDateTime.now();
         String paymentDetails = "payment-details";
@@ -100,7 +100,7 @@ public class BookingControllerTest {
     public void shouldCreateBooking() throws Exception {
         long bookingId = 99;
         String learner = "_learner";
-        BookingStatus status = BookingStatus.APPROVED;
+        BookingStatus status = BookingStatus.CONFIRMED;
         String event = "_event";
         LocalDateTime bookingTime = LocalDateTime.now();
         String paymentDetails = "payment-details";
@@ -135,7 +135,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnBadRequestIfLearnerOrEventIsMissing() throws Exception {
-        BookingStatus status = BookingStatus.APPROVED;
+        BookingStatus status = BookingStatus.CONFIRMED;
         LocalDateTime bookingTime = LocalDateTime.now();
         String paymentDetails = "payment-details";
 

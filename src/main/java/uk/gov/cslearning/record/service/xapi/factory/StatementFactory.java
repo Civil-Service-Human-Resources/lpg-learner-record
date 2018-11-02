@@ -10,11 +10,13 @@ public class StatementFactory {
     private final ActorFactory actorFactory;
     private final ResultFactory resultFactory;
     private final IStatementObjectFactory objectFactory;
+    private final VerbFactory verbFactory;
 
-    public StatementFactory(ActorFactory actorFactory, ResultFactory resultFactory, IStatementObjectFactory objectFactory) {
+    public StatementFactory(ActorFactory actorFactory, ResultFactory resultFactory, IStatementObjectFactory objectFactory, VerbFactory verbFactory) {
         this.actorFactory = actorFactory;
         this.resultFactory = resultFactory;
         this.objectFactory = objectFactory;
+        this.verbFactory = verbFactory;
     }
 
     public Statement createRegisteredStatement(BookingDto bookingDto) {
@@ -26,7 +28,7 @@ public class StatementFactory {
 
         Statement statement = new Statement();
         statement.setActor(actor);
-        statement.setVerb(Verbs.registered());
+        statement.setVerb(verbFactory.createdRegistered());
         statement.setObject(object);
         statement.setResult(result);
 

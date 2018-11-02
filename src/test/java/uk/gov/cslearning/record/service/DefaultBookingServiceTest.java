@@ -61,7 +61,7 @@ public class DefaultBookingServiceTest {
     @Test
     public void shouldRegisterAndSaveBooking() {
         BookingDto unsavedBookingDto = new BookingDto();
-        unsavedBookingDto.setStatus(BookingStatus.APPROVED);
+        unsavedBookingDto.setStatus(BookingStatus.CONFIRMED);
         Booking unsavedBooking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();

@@ -1,9 +1,6 @@
 package uk.gov.cslearning.record.service.xapi.factory;
 
-import gov.adlnet.xapi.model.Actor;
-import gov.adlnet.xapi.model.IStatementObject;
-import gov.adlnet.xapi.model.Result;
-import gov.adlnet.xapi.model.Statement;
+import gov.adlnet.xapi.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,6 +25,9 @@ public class StatementFactoryTest {
     @Mock
     private ResultFactory resultFactory;
 
+    @Mock
+    private VerbFactory verbFactory;
+
     @InjectMocks
     private StatementFactory statementFactory;
 
@@ -45,19 +45,23 @@ public class StatementFactoryTest {
         Actor actor = mock(Actor.class);
         IStatementObject object = mock(IStatementObject.class);
         Result result = new Result();
+        Verb registered = new Verb();
 
         when(actorFactory.create(userId)).thenReturn(actor);
         when(objectFactory.createEventObject(eventId)).thenReturn(object);
         when(resultFactory.createPurchaseOrderResult(paymentDetails)).thenReturn(result);
+        when(verbFactory.createdRegistered()).thenReturn(registered);
 
         Statement statement = statementFactory.createRegisteredStatement(bookingDto);
 
         assertEquals(actor, statement.getActor());
         assertEquals(object, statement.getObject());
         assertEquals(result, statement.getResult());
+        assertEquals(registered, statement.getVerb());
 
         verify(actorFactory).create(userId);
         verify(objectFactory).createEventObject(eventId);
         verify(resultFactory).createPurchaseOrderResult(paymentDetails);
+        verify(verbFactory).createdRegistered();
     }
 }

@@ -38,7 +38,7 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto save(BookingDto bookingDto) {
-        if (bookingDto.getStatus().equals(BookingStatus.APPROVED)) {
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.register(bookingDto);
         }
 
