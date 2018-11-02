@@ -3,7 +3,8 @@ package uk.gov.cslearning.record.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.time.LocalDateTime;
 
 @Data
@@ -11,13 +12,14 @@ import java.time.LocalDateTime;
 public class BookingDto {
     private Long id;
 
-    @NotBlank(message = "{booking.learner.required}")
+    @NotNull(message = "{booking.learner.required}")
     private String learner;
 
-    @NotBlank(message = "{booking.event.required}")
-    private String event;
+    @NotNull(message = "{booking.event.required}")
+    private URI event;
     private BookingStatus status;
 
     private LocalDateTime bookingTime;
-    private String paymentDetails;
+
+    private URI paymentDetails;
 }

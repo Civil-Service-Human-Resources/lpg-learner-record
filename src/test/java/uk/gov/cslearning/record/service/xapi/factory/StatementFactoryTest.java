@@ -8,6 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.dto.BookingDto;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -32,15 +35,15 @@ public class StatementFactoryTest {
     private StatementFactory statementFactory;
 
     @Test
-    public void shouldReturnStatement() {
+    public void shouldReturnStatement() throws URISyntaxException {
         String userId = "learner-uuid";
-        String paymentDetails = "payment-details";
-        String eventId = "event-details";
+        URI paymentDetails = new URI("http://csrs/payment-details");
+        URI event = new URI("http://learning-catalogue/event-details");
 
         BookingDto bookingDto = new BookingDto();
         bookingDto.setLearner(userId);
         bookingDto.setPaymentDetails(paymentDetails);
-        bookingDto.setEvent(eventId);
+        bookingDto.setEvent(event);
 
         Actor actor = mock(Actor.class);
         IStatementObject object = mock(IStatementObject.class);
@@ -48,8 +51,8 @@ public class StatementFactoryTest {
         Verb registered = new Verb();
 
         when(actorFactory.create(userId)).thenReturn(actor);
-        when(objectFactory.createEventObject(eventId)).thenReturn(object);
-        when(resultFactory.createPurchaseOrderResult(paymentDetails)).thenReturn(result);
+        when(objectFactory.createEventObject(event.toString())).thenReturn(object);
+        when(resultFactory.createPurchaseOrderResult(paymentDetails.toString())).thenReturn(result);
         when(verbFactory.createdRegistered()).thenReturn(registered);
 
         Statement statement = statementFactory.createRegisteredStatement(bookingDto);
@@ -60,8 +63,8 @@ public class StatementFactoryTest {
         assertEquals(registered, statement.getVerb());
 
         verify(actorFactory).create(userId);
-        verify(objectFactory).createEventObject(eventId);
-        verify(resultFactory).createPurchaseOrderResult(paymentDetails);
+        verify(objectFactory).createEventObject(event.toString());
+        verify(resultFactory).createPurchaseOrderResult(paymentDetails.toString());
         verify(verbFactory).createdRegistered();
     }
 }

@@ -22,9 +22,9 @@ public class StatementFactory {
     public Statement createRegisteredStatement(BookingDto bookingDto) {
         Actor actor = actorFactory.create(bookingDto.getLearner());
 
-        Result result = resultFactory.createPurchaseOrderResult(bookingDto.getPaymentDetails());
+        Result result = resultFactory.createPurchaseOrderResult(bookingDto.getPaymentDetails().toString());
 
-        IStatementObject object = objectFactory.createEventObject(bookingDto.getEvent());
+        IStatementObject object = objectFactory.createEventObject(bookingDto.getEvent().toString());
 
         Statement statement = new Statement();
         statement.setActor(actor);
