@@ -9,10 +9,10 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 60)
     private String catalogueId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String path;
 
     public Event() {}
