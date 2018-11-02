@@ -1,0 +1,42 @@
+{
+  "actor": {
+    "account": {
+      "homePage": "https://cslearning.gov.uk/",
+      "name": "3c706a70-3fff-4e7b-ae7f-102c1d46f569"
+    },
+    "objectType": "Agent"
+  },
+  "object": {
+    "definition": {
+      "name": {
+        "en": "Face to Face Module"
+      },
+      "type": "http://adlnet.gov/expapi/activities/event"
+    },
+    "id": "http://cslearning.gov.uk/events/xfksY467RbCNu20_EdLtrg",
+    "objectType": "Activity"
+  },
+  "verb": {
+    "display": {
+      "en": "registered"
+    },
+    "id": "http://adlnet.gov/expapi/verbs/registered"
+  },
+  "context": {
+    "contextActivities": {
+      "parent": [
+        {
+          "id": "http://cslearning.gov.uk/courses/L96__oU8S0SqwEiVbcR49A"
+        },
+        {
+          "id": "http://cslearning.gov.uk/modules/HYAB1PXxQySn-XOs4HO9iQ"
+        }
+      ]
+    }
+  },
+  "result": {
+    "extensions": {
+      "http://cslearning.gov.uk/extension/payment": "PURCHASE_ORDER: Call off ecZKbDvsS3GcG35vclpJ9g"
+    }
+  }
+}
