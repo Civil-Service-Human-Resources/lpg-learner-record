@@ -122,7 +122,7 @@ public class BookingControllerTest {
 
         String json = objectMapper.writeValueAsString(booking);
 
-        when(bookingService.register(eq(booking))).thenReturn(savedBooking);
+        when(bookingService.save(eq(booking))).thenReturn(savedBooking);
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())

@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
@@ -36,8 +37,10 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public BookingDto register(BookingDto bookingDto) {
-        xApiService.register(bookingDto);
+    public BookingDto save(BookingDto bookingDto) {
+        if (bookingDto.getStatus().equals(BookingStatus.APPROVED)) {
+            xApiService.register(bookingDto);
+        }
 
         return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
     }
