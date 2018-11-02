@@ -19,7 +19,7 @@ public class Booking {
     @Column(nullable = false)
     private int eventId;
 
-    @Column
+    @Column(length = 255)
     private String paymentDetails;
 
     @Column(nullable = false)

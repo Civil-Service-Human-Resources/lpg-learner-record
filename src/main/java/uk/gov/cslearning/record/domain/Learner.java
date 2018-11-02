@@ -11,7 +11,7 @@ public class Learner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 60)
     private String uid;
 
     public Learner() {}
