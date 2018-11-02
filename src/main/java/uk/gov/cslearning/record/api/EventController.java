@@ -30,9 +30,6 @@ public class EventController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody Invite invite, UriComponentsBuilder builder){
-        if(invite == null){
-            return ResponseEntity.badRequest().build();
-        }
         if(!eventRepository.findByCatalogueId(catalogueId).isPresent()){
             return ResponseEntity.badRequest().build();
         }
