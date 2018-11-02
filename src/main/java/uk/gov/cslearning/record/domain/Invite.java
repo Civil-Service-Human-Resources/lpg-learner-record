@@ -12,7 +12,7 @@ public class Invite {
     @OneToOne(cascade = CascadeType.ALL)
     private Event event;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String learnerEmail;
 
     public Invite(){}
