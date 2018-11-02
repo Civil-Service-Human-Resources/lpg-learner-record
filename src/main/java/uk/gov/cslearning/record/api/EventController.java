@@ -29,18 +29,16 @@ public class EventController {
     }
 
     @PostMapping("/{eventId}/invitee")
-    public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody String email, UriComponentsBuilder builder){
-        if(email == null){
+    public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody Invite invite, UriComponentsBuilder builder){
+        if(invite == null){
             return ResponseEntity.badRequest().build();
         }
-        if(!eventRepository.existsByCatalogueId(catalogueId)){
+        if(!eventRepository.findByCatalogueId(catalogueId).isPresent()){
             return ResponseEntity.badRequest().build();
         }
 
         Event event = eventRepository.findByCatalogueId(catalogueId).get();
 
-        Invite invite = new Invite();
-        invite.setLearnerEmail(email);
         invite.setEvent(event);
         inviteRepository.save(invite);
 

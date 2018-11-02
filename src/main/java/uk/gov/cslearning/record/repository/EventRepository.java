@@ -12,6 +12,4 @@ public interface EventRepository extends CrudRepository<Event, Integer> {
 
     @Query("SELECT e FROM Event e WHERE e.catalogueId = ?1")
     Optional<Event> findByCatalogueId(String catalogueId);
-
-    boolean existsByCatalogueId(String catalogueId);
 }

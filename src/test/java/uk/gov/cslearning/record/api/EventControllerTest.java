@@ -12,6 +12,9 @@ import uk.gov.cslearning.record.repository.InviteRepository;
 
 import javax.ws.rs.core.MediaType;
 
+import java.util.Optional;
+
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,16 +46,25 @@ public class EventControllerTest {
         event.setCatalogueId("SAI");
         event.setPath("test/path");
 
-
-
-        eventRepository.save(event);
+        when(eventRepository.findByCatalogueId("SAI")).thenReturn(Optional.of(event));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
-                .content("{\"email\": \"user@test.com\"}")
+                .content("{\"learnerEmail\": \"user@test.com\"}")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldReturnBadRequestIfNoEmailIsPresent() throws Exception{
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
+                .content("{}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
