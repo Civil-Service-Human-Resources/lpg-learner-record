@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 public class Booking {
@@ -26,7 +26,7 @@ public class Booking {
     private String status;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime bookingTime;
+    private Instant bookingTime;
 
     public Booking() {}
 
@@ -74,11 +74,11 @@ public class Booking {
         this.status = status;
     }
 
-    public LocalDateTime getBookingTime() {
+    public Instant getBookingTime() {
         return bookingTime;
     }
 
-    public void setBookingTime(LocalDateTime booking_time) {
+    public void setBookingTime(Instant booking_time) {
         this.bookingTime = booking_time;
     }
 
