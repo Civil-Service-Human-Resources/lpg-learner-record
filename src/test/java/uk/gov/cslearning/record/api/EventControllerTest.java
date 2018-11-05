@@ -7,11 +7,13 @@ import org.mockito.Mock;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.repository.InviteRepository;
 
 import javax.ws.rs.core.MediaType;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -66,5 +68,28 @@ public class EventControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldGetAllInvitees() throws Exception{
+        Event event = new Event(1);
+        event.setCatalogueId("SGAI");
+        event.setPath("test/path");
+
+        Invite invite = new Invite(1);
+        invite.setEvent(event);
+        invite.setLearnerEmail("test1@test.com");
+
+        ArrayList<Invite> invites = new ArrayList<>();
+        invites.add(invite);
+
+        when(inviteRepository.findByEventId("SGAI")).thenReturn(invites);
+        when(eventRepository.findByCatalogueId("SGAI")).thenReturn(Optional.of(event));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/event/SGAI/invitee").with(csrf())
+                .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk());
     }
 }
