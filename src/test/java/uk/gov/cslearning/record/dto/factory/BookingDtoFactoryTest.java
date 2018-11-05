@@ -9,7 +9,9 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -22,14 +24,14 @@ public class BookingDtoFactoryTest {
 
     @Test
     public void shouldReturnBookingDto() throws URISyntaxException {
-        long bookingId = 99L;
+        int bookingId = 99;
         String status = "Confirmed";
         String paymentDetails = "/purchase-order/abcde12345";
-        LocalDateTime bookingTime = LocalDateTime.now();
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
 
         String learnerUuid = "learner-uuid";
         Learner learner = new Learner();
-        learner.setUuid(learnerUuid);
+        learner.setUid(learnerUuid);
 
         String eventPath = "/courses/abc/modules/def/events/ghi";
         Event event = new Event();

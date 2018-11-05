@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Learner;
 
 @Repository
-public interface LearnerRepository extends CrudRepository<Learner, Long> {
+public interface LearnerRepository extends CrudRepository<Learner, Integer> {
 }

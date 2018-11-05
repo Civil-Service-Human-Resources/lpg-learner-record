@@ -1,12 +1,13 @@
 CREATE TABLE `event` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `catalogue_id` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
   PRIMARY KEY(`id`)
 );
 
 CREATE TABLE `learner` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(60) NOT NULL,
+  `uid` varchar(60) NOT NULL,
   PRIMARY KEY(`id`)
 );
 

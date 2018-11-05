@@ -11,14 +11,9 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
 
 import javax.transaction.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -38,17 +33,19 @@ public class BookingRepositoryTest {
     @Test
     public void shouldSaveBooking() {
         Learner learner = new Learner();
-        learner.setUuid("75c2c3b3-722f-4ffb-aec9-3d743a2d5330");
+        learner.setUid("75c2c3b3-722f-4ffb-aec9-3d743a2d5330");
 
         Event event = new Event();
         event.setPath("test/path");
+        event.setCatalogueId("SSB");
 
         Booking booking = new Booking();
         booking.setEvent(event);
         booking.setLearner(learner);
+
         booking.setStatus("CONFIRMED");
         booking.setPaymentDetails("payment/details");
-        booking.setBookingTime(LocalDateTime.now());
+        booking.setBookingTime(Instant.now());
 
         booking = bookingRepository.save(booking);
 

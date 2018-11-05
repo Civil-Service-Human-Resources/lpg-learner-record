@@ -19,13 +19,14 @@ import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
 import uk.gov.cslearning.record.service.BookingService;
 
 import java.net.URI;
-import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.collection.IsArrayContainingInAnyOrder.arrayContainingInAnyOrder;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -56,11 +57,11 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnBookingIfFound() throws Exception {
-        long bookingId = 99;
+        int bookingId = 99;
         String learner = "_learner";
         BookingStatus status = BookingStatus.CONFIRMED;
         URI event = new URI("_event");
-        LocalDateTime bookingTime = LocalDateTime.now();
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
 
         BookingDto bookingDto = new BookingDto();
@@ -73,22 +74,24 @@ public class BookingControllerTest {
 
         when(bookingService.find(bookingId)).thenReturn(Optional.of(bookingDto));
 
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.ofHours(0));
+
         mockMvc.perform(
                 get("/event/blah/booking/" + bookingId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", equalTo((int)bookingId)))
+                .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learner)))
                 .andExpect(jsonPath("$.status", equalTo(status.getValue())))
                 .andExpect(jsonPath("$.event", equalTo(event.toString())))
                 .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
-                        equalTo(bookingTime.format(DateTimeFormatter.ISO_DATE_TIME))));
+                        equalTo(dateTimeFormatter.format(bookingTime))));
     }
 
     @Test
     public void shouldReturn404IfNotFound() throws Exception {
-        long bookingId = 99;
+        int bookingId = 99;
 
         when(bookingService.find(bookingId)).thenReturn(Optional.empty());
 
@@ -100,11 +103,11 @@ public class BookingControllerTest {
 
     @Test
     public void shouldCreateBooking() throws Exception {
-        long bookingId = 99;
+        int bookingId = 99;
         String learner = "_learner";
         BookingStatus status = BookingStatus.CONFIRMED;
         URI event = new URI("http://event");
-        LocalDateTime bookingTime = LocalDateTime.now();
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
@@ -138,7 +141,7 @@ public class BookingControllerTest {
     @Test
     public void shouldReturnBadRequestIfLearnerOrEventIsMissing() throws Exception {
         BookingStatus status = BookingStatus.CONFIRMED;
-        LocalDateTime bookingTime = LocalDateTime.now();
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();

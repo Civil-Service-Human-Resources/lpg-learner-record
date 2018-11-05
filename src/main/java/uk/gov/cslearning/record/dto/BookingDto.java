@@ -5,12 +5,12 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BookingDto {
-    private Long id;
+    private Integer id;
 
     @NotNull(message = "{booking.learner.required}")
     private String learner;
@@ -19,7 +19,7 @@ public class BookingDto {
     private URI event;
     private BookingStatus status;
 
-    private LocalDateTime bookingTime;
+    private Instant bookingTime;
 
     private URI paymentDetails;
 }

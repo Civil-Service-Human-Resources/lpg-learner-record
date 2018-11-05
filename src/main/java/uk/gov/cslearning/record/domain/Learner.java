@@ -14,16 +14,12 @@ import java.util.List;
 public class Learner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(nullable = false)
-    private String uuid;
+    @Column(nullable = false, length = 60)
+    private String uid;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "learner")
     private List<Booking> bookings = new ArrayList<>();
-
-    public void addToBookings(Booking booking) {
-        this.bookings.add(booking);
-    }
 }

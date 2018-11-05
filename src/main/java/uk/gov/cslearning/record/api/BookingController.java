@@ -22,7 +22,7 @@ public class BookingController {
     }
 
     @GetMapping(value = "/event/{eventId}/booking/{bookingId}", produces = "application/json")
-    public ResponseEntity<BookingDto> getBooking(@PathVariable long bookingId) {
+    public ResponseEntity<BookingDto> getBooking(@PathVariable int bookingId) {
         Optional<BookingDto> booking = bookingService.find(bookingId);
 
         return booking
