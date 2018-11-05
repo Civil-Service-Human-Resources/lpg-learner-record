@@ -43,34 +43,6 @@ public class EventControllerTest {
     }
 
     @Test
-    public void shouldAddInvitee() throws Exception{
-        Event event = new Event();
-        event.setCatalogueId("SAI");
-        event.setPath("test/path");
-
-        when(eventRepository.findByCatalogueId("SAI")).thenReturn(Optional.of(event));
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
-                .content("{\"learnerEmail\": \"user@test.com\"}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    public void shouldReturnBadRequestIfNoEmailIsPresent() throws Exception{
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
-                .content("{}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     public void shouldGetAllInvitees() throws Exception{
         Event event = new Event(1);
         event.setCatalogueId("SGAI");
@@ -88,8 +60,25 @@ public class EventControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/event/SGAI/invitee").with(csrf())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldAddInvitee() throws Exception{
+        Event event = new Event();
+        event.setCatalogueId("SAI");
+        event.setPath("test/path");
+
+        when(eventRepository.findByCatalogueId("SAI")).thenReturn(Optional.of(event));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
+                .content("{\"learnerEmail\": \"user@test.com\"}")
+                .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-        .andDo(print())
-        .andExpect(status().isOk());
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
 }

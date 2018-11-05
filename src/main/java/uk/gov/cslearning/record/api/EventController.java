@@ -33,10 +33,6 @@ public class EventController {
 
     @GetMapping("/{eventId}/invitee")
     public ResponseEntity<Collection<Invite>> listInvitees(@PathVariable("eventId") String catalogueId){
-        if(!eventRepository.findByCatalogueId(catalogueId).isPresent()){
-            return ResponseEntity.badRequest().build();
-        }
-
         Collection<Invite> result = inviteRepository.findByEventId(catalogueId);
         
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -45,7 +41,10 @@ public class EventController {
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody Invite invite, UriComponentsBuilder builder){
         if(!eventRepository.findByCatalogueId(catalogueId).isPresent()){
-            return ResponseEntity.badRequest().build();
+            Event event = new Event();
+            event.setPath("/test/path");
+            event.setCatalogueId(catalogueId);
+            eventRepository.save(event);
         }
 
         Event event = eventRepository.findByCatalogueId(catalogueId).get();
@@ -53,6 +52,6 @@ public class EventController {
         invite.setEvent(event);
         inviteRepository.save(invite);
 
-        return ResponseEntity.created(builder.path("/event/{eventId}/invitee/{inviteId}").build(catalogueId, invite.getId())).build();
+        return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(catalogueId)).build();
     }
 }
