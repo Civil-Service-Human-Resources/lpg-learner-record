@@ -86,13 +86,14 @@ public class XApiService implements Serializable {
         return more.substring(length);
     }
 
-    public void register(BookingDto bookingDto){
+    public String register(BookingDto bookingDto){
+        return postStatement(statementFactory.createRegisteredStatement(bookingDto));
+    }
 
+    private String postStatement(Statement statement) {
         StatementClient statementClient = statementClientFactory.create();
-        Statement statement = statementFactory.createRegisteredStatement(bookingDto);
-
         try {
-            statementClient.postStatement(statement);
+            return statementClient.postStatement(statement);
         } catch (IOException e) {
             throw new XApiException("Unable to post statement to XApi", e);
         }

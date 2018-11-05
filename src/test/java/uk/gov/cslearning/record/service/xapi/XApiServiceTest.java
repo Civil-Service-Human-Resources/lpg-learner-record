@@ -35,14 +35,16 @@ public class XApiServiceTest {
 
     @Test
     public void shouldRegisterEvent() throws IOException {
+        String recordId = "record-id";
         BookingDto bookingDto = new BookingDto();
         Statement statement = new Statement();
         StatementClient statementClient = mock(StatementClient.class);
 
         when(statementClientFactory.create()).thenReturn(statementClient);
         when(statementFactory.createRegisteredStatement(bookingDto)).thenReturn(statement);
+        when(statementClient.postStatement(statement)).thenReturn(recordId);
 
-        xApiService.register(bookingDto);
+        assertEquals(recordId, xApiService.register(bookingDto));
 
         verify(statementClient).postStatement(statement);
     }
