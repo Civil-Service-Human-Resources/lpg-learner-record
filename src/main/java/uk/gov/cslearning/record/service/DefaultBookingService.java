@@ -4,11 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
+import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
+import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -37,11 +38,24 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public BookingDto save(BookingDto bookingDto) {
+    public BookingDto register(BookingDto bookingDto) {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.register(bookingDto);
         }
 
         return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
+    }
+
+    @Override
+    public BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus) {
+        BookingDto booking = find(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
+
+        if (booking.getStatus().equals(BookingStatus.CONFIRMED)) {
+            throw new IllegalStateException("Cannot update a confirmed booking");
+        }
+
+        booking.setStatus(bookingStatus.getStatus());
+
+        return register(booking);
     }
 }
