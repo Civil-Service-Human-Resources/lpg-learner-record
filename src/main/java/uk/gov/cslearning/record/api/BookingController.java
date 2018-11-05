@@ -45,6 +45,6 @@ public class BookingController {
     public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventId, @PathVariable int bookingId, @RequestBody BookingStatusDto bookingStatus) {
         BookingDto result = bookingService.updateStatus(bookingId, bookingStatus);
 
-        return new ResponseEntity<>(result, OK);
+        return ResponseEntity.ok(result);
     }
 }
