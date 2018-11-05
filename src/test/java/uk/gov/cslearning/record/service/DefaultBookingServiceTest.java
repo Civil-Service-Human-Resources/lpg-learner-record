@@ -39,7 +39,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldFindBookingById() {
-        long bookingId = 99L;
+        int bookingId = 99;
         Booking booking = new Booking();
         BookingDto bookingDto = new BookingDto();
 
@@ -51,7 +51,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldReturnEmptyOptionalIfBookingNotFound() {
-        long bookingId = 99L;
+        int bookingId = 99;
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 

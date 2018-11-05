@@ -1,10 +1,12 @@
 package uk.gov.cslearning.record.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -13,7 +15,7 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="learnerId")
@@ -23,10 +25,12 @@ public class Booking {
     @JoinColumn(name="eventId")
     private Event event;
 
+    @Column(length = 255)
     private String paymentDetails;
 
     @Column(nullable = false)
     private String status;
 
-    private LocalDateTime bookingTime;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private Instant bookingTime;
 }

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface BookingService {
     @Transactional(readOnly = true)
-    Optional<BookingDto> find(long bookingId);
+    Optional<BookingDto> find(int bookingId);
 
     @Transactional
     BookingDto save(BookingDto booking);

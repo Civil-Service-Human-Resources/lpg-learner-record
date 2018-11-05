@@ -24,7 +24,7 @@ public class BookingDtoFactory {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(booking.getId());
         bookingDto.setEvent(UriBuilder.fromUri(learningCatalogueBaseUrl).path(booking.getEvent().getPath()).build());
-        bookingDto.setLearner(booking.getLearner().getUuid());
+        bookingDto.setLearner(booking.getLearner().getUid());
         bookingDto.setBookingTime(booking.getBookingTime());
         bookingDto.setPaymentDetails(UriBuilder.fromUri(csrsBaseUrl).path(booking.getPaymentDetails()).build());
         bookingDto.setStatus(BookingStatus.forValue(booking.getStatus()));

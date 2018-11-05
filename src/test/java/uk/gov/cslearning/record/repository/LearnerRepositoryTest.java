@@ -23,7 +23,7 @@ public class LearnerRepositoryTest {
     @Test
     public void shouldSaveLearner(){
         Learner learner = new Learner();
-        learner.setUuid("test-uuid");
+        learner.setUid("test-uuid");
         learnerRepository.save(learner);
 
         assertThat(learner.getId(), notNullValue());

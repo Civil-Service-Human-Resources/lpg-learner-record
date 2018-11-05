@@ -27,7 +27,7 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Optional<BookingDto> find(long bookingId) {
+    public Optional<BookingDto> find(int bookingId) {
 
         BookingDto bookingDto = bookingRepository.findById(bookingId).map(
                 bookingDtoFactory::create

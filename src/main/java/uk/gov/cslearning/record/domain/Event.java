@@ -14,7 +14,10 @@ import java.util.List;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
+
+    @Column(nullable = false, length = 60)
+    private String catalogueId;
 
     @Column(nullable = false)
     private String path;
@@ -22,8 +25,4 @@ public class Event {
     @ToString.Exclude
     @OneToMany(mappedBy = "event")
     private List<Booking> bookings = new ArrayList<>();
-
-    public void addToBookings(Booking booking) {
-        this.bookings.add(booking);
-    }
 }
