@@ -11,10 +11,12 @@ public class EventFactoryTest {
 
     @Test
     public void shouldReturnEvent() {
-        String eventPath = "event-path";
+        String catalogueId = "KbOAp+vGQYq7Fu3V6VNAvw";
+        String eventPath = "/courses/Vy836d5IT+mgyVQ4dAVrHQ/modules/ZHsOVpU6Sgunlc/zVMbpJw/events/" + catalogueId;
 
         Event event = eventFactory.create(eventPath);
 
         assertThat(event.getPath(), equalTo(eventPath));
+        assertThat(event.getCatalogueId(), equalTo(catalogueId));
     }
 }

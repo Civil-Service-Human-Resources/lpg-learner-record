@@ -15,7 +15,7 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="learnerId")
@@ -25,10 +25,10 @@ public class Booking {
     @JoinColumn(name="eventId")
     private Event event;
 
-    @Column(length = 255)
+    @Column
     private String paymentDetails;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 9)
     private String status;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
