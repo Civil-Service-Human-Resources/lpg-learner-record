@@ -2,7 +2,9 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.dto.BookingStatusDto;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface BookingService {
@@ -10,5 +12,8 @@ public interface BookingService {
     Optional<BookingDto> find(int bookingId);
 
     @Transactional
-    BookingDto save(BookingDto booking);
+    BookingDto register(BookingDto booking);
+
+    @Transactional
+    BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus);
 }
