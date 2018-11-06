@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -17,6 +16,8 @@ import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,75 +60,52 @@ public class LearnerRecordEventsController {
             return ResponseEntity.badRequest().build();
         }
 
-        Map<String, LearnerRecordEvents> events = getEvents(records, "");
-
-        return new ResponseEntity<>(events.values(), OK);
-    }
-
-    @GetMapping ("/{eventId}")
-    public ResponseEntity<Collection<LearnerRecordEvents>> listById(@PathVariable("eventId") String eventId) {
-
-        Iterable<CourseRecord> records = courseRecordRepository.listEventRecordsById(eventId);
-        if (records == null) {
-            LOGGER.info("No event records returned.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        Map<String, LearnerRecordEvents> events = getEvents(records, eventId);
-
-        return new ResponseEntity<>(events.values(), OK);
-    }
-
-    private Map<String, LearnerRecordEvents> getEvents(Iterable<CourseRecord> records, String eventId){
         Map<String, LearnerRecordEvents> events = new HashMap<>();
 
         for (CourseRecord courseRecord : records) {
 
             for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
-                if(moduleRecord.getEventId().equals(eventId) || eventId.equals("")) {
-                    String key = String.format("%s-%s", courseRecord.getUserId(), moduleRecord.getModuleId());
+                String key = String.format("%s-%s", courseRecord.getUserId(), moduleRecord.getModuleId());
 
-                    LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
+                LearnerRecordEvents eventSummary = events.computeIfAbsent(key, s -> {
 
-                        //if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDateTime.now())) {
-                        //  LOGGER.debug("Event date is before today, ignoring.");
-                        //  return null;
-                        //}
-
-                        Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
-
-                        if (!civilServant.isPresent()) {
-                            LOGGER.warn("Civil servant not found for uid {}.", courseRecord.getUserId());
-                            return null;
-                        }
-
-                        String emailAddress = identityService.getEmailAddress(courseRecord.getUserId());
-
-                        LearnerRecordEvents newEvent = new LearnerRecordEvents();
-                        newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6, '0')));
-                        newEvent.setCourseName(courseRecord.getCourseTitle());
-                        newEvent.setCourseId(courseRecord.getCourseId());
-                        newEvent.setModuleId(moduleRecord.getModuleId());
-                        newEvent.setEventId(moduleRecord.getEventId());
-                        newEvent.setModuleName(moduleRecord.getModuleTitle());
-                        newEvent.setCost(moduleRecord.getCost());
-                        newEvent.setDate(moduleRecord.getEventDate());
-                        newEvent.setDelegateEmailAddress(emailAddress);
-                        newEvent.setDelegateName(civilServant.get().getFullName());
-                        return newEvent;
-                    });
-
-                    if (eventSummary != null) {
-                        eventSummary.setCreatedAt(moduleRecord.getCreatedAt());
-                        eventSummary.setUpdatedAt(moduleRecord.getUpdatedAt());
-                        eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
-                        eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
-                        eventSummary.setStatus(moduleRecord.getBookingStatus());
+                    if (moduleRecord.getEventDate() == null || moduleRecord.getEventDate().isBefore(LocalDate.now())) {
+                        LOGGER.debug("Event date is before today, ignoring.");
+                        return null;
                     }
+
+                    Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
+
+                    if (!civilServant.isPresent()) {
+                        LOGGER.warn("Civil servant not found for uid {}.", courseRecord.getUserId());
+                        return null;
+                    }
+
+                    String emailAddress = identityService.getEmailAddress(courseRecord.getUserId());
+
+                    LearnerRecordEvents newEvent = new LearnerRecordEvents();
+                    newEvent.setBookingReference(String.format("REF-%s", StringUtils.leftPad(moduleRecord.getId().toString(), 6, '0')));
+                    newEvent.setCourseName(courseRecord.getCourseTitle());
+                    newEvent.setCourseId(courseRecord.getCourseId());
+                    newEvent.setModuleId(moduleRecord.getModuleId());
+                    newEvent.setEventId(moduleRecord.getEventId());
+                    newEvent.setModuleName(moduleRecord.getModuleTitle());
+                    newEvent.setCost(moduleRecord.getCost());
+                    newEvent.setDate(moduleRecord.getEventDate());
+                    newEvent.setDelegateEmailAddress(emailAddress);
+                    newEvent.setDelegateName(civilServant.get().getFullName());
+                    return newEvent;
+                });
+
+                if (eventSummary != null) {
+                    eventSummary.setCreatedAt(moduleRecord.getCreatedAt());
+                    eventSummary.setUpdatedAt(moduleRecord.getUpdatedAt());
+                    eventSummary.setPaymentMethod(moduleRecord.getPaymentMethod());
+                    eventSummary.setPaymentDetails(moduleRecord.getPaymentDetails());
+                    eventSummary.setStatus(moduleRecord.getBookingStatus());
                 }
             }
         }
-
-        return events;
+        return new ResponseEntity<>(events.values(), OK);
     }
 }
