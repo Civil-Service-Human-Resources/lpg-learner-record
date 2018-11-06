@@ -157,4 +157,21 @@ public class DefaultBookingServiceTest {
             assertEquals("Cannot update a confirmed booking", e.getMessage());
         }
     }
+
+    @Test
+    public void shouldUnregisterBooking() {
+        int bookingId = 99;
+        BookingDto bookingDto = new BookingDto();
+        Booking booking = new Booking();
+        Booking bookingToDelete = new Booking();
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+        when(bookingFactory.create(bookingDto)).thenReturn(bookingToDelete);
+
+        bookingService.unregister(bookingId);
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).delete(bookingToDelete);
+    }
 }

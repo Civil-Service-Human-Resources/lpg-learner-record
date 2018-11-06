@@ -47,4 +47,12 @@ public class BookingController {
 
         return ResponseEntity.ok(result);
     }
+
+
+    @DeleteMapping(value = "/event/{eventId}/booking/{bookingId}")
+    public ResponseEntity<BookingDto> deleteBooking(@PathVariable String eventId, @PathVariable int bookingId) {
+        bookingService.unregister(bookingId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

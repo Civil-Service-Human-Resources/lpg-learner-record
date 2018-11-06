@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.gov.cslearning.record.dto.ValidationErrors;
 import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
+import uk.gov.cslearning.record.exception.BookingNotFoundException;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
@@ -27,5 +28,13 @@ public class ApiExceptionHandler {
         LOGGER.error("Bad Request: ", e);
 
         return ResponseEntity.badRequest().body(validationErrorsFactory.create(e.getBindingResult().getFieldErrors()));
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(BookingNotFoundException.class)
+    protected ResponseEntity<ValidationErrors> handleBookingNotFoundException(BookingNotFoundException e) {
+        LOGGER.error("Not Found: ", e);
+
+        return ResponseEntity.notFound().build();
     }
 }

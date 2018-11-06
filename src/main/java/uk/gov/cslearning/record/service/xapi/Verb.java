@@ -16,7 +16,7 @@ public enum Verb {
     REGISTERED("http://adlnet.gov/expapi/verbs/registered"),
     SKIPPED("http://id.tincanapi.com/verb/skipped"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),
-    UNREGISTERED("http://adlnet.gov/expapi/verbs/unregistered"),
+    UNREGISTERED("http://adlnet.gov/expapi/verbs/unregistered"), // This verb does not exist
     VIEWED("http://id.tincanapi.com/verb/viewed");
 
     public static Verb fromUri(String uri) {
