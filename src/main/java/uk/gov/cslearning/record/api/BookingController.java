@@ -42,7 +42,7 @@ public class BookingController {
     }
 
     @PatchMapping(value = "/event/{eventId}/booking/{bookingId}")
-    public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventId, @PathVariable int bookingId, @RequestBody BookingStatusDto bookingStatus) {
+    public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventId, @PathVariable int bookingId, @Valid @RequestBody BookingStatusDto bookingStatus) {
         BookingDto result = bookingService.updateStatus(bookingId, bookingStatus);
 
         return ResponseEntity.ok(result);

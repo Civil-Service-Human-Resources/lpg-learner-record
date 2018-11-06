@@ -210,4 +210,25 @@ public class BookingControllerTest {
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 
+
+    @Test
+    public void shouldReturnBadMessageWithInvalidStatus() throws Exception {
+        int bookingId = 930;
+        BookingStatus status = BookingStatus.REQUESTED;
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+
+        mockMvc.perform(
+                patch("/event/blah/booking/" + bookingId).with(csrf())
+                        .content(objectMapper.writeValueAsString(bookingStatus))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.size", equalTo(1)))
+                .andExpect(jsonPath("$.errors[0].field", equalTo("status")))
+                .andExpect(jsonPath("$.errors[0].details", equalTo("Booking status should be 'Confirmed'")));
+
+        verifyZeroInteractions(bookingService);
+    }
+
 }
