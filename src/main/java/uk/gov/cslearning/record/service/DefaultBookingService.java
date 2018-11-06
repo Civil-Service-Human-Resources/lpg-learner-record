@@ -58,4 +58,13 @@ public class DefaultBookingService implements BookingService {
 
         return register(booking);
     }
+
+    @Override
+    public void unregister(int bookingId) {
+        BookingDto bookingDto = find(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
+
+        xApiService.unregister(bookingDto);
+
+        bookingRepository.delete(bookingFactory.create(bookingDto));
+    }
 }

@@ -17,6 +17,7 @@ import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
+import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.service.BookingService;
 
 import java.net.URI;
@@ -28,12 +29,9 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -231,4 +229,33 @@ public class BookingControllerTest {
         verifyZeroInteractions(bookingService);
     }
 
+    @Test
+    public void shouldReturnNoContentOnDelete() throws Exception {
+        int bookingId = 930;
+
+        mockMvc.perform(
+                delete("/event/blah/booking/" + bookingId).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        verify(bookingService).unregister(bookingId);
+    }
+
+    @Test
+    public void shouldReturnNotFoundIfBookingNotFoundOnDelete() throws Exception {
+        int bookingId = 930;
+
+        BookingNotFoundException exception = mock(BookingNotFoundException.class);
+
+        doThrow(exception).when(bookingService).unregister(bookingId);
+
+        mockMvc.perform(
+                delete("/event/blah/booking/" + bookingId).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(bookingService).unregister(bookingId);
+    }
 }

@@ -16,4 +16,7 @@ public interface BookingService {
 
     @Transactional
     BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus);
+
+    @Transactional
+    void unregister(int bookingId);
 }

@@ -90,6 +90,10 @@ public class XApiService implements Serializable {
         return postStatement(statementFactory.createRegisteredStatement(bookingDto));
     }
 
+    public String unregister(BookingDto bookingDto) {
+        return postStatement(statementFactory.createUnregisteredStatement(bookingDto));
+    }
+
     private String postStatement(Statement statement) {
         StatementClient statementClient = statementClientFactory.create();
         try {
