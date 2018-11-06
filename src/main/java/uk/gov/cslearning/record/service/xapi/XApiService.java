@@ -7,9 +7,12 @@ import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.StatementResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.config.XApiProperties;
+import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.service.xapi.exception.XApiException;
+import uk.gov.cslearning.record.service.xapi.factory.StatementClientFactory;
+import uk.gov.cslearning.record.service.xapi.factory.StatementFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -18,7 +21,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -26,6 +28,7 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 @Service
 public class XApiService implements Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XApiService.class);
 
     public static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder()
             .append(ISO_LOCAL_DATE_TIME)
@@ -34,14 +37,14 @@ public class XApiService implements Serializable {
 
     private static final String HOMEPAGE = "https://cslearning.gov.uk/";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(XApiService.class);
+    private final XApiProperties xApiProperties;
+    private final StatementClientFactory statementClientFactory;
+    private final StatementFactory statementFactory;
 
-    private XApiProperties xApiProperties;
-
-    @Autowired
-    public XApiService(XApiProperties xApiProperties) {
-        checkArgument(xApiProperties != null);
+    public XApiService(XApiProperties xApiProperties, StatementClientFactory statementClientFactory, StatementFactory statementFactory) {
         this.xApiProperties = xApiProperties;
+        this.statementClientFactory = statementClientFactory;
+        this.statementFactory = statementFactory;
     }
 
     public Collection<Statement> getStatements(String userId, String activityId, LocalDateTime since) throws IOException {
@@ -75,30 +78,24 @@ public class XApiService implements Serializable {
         return statements;
     }
 
-    public Collection<Statement> getStatements(String activityId) throws IOException {
-        LOGGER.debug("Getting xAPI statements for activity {}", activityId);
-
-        StatementClient statementClient = new StatementClient(xApiProperties.getUrl(), xApiProperties.getUsername(),
-                xApiProperties.getPassword());
-
-        StatementResult result = statementClient
-                .filterByActivity(activityId)
-                .includeRelatedActivities(true)
-                .getStatements();
-
-        List<Statement> statements = new ArrayList<>(result.getStatements());
-        while (result.hasMore()) {
-            result = statementClient.getStatements(stripPath(xApiProperties.getUrl(), result.getMore()));
-            statements.addAll(result.getStatements());
-        }
-        return statements;
-    }
-
     private String stripPath(String url, String more) {
         int length = 1;
         while (!url.endsWith(more.substring(0, length))) {
             length += 1;
         }
         return more.substring(length);
+    }
+
+    public String register(BookingDto bookingDto){
+        return postStatement(statementFactory.createRegisteredStatement(bookingDto));
+    }
+
+    private String postStatement(Statement statement) {
+        StatementClient statementClient = statementClientFactory.create();
+        try {
+            return statementClient.postStatement(statement);
+        } catch (IOException e) {
+            throw new XApiException("Unable to post statement to XApi", e);
+        }
     }
 }

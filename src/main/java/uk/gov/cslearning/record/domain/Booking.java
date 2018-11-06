@@ -2,95 +2,35 @@ package uk.gov.cslearning.record.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
+@Data
+@NoArgsConstructor
 public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @Column(nullable = false)
-    private int learnerId;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name="learnerId")
+    private Learner learner;
 
-    @Column(nullable = false)
-    private int eventId;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name="eventId")
+    private Event event;
 
     @Column
     private String paymentDetails;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 9)
     private String status;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private Instant bookingTime;
-
-    public Booking() {}
-
-    public Booking(int id){
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
-    }
-
-    public int getLearnerId() {
-        return learnerId;
-    }
-
-    public void setLearnerId(int learnerId) {
-        this.learnerId = learnerId;
-    }
-
-    public String getPaymentDetails() {
-        return paymentDetails;
-    }
-
-    public void setPaymentDetails(String paymentDetails) {
-        this.paymentDetails = paymentDetails;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Instant getBookingTime() {
-        return bookingTime;
-    }
-
-    public void setBookingTime(Instant booking_time) {
-        this.bookingTime = booking_time;
-    }
-
-    @Override
-    public String toString() {
-        return "Booking{" +
-                "id=" + id +
-                ", eventId=" + eventId +
-                ", learnerId=" + learnerId +
-                ", paymentDetails='" + paymentDetails + '\'' +
-                ", status='" + status + '\'' +
-                ", booking_time=" + bookingTime +
-                '}';
-    }
 }
