@@ -11,6 +11,7 @@ import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.repository.InviteRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -40,18 +41,24 @@ public class InviteController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody Invite invite, UriComponentsBuilder builder){
-        if(eventRepository.findByCatalogueId(catalogueId).isPresent()){
-            Event event = new Event();
-            event.setPath("/test/path");
-            event.setCatalogueId(catalogueId);
-            eventRepository.save(event);
+        Optional<Event> result = eventRepository.findByCatalogueId(catalogueId);
+
+        if(!result.isPresent()){
+            createEvent(catalogueId, invite);
         }
 
-        Event event = eventRepository.findByCatalogueId(catalogueId).get();
+        Event event = result.get();
 
         invite.setEvent(event);
         inviteRepository.save(invite);
 
         return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(catalogueId)).build();
+    }
+
+    private void createEvent(String catalogueId, Invite invite){
+        Event event = new Event();
+        event.setPath(invite.getEvent().getPath());
+        event.setEventUid(catalogueId);
+        eventRepository.save(event);
     }
 }

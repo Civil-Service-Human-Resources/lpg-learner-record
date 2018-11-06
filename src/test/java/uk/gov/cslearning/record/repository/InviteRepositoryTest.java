@@ -30,7 +30,7 @@ public class InviteRepositoryTest {
     public void shouldSaveInvite() {
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("test-catalogue-id");
+        event.setEventUid("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
@@ -45,7 +45,7 @@ public class InviteRepositoryTest {
     public void shouldFindInviteById() {
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("test-catalogue-id");
+        event.setEventUid("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
@@ -64,7 +64,7 @@ public class InviteRepositoryTest {
     public void shouldContainCorrectEvent(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("test-catalogue-id");
+        event.setEventUid("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);

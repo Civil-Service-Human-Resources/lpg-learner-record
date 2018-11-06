@@ -46,7 +46,7 @@ public class InviteControllerTest {
     public void shouldGetAllInvitees() throws Exception{
         Event event = new Event();
         event.setId(1);
-        event.setCatalogueId("SGAI");
+        event.setEventUid("SGAI");
         event.setPath("test/path");
 
         Invite invite = new Invite(1);
@@ -69,7 +69,7 @@ public class InviteControllerTest {
     @Test
     public void shouldAddInvitee() throws Exception{
         Event event = new Event();
-        event.setCatalogueId("SAI");
+        event.setEventUid("SAI");
         event.setPath("test/path");
 
         when(eventRepository.findByCatalogueId("SAI")).thenReturn(Optional.of(event));

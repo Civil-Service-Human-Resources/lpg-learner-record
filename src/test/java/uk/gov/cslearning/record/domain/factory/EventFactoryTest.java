@@ -17,6 +17,6 @@ public class EventFactoryTest {
         Event event = eventFactory.create(eventPath);
 
         assertThat(event.getPath(), equalTo(eventPath));
-        assertThat(event.getCatalogueId(), equalTo(catalogueId));
+        assertThat(event.getEventUid(), equalTo(catalogueId));
     }
 }

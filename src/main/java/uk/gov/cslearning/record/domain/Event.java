@@ -17,7 +17,7 @@ public class Event {
     private int id;
 
     @Column(nullable = false, length = 60)
-    private String catalogueId;
+    private String eventUid;
 
     @Column(nullable = false)
     private String path;
