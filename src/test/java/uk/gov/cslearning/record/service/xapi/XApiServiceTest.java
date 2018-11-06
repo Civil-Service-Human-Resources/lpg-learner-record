@@ -68,4 +68,20 @@ public class XApiServiceTest {
             assertEquals(exception, e.getCause());
         }
     }
+
+    @Test
+    public void shouldUnregisterEvent() throws IOException {
+        String recordId = "record-id";
+        BookingDto bookingDto = new BookingDto();
+        Statement statement = new Statement();
+        StatementClient statementClient = mock(StatementClient.class);
+
+        when(statementClientFactory.create()).thenReturn(statementClient);
+        when(statementFactory.createUnregisteredStatement(bookingDto)).thenReturn(statement);
+        when(statementClient.postStatement(statement)).thenReturn(recordId);
+
+        assertEquals(recordId, xApiService.unregister(bookingDto));
+
+        verify(statementClient).postStatement(statement);
+    }
 }
