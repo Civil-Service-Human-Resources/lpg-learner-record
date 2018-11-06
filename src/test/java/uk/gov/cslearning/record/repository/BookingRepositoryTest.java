@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.repository;
 
+import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +11,10 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
 
 import javax.transaction.Transactional;
-
 import java.time.Instant;
+import java.util.Collections;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -39,18 +39,27 @@ public class BookingRepositoryTest {
         event.setPath("test/path");
         event.setCatalogueId("SSB");
 
-        learnerRepository.save(learner);
-        eventRepository.save(event);
+        Booking booking = new Booking();
+        booking.setEvent(event);
+        booking.setLearner(learner);
 
-        Booking booking = new Booking(1);
-        booking.setEventId(event.getId());
-        booking.setLearnerId(learner.getId());
         booking.setStatus("CONFIRMED");
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(Instant.now());
 
-        bookingRepository.save(booking);
+        booking = bookingRepository.save(booking);
 
-        assertThat(booking.getId(), notNullValue());
+        event.setBookings(Lists.newArrayList(booking));
+        learner.setBookings(Lists.newArrayList(booking));
+
+        eventRepository.save(event);
+        learnerRepository.save(learner);
+
+        Booking savedBooking = bookingRepository.findById(booking.getId()).get();
+        assertEquals(event, savedBooking.getEvent());
+        assertEquals(learner, savedBooking.getLearner());
+
+        assertEquals(Collections.singletonList(booking), learner.getBookings());
+        assertEquals(Collections.singletonList(booking), event.getBookings());
     }
 }

@@ -40,7 +40,7 @@ public class InviteController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody Invite invite, UriComponentsBuilder builder){
-        if(!eventRepository.findByCatalogueId(catalogueId).isPresent()){
+        if(eventRepository.findByCatalogueId(catalogueId).isPresent()){
             Event event = new Event();
             event.setPath("/test/path");
             event.setCatalogueId(catalogueId);

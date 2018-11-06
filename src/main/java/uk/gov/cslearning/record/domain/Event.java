@@ -1,10 +1,17 @@
 package uk.gov.cslearning.record.domain;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Data
+@NoArgsConstructor
 public class Event {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -12,45 +19,10 @@ public class Event {
     @Column(nullable = false, length = 60)
     private String catalogueId;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String path;
 
-    public Event() {}
-
-    public Event(int id){
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getCatalogueId() {
-        return catalogueId;
-    }
-
-    public void setCatalogueId(String catalogueId) {
-        this.catalogueId = catalogueId;
-    }
-
-    @Override
-    public String toString() {
-        return "Event{" +
-                "id=" + id +
-                ", catalogueId='" + catalogueId + '\'' +
-                ", path='" + path + '\'' +
-                '}';
-    }
+    @ToString.Exclude
+    @OneToMany(mappedBy = "event")
+    private List<Booking> bookings = new ArrayList<>();
 }

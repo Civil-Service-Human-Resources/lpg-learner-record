@@ -44,7 +44,8 @@ public class InviteControllerTest {
 
     @Test
     public void shouldGetAllInvitees() throws Exception{
-        Event event = new Event(1);
+        Event event = new Event();
+        event.setId(1);
         event.setCatalogueId("SGAI");
         event.setPath("test/path");
 
