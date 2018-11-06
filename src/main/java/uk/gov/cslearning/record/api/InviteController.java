@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 @RestController
 @RequestMapping("/event")
-public class EventController {
+public class InviteController {
 
     @Autowired
     EventRepository eventRepository;
@@ -24,7 +24,7 @@ public class EventController {
     @Autowired
     InviteRepository inviteRepository;
 
-    public EventController(InviteRepository inviteRepository, EventRepository eventRepository){
+    public InviteController(InviteRepository inviteRepository, EventRepository eventRepository){
         checkArgument(inviteRepository != null);
         checkArgument(eventRepository != null);
         this.inviteRepository = inviteRepository;

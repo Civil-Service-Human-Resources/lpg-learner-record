@@ -23,12 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-public class EventControllerTest {
+public class InviteControllerTest {
 
     private MockMvc mockMvc;
 
     @InjectMocks
-    private EventController controller;
+    private InviteController controller;
 
     @Mock
     private EventRepository eventRepository;

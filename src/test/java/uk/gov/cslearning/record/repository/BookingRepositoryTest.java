@@ -12,7 +12,6 @@ import uk.gov.cslearning.record.domain.Learner;
 import javax.transaction.Transactional;
 
 import java.time.Instant;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.notNullValue;
