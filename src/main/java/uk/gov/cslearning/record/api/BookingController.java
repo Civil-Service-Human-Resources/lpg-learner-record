@@ -54,5 +54,4 @@ public class BookingController {
         bookingService.unregister(bookingId);
         return ResponseEntity.noContent().build();
     }
-
 }
