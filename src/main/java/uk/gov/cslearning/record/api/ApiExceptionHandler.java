@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.gov.cslearning.record.dto.ValidationErrors;
 import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.exception.EventNotFoundException;
 
 @ControllerAdvice
 public class ApiExceptionHandler {
@@ -31,8 +32,8 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(BookingNotFoundException.class)
-    protected ResponseEntity<ValidationErrors> handleBookingNotFoundException(BookingNotFoundException e) {
+    @ExceptionHandler({BookingNotFoundException.class, EventNotFoundException.class})
+    protected ResponseEntity handleNotFoundException(RuntimeException e) {
         LOGGER.error("Not Found: ", e);
 
         return ResponseEntity.notFound().build();

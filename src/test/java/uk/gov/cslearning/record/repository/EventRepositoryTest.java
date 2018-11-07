@@ -9,6 +9,8 @@ import uk.gov.cslearning.record.domain.Event;
 
 import javax.transaction.Transactional;
 
+import java.util.Optional;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
