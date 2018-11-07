@@ -5,9 +5,10 @@ import uk.gov.cslearning.record.domain.Learner;
 
 @Component
 public class LearnerFactory {
-    public Learner create(String uuid) {
+    public Learner create(String uuid, String learnerEmail) {
         Learner learner = new Learner();
         learner.setUid(uuid);
+        learner.setLearnerEmail(learnerEmail);
 
         return learner;
     }

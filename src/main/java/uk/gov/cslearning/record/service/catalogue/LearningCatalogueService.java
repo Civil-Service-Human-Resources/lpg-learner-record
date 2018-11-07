@@ -50,9 +50,13 @@ public class LearningCatalogueService {
 
     @Cacheable("courseId")
     public Course getCourse(String courseId) {
-        RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(courseUrlFormat, courseId));
-        ResponseEntity<Course> responseEntity = restTemplate.exchange(requestEntity, Course.class);
-        return responseEntity.getBody();
+        try {
+            RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(courseUrlFormat, courseId));
+            ResponseEntity<Course> responseEntity = restTemplate.exchange(requestEntity, Course.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static class Results {

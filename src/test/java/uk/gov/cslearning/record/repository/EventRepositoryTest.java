@@ -26,7 +26,7 @@ public class EventRepositoryTest {
     public void shouldSaveEvent(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("SSE");
+        event.setEventUid("SSE");
         eventRepository.save(event);
 
         assertThat(event.getId(), notNullValue());
@@ -36,7 +36,7 @@ public class EventRepositoryTest {
     public void shouldBeAbleToFindEventByCatalogueId(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("SBATFEBC");
+        event.setEventUid("SBATFEBC");
 
         eventRepository.save(event);
 

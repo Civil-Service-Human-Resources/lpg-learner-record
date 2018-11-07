@@ -8,6 +8,6 @@ import uk.gov.cslearning.record.domain.Event;
 @Repository
 public interface EventRepository extends CrudRepository<Event, Integer> {
 
-    @Query("SELECT e FROM Event e WHERE e.catalogueId = ?1")
+    @Query("SELECT e FROM Event e WHERE e.eventUid = ?1")
     Iterable<Event> findByCatalogueId(String catalogueId);
 }

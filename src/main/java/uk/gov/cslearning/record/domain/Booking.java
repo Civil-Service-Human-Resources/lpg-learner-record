@@ -1,7 +1,5 @@
 package uk.gov.cslearning.record.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +29,5 @@ public class Booking {
     @Column(nullable = false, length = 9)
     private String status;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private Instant bookingTime;
 }

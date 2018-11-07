@@ -1,10 +1,13 @@
 package uk.gov.cslearning.record.api;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
+import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.BookingService;
 
 import javax.validation.Valid;
@@ -18,8 +21,18 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    public BookingController(BookingService bookingService) {
+    private BookingRepository bookingRepository;
+
+    public BookingController(BookingService bookingService, BookingRepository bookingRepository) {
         this.bookingService = bookingService;
+        this.bookingRepository = bookingRepository;
+    }
+
+    @GetMapping(value = "/event/{eventId}/booking")
+    public ResponseEntity<Iterable<Booking>> listEventBookings(@PathVariable String eventId){
+        Iterable<Booking> result = bookingRepository.listByEventId(eventId);
+
+        return new ResponseEntity<>(result, OK);
     }
 
     @GetMapping(value = "/event/{eventId}/booking/{bookingId}", produces = "application/json")

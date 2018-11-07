@@ -11,7 +11,7 @@ public class EventFactory {
     public Event create(String path) {
         Event event = new Event();
         event.setPath(path);
-        event.setCatalogueId(Paths.get(path).getFileName().toString());
+        event.setEventUid(Paths.get(path).getFileName().toString());
         return event;
     }
 }

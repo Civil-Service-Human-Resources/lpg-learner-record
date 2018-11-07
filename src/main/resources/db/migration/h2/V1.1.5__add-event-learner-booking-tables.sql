@@ -1,6 +1,6 @@
 CREATE TABLE `event` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `catalogue_id` varchar(60) NOT NULL,
+  `event_uid` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
   PRIMARY KEY(`id`)
 );
@@ -8,6 +8,7 @@ CREATE TABLE `event` (
 CREATE TABLE `learner` (
   `id` int NOT NULL AUTO_INCREMENT,
   `uid` varchar(60) NOT NULL,
+  `learner_email` varchar(60) NOT NULL,
   PRIMARY KEY(`id`)
 );
 

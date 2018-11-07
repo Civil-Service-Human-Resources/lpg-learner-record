@@ -19,7 +19,7 @@ public class BookingFactory {
 
         booking.setBookingTime(bookingDto.getBookingTime());
         booking.setEvent(eventFactory.create(bookingDto.getEvent().getPath()));
-        booking.setLearner(learnerFactory.create(bookingDto.getLearner()));
+        booking.setLearner(learnerFactory.create(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
         booking.setPaymentDetails(bookingDto.getPaymentDetails().getPath());
         booking.setId(bookingDto.getId());
         booking.setStatus(bookingDto.getStatus().getValue());
