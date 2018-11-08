@@ -20,7 +20,7 @@ public class Event {
     @Column(nullable = false, length = 60)
     private String catalogueId;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String path;
 
     @ToString.Exclude

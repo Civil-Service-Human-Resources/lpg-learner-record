@@ -25,7 +25,7 @@ public class Booking {
     @JoinColumn(name="eventId")
     private Event event;
 
-    @Column(length = 255)
+    @Column
     private String paymentDetails;
 
     @Column(nullable = false, length = 9)

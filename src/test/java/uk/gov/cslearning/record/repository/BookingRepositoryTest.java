@@ -11,7 +11,6 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
 
 import javax.transaction.Transactional;
-
 import java.time.Instant;
 import java.util.Collections;
 
