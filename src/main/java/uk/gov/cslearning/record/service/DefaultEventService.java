@@ -1,10 +1,9 @@
-package uk.gov.cslearning.record.api;
+package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.repository.EventRepository;
-import uk.gov.cslearning.record.service.BookingService;
 
 @Service
 public class DefaultEventService implements EventService {

@@ -16,10 +16,10 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, length = 60)
+    @Column(nullable = false, length = 60, unique = true)
     private String catalogueId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String path;
 
     @ToString.Exclude

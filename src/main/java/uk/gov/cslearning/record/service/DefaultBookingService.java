@@ -43,7 +43,7 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
-        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
+        return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
     }
 
     @Override

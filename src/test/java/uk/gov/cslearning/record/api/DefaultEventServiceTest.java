@@ -10,6 +10,7 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.BookingService;
+import uk.gov.cslearning.record.service.DefaultEventService;
 
 import java.util.Arrays;
 import java.util.Optional;

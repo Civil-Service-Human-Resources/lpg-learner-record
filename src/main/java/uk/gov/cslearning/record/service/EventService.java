@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.api;
+package uk.gov.cslearning.record.service;
 
 import org.springframework.transaction.annotation.Transactional;
 
