@@ -33,32 +33,30 @@ public class InviteController {
     }
 
     @GetMapping("/{eventId}/invitee")
-    public ResponseEntity<Collection<Invite>> listInvitees(@PathVariable("eventId") String catalogueId){
-        Collection<Invite> result = inviteRepository.findByEventId(catalogueId);
+    public ResponseEntity<Collection<Invite>> listInvitees(@PathVariable("eventId") String eventUid){
+        Collection<Invite> result = inviteRepository.findByEventId(eventUid);
         
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/{eventId}/invitee")
-    public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String catalogueId, @RequestBody Invite invite, UriComponentsBuilder builder){
-        Optional<Event> result = eventRepository.findByCatalogueId(catalogueId);
-
-        if(!result.isPresent()){
-            createEvent(catalogueId, invite);
+    public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody Invite invite, UriComponentsBuilder builder){
+        if(!eventRepository.findByEventUid(eventUid).isPresent()){
+            createEvent(eventUid, invite);
         }
 
-        Event event = result.get();
+        Event event = eventRepository.findByEventUid(eventUid).get();
 
         invite.setEvent(event);
         inviteRepository.save(invite);
 
-        return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(catalogueId)).build();
+        return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
     }
 
-    private void createEvent(String catalogueId, Invite invite){
+    private void createEvent(String eventUid, Invite invite){
         Event event = new Event();
         event.setPath(invite.getEvent().getPath());
-        event.setEventUid(catalogueId);
+        event.setEventUid(eventUid);
         eventRepository.save(event);
     }
 }

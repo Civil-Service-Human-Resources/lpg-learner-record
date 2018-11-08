@@ -10,6 +10,6 @@ import java.util.Collection;
 @Repository
 public interface InviteRepository extends CrudRepository<Invite, Integer> {
 
-    @Query("SELECT i FROM Invite i INNER JOIN Event e ON i.event = e WHERE e.catalogueId = ?1")
-    Collection<Invite> findByEventId(String eventId);
+    @Query("SELECT i FROM Invite i INNER JOIN Event e ON i.event = e WHERE e.eventUid = ?1")
+    Collection<Invite> findByEventId(String eventUid);
 }

@@ -57,7 +57,7 @@ public class InviteControllerTest {
         invites.add(invite);
 
         when(inviteRepository.findByEventId("SGAI")).thenReturn(invites);
-        when(eventRepository.findByCatalogueId("SGAI")).thenReturn(Optional.of(event));
+        when(eventRepository.findByEventUid("SGAI")).thenReturn(Optional.of(event));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/event/SGAI/invitee").with(csrf())
@@ -72,7 +72,7 @@ public class InviteControllerTest {
         event.setEventUid("SAI");
         event.setPath("test/path");
 
-        when(eventRepository.findByCatalogueId("SAI")).thenReturn(Optional.of(event));
+        when(eventRepository.findByEventUid("SAI")).thenReturn(Optional.of(event));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())

@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface EventRepository extends CrudRepository<Event, Integer> {
 
-    @Query("SELECT e FROM Event e WHERE e.catalogueId = ?1")
-    Optional<Event> findByCatalogueId(String catalogueId);
+    @Query("SELECT e FROM Event e WHERE e.eventUid = ?1")
+    Optional<Event> findByEventUid(String eventUid);
 }
