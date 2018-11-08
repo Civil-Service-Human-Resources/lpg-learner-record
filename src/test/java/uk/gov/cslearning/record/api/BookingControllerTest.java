@@ -15,13 +15,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
+import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
 import uk.gov.cslearning.record.service.BookingService;
 
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -32,6 +32,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -39,6 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({BookingController.class, ValidationErrorsFactory.class})
 @WithMockUser(username = "user")
 public class BookingControllerTest {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.ofHours(0));
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,6 +50,7 @@ public class BookingControllerTest {
     private BookingService bookingService;
 
     private ObjectMapper objectMapper;
+
 
     @Before
     public void setUp() {
@@ -74,7 +78,6 @@ public class BookingControllerTest {
 
         when(bookingService.find(bookingId)).thenReturn(Optional.of(bookingDto));
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.ofHours(0));
 
         mockMvc.perform(
                 get("/event/blah/booking/" + bookingId)
@@ -86,7 +89,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.event", equalTo(event.toString())))
                 .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
-                        equalTo(dateTimeFormatter.format(bookingTime))));
+                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 
     @Test
@@ -106,8 +109,8 @@ public class BookingControllerTest {
         int bookingId = 99;
         String learner = "_learner";
         BookingStatus status = BookingStatus.CONFIRMED;
-        URI event = new URI("http://event");
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        URI event = new URI("http://event");
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
@@ -127,7 +130,7 @@ public class BookingControllerTest {
 
         String json = objectMapper.writeValueAsString(booking);
 
-        when(bookingService.save(eq(booking))).thenReturn(savedBooking);
+        when(bookingService.register(eq(booking))).thenReturn(savedBooking);
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())
@@ -163,4 +166,69 @@ public class BookingControllerTest {
 
         verifyZeroInteractions(bookingService);
     }
+
+    @Test
+    public void shouldUpdateBooking() throws Exception {
+        int bookingId = 930;
+        BookingStatus status = BookingStatus.CONFIRMED;
+        Instant bookingTime =
+                LocalDateTime.of(2018,
+                        1,
+                        1,
+                        13,
+                        59,
+                        12,
+                        500).toInstant(ZoneOffset.UTC);
+        URI paymentDetails = new URI("payment-details");
+        URI event = new URI("http://event");
+        String learner = "_learner";
+
+        BookingDto booking = new BookingDto();
+        booking.setId(bookingId);
+        booking.setStatus(status);
+        booking.setBookingTime(bookingTime);
+        booking.setPaymentDetails(paymentDetails);
+        booking.setEvent(event);
+        booking.setLearner(learner);
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+
+        when(bookingService.updateStatus(eq(bookingId), eq(bookingStatus))).thenReturn(booking);
+
+        mockMvc.perform(
+                patch("/event/blah/booking/" + bookingId).with(csrf())
+                        .content(objectMapper.writeValueAsString(bookingStatus))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(bookingId)))
+                .andExpect(jsonPath("$.learner", equalTo(learner)))
+                .andExpect(jsonPath("$.status", equalTo(status.getValue())))
+                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
+                .andExpect(jsonPath("$.bookingTime",
+                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
+    }
+
+
+    @Test
+    public void shouldReturnBadMessageWithInvalidStatus() throws Exception {
+        int bookingId = 930;
+        BookingStatus status = BookingStatus.REQUESTED;
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+
+        mockMvc.perform(
+                patch("/event/blah/booking/" + bookingId).with(csrf())
+                        .content(objectMapper.writeValueAsString(bookingStatus))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.size", equalTo(1)))
+                .andExpect(jsonPath("$.errors[0].field", equalTo("status")))
+                .andExpect(jsonPath("$.errors[0].details", equalTo("Booking status should be 'Confirmed'")));
+
+        verifyZeroInteractions(bookingService);
+    }
+
 }

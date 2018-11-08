@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.service.BookingService;
 
 import javax.validation.Valid;
@@ -33,10 +34,17 @@ public class BookingController {
     @PostMapping(value="/event/{eventId}/booking/")
     public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
 
-        BookingDto result = bookingService.save(booking);
+        BookingDto result = bookingService.register(booking);
 
         return ResponseEntity.created(
                 uriBuilder.path("/event/{eventId}/booking/{bookingId}").build(eventId, result.getId())
         ).build();
+    }
+
+    @PatchMapping(value = "/event/{eventId}/booking/{bookingId}")
+    public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventId, @PathVariable int bookingId, @Valid @RequestBody BookingStatusDto bookingStatus) {
+        BookingDto result = bookingService.updateStatus(bookingId, bookingStatus);
+
+        return ResponseEntity.ok(result);
     }
 }
