@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
+import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.service.EventService;
 
@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({EventController.class, ValidationErrorsFactory.class})
+@WebMvcTest({EventController.class, ErrorDtoFactory.class})
 @WithMockUser(username = "user")
 public class EventControllerTest {
 
