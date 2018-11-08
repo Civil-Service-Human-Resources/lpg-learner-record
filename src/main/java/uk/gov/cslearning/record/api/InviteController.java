@@ -7,9 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Invite;
+import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.repository.InviteRepository;
+import uk.gov.cslearning.record.service.InviteService;
 
+import javax.ws.rs.core.UriBuilder;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -22,40 +25,35 @@ public class InviteController {
     @Autowired
     EventRepository eventRepository;
 
-    @Autowired
-    InviteRepository inviteRepository;
+    InviteService inviteService;
 
-    public InviteController(InviteRepository inviteRepository, EventRepository eventRepository){
-        checkArgument(inviteRepository != null);
-        checkArgument(eventRepository != null);
-        this.inviteRepository = inviteRepository;
+    public InviteController(InviteService inviteService, EventRepository eventRepository){
+        this.inviteService = inviteService;
         this.eventRepository = eventRepository;
     }
 
     @GetMapping("/{eventId}/invitee")
-    public ResponseEntity<Collection<Invite>> listInvitees(@PathVariable("eventId") String eventUid){
-        Collection<Invite> result = inviteRepository.findByEventId(eventUid);
+    public ResponseEntity<Collection<InviteDto>> listInvitees(@PathVariable("eventId") String eventUid){
+        Collection<InviteDto> result = inviteService.findByEventId(eventUid);
         
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/{eventId}/invitee")
-    public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody Invite invite, UriComponentsBuilder builder){
+    public ResponseEntity<Event> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
         if(!eventRepository.findByEventUid(eventUid).isPresent()){
-            createEvent(eventUid, invite);
+            createEvent(eventUid, inviteDto);
         }
 
-        Event event = eventRepository.findByEventUid(eventUid).get();
-
-        invite.setEvent(event);
-        inviteRepository.save(invite);
+        inviteDto.setEvent(UriBuilder.fromUri(inviteDto.getEvent().getPath()).build());
+        inviteService.save(inviteDto);
 
         return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
     }
 
-    private void createEvent(String eventUid, Invite invite){
+    private void createEvent(String eventUid, InviteDto inviteDto){
         Event event = new Event();
-        event.setPath(invite.getEvent().getPath());
+        event.setPath(inviteDto.getEvent().getPath());
         event.setEventUid(eventUid);
         eventRepository.save(event);
     }
