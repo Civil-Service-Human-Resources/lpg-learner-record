@@ -70,7 +70,7 @@ public class DefaultBookingServiceTest {
         Booking savedBooking = new Booking();
 
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
-        when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
+        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
@@ -78,7 +78,7 @@ public class DefaultBookingServiceTest {
         InOrder order = inOrder(xApiService, bookingRepository);
 
         order.verify(xApiService).register(unsavedBookingDto);
-        order.verify(bookingRepository).save(unsavedBooking);
+        order.verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
     @Test
@@ -90,13 +90,13 @@ public class DefaultBookingServiceTest {
         Booking savedBooking = new Booking();
 
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
-        when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
+        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
         verifyZeroInteractions(xApiService);
-        verify(bookingRepository).save(unsavedBooking);
+        verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
     @Test
@@ -118,7 +118,7 @@ public class DefaultBookingServiceTest {
         BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED);
 
         when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
-        when(bookingRepository.save(updatedBooking)).thenReturn(savedBooking);
+        when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));

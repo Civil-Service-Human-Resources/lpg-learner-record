@@ -2,29 +2,25 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.factory.EventFactory;
+import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.repository.EventRepository;
 
 @Service
 public class DefaultEventService implements EventService {
-
     private final EventRepository eventRepository;
-    private final EventFactory eventFactory;
+    private final BookingService bookingService;
 
-    public DefaultEventService(EventRepository eventRepository, EventFactory eventFactory){
+    public DefaultEventService(EventRepository eventRepository, BookingService bookingService) {
         this.eventRepository = eventRepository;
-        this.eventFactory = eventFactory;
-    }
-
-    private void createEventIfNotPresent(String eventUid, String path) {
-        if(!eventRepository.findByEventUid(eventUid).isPresent()){
-            eventRepository.save(eventFactory.create(path));
-        }
+        this.bookingService = bookingService;
     }
 
     @Override
-    public Event getEvent(String eventUid, String path){
-        createEventIfNotPresent(eventUid, path);
-        return eventRepository.findByEventUid(eventUid).get();
+    public void cancelEvent(String eventId) {
+        Event event = eventRepository.findByCatalogueId(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+
+        event.getBookings().forEach(booking -> bookingService.unregister(booking.getId()));
+
+        eventRepository.delete(event);
     }
 }
