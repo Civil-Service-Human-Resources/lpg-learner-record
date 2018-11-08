@@ -63,7 +63,10 @@ public class DefaultBookingService implements BookingService {
     public void unregister(int bookingId) {
         BookingDto bookingDto = find(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
 
-        xApiService.unregister(bookingDto);
+        // only update unregister confirmed bookings
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
+            xApiService.unregister(bookingDto);
+        }
 
         bookingRepository.delete(bookingFactory.create(bookingDto));
     }

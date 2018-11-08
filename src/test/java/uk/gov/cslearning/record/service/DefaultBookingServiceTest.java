@@ -159,9 +159,10 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldUnregisterBooking() {
+    public void shouldUnregisterBookingIfConfirmed() {
         int bookingId = 99;
         BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
         Booking booking = new Booking();
         Booking bookingToDelete = new Booking();
 
@@ -172,6 +173,24 @@ public class DefaultBookingServiceTest {
         bookingService.unregister(bookingId);
 
         verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).delete(bookingToDelete);
+    }
+
+    @Test
+    public void shouldNotCallXApiIfStatusIsRequested() {
+        int bookingId = 99;
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
+        Booking booking = new Booking();
+        Booking bookingToDelete = new Booking();
+
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+        when(bookingFactory.create(bookingDto)).thenReturn(bookingToDelete);
+
+        bookingService.unregister(bookingId);
+
+        verifyZeroInteractions(xApiService);
         verify(bookingRepository).delete(bookingToDelete);
     }
 }
