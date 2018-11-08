@@ -141,10 +141,11 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldUnregisterBooking() {
+    public void shouldUnregisterBookingWithBookingDto() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setStatus(BookingStatus.CANCELLED);
         BookingDto savedBookingDto = new BookingDto();
+
         Booking booking = new Booking();
         Booking savedBooking = new Booking();
 
@@ -155,6 +156,46 @@ public class DefaultBookingServiceTest {
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
         verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).save(booking);
+    }
+
+    @Test
+    public void shouldUnregisterBookingWithBooking() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.CANCELLED);
+        BookingDto savedBookingDto = new BookingDto();
+
+        Booking booking1 = new Booking();
+        Booking booking2 = new Booking();
+
+        Booking savedBooking = new Booking();
+
+        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto);
+        when(bookingFactory.create(bookingDto)).thenReturn(booking2);
+        when(bookingRepository.save(booking2)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.unregister(booking1));
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).save(booking1);
+    }
+
+    @Test
+    public void shouldNotCallXApiIfStatusIsRequested() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
+        Booking booking = new Booking();
+        BookingDto savedBookingDto = new BookingDto();
+        Booking savedBooking = new Booking();
+
+        when(bookingFactory.create(bookingDto)).thenReturn(booking);
+        when(bookingRepository.save(booking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
+
+        verifyZeroInteractions(xApiService);
         verify(bookingRepository).save(booking);
     }
 }
