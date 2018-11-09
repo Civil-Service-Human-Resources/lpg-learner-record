@@ -4,9 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cslearning.record.domain.factory.EventFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
-import uk.gov.cslearning.record.service.EventService;
 import uk.gov.cslearning.record.service.InviteService;
 
 import java.util.Collection;
@@ -17,14 +15,8 @@ public class InviteController {
 
     InviteService inviteService;
 
-    EventService eventService;
-
-    EventFactory eventFactory;
-
-    public InviteController(InviteService inviteService, EventService eventService, EventFactory eventFactory){
+    public InviteController(InviteService inviteService){
         this.inviteService = inviteService;
-        this.eventService = eventService;
-        this.eventFactory = eventFactory;
     }
 
     @GetMapping("/{eventId}/invitee")

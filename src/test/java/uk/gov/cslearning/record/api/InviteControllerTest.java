@@ -6,16 +6,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Invite;
-import uk.gov.cslearning.record.repository.EventRepository;
-import uk.gov.cslearning.record.repository.InviteRepository;
+import uk.gov.cslearning.record.dto.InviteDto;
+import uk.gov.cslearning.record.service.InviteService;
 
 import javax.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -31,10 +29,7 @@ public class InviteControllerTest {
     private InviteController controller;
 
     @Mock
-    private EventRepository eventRepository;
-
-    @Mock
-    private InviteRepository inviteRepository;
+    private InviteService inviteService;
 
     @Before
     public void setup(){
@@ -44,20 +39,13 @@ public class InviteControllerTest {
 
     @Test
     public void shouldGetAllInvitees() throws Exception{
-        Event event = new Event();
-        event.setId(1);
-        event.setEventUid("SGAI");
-        event.setPath("test/path");
+        InviteDto inviteDto = new InviteDto();
+        inviteDto.setId(1);
 
-        Invite invite = new Invite(1);
-        invite.setEvent(event);
-        invite.setLearnerEmail("test1@test.com");
+        ArrayList<InviteDto> invites = new ArrayList<>();
+        invites.add(inviteDto);
 
-        ArrayList<Invite> invites = new ArrayList<>();
-        invites.add(invite);
-
-        when(inviteRepository.findByEventId("SGAI")).thenReturn(invites);
-        when(eventRepository.findByEventUid("SGAI")).thenReturn(Optional.of(event));
+        when(inviteService.findByEventId("SGAI")).thenReturn(invites);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/event/SGAI/invitee").with(csrf())
@@ -68,11 +56,7 @@ public class InviteControllerTest {
 
     @Test
     public void shouldAddInvitee() throws Exception{
-        Event event = new Event();
-        event.setEventUid("SAI");
-        event.setPath("test/path");
-
-        when(eventRepository.findByEventUid("SAI")).thenReturn(Optional.of(event));
+        when(inviteService.save(any())).thenReturn(new InviteDto());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())

@@ -16,8 +16,7 @@ public class DefaultEventService implements EventService {
         this.eventFactory = eventFactory;
     }
 
-    @Override
-    public void createEventIfNotPresent(String eventUid, String path) {
+    private void createEventIfNotPresent(String eventUid, String path) {
         if(!eventRepository.findByEventUid(eventUid).isPresent()){
             eventRepository.save(eventFactory.create(path));
         }

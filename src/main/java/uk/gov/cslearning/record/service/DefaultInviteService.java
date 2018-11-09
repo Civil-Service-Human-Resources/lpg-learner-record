@@ -6,7 +6,6 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
-import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.repository.InviteRepository;
 
 import java.nio.file.Paths;
@@ -18,14 +17,12 @@ public class DefaultInviteService implements InviteService{
     private final InviteFactory inviteFactory;
     private final InviteDtoFactory inviteDtoFactory;
     private final InviteRepository inviteRepository;
-    private final EventRepository eventRepository;
     private final EventService eventService;
 
-    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventRepository eventRepository, EventService eventService){
+    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventService eventService){
         this.inviteFactory = inviteFactory;
         this.inviteDtoFactory = inviteDtoFactory;
         this.inviteRepository = inviteRepository;
-        this.eventRepository = eventRepository;
         this.eventService = eventService;
     }
 
