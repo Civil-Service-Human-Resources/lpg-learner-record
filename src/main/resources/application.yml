@@ -26,6 +26,9 @@ logging:
   level:
     root: ${ROOT_LOGGING_LEVEL:INFO}
     com.zaxxer.hikari: ERROR
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.type: TRACE
 
 notifications:
   emailUrl: ${NOTIFICATIONS_EMAIL_URL:http://localhost:9010/notifications/email/}
