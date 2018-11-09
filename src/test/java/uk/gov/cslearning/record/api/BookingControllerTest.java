@@ -224,38 +224,8 @@ public class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.size", equalTo(1)))
                 .andExpect(jsonPath("$.errors[0].field", equalTo("status")))
-                .andExpect(jsonPath("$.errors[0].details", equalTo("Booking status should be 'Confirmed'")));
+                .andExpect(jsonPath("$.errors[0].details", equalTo("Booking status cannot be updated to 'Requested'")));
 
         verifyZeroInteractions(bookingService);
-    }
-
-    @Test
-    public void shouldReturnNoContentOnDelete() throws Exception {
-        int bookingId = 930;
-
-        mockMvc.perform(
-                delete("/event/blah/booking/" + bookingId).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-
-        verify(bookingService).unregister(bookingId);
-    }
-
-    @Test
-    public void shouldReturnNotFoundIfBookingNotFoundOnDelete() throws Exception {
-        int bookingId = 930;
-
-        BookingNotFoundException exception = mock(BookingNotFoundException.class);
-
-        doThrow(exception).when(bookingService).unregister(bookingId);
-
-        mockMvc.perform(
-                delete("/event/blah/booking/" + bookingId).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-
-        verify(bookingService).unregister(bookingId);
     }
 }
