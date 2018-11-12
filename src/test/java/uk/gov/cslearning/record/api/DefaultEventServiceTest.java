@@ -46,8 +46,8 @@ public class DefaultEventServiceTest {
 
         eventService.cancelEvent(eventId);
 
-        verify(bookingService).unregister(10);
-        verify(bookingService).unregister(20);
+        verify(bookingService).unregister(booking1);
+        verify(bookingService).unregister(booking2);
         verify(eventRepository).delete(event);
     }
 

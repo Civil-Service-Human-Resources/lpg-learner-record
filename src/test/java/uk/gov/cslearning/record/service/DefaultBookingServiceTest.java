@@ -143,42 +143,44 @@ public class DefaultBookingServiceTest {
     @Test
     public void shouldUnregisterBookingWithBookingDto() {
         BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.CANCELLED);
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
         BookingDto savedBookingDto = new BookingDto();
 
         Booking booking = new Booking();
         Booking savedBooking = new Booking();
 
         when(bookingFactory.create(bookingDto)).thenReturn(booking);
-        when(bookingRepository.save(booking)).thenReturn(savedBooking);
+        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
         verify(xApiService).unregister(bookingDto);
-        verify(bookingRepository).save(booking);
+        verify(bookingRepository).saveBooking(booking);
     }
 
     @Test
     public void shouldUnregisterBookingWithBooking() {
         BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.CANCELLED);
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
         BookingDto savedBookingDto = new BookingDto();
 
         Booking booking1 = new Booking();
+        booking1.setId(1);
         Booking booking2 = new Booking();
+        booking2.setId(2);
 
         Booking savedBooking = new Booking();
 
         when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto);
         when(bookingFactory.create(bookingDto)).thenReturn(booking2);
-        when(bookingRepository.save(booking2)).thenReturn(savedBooking);
+        when(bookingRepository.saveBooking(booking2)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.unregister(booking1));
 
         verify(xApiService).unregister(bookingDto);
-        verify(bookingRepository).save(booking1);
+        verify(bookingRepository).saveBooking(booking2);
     }
 
     @Test
@@ -190,12 +192,12 @@ public class DefaultBookingServiceTest {
         Booking savedBooking = new Booking();
 
         when(bookingFactory.create(bookingDto)).thenReturn(booking);
-        when(bookingRepository.save(booking)).thenReturn(savedBooking);
+        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
-        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
+        assertEquals(savedBookingDto, bookingService.register(bookingDto));
 
         verifyZeroInteractions(xApiService);
-        verify(bookingRepository).save(booking);
+        verify(bookingRepository).saveBooking(booking);
     }
 }

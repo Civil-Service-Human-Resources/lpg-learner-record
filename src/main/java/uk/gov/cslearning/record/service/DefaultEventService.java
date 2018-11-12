@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.repository.EventRepository;
 
@@ -18,9 +19,7 @@ public class DefaultEventService implements EventService {
     @Override
     public void cancelEvent(String eventId) {
         Event event = eventRepository.findByCatalogueId(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
-
-        event.getBookings().forEach(booking -> bookingService.unregister(booking.getId()));
-
+        event.getBookings().forEach(bookingService::unregister);
         eventRepository.delete(event);
     }
 }
