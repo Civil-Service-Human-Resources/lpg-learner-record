@@ -8,7 +8,6 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.service.BookingService;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -24,8 +23,8 @@ public class BookingController {
     }
 
     @GetMapping(value = "/event/{eventId}/booking")
-    public ResponseEntity<Collection<BookingDto>> listEventBookings(@PathVariable String eventId){
-        Collection<BookingDto> result = bookingService.listByEventUid(eventId);
+    public ResponseEntity<Iterable<BookingDto>> listEventBookings(@PathVariable String eventId){
+        Iterable<BookingDto> result = bookingService.listByEventUid(eventId);
 
         return new ResponseEntity<>(result, OK);
     }

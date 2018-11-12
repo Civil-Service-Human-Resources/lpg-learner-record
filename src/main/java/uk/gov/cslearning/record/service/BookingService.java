@@ -13,7 +13,7 @@ public interface BookingService {
     Optional<BookingDto> find(int bookingId);
 
     @Transactional(readOnly = true)
-    Collection<BookingDto> listByEventUid(String eventUid);
+    Iterable<BookingDto> listByEventUid(String eventUid);
 
     @Transactional
     BookingDto register(BookingDto booking);

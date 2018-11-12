@@ -16,6 +16,7 @@ import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -59,6 +60,34 @@ public class DefaultBookingServiceTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
         assertEquals(Optional.empty(), bookingService.find(bookingId));
+    }
+
+    @Test
+    public void shouldListBookingsByEventUid() {
+        String eventId = "test-event-id";
+
+        Booking booking1 = new Booking();
+        booking1.setId(11);
+        Booking booking2 = new Booking();
+        booking2.setId(21);
+
+        ArrayList<Booking> bookings = new ArrayList<>();
+        bookings.add(booking1);
+        bookings.add(booking2);
+
+        BookingDto bookingDto1 = new BookingDto();
+        bookingDto1.setId(11);
+        BookingDto bookingDto2 = new BookingDto();
+        bookingDto2.setId(21);
+
+        ArrayList<BookingDto> bookingDtos = new ArrayList<>();
+        bookingDtos.add(bookingDto1);
+        bookingDtos.add(bookingDto2);
+
+        when(bookingRepository.listByEventId(eventId)).thenReturn(bookings);
+        when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
+
+        assertEquals(bookingDtos, bookingService.listByEventUid(eventId));
     }
 
     @Test

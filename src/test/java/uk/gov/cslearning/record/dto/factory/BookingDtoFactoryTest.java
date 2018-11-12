@@ -30,8 +30,10 @@ public class BookingDtoFactoryTest {
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
 
         String learnerUuid = "learner-uuid";
+        String learnerEmail = "test@domain.com";
         Learner learner = new Learner();
         learner.setUid(learnerUuid);
+        learner.setLearnerEmail(learnerEmail);
 
         String eventPath = "/courses/abc/modules/def/events/ghi";
         Event event = new Event();
@@ -53,6 +55,7 @@ public class BookingDtoFactoryTest {
                 equalTo(new URI(String.join("", learningCatalogueBaseUri, eventPath))));
 
         assertThat(bookingDto.getLearner(), equalTo(learnerUuid));
+        assertThat(bookingDto.getLearnerEmail(), equalTo(learnerEmail));
         assertThat(bookingDto.getPaymentDetails(),
                 equalTo(new URI(String.join("", csrsBaseUri, paymentDetails))));
 

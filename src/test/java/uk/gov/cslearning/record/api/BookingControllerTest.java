@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({BookingController.class, ValidationErrorsFactory.class})
@@ -60,6 +63,40 @@ public class BookingControllerTest {
     }
 
     @Test
+    public void shouldListAllBookingsOnEvent() throws Exception {
+        BookingDto bookingDto1 = new BookingDto();
+        bookingDto1.setId(11);
+        BookingDto bookingDto2 = new BookingDto();
+        bookingDto2.setId(21);
+
+        ArrayList<BookingDto> bookings = new ArrayList<>();
+        bookings.add(bookingDto1);
+        bookings.add(bookingDto2);
+
+        when(bookingService.listByEventUid("test-event-id")).thenReturn(bookings);
+
+        mockMvc.perform(
+                get("/event/test-event-id/booking")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", equalTo(11)))
+                .andExpect(jsonPath("$[1].id", equalTo(21)));
+    }
+
+    @Test
+    public void shouldReturnEmptyArrayIfNoBookingsOnEvent() throws Exception {
+        when(bookingService.listByEventUid("test-event-id")).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(
+                get("/event/test-event-id/booking")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", equalTo(new ArrayList<>())));
+    }
+
+    @Test
     public void shouldReturnBookingIfFound() throws Exception {
         int bookingId = 99;
         String learner = "_learner";
@@ -77,7 +114,6 @@ public class BookingControllerTest {
         bookingDto.setPaymentDetails(paymentDetails);
 
         when(bookingService.find(bookingId)).thenReturn(Optional.of(bookingDto));
-
 
         mockMvc.perform(
                 get("/event/blah/booking/" + bookingId)
