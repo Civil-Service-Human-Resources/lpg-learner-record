@@ -26,21 +26,21 @@ public class EventRepositoryTest {
     public void shouldSaveEvent(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("SSE");
+        event.setEventUid("SSE");
         eventRepository.save(event);
 
         assertThat(event.getId(), notNullValue());
     }
 
     @Test
-    public void shouldBeAbleToFindEventByCatalogueId(){
+    public void shouldBeAbleToFindEventByEventUid(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setCatalogueId("SBATFEBC");
+        event.setEventUid("SBATFEBC");
 
         eventRepository.save(event);
 
-        Event repositoryEvent = eventRepository.findByCatalogueId("SBATFEBC").get();
+        Event repositoryEvent = eventRepository.findByEventUid("SBATFEBC").get();
 
         assertThat(repositoryEvent, is(equalTo(event)));
     }
