@@ -2,6 +2,8 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.dto.EventDto;
+import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.domain.factory.EventFactory;
 import uk.gov.cslearning.record.repository.EventRepository;
@@ -36,5 +38,10 @@ public class DefaultEventService implements EventService {
     public Event getEvent(String eventUid, String path){
         createEventIfNotPresent(eventUid, path);
         return eventRepository.findByEventUid(eventUid).get();
+    }
+
+    @Override
+    public EventDto updateStatus(String eventUid, EventStatusDto eventStatus) {
+        return null;
     }
 }
