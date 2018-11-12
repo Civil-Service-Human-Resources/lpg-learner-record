@@ -17,7 +17,7 @@ CREATE TABLE `booking` (
   `learner_id` int(10) unsigned NOT NULL,
   `event_id` int(10) unsigned NOT NULL,
   `booking_time` datetime NOT NULL,
-  `status` enum('REQUESTED','CONFIRMED') DEFAULT NULL,
+  `status` enum('REQUESTED','CONFIRMED','CANCELLED') DEFAULT NULL,
   `payment_details` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_learner_event` (`learner_id`, `event_id`),

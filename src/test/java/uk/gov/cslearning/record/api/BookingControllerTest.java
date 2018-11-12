@@ -223,9 +223,9 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.size", equalTo(1)))
-                .andExpect(jsonPath("$.errors[0].field", equalTo("status")))
-                .andExpect(jsonPath("$.errors[0].details", equalTo("Booking status cannot be updated to 'Requested'")));
+                .andExpect(jsonPath("$.errors[0]", equalTo("status: Booking status cannot be updated to 'Requested'")))
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
         verifyZeroInteractions(bookingService);
     }

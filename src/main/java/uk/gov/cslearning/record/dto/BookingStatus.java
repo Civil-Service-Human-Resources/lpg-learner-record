@@ -2,7 +2,7 @@ package uk.gov.cslearning.record.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import uk.gov.cslearning.record.exception.UnknownBookingStatusException;
+import uk.gov.cslearning.record.exception.UnknownStatusException;
 
 import java.util.Arrays;
 
@@ -20,7 +20,7 @@ public enum BookingStatus {
         return Arrays.stream(BookingStatus.values())
                 .filter(v -> v.value.equalsIgnoreCase(value))
                 .findAny()
-                .orElseThrow(() -> new UnknownBookingStatusException(value));
+                .orElseThrow(() -> new UnknownStatusException(value));
     }
 
     @JsonValue
