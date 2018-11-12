@@ -10,7 +10,9 @@ import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultBookingService implements BookingService {
@@ -35,6 +37,15 @@ public class DefaultBookingService implements BookingService {
         ).orElse(null);
 
         return Optional.ofNullable(bookingDto);
+    }
+
+    @Override
+    public Collection<BookingDto> listByEventUid(String eventUid){
+        Collection<BookingDto> bookings = bookingRepository.listByEventId(eventUid).stream().map(
+                bookingDtoFactory::create
+        ).collect(Collectors.toList());
+
+        return bookings;
     }
 
     @Override
