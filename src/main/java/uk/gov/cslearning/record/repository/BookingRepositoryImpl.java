@@ -18,7 +18,7 @@ public class BookingRepositoryImpl implements CustomBookingRepository {
     @Override
     public <S extends Booking> S saveBooking(S entity) {
         learnerRepository.findByUid(entity.getLearner().getUid()).ifPresent(entity::setLearner);
-        eventRepository.findByCatalogueId(entity.getEvent().getCatalogueId()).ifPresent(entity::setEvent);
+        eventRepository.findByEventUid(entity.getEvent().getEventUid()).ifPresent(entity::setEvent);
 
         return bookingRepository.save(entity);
     }

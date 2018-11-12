@@ -42,7 +42,7 @@ public class DefaultEventServiceTest {
         booking2.setId(20);
         event.setBookings(Arrays.asList(booking1, booking2));
 
-        when(eventRepository.findByCatalogueId(eventId)).thenReturn(Optional.of(event));
+        when(eventRepository.findByEventUid(eventId)).thenReturn(Optional.of(event));
 
         eventService.cancelEvent(eventId);
 
@@ -55,7 +55,7 @@ public class DefaultEventServiceTest {
     public void shouldThrowEventNotFoundException() {
         String eventId = "event-id";
 
-        when(eventRepository.findByCatalogueId(eventId)).thenReturn(Optional.empty());
+        when(eventRepository.findByEventUid(eventId)).thenReturn(Optional.empty());
 
         try {
             eventService.cancelEvent(eventId);
