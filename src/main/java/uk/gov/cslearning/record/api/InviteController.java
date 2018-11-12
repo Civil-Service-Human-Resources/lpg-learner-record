@@ -13,7 +13,7 @@ import java.util.Collection;
 @RequestMapping("/event")
 public class InviteController {
 
-    InviteService inviteService;
+    private final InviteService inviteService;
 
     public InviteController(InviteService inviteService){
         this.inviteService = inviteService;
