@@ -108,6 +108,7 @@ public class BookingControllerTest {
     public void shouldCreateBooking() throws Exception {
         int bookingId = 99;
         String learner = "_learner";
+        String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI event = new URI("http://event");
@@ -115,6 +116,7 @@ public class BookingControllerTest {
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
+        booking.setLearnerEmail(learnerEmail);
         booking.setStatus(status);
         booking.setEvent(event);
         booking.setBookingTime(bookingTime);
@@ -123,6 +125,7 @@ public class BookingControllerTest {
         BookingDto savedBooking = new BookingDto();
         savedBooking.setId(bookingId);
         savedBooking.setLearner(learner);
+        savedBooking.setLearnerEmail(learnerEmail);
         savedBooking.setStatus(status);
         savedBooking.setEvent(event);
         savedBooking.setBookingTime(bookingTime);
@@ -158,11 +161,13 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.size", equalTo(2)))
+                .andExpect(jsonPath("$.size", equalTo(3)))
                 .andExpect(jsonPath("$.errors[0].field", equalTo("event")))
                 .andExpect(jsonPath("$.errors[0].details", equalTo("A booking requires an event")))
                 .andExpect(jsonPath("$.errors[1].field", equalTo("learner")))
-                .andExpect(jsonPath("$.errors[1].details", equalTo("A booking requires a learner")));
+                .andExpect(jsonPath("$.errors[1].details", equalTo("A booking requires a learner")))
+                .andExpect(jsonPath("$.errors[2].field", equalTo("learnerEmail")))
+                .andExpect(jsonPath("$.errors[2].details", equalTo("A booking requires a learner email address")));
 
         verifyZeroInteractions(bookingService);
     }
@@ -209,26 +214,4 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.bookingTime",
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
-
-
-    @Test
-    public void shouldReturnBadMessageWithInvalidStatus() throws Exception {
-        int bookingId = 930;
-        BookingStatus status = BookingStatus.REQUESTED;
-
-        BookingStatusDto bookingStatus = new BookingStatusDto(status);
-
-        mockMvc.perform(
-                patch("/event/blah/booking/" + bookingId).with(csrf())
-                        .content(objectMapper.writeValueAsString(bookingStatus))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.size", equalTo(1)))
-                .andExpect(jsonPath("$.errors[0].field", equalTo("status")))
-                .andExpect(jsonPath("$.errors[0].details", equalTo("Booking status should be 'Confirmed'")));
-
-        verifyZeroInteractions(bookingService);
-    }
-
 }

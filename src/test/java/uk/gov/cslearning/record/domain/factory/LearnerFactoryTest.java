@@ -12,7 +12,8 @@ public class LearnerFactoryTest {
     @Test
     public void shouldReturnLearner() {
         String learnerUid = "learner-uuid";
-        Learner learner = learnerFactory.create(learnerUid);
+        String learnerEmail = "test@domain.com";
+        Learner learner = learnerFactory.create(learnerUid, learnerEmail);
         assertThat(learner.getUid(), equalTo(learnerUid));
     }
 }

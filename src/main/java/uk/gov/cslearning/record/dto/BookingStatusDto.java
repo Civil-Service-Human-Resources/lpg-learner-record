@@ -10,6 +10,5 @@ import uk.gov.cslearning.record.validation.annotations.BookingStatusEquals;
 @NoArgsConstructor
 public class BookingStatusDto {
 
-    @BookingStatusEquals(value = BookingStatus.CONFIRMED, message = "{booking.status.confirmed}")
     private BookingStatus status;
 }

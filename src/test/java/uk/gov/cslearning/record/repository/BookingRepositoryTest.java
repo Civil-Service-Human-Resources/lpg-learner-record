@@ -34,6 +34,7 @@ public class BookingRepositoryTest {
     public void shouldSaveBooking() {
         Learner learner = new Learner();
         learner.setUid("75c2c3b3-722f-4ffb-aec9-3d743a2d5330");
+        learner.setLearnerEmail("test@domain.com");
 
         Event event = new Event();
         event.setPath("test/path");
@@ -49,17 +50,11 @@ public class BookingRepositoryTest {
 
         booking = bookingRepository.save(booking);
 
-        event.setBookings(Lists.newArrayList(booking));
-        learner.setBookings(Lists.newArrayList(booking));
-
         eventRepository.save(event);
         learnerRepository.save(learner);
 
         Booking savedBooking = bookingRepository.findById(booking.getId()).get();
         assertEquals(event, savedBooking.getEvent());
         assertEquals(learner, savedBooking.getLearner());
-
-        assertEquals(Collections.singletonList(booking), learner.getBookings());
-        assertEquals(Collections.singletonList(booking), event.getBookings());
     }
 }

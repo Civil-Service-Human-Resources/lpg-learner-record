@@ -139,22 +139,4 @@ public class DefaultBookingServiceTest {
             assertEquals("Booking does not exist with id: 99", e.getMessage());
         }
     }
-
-    @Test
-    public void shouldThrowIllegalStateException() {
-        int bookingId = 99;
-        Booking booking = new Booking();
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.CONFIRMED);
-
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
-        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
-
-        try {
-            bookingService.updateStatus(bookingId, new BookingStatusDto(BookingStatus.CONFIRMED));
-            fail("Expected IllegalStateException");
-        } catch (IllegalStateException e) {
-            assertEquals("Cannot update a confirmed booking", e.getMessage());
-        }
-    }
 }
