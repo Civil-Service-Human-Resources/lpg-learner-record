@@ -1,9 +1,9 @@
 package uk.gov.cslearning.record.api;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cslearning.record.dto.EventDto;
+import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.service.EventService;
 
 @RestController
@@ -15,9 +15,9 @@ public class EventController {
         this.eventService = eventService;
     }
 
-    @DeleteMapping(path = "/event/{eventId}")
-    public ResponseEntity cancelEvent(@PathVariable String eventId) {
-        eventService.cancelEvent(eventId);
-        return ResponseEntity.noContent().build();
+    @PatchMapping(path = "/event/{eventUid}")
+    public ResponseEntity cancelEvent(@PathVariable String eventUid, @RequestBody EventStatusDto eventStatus) {
+        EventDto event = eventService.updateStatus(eventUid, eventStatus);
+        return ResponseEntity.ok(event);
     }
 }
