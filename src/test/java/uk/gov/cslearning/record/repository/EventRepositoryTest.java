@@ -33,17 +33,15 @@ public class EventRepositoryTest {
     }
 
     @Test
-    public void shouldBeAbleToFindEventByCatalogueId(){
+    public void shouldBeAbleToFindEventByEventUid(){
         Event event = new Event();
         event.setPath("test/path");
         event.setEventUid("SBATFEBC");
 
         eventRepository.save(event);
 
-        Iterable<Event> result = eventRepository.findByCatalogueId("SBATFEBC");
+        Event repositoryEvent = eventRepository.findByEventUid("SBATFEBC").get();
 
-        for(Event e : result){
-            assertThat(e, is(equalTo(event)));
-        }
+        assertThat(repositoryEvent, is(equalTo(event)));
     }
 }

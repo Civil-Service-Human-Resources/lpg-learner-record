@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.domain;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,14 +8,16 @@ import javax.persistence.*;
 @Entity
 @Data
 @NoArgsConstructor
-public class Event {
+public class Invite {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    @Column(nullable = false, length = 60)
-    private String eventUid;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name="eventId")
+    private Event event;
 
-    @Column(nullable = false)
-    private String path;
+    @Column(nullable = false, length = 50)
+    private String learnerEmail;
 }

@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface BookingService {
-
     @Transactional(readOnly = true)
     Optional<BookingDto> find(int bookingId);
 
