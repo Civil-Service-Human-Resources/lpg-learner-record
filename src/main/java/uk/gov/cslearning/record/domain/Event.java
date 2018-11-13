@@ -15,13 +15,16 @@ import java.util.List;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false, length = 60, unique = true)
-    private String eventUid;
+    private String uid;
 
     @Column(nullable = false, unique = true)
     private String path;
+
+    @Column(nullable = false)
+    private String status;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "event")

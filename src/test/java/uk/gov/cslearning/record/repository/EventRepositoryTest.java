@@ -9,8 +9,6 @@ import uk.gov.cslearning.record.domain.Event;
 
 import javax.transaction.Transactional;
 
-import java.util.Optional;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -28,21 +26,21 @@ public class EventRepositoryTest {
     public void shouldSaveEvent(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setEventUid("SSE");
+        event.setUid("SSE");
         eventRepository.save(event);
 
         assertThat(event.getId(), notNullValue());
     }
 
     @Test
-    public void shouldBeAbleToFindEventByEventUid(){
+    public void shouldBeAbleToFindEventByUid(){
         Event event = new Event();
         event.setPath("test/path");
-        event.setEventUid("SBATFEBC");
+        event.setUid("SBATFEBC");
 
         eventRepository.save(event);
 
-        Event repositoryEvent = eventRepository.findByEventUid("SBATFEBC").get();
+        Event repositoryEvent = eventRepository.findByUid("SBATFEBC").get();
 
         assertThat(repositoryEvent, is(equalTo(event)));
     }

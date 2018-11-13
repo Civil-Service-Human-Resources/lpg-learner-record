@@ -1,9 +1,10 @@
 CREATE TABLE `event` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `event_uid` varchar(60) NOT NULL,
+  `uid` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
+  `status` enum('ACTIVE','CANCELLED'),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_key_catalogue_id` (`catalogue_id`)
+  UNIQUE KEY `unique_key_uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `learner` (

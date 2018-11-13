@@ -20,5 +20,6 @@ public interface BookingService {
     @Transactional
     BookingDto unregister(BookingDto booking);
 
+    @Transactional
     BookingDto unregister(Booking booking);
 }
