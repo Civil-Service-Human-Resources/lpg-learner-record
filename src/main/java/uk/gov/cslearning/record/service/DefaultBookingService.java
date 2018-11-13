@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service;
 
+import com.google.common.collect.ImmutableMap;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
@@ -7,10 +8,13 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.exception.UnknownBookingStatusException;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 public class DefaultBookingService implements BookingService {
@@ -43,19 +47,28 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
-        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
+        return save(bookingDto);
     }
 
     @Override
     public BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus) {
         BookingDto booking = find(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
 
-        if (booking.getStatus().equals(BookingStatus.CONFIRMED)) {
-            throw new IllegalStateException("Cannot update a confirmed booking");
-        }
-
         booking.setStatus(bookingStatus.getStatus());
 
-        return register(booking);
+        return bookingStatus.getStatus().equals(BookingStatus.CONFIRMED) ? register(booking) : unregister(booking);
+    }
+
+    @Override
+    public BookingDto unregister(BookingDto bookingDto) {
+        if (bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
+            xApiService.unregister(bookingDto);
+        }
+
+        return save(bookingDto);
+    }
+
+    private BookingDto save(BookingDto bookingDto) {
+        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto)));
     }
 }

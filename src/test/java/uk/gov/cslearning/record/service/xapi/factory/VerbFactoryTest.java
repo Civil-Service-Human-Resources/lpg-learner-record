@@ -15,4 +15,13 @@ public class VerbFactoryTest {
         assertEquals("http://adlnet.gov/expapi/verbs/registered", verb.getId());
         assertEquals("registered", verb.getDisplay().get("en"));
     }
+
+    @Test
+    public void shouldReturnUnregisteredVerb() {
+        Verb verb = verbFactory.createdUnregistered();
+
+        assertEquals("http://id.tincanapi.com/verb/unregistered", verb.getId());
+        assertEquals("unregistered", verb.getDisplay().get("en"));
+    }
+
 }

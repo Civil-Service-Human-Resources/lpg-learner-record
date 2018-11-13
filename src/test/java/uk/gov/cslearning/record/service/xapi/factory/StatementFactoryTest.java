@@ -35,7 +35,7 @@ public class StatementFactoryTest {
     private StatementFactory statementFactory;
 
     @Test
-    public void shouldReturnStatement() throws URISyntaxException {
+    public void shouldReturnRegisteredStatement() throws URISyntaxException {
         String userId = "learner-uuid";
         URI paymentDetails = new URI("http://csrs/payment-details");
         URI event = new URI("http://learning-catalogue/event-details");
@@ -66,5 +66,35 @@ public class StatementFactoryTest {
         verify(objectFactory).createEventObject(event.toString());
         verify(resultFactory).createPurchaseOrderResult(paymentDetails.toString());
         verify(verbFactory).createdRegistered();
+    }
+
+    @Test
+    public void shouldReturnUnregisteredStatement() throws URISyntaxException {
+        String userId = "learner-uuid";
+        URI paymentDetails = new URI("http://csrs/payment-details");
+        URI event = new URI("http://learning-catalogue/event-details");
+
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setLearner(userId);
+        bookingDto.setPaymentDetails(paymentDetails);
+        bookingDto.setEvent(event);
+
+        Actor actor = mock(Actor.class);
+        IStatementObject object = mock(IStatementObject.class);
+        Verb unregistered = new Verb();
+
+        when(actorFactory.create(userId)).thenReturn(actor);
+        when(objectFactory.createEventObject(event.toString())).thenReturn(object);
+        when(verbFactory.createdUnregistered()).thenReturn(unregistered);
+
+        Statement statement = statementFactory.createUnregisteredStatement(bookingDto);
+
+        assertEquals(actor, statement.getActor());
+        assertEquals(object, statement.getObject());
+        assertEquals(unregistered, statement.getVerb());
+
+        verify(actorFactory).create(userId);
+        verify(objectFactory).createEventObject(event.toString());
+        verify(verbFactory).createdUnregistered();
     }
 }

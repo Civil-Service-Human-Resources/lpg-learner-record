@@ -141,20 +141,20 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldThrowIllegalStateException() {
-        int bookingId = 99;
-        Booking booking = new Booking();
+    public void shouldUnregisterBooking() {
         BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.CONFIRMED);
+        bookingDto.setStatus(BookingStatus.CANCELLED);
+        BookingDto savedBookingDto = new BookingDto();
+        Booking booking = new Booking();
+        Booking savedBooking = new Booking();
 
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
-        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+        when(bookingFactory.create(bookingDto)).thenReturn(booking);
+        when(bookingRepository.save(booking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
-        try {
-            bookingService.updateStatus(bookingId, new BookingStatusDto(BookingStatus.CONFIRMED));
-            fail("Expected IllegalStateException");
-        } catch (IllegalStateException e) {
-            assertEquals("Cannot update a confirmed booking", e.getMessage());
-        }
+        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).save(booking);
     }
 }

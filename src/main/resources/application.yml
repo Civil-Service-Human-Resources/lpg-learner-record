@@ -27,6 +27,10 @@ logging:
     root: ${ROOT_LOGGING_LEVEL:INFO}
     com.zaxxer.hikari: ERROR
 
+notifications:
+  service: ${NOTIFICATION_SERVICE_URL:http://localhost:9005}
+  email: ${notifications.service}/notifications/email/
+
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
   password: ${XAPI_PASSWORD:1c0e1b6827606d7efed71e204939d048f94f842b}

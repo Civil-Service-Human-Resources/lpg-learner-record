@@ -7,7 +7,7 @@ import uk.gov.cslearning.record.exception.UnknownBookingStatusException;
 import java.util.Arrays;
 
 public enum BookingStatus {
-    REQUESTED("Requested"), CONFIRMED("Confirmed");
+    REQUESTED("Requested"), CONFIRMED("Confirmed"), CANCELLED("Cancelled");
 
     private String value;
 

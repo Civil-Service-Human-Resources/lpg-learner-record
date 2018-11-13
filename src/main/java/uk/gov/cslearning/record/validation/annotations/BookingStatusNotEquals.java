@@ -1,7 +1,7 @@
 package uk.gov.cslearning.record.validation.annotations;
 
 import uk.gov.cslearning.record.dto.BookingStatus;
-import uk.gov.cslearning.record.validation.validators.BookingStatusEqualsValidator;
+import uk.gov.cslearning.record.validation.validators.BookingStatusNotEqualsValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy= BookingStatusEqualsValidator.class)
-public @interface BookingStatusEquals {
+@Constraint(validatedBy= BookingStatusNotEqualsValidator.class)
+public @interface BookingStatusNotEquals {
     BookingStatus value();
 
     String message() default "";
