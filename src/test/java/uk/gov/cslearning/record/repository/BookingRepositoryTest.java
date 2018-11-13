@@ -61,7 +61,7 @@ public class BookingRepositoryTest {
 
         Learner learner2 = new Learner();
         learner2.setUid("82a2j3b6-822f-4ffb-tnb9-4d734e01v721");
-        learner2.setLearnerEmail("test@domain.com");
+        learner2.setLearnerEmail("test2@domain.com");
 
         Event event = new Event();
         event.setPath("test/path");

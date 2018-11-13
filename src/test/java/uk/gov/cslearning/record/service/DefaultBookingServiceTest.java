@@ -14,6 +14,7 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
+import uk.gov.cslearning.record.repository.LearnerRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private XApiService xApiService;
+
+    @Mock
+    private LearnerRepository learnerRepository;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -114,6 +118,7 @@ public class DefaultBookingServiceTest {
     public void shouldSaveBookingButNotRegisterIfNotConfirmed() {
         BookingDto unsavedBookingDto = new BookingDto();
         unsavedBookingDto.setStatus(BookingStatus.REQUESTED);
+        unsavedBookingDto.setLearner("test-uid");
         Booking unsavedBooking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
@@ -121,6 +126,7 @@ public class DefaultBookingServiceTest {
         when(bookingFactory.create(unsavedBookingDto, Optional.empty())).thenReturn(unsavedBooking);
         when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+        when(learnerRepository.getLearnerByUid("test-uid")).thenReturn(Optional.empty());
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
@@ -137,7 +143,7 @@ public class DefaultBookingServiceTest {
 
         BookingDto bookingDto = new BookingDto();
         bookingDto.setStatus(BookingStatus.REQUESTED);
-
+        bookingDto.setLearner("test-uid");
         BookingDto savedBookingDto = new BookingDto();
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
@@ -149,6 +155,7 @@ public class DefaultBookingServiceTest {
         when(bookingFactory.create(bookingDto, Optional.empty())).thenReturn(updatedBooking);
         when(bookingRepository.save(updatedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+        when(learnerRepository.getLearnerByUid("test-uid")).thenReturn(Optional.empty());
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 
