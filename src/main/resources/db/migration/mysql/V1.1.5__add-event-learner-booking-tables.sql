@@ -14,8 +14,8 @@ CREATE TABLE `learner` (
 
 CREATE TABLE `booking` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `learner_id` UNSIGNED int NOT NULL,
-  `event_id` UNSIGNED int NOT NULL,
+  `learner_id` int UNSIGNED  NOT NULL,
+  `event_id` int UNSIGNED NOT NULL,
   `booking_time` datetime NOT NULL,
   `status` enum('REQUESTED', 'CONFIRMED'),
   `payment_details` varchar(255),
