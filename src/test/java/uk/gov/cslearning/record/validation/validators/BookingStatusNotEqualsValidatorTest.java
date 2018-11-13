@@ -2,7 +2,7 @@ package uk.gov.cslearning.record.validation.validators;
 
 import org.junit.Test;
 import uk.gov.cslearning.record.dto.BookingStatus;
-import uk.gov.cslearning.record.validation.annotations.BookingStatusEquals;
+import uk.gov.cslearning.record.validation.annotations.BookingStatusNotEquals;
 
 import javax.validation.ConstraintValidatorContext;
 
@@ -11,14 +11,14 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BookingStatusEqualsValidatorTest {
+public class BookingStatusNotEqualsValidatorTest {
 
-    private BookingStatusEqualsValidator validator = new BookingStatusEqualsValidator();
+    private BookingStatusNotEqualsValidator validator = new BookingStatusNotEqualsValidator();
 
     @Test
-    public void shouldReturnTrueIfValueEqualsAnnotationValue() {
-        BookingStatusEquals annotation = mock(BookingStatusEquals.class);
-        when(annotation.value()).thenReturn(BookingStatus.CONFIRMED);
+    public void shouldReturnTrueIfValueNotEqualsAnnotationValue() {
+        BookingStatusNotEquals annotation = mock(BookingStatusNotEquals.class);
+        when(annotation.value()).thenReturn(BookingStatus.REQUESTED);
 
         validator.initialize(annotation);
 
@@ -27,8 +27,8 @@ public class BookingStatusEqualsValidatorTest {
 
     @Test
     public void shouldReturnFalseIfValueDoesNotEqualAnnotationValue() {
-        BookingStatusEquals annotation = mock(BookingStatusEquals.class);
-        when(annotation.value()).thenReturn(BookingStatus.CONFIRMED);
+        BookingStatusNotEquals annotation = mock(BookingStatusNotEquals.class);
+        when(annotation.value()).thenReturn(BookingStatus.REQUESTED);
 
         validator.initialize(annotation);
 

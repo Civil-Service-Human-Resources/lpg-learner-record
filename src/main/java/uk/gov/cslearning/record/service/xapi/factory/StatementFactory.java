@@ -34,4 +34,16 @@ public class StatementFactory {
 
         return statement;
     }
+
+    public Statement createUnregisteredStatement(BookingDto bookingDto) {
+        Actor actor = actorFactory.create(bookingDto.getLearner());
+        IStatementObject object = objectFactory.createEventObject(bookingDto.getEvent().toString());
+
+        Statement statement = new Statement();
+        statement.setActor(actor);
+        statement.setVerb(verbFactory.createdUnregistered());
+        statement.setObject(object);
+
+        return statement;
+    }
 }

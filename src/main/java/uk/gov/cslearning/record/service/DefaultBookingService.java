@@ -57,8 +57,7 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
-        Optional<Learner> learner = learnerRepository.getLearnerByUid(bookingDto.getLearner());
-        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto, learner)));
+        return save(bookingDto);
     }
 
     @Override
@@ -67,6 +66,20 @@ public class DefaultBookingService implements BookingService {
 
         booking.setStatus(bookingStatus.getStatus());
 
-        return register(booking);
+        return bookingStatus.getStatus().equals(BookingStatus.CONFIRMED) ? register(booking) : unregister(booking);
+    }
+
+    @Override
+    public BookingDto unregister(BookingDto bookingDto) {
+        if (bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
+            xApiService.unregister(bookingDto);
+        }
+
+        return save(bookingDto);
+    }
+
+    private BookingDto save(BookingDto bookingDto) {
+        Optional<Learner> learner = learnerRepository.getLearnerByUid(bookingDto.getLearner());
+        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto, learner)));
     }
 }
