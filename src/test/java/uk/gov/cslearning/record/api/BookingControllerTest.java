@@ -266,7 +266,7 @@ public class BookingControllerTest {
                         .content(objectMapper.writeValueAsString(booking))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", equalTo("constraint-violation, sql-exception")))
+                .andExpect(jsonPath("$.errors[0]", equalTo("Storage error")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
     }
