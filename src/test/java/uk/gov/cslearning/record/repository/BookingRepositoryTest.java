@@ -12,7 +12,6 @@ import uk.gov.cslearning.record.domain.Learner;
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -85,7 +84,7 @@ public class BookingRepositoryTest {
         bookingRepository.save(booking);
         bookingRepository.save(booking2);
 
-        ArrayList<Booking> bookings = (ArrayList) bookingRepository.listByEventId("SLBEI");
+        ArrayList<Booking> bookings = (ArrayList) bookingRepository.listByEventUid("SLBEI");
 
         assertEquals(bookings.get(0), booking);
         assertEquals(bookings.get(1), booking2);

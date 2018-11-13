@@ -84,7 +84,7 @@ public class DefaultBookingServiceTest {
         bookingDtos.add(bookingDto1);
         bookingDtos.add(bookingDto2);
 
-        when(bookingRepository.listByEventId(eventId)).thenReturn(bookings);
+        when(bookingRepository.listByEventUid(eventId)).thenReturn(bookings);
         when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
 
         assertEquals(bookingDtos, bookingService.listByEventUid(eventId));

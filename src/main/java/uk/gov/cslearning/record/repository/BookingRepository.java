@@ -11,5 +11,5 @@ import java.util.Collection;
 public interface BookingRepository extends CrudRepository<Booking, Integer> {
 
     @Query("SELECT b FROM Booking b INNER JOIN Event e ON b.event = e WHERE e.eventUid = ?1")
-    Collection<Booking> listByEventId(String eventId);
+    Collection<Booking> listByEventUid(String eventUid);
 }

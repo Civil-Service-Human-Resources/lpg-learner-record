@@ -40,7 +40,7 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public Iterable<BookingDto> listByEventUid(String eventUid){
-        Iterable<BookingDto> bookings = bookingRepository.listByEventId(eventUid).stream().map(
+        Iterable<BookingDto> bookings = bookingRepository.listByEventUid(eventUid).stream().map(
                 bookingDtoFactory::create
         ).collect(Collectors.toList());
 
