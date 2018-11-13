@@ -4,7 +4,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 
-import java.util.Collection;
 import java.util.Optional;
 
 public interface BookingService {

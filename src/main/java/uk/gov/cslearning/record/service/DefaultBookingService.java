@@ -10,7 +10,6 @@ import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
