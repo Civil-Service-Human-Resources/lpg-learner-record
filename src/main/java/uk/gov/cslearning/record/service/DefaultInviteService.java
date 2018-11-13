@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
@@ -10,6 +11,7 @@ import uk.gov.cslearning.record.repository.InviteRepository;
 
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,13 +35,18 @@ public class DefaultInviteService implements InviteService{
                         inviteDtoFactory::create
                 ).collect(Collectors.toList());
 
-
         return result;
     }
 
     @Override
     public InviteDto save(InviteDto inviteDto){
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
-        return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+
+        Optional<Invite> invite = (event == null) ? Optional.empty() : inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
+
+        if(!invite.isPresent()) {
+            return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+        }
+        return inviteDtoFactory.create(invite.get());
     }
 }
