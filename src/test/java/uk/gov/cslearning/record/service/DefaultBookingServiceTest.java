@@ -98,7 +98,7 @@ public class DefaultBookingServiceTest {
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
 
-        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
+        when(bookingFactory.create(unsavedBookingDto, Optional.empty())).thenReturn(unsavedBooking);
         when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
@@ -118,7 +118,7 @@ public class DefaultBookingServiceTest {
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
 
-        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
+        when(bookingFactory.create(unsavedBookingDto, Optional.empty())).thenReturn(unsavedBooking);
         when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
@@ -146,7 +146,7 @@ public class DefaultBookingServiceTest {
 
         BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED);
 
-        when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
+        when(bookingFactory.create(bookingDto, Optional.empty())).thenReturn(updatedBooking);
         when(bookingRepository.save(updatedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
