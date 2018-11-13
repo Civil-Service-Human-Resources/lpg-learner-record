@@ -64,6 +64,10 @@ public class DefaultBookingService implements BookingService {
     public BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus) {
         BookingDto booking = find(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
 
+        if (booking.getStatus().equals(BookingStatus.CONFIRMED)) {
+            throw new IllegalStateException("Cannot update a confirmed booking");
+        }
+
         booking.setStatus(bookingStatus.getStatus());
 
         return bookingStatus.getStatus().equals(BookingStatus.CONFIRMED) ? register(booking) : unregister(booking);
