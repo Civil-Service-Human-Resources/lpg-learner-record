@@ -13,7 +13,7 @@ public class NotificationService {
     private final String emailNotificationUrl;
 
     public NotificationService(RestTemplate restTemplate,
-                               @Value("${notifications.emailUrl}") String emailNotificationUrl) {
+                               @Value("${notifications.email}") String emailNotificationUrl) {
         this.restTemplate = restTemplate;
         this.emailNotificationUrl = emailNotificationUrl;
     }
