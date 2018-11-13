@@ -53,8 +53,7 @@ public class ApiExceptionHandler {
     protected ResponseEntity<ErrorDto> handleConstraintViolationException(ConstraintViolationException e) {
         LOGGER.error("Bad Request: ", e);
 
-        ErrorDto error = errorDtoFactory.create(HttpStatus.BAD_REQUEST,
-                Collections.singletonList(String.join(", ", e.toString(), e.getSQLException().getMessage())));
+        ErrorDto error = errorDtoFactory.create(HttpStatus.BAD_REQUEST, Collections.singletonList("Storage error"));
 
         return ResponseEntity.badRequest().body(error);
     }
