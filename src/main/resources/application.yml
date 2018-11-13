@@ -29,7 +29,7 @@ logging:
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9005}
-  email: ${notifications.service}/email
+  email: ${notifications.service}/notifications/email/
 
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
