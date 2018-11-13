@@ -1,7 +1,8 @@
 CREATE TABLE `event` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `event_uid` varchar(60) NOT NULL,
+  `uid` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
+  `status` enum('ACTIVE','CANCELLED'),
   PRIMARY KEY(`id`)
 );
 

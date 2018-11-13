@@ -21,11 +21,12 @@ import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.service.EventService;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,6 +50,32 @@ public class EventControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
+
+
+    @Test
+    public void shouldReturnEventOnGet() throws Exception {
+        String eventUid = "event-id";
+        URI uri = URI.create("http://localhost:9001/courses/course-id/modules/module-id/events/event-id");
+
+        EventDto event = new EventDto();
+        event.setStatus(EventStatus.CANCELLED);
+        event.setUid(eventUid);
+        event.setUri(uri);
+
+        when(eventService.findByUid(eventUid)).thenReturn(Optional.of(event));
+
+        mockMvc.perform(
+                get("/event/" + eventUid).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uid", equalTo(eventUid)))
+                .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())))
+                .andExpect(jsonPath("$.uri", equalTo(uri.toString())));
+
+        verify(eventService).findByUid(eventUid);
+    }
+
 
     @Test
     public void shouldReturnEventOnPatch() throws Exception {
@@ -78,7 +105,7 @@ public class EventControllerTest {
     }
 
     @Test
-    public void shouldReturnNotFoundIfEventNotFoundOnDelete() throws Exception {
+    public void shouldReturnNotFoundIfEventNotFoundOnPatch() throws Exception {
         String eventUid = "event-id";
         EventStatusDto eventStatus = new EventStatusDto(EventStatus.CANCELLED);
 
@@ -95,4 +122,20 @@ public class EventControllerTest {
 
         verify(eventService).updateStatus(eventUid, eventStatus);
     }
+
+    @Test
+    public void shouldReturnNotFoundIfEventNotFoundOnGet() throws Exception {
+        String eventUid = "event-id";
+
+        when(eventService.findByUid(eventUid)).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get("/event/" + eventUid).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(eventService).findByUid(eventUid);
+    }
+
 }
