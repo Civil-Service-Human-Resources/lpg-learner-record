@@ -3,8 +3,11 @@ package uk.gov.cslearning.record.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -19,4 +22,8 @@ public class Event {
 
     @Column(nullable = false)
     private String path;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "event")
+    private List<Booking> bookings = new ArrayList<>();
 }
