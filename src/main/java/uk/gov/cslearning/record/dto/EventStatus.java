@@ -6,18 +6,18 @@ import uk.gov.cslearning.record.exception.UnknownStatusException;
 
 import java.util.Arrays;
 
-public enum BookingStatus {
-    REQUESTED("Requested"), CONFIRMED("Confirmed"), CANCELLED("Cancelled");
+public enum EventStatus {
+    ACTIVE("Active"),CANCELLED("Cancelled");
 
-    private String value;
+    private final String value;
 
-    BookingStatus(String value) {
+    EventStatus(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static BookingStatus forValue(String value) {
-        return Arrays.stream(BookingStatus.values())
+    public static EventStatus forValue(String value) {
+        return Arrays.stream(EventStatus.values())
                 .filter(v -> v.value.equalsIgnoreCase(value))
                 .findAny()
                 .orElseThrow(() -> new UnknownStatusException(value));

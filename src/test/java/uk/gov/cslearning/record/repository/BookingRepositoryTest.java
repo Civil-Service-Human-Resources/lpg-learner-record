@@ -37,7 +37,7 @@ public class BookingRepositoryTest {
 
         Event event = new Event();
         event.setPath("test/path");
-        event.setEventUid("SSB");
+        event.setUid("SSB");
 
         Booking booking = new Booking();
         booking.setEvent(event);

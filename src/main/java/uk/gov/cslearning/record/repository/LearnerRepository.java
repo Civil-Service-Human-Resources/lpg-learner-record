@@ -9,7 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface LearnerRepository extends CrudRepository<Learner, Integer> {
-
-    @Query("SELECT l FROM Learner l WHERE l.uid = ?1")
-    Optional<Learner> getLearnerByUid(String uid);
+    Optional<Learner> findByUid(String uid);
 }

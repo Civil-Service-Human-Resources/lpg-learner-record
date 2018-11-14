@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 
@@ -21,4 +22,7 @@ public interface BookingService {
 
     @Transactional
     BookingDto unregister(BookingDto booking);
+
+    @Transactional
+    BookingDto unregister(Booking booking);
 }

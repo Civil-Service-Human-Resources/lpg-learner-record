@@ -17,13 +17,13 @@ public class BookingFactory {
         this.learnerFactory = learnerFactory;
     }
 
-    public Booking create(BookingDto bookingDto, Optional<Learner> learner) {
+    public Booking create(BookingDto bookingDto) {
         Booking booking = new Booking();
 
         booking.setBookingTime(bookingDto.getBookingTime());
         booking.setEvent(eventFactory.create(bookingDto.getEvent().getPath()));
         booking.setPaymentDetails(bookingDto.getPaymentDetails().getPath());
-        booking.setLearner(learner.isPresent() ? learner.get() : learnerFactory.create(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
+        booking.setLearner(learnerFactory.create(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
         booking.setId(bookingDto.getId());
         booking.setStatus(bookingDto.getStatus().getValue());
         booking.setStatus(bookingDto.getStatus().getValue());

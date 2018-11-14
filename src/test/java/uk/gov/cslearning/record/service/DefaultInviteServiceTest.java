@@ -63,7 +63,7 @@ public class DefaultInviteServiceTest {
 
         Event event = new Event();
         event.setId(1);
-        event.setEventUid(eventId);
+        event.setUid(eventId);
         event.setPath(eventURI.getPath());
 
         Invite invite = new Invite();

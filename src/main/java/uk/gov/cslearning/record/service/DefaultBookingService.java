@@ -1,7 +1,7 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.domain.Learner;
+import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -9,7 +9,6 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
-import uk.gov.cslearning.record.repository.LearnerRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.Optional;
@@ -21,14 +20,12 @@ public class DefaultBookingService implements BookingService {
     private final BookingFactory bookingFactory;
     private final BookingDtoFactory bookingDtoFactory;
     private final BookingRepository bookingRepository;
-    private final LearnerRepository learnerRepository;
     private final XApiService xApiService;
 
-    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, LearnerRepository learnerRepository, XApiService xApiService) {
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, XApiService xApiService) {
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
-        this.learnerRepository = learnerRepository;
         this.xApiService = xApiService;
     }
 
@@ -44,7 +41,7 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public Iterable<BookingDto> listByEventUid(String eventUid){
-        Iterable<BookingDto> bookings = bookingRepository.listByEventUid(eventUid).stream().map(
+        Iterable<BookingDto> bookings = bookingRepository.findByEventUid(eventUid).stream().map(
                 bookingDtoFactory::create
         ).collect(Collectors.toList());
 
@@ -71,15 +68,21 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto unregister(BookingDto bookingDto) {
-        if (bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.unregister(bookingDto);
         }
 
+        bookingDto.setStatus(BookingStatus.CANCELLED);
         return save(bookingDto);
     }
 
+    @Override
+    public BookingDto unregister(Booking booking) {
+        return unregister(bookingDtoFactory.create(booking));
+    }
+
+
     private BookingDto save(BookingDto bookingDto) {
-        Optional<Learner> learner = learnerRepository.getLearnerByUid(bookingDto.getLearner());
-        return bookingDtoFactory.create(bookingRepository.save(bookingFactory.create(bookingDto, learner)));
+        return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
     }
 }
