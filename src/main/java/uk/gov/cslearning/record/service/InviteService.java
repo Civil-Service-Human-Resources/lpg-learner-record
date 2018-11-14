@@ -9,6 +9,9 @@ public interface InviteService {
     @Transactional(readOnly = true)
     Collection<InviteDto> findByEventId(String eventId);
 
+    @Transactional(readOnly = true)
+    InviteDto findInvite(int inviteId);
+
     @Transactional
     InviteDto save(InviteDto invite);
 }

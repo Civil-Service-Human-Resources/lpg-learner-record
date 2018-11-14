@@ -59,16 +59,7 @@ public class IdentityService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
                 .queryParam("uid", uid);
 
-        Identity identity;
-
-        try {
-            identity = restOperations.getForObject(builder.toUriString(), Identity.class);
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
-            }
-            throw new RuntimeException(e);
-        }
+        Identity identity = getIdentity(builder.toUriString());
 
         if (identity != null) {
             return identity.getUsername();
@@ -77,25 +68,30 @@ public class IdentityService {
     }
 
     public Identity getIdentityByEmailAddress(String emailAddress){
+
         LOGGER.debug("Getting identity with email address {}", emailAddress);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl).queryParam("emailAddress", emailAddress);
 
-        Identity identity;
-
-        try{
-            identity = restOperations.getForObject(builder.toUriString(), Identity.class);
-        } catch (HttpClientErrorException e) {
-            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
-            }
-            throw new RuntimeException(e);
-        }
+        Identity identity = getIdentity(builder.toUriString());
 
         if(identity != null){
             return identity;
         }
 
         return null;
+    }
+
+    private Identity getIdentity(String path){
+        Identity identity;
+        try{
+            identity = restOperations.getForObject(path, Identity.class);
+        } catch (HttpClientErrorException e) {
+            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return null;
+            }
+            throw new RuntimeException(e);
+        }
+        return identity;
     }
 }

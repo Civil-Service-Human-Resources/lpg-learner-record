@@ -8,6 +8,8 @@ import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
 import uk.gov.cslearning.record.repository.InviteRepository;
+import uk.gov.cslearning.record.service.identity.Identity;
+import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -20,12 +22,14 @@ public class DefaultInviteService implements InviteService{
     private final InviteDtoFactory inviteDtoFactory;
     private final InviteRepository inviteRepository;
     private final EventService eventService;
+    private final IdentityService identityService;
 
-    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventService eventService){
+    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventService eventService, IdentityService identityService){
         this.inviteFactory = inviteFactory;
         this.inviteDtoFactory = inviteDtoFactory;
         this.inviteRepository = inviteRepository;
         this.eventService = eventService;
+        this.identityService = identityService;
     }
 
     @Override
@@ -39,14 +43,26 @@ public class DefaultInviteService implements InviteService{
     }
 
     @Override
+    public InviteDto findInvite(int id){
+        Optional<Invite> invite = inviteRepository.findById(id);
+
+        return invite.isPresent() ? inviteDtoFactory.create(invite.get()) : null;
+    }
+
+    @Override
     public InviteDto save(InviteDto inviteDto){
-        Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
+        Identity identity = identityService.getIdentityByEmailAddress(inviteDto.getLearnerEmail());
+        if(identity != null) {
+            Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
 
-        Optional<Invite> invite = (event == null) ? Optional.empty() : inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
+            Optional<Invite> invite = (event == null) ? Optional.empty() : inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
 
-        if(!invite.isPresent()) {
-            return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+            if (!invite.isPresent()) {
+                return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+            }
+            return inviteDtoFactory.create(invite.get());
         }
-        return inviteDtoFactory.create(invite.get());
+
+        return null;
     }
 }

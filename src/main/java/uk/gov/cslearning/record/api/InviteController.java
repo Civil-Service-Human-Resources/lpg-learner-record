@@ -26,10 +26,21 @@ public class InviteController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/{eventId}/invitee/{inviteId}")
+    public ResponseEntity<InviteDto> getInvitee(@PathVariable("eventId") String eventUid, @PathVariable("inviteId") int inviteId){
+        InviteDto inviteDto = inviteService.findInvite(inviteId);
+
+        return new ResponseEntity<>(inviteDto, HttpStatus.OK);
+    }
+
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Void> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
-        inviteService.save(inviteDto);
+        InviteDto result = inviteService.save(inviteDto);
 
-        return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
+        if(result != null) {
+            return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 }
