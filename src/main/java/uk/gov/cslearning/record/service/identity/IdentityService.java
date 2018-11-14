@@ -75,4 +75,27 @@ public class IdentityService {
         }
         return null;
     }
+
+    public Identity getIdentityByEmailAddress(String emailAddress){
+        LOGGER.debug("Getting identity with email address {}", emailAddress);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl).queryParam("emailAddress", emailAddress);
+
+        Identity identity;
+
+        try{
+            identity = restOperations.getForObject(builder.toUriString(), Identity.class);
+        } catch (HttpClientErrorException e) {
+            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return null;
+            }
+            throw new RuntimeException(e);
+        }
+
+        if(identity != null){
+            return identity;
+        }
+
+        return null;
+    }
 }
