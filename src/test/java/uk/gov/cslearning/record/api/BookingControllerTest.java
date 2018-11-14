@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,13 +14,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
-import uk.gov.cslearning.record.dto.BookingStatusDto;
-import uk.gov.cslearning.record.dto.factory.ValidationErrorsFactory;
+import uk.gov.cslearning.record.dto.*;
+import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
+import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.service.BookingService;
+import uk.gov.cslearning.record.service.DefaultEventService;
+import uk.gov.cslearning.record.service.EventService;
 
 import java.net.URI;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -36,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({BookingController.class, ValidationErrorsFactory.class})
+@WebMvcTest({BookingController.class, ErrorDtoFactory.class})
 @WithMockUser(username = "user")
 public class BookingControllerTest {
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
@@ -48,8 +51,10 @@ public class BookingControllerTest {
     @MockBean
     private BookingService bookingService;
 
-    private ObjectMapper objectMapper;
+    @MockBean
+    private EventService eventService;
 
+    private ObjectMapper objectMapper;
 
     @Before
     public void setUp() {
@@ -143,7 +148,7 @@ public class BookingControllerTest {
         String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        URI event = new URI("http://event");
+        URI event = new URI("http://example.org/path/to/event/event-id");
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
@@ -166,6 +171,11 @@ public class BookingControllerTest {
         String json = objectMapper.writeValueAsString(booking);
 
         when(bookingService.register(eq(booking))).thenReturn(savedBooking);
+
+        EventDto eventDto = new EventDto();
+        eventDto.setStatus(EventStatus.ACTIVE);
+
+        when(eventService.findByUid("event-id")).thenReturn(Optional.of(eventDto));
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())
@@ -193,13 +203,11 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.size", equalTo(3)))
-                .andExpect(jsonPath("$.errors[0].field", equalTo("event")))
-                .andExpect(jsonPath("$.errors[0].details", equalTo("A booking requires an event")))
-                .andExpect(jsonPath("$.errors[1].field", equalTo("learner")))
-                .andExpect(jsonPath("$.errors[1].details", equalTo("A booking requires a learner")))
-                .andExpect(jsonPath("$.errors[2].field", equalTo("learnerEmail")))
-                .andExpect(jsonPath("$.errors[2].details", equalTo("A booking requires a learner email address")));
+                .andExpect(jsonPath("$.errors[0]", equalTo("event: A booking requires an event")))
+                .andExpect(jsonPath("$.errors[1]", equalTo("learner: A booking requires a learner")))
+                .andExpect(jsonPath("$.errors[2]", equalTo("learnerEmail: A booking requires a learner email address")))
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
         verifyZeroInteractions(bookingService);
     }
@@ -247,4 +255,91 @@ public class BookingControllerTest {
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 
+
+    @Test
+    public void shouldReturnBadMessageWithInvalidStatus() throws Exception {
+        int bookingId = 930;
+        BookingStatus status = BookingStatus.REQUESTED;
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+
+        mockMvc.perform(
+                patch("/event/blah/booking/" + bookingId).with(csrf())
+                        .content(objectMapper.writeValueAsString(bookingStatus))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", equalTo("status: Booking status cannot be updated to 'Requested'")))
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
+
+        verifyZeroInteractions(bookingService);
+    }
+
+    @Test
+    public void shouldReturnBadRequestOnConstraintViolationException() throws Exception {
+        String learner = "_learner";
+        String learnerEmail = "test@domain.com";
+        BookingStatus status = BookingStatus.CONFIRMED;
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        URI event = new URI("http://event");
+        URI paymentDetails = new URI("payment-details");
+
+        BookingDto booking = new BookingDto();
+        booking.setLearner(learner);
+        booking.setLearnerEmail(learnerEmail);
+        booking.setStatus(status);
+        booking.setEvent(event);
+        booking.setBookingTime(bookingTime);
+        booking.setPaymentDetails(paymentDetails);
+
+        ConstraintViolationException exception = mock(ConstraintViolationException.class);
+        SQLException sqlException = mock(SQLException.class);
+        when(sqlException.getMessage()).thenReturn("sql-exception");
+        when(exception.getSQLException()).thenReturn(sqlException);
+        when(exception.toString()).thenReturn("constraint-violation");
+
+        doThrow(exception).when(bookingService).register(booking);
+
+        mockMvc.perform(
+                post("/event/blah/booking/").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(booking))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", equalTo("Storage error")))
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
+    }
+
+    @Test
+    public void shouldReturnBadRequestIfEventIsCancelled() throws Exception {
+        String learner = "_learner";
+        BookingStatus status = BookingStatus.CONFIRMED;
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        URI event = new URI("http://example.org/path/to/event/event-id");
+        URI paymentDetails = new URI("payment-details");
+
+        BookingDto booking = new BookingDto();
+        booking.setLearner(learner);
+        booking.setStatus(status);
+        booking.setEvent(event);
+        booking.setBookingTime(bookingTime);
+        booking.setPaymentDetails(paymentDetails);
+
+        EventDto eventDto = new EventDto();
+        eventDto.setStatus(EventStatus.CANCELLED);
+
+        when(eventService.findByUid("event-id")).thenReturn(Optional.of(eventDto));
+
+        mockMvc.perform(
+                post("/event/blah/booking/").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(booking))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", equalTo("event: Cannot apply booking to a cancelled event.")))
+                .andExpect(jsonPath("$.status", equalTo(400)))
+                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
+    }
 }

@@ -8,6 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface LearnerRepository extends CrudRepository<Learner, Integer> {
-
-    Optional<Learner> findByByUid(String uid);
+    Optional<Learner> findByUid(String uid);
 }

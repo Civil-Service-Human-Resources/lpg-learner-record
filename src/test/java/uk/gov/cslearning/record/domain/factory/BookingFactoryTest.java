@@ -20,6 +20,7 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BookingFactoryTest {
@@ -54,15 +55,15 @@ public class BookingFactoryTest {
         bookingDto.setEvent(event);
         bookingDto.setStatus(BookingStatus.CONFIRMED);
 
-        Booking booking = bookingFactory.create(bookingDto, Optional.of(learner));
+        Booking booking = bookingFactory.create(bookingDto);
 
         assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
         assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
         assertThat(booking.getId(), equalTo(bookingDto.getId()));
-        assertThat(booking.getLearner().getId(), equalTo(99));
 
         verify(eventFactory).create(event.getPath());
+        verify(learnerFactory).create(learnerUid, learnerEmail);
     }
 
     @Test
@@ -84,7 +85,7 @@ public class BookingFactoryTest {
         bookingDto.setEvent(event);
         bookingDto.setStatus(BookingStatus.CONFIRMED);
 
-        Booking booking = bookingFactory.create(bookingDto, Optional.empty());
+        Booking booking = bookingFactory.create(bookingDto);
 
         assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));

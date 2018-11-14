@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -14,7 +15,7 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
-import uk.gov.cslearning.record.repository.LearnerRepository;
+import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class DefaultBookingServiceTest {
     private XApiService xApiService;
 
     @Mock
-    private LearnerRepository learnerRepository;
+    private EventRepository eventRepository;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -88,7 +89,10 @@ public class DefaultBookingServiceTest {
         bookingDtos.add(bookingDto1);
         bookingDtos.add(bookingDto2);
 
-        when(bookingRepository.listByEventUid(eventId)).thenReturn(bookings);
+        Event event = new Event();
+        event.setBookings(bookings);
+
+        when(eventRepository.findByUid(eventId)).thenReturn(Optional.of(event));
         when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
 
         assertEquals(bookingDtos, bookingService.listByEventUid(eventId));
@@ -102,8 +106,8 @@ public class DefaultBookingServiceTest {
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
 
-        when(bookingFactory.create(unsavedBookingDto, Optional.empty())).thenReturn(unsavedBooking);
-        when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
+        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
+        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
@@ -111,7 +115,7 @@ public class DefaultBookingServiceTest {
         InOrder order = inOrder(xApiService, bookingRepository);
 
         order.verify(xApiService).register(unsavedBookingDto);
-        order.verify(bookingRepository).save(unsavedBooking);
+        order.verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
     @Test
@@ -123,15 +127,14 @@ public class DefaultBookingServiceTest {
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
 
-        when(bookingFactory.create(unsavedBookingDto, Optional.empty())).thenReturn(unsavedBooking);
-        when(bookingRepository.save(unsavedBooking)).thenReturn(savedBooking);
+        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
+        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-        when(learnerRepository.getLearnerByUid("test-uid")).thenReturn(Optional.empty());
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
         verifyZeroInteractions(xApiService);
-        verify(bookingRepository).save(unsavedBooking);
+        verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
     @Test
@@ -152,10 +155,9 @@ public class DefaultBookingServiceTest {
 
         BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED);
 
-        when(bookingFactory.create(bookingDto, Optional.empty())).thenReturn(updatedBooking);
-        when(bookingRepository.save(updatedBooking)).thenReturn(savedBooking);
+        when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
+        when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-        when(learnerRepository.getLearnerByUid("test-uid")).thenReturn(Optional.empty());
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 
@@ -174,5 +176,66 @@ public class DefaultBookingServiceTest {
         } catch (BookingNotFoundException e) {
             assertEquals("Booking does not exist with id: 99", e.getMessage());
         }
+    }
+
+    @Test
+    public void shouldUnregisterBookingWithBookingDto() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
+        BookingDto savedBookingDto = new BookingDto();
+
+        Booking booking = new Booking();
+        Booking savedBooking = new Booking();
+
+        when(bookingFactory.create(bookingDto)).thenReturn(booking);
+        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).saveBooking(booking);
+    }
+
+    @Test
+    public void shouldUnregisterBookingWithBooking() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
+        BookingDto savedBookingDto = new BookingDto();
+
+        Booking booking1 = new Booking();
+        booking1.setId(1);
+        Booking booking2 = new Booking();
+        booking2.setId(2);
+
+        Booking savedBooking = new Booking();
+
+        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto);
+        when(bookingFactory.create(bookingDto)).thenReturn(booking2);
+        when(bookingRepository.saveBooking(booking2)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.unregister(booking1));
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).saveBooking(booking2);
+    }
+
+    @Test
+    public void shouldNotCallXApiIfStatusIsRequested() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
+        Booking booking = new Booking();
+        BookingDto savedBookingDto = new BookingDto();
+        Booking savedBooking = new Booking();
+
+        when(bookingFactory.create(bookingDto)).thenReturn(booking);
+        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.register(bookingDto));
+
+        verifyZeroInteractions(xApiService);
+        verify(bookingRepository).saveBooking(booking);
     }
 }
