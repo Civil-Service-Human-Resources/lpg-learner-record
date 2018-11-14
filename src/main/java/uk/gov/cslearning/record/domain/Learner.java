@@ -23,6 +23,6 @@ public class Learner {
     private String learnerEmail;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "event")
+    @OneToMany(mappedBy = "learner")
     private List<Booking> bookings = new ArrayList<>();
 }
