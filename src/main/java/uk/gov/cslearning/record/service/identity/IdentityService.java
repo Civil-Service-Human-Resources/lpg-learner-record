@@ -10,13 +10,9 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cslearning.record.service.CivilServant;
 
-import java.net.URL;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
 
 import static java.util.Collections.emptySet;
@@ -87,28 +83,5 @@ public class IdentityService {
             throw new RuntimeException(e);
         }
         return Optional.of(identity);
-    }
-
-    public Identity getIdentityByEmailAddress(String emailAddress){
-        LOGGER.debug("Getting identity with email address {}", emailAddress);
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl).queryParam("emailAddress", emailAddress);
-
-        Identity identity;
-
-        try{
-            identity = restOperations.getForObject(builder.toUriString(), Identity.class);
-        } catch (HttpClientErrorException e) {
-            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
-            }
-            throw new RuntimeException(e);
-        }
-
-        if(identity != null){
-            return identity;
-        }
-
-        return null;
     }
 }
