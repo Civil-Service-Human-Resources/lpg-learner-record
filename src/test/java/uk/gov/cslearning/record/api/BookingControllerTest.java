@@ -206,7 +206,7 @@ public class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("event: A booking requires an event")))
                 .andExpect(jsonPath("$.errors[1]", equalTo("learner: A booking requires a learner")))
-                .andExpect(jsonPath("$.errors[2]", equalTo("learnerEmail")))
+                .andExpect(jsonPath("$.errors[2]", equalTo("learnerEmail: A booking requires a learner email address")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
@@ -280,6 +280,7 @@ public class BookingControllerTest {
     @Test
     public void shouldReturnBadRequestOnConstraintViolationException() throws Exception {
         String learner = "_learner";
+        String learnerEmail = "test@test.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI event = new URI("http://event");
@@ -287,6 +288,7 @@ public class BookingControllerTest {
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
+        booking.setLearnerEmail(learnerEmail);
         booking.setStatus(status);
         booking.setEvent(event);
         booking.setBookingTime(bookingTime);

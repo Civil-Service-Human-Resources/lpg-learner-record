@@ -126,7 +126,6 @@ public class DefaultBookingServiceTest {
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
         when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-        when(learnerRepository.findByUid("test-uid")).thenReturn(Optional.empty());
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
@@ -155,7 +154,6 @@ public class DefaultBookingServiceTest {
         when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
         when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-        when(learnerRepository.findByUid("test-uid")).thenReturn(Optional.empty());
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 

@@ -65,7 +65,7 @@ public class BookingRepositoryTest {
 
         Event event = new Event();
         event.setPath("test/path");
-        event.setEventUid("SLBEI");
+        event.setUid("SLBEI");
 
         Booking booking = new Booking();
         booking.setEvent(event);
@@ -84,7 +84,7 @@ public class BookingRepositoryTest {
         bookingRepository.save(booking);
         bookingRepository.save(booking2);
 
-        ArrayList<Booking> bookings = (ArrayList) bookingRepository.listByEventUid("SLBEI");
+        ArrayList<Booking> bookings = (ArrayList) bookingRepository.findByEventUid("SLBEI");
 
         assertEquals(bookings.get(0), booking);
         assertEquals(bookings.get(1), booking2);
