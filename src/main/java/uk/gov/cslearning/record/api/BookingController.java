@@ -22,6 +22,13 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
+    @GetMapping(value = "/event/{eventId}/booking")
+    public ResponseEntity<Iterable<BookingDto>> listEventBookings(@PathVariable String eventId){
+        Iterable<BookingDto> result = bookingService.listByEventUid(eventId);
+
+        return new ResponseEntity<>(result, OK);
+    }
+
     @GetMapping(value = "/event/{eventId}/booking/{bookingId}", produces = "application/json")
     public ResponseEntity<BookingDto> getBooking(@PathVariable int bookingId) {
         Optional<BookingDto> booking = bookingService.find(bookingId);

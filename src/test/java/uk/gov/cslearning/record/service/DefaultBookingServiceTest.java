@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -14,8 +15,10 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
+import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -36,6 +39,9 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private XApiService xApiService;
+
+    @Mock
+    private EventRepository eventRepository;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -62,6 +68,37 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
+    public void shouldListBookingsByEventUid() {
+        String eventId = "test-event-id";
+
+        Booking booking1 = new Booking();
+        booking1.setId(11);
+        Booking booking2 = new Booking();
+        booking2.setId(21);
+
+        ArrayList<Booking> bookings = new ArrayList<>();
+        bookings.add(booking1);
+        bookings.add(booking2);
+
+        BookingDto bookingDto1 = new BookingDto();
+        bookingDto1.setId(11);
+        BookingDto bookingDto2 = new BookingDto();
+        bookingDto2.setId(21);
+
+        ArrayList<BookingDto> bookingDtos = new ArrayList<>();
+        bookingDtos.add(bookingDto1);
+        bookingDtos.add(bookingDto2);
+
+        Event event = new Event();
+        event.setBookings(bookings);
+
+        when(eventRepository.findByUid(eventId)).thenReturn(Optional.of(event));
+        when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
+
+        assertEquals(bookingDtos, bookingService.listByEventUid(eventId));
+    }
+
+    @Test
     public void shouldRegisterAndSaveBooking() {
         BookingDto unsavedBookingDto = new BookingDto();
         unsavedBookingDto.setStatus(BookingStatus.CONFIRMED);
@@ -85,6 +122,7 @@ public class DefaultBookingServiceTest {
     public void shouldSaveBookingButNotRegisterIfNotConfirmed() {
         BookingDto unsavedBookingDto = new BookingDto();
         unsavedBookingDto.setStatus(BookingStatus.REQUESTED);
+        unsavedBookingDto.setLearner("test-uid");
         Booking unsavedBooking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
@@ -108,7 +146,7 @@ public class DefaultBookingServiceTest {
 
         BookingDto bookingDto = new BookingDto();
         bookingDto.setStatus(BookingStatus.REQUESTED);
-
+        bookingDto.setLearner("test-uid");
         BookingDto savedBookingDto = new BookingDto();
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));

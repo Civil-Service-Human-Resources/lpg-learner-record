@@ -8,7 +8,8 @@ CREATE TABLE `event` (
 
 CREATE TABLE `learner` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `uid` varchar(60) NOT NULL,
+  `uid` varchar(60) UNIQUE NOT NULL,
+  `learner_email` varchar(60) UNIQUE NOT NULL,
   PRIMARY KEY(`id`)
 );
 

@@ -65,7 +65,6 @@ public class DefaultInviteServiceTest {
         event.setId(1);
         event.setUid(eventId);
         event.setPath(eventURI.getPath());
-        event.setBookings(new ArrayList<>());
 
         Invite invite = new Invite();
         invite.setEvent(event);

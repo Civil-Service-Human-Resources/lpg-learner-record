@@ -24,6 +24,7 @@ public class LearnerRepositoryTest {
     public void shouldSaveLearner(){
         Learner learner = new Learner();
         learner.setUid("test-uuid");
+        learner.setLearnerEmail("test@domain.com");
         learnerRepository.save(learner);
 
         assertThat(learner.getId(), notNullValue());

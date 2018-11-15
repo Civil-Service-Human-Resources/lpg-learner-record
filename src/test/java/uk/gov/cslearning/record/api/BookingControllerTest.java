@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({BookingController.class, ErrorDtoFactory.class})
@@ -62,6 +64,40 @@ public class BookingControllerTest {
     }
 
     @Test
+    public void shouldListAllBookingsOnEvent() throws Exception {
+        BookingDto bookingDto1 = new BookingDto();
+        bookingDto1.setId(11);
+        BookingDto bookingDto2 = new BookingDto();
+        bookingDto2.setId(21);
+
+        ArrayList<BookingDto> bookings = new ArrayList<>();
+        bookings.add(bookingDto1);
+        bookings.add(bookingDto2);
+
+        when(bookingService.listByEventUid("test-event-id")).thenReturn(bookings);
+
+        mockMvc.perform(
+                get("/event/test-event-id/booking")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", equalTo(11)))
+                .andExpect(jsonPath("$[1].id", equalTo(21)));
+    }
+
+    @Test
+    public void shouldReturnEmptyArrayIfNoBookingsOnEvent() throws Exception {
+        when(bookingService.listByEventUid("test-event-id")).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(
+                get("/event/test-event-id/booking")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", equalTo(new ArrayList<>())));
+    }
+
+    @Test
     public void shouldReturnBookingIfFound() throws Exception {
         int bookingId = 99;
         String learner = "_learner";
@@ -79,7 +115,6 @@ public class BookingControllerTest {
         bookingDto.setPaymentDetails(paymentDetails);
 
         when(bookingService.find(bookingId)).thenReturn(Optional.of(bookingDto));
-
 
         mockMvc.perform(
                 get("/event/blah/booking/" + bookingId)
@@ -110,6 +145,7 @@ public class BookingControllerTest {
     public void shouldCreateBooking() throws Exception {
         int bookingId = 99;
         String learner = "_learner";
+        String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI event = new URI("http://example.org/path/to/event/event-id");
@@ -117,6 +153,7 @@ public class BookingControllerTest {
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
+        booking.setLearnerEmail(learnerEmail);
         booking.setStatus(status);
         booking.setEvent(event);
         booking.setBookingTime(bookingTime);
@@ -125,6 +162,7 @@ public class BookingControllerTest {
         BookingDto savedBooking = new BookingDto();
         savedBooking.setId(bookingId);
         savedBooking.setLearner(learner);
+        savedBooking.setLearnerEmail(learnerEmail);
         savedBooking.setStatus(status);
         savedBooking.setEvent(event);
         savedBooking.setBookingTime(bookingTime);
@@ -167,6 +205,7 @@ public class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("event: A booking requires an event")))
                 .andExpect(jsonPath("$.errors[1]", equalTo("learner: A booking requires a learner")))
+                .andExpect(jsonPath("$.errors[2]", equalTo("learnerEmail: A booking requires a learner email address")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
@@ -240,6 +279,7 @@ public class BookingControllerTest {
     @Test
     public void shouldReturnBadRequestOnConstraintViolationException() throws Exception {
         String learner = "_learner";
+        String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI event = new URI("http://event");
@@ -247,6 +287,7 @@ public class BookingControllerTest {
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
+        booking.setLearnerEmail(learnerEmail);
         booking.setStatus(status);
         booking.setEvent(event);
         booking.setBookingTime(bookingTime);

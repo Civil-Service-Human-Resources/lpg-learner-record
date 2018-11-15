@@ -19,6 +19,9 @@ public class Learner {
     @Column(nullable = false, length = 60)
     private String uid;
 
+    @Column(nullable = false, length = 150)
+    private String learnerEmail;
+
     @ToString.Exclude
     @OneToMany(mappedBy = "learner")
     private List<Booking> bookings = new ArrayList<>();

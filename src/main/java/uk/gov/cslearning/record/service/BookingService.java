@@ -11,6 +11,9 @@ public interface BookingService {
     @Transactional(readOnly = true)
     Optional<BookingDto> find(int bookingId);
 
+    @Transactional(readOnly = true)
+    Iterable<BookingDto> listByEventUid(String eventUid);
+
     @Transactional
     BookingDto register(BookingDto booking);
 
