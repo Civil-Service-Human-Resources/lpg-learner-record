@@ -37,10 +37,10 @@ public class InviteController {
     public ResponseEntity<Void> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
         InviteDto result = inviteService.save(inviteDto);
 
-        if(result != null) {
-            return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
-        } else {
+        if(result == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
+
+        return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
     }
 }

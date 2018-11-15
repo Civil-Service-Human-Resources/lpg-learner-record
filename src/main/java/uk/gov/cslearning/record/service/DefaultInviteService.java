@@ -52,17 +52,16 @@ public class DefaultInviteService implements InviteService{
     @Override
     public InviteDto save(InviteDto inviteDto){
         Identity identity = identityService.getIdentityByEmailAddress(inviteDto.getLearnerEmail());
-        if(identity != null) {
-            Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
-
-            Optional<Invite> invite = (event == null) ? Optional.empty() : inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
-
-            if (!invite.isPresent()) {
-                return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
-            }
-            return inviteDtoFactory.create(invite.get());
+        if(identity == null) {
+            return null;
         }
 
-        return null;
+        Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
+
+        Optional<Invite> invite = (event == null) ? Optional.empty() : inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
+        if (!invite.isPresent()) {
+            return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+        }
+        return inviteDtoFactory.create(invite.get());
     }
 }

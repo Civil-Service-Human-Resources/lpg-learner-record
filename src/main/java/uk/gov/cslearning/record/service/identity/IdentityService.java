@@ -75,11 +75,7 @@ public class IdentityService {
 
         Identity identity = getIdentity(builder.toUriString());
 
-        if(identity != null){
-            return identity;
-        }
-
-        return null;
+        return identity;
     }
 
     private Identity getIdentity(String path){
