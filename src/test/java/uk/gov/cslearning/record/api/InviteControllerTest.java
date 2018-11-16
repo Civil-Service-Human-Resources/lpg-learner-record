@@ -17,9 +17,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
+import static org.hamcrest.Matchers.equalTo;
 
 public class InviteControllerTest {
 
@@ -52,6 +55,22 @@ public class InviteControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldGetInvitee() throws Exception{
+        InviteDto inviteDto = new InviteDto();
+        inviteDto.setId(99);
+
+        when(inviteService.findInvite(99)).thenReturn(inviteDto);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/event/SGI/invitee/99").with(csrf())
+                    .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(99)));
+
     }
 
     @Test
