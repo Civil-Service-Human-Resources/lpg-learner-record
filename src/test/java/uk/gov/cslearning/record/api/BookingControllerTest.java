@@ -19,6 +19,7 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.*;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
+import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.EventService;
 
@@ -256,7 +257,6 @@ public class BookingControllerTest {
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 
-
     @Test
     public void shouldReturnBadMessageWithInvalidStatus() throws Exception {
         int bookingId = 930;
@@ -280,7 +280,7 @@ public class BookingControllerTest {
     @Test
     public void shouldReturnBadRequestOnConstraintViolationException() throws Exception {
         String learner = "_learner";
-        String learnerEmail = "test@test.com";
+        String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI event = new URI("http://event");

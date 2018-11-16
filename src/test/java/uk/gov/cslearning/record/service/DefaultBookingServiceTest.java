@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -14,7 +15,7 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
-import uk.gov.cslearning.record.repository.LearnerRepository;
+import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class DefaultBookingServiceTest {
     private XApiService xApiService;
 
     @Mock
-    private LearnerRepository learnerRepository;
+    private EventRepository eventRepository;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -88,7 +89,10 @@ public class DefaultBookingServiceTest {
         bookingDtos.add(bookingDto1);
         bookingDtos.add(bookingDto2);
 
-        when(bookingRepository.findByEventUid(eventId)).thenReturn(bookings);
+        Event event = new Event();
+        event.setBookings(bookings);
+
+        when(eventRepository.findByUid(eventId)).thenReturn(Optional.of(event));
         when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
 
         assertEquals(bookingDtos, bookingService.listByEventUid(eventId));

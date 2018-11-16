@@ -66,6 +66,7 @@ public class BookingFactoryTest {
         assertThat(booking.getLearner().getId(), equalTo(99));
 
         verify(eventFactory).create(event.getPath());
+        verify(learnerFactory).create(learnerUid, learnerEmail);
     }
 
     @Test

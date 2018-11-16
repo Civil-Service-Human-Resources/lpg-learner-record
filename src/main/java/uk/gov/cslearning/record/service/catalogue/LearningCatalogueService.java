@@ -1,11 +1,16 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.RequestEntityException;
 import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.util.List;
@@ -14,6 +19,8 @@ import static java.util.Collections.emptyList;
 
 @Service
 public class LearningCatalogueService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
 
     private final RestTemplate restTemplate;
 
@@ -54,7 +61,8 @@ public class LearningCatalogueService {
             RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(courseUrlFormat, courseId));
             ResponseEntity<Course> responseEntity = restTemplate.exchange(requestEntity, Course.class);
             return responseEntity.getBody();
-        } catch (Exception e) {
+        } catch (RequestEntityException | RestClientException e) {
+            LOGGER.error("Could not get course from learning catalogue: ", e.getLocalizedMessage());
             return null;
         }
     }

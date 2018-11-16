@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
@@ -9,8 +10,10 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.repository.BookingRepository;
+import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,12 +23,14 @@ public class DefaultBookingService implements BookingService {
     private final BookingFactory bookingFactory;
     private final BookingDtoFactory bookingDtoFactory;
     private final BookingRepository bookingRepository;
+    private final EventRepository eventRepository;
     private final XApiService xApiService;
 
-    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, XApiService xApiService) {
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService) {
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
+        this.eventRepository = eventRepository;
         this.xApiService = xApiService;
     }
 
@@ -41,11 +46,16 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public Iterable<BookingDto> listByEventUid(String eventUid){
-        Iterable<BookingDto> bookings = bookingRepository.findByEventUid(eventUid).stream().map(
-                bookingDtoFactory::create
-        ).collect(Collectors.toList());
+        Optional<Event> event = eventRepository.findByUid(eventUid);
 
-        return bookings;
+        if(event.isPresent()) {
+            Iterable<BookingDto> bookings = event.get().getBookings().stream().map(
+                    bookingDtoFactory::create
+            ).collect(Collectors.toList());
+
+            return bookings;
+        }
+        return new ArrayList<>();
     }
 
     @Override

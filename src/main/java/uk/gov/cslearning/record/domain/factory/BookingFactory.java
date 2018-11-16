@@ -2,10 +2,7 @@ package uk.gov.cslearning.record.domain.factory;
 
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
-
-import java.util.Optional;
 
 @Component
 public class BookingFactory {
