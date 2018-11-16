@@ -10,6 +10,8 @@ import java.util.Collection;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -36,6 +38,29 @@ public class IdentityServiceTest {
     public void shouldReturnEmptySetForNoIdentities() {
         when(restOperations.getForObject(any(), any())).thenReturn(new Identity[]{});
         assertThat(identityService.listAll(), hasSize(0));
+    }
+
+    @Test
+    public void shouldReturnIdentityWithEmailAddress() {
+        Identity identity = new Identity();
+        identity.setUid("uid");
+        identity.setUsername("username");
+
+        when(restOperations.getForObject(API_URL + "?emailAddress=test@domain.com", Identity.class)).thenReturn(identity);
+
+        Identity returnedIdentity = identityService.getIdentityByEmailAddress("test@domain.com");
+
+        assertEquals(returnedIdentity.getUid(), "uid");
+        assertEquals(returnedIdentity.getUsername(), "username");
+    }
+
+    @Test
+    public void shouldReturnNullIfIdentityDoesNotExist() {
+        when(restOperations.getForObject(LIST_ALL_URL, Identity[].class)).thenReturn(null);
+
+        Identity returnedIdentity =  identityService.getIdentityByEmailAddress("test@domain.com");
+
+        assertNull(returnedIdentity);
     }
 
     @Test
