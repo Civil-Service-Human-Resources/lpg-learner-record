@@ -52,7 +52,7 @@ public class DefaultInviteServiceTest {
         ArrayList<Invite> invites = new ArrayList<>();
         invites.add(invite);
 
-        Mockito.when(inviteRepository.findByEventId(eventId)).thenReturn(invites);
+        Mockito.when(inviteRepository.findAllByEventUid(eventId)).thenReturn(invites);
         Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
 
         Assert.assertEquals(inviteDto, ((ArrayList) inviteService.findByEventId(eventId)).get(0));

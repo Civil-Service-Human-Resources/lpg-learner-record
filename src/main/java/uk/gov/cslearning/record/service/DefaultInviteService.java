@@ -34,7 +34,7 @@ public class DefaultInviteService implements InviteService{
 
     @Override
     public Collection<InviteDto> findByEventId(String eventId){
-        Collection<InviteDto> result = inviteRepository.findByEventId(eventId)
+        Collection<InviteDto> result = inviteRepository.findAllByEventUid(eventId)
                 .stream().map(
                         inviteDtoFactory::create
                 ).collect(Collectors.toList());
@@ -57,8 +57,8 @@ public class DefaultInviteService implements InviteService{
         }
 
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
+        Optional<Invite> invite = inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
 
-        Optional<Invite> invite = (event == null) ? Optional.empty() : inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
         if (!invite.isPresent()) {
             return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
         }
