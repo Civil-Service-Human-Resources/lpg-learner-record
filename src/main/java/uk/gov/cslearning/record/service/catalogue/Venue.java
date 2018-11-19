@@ -21,9 +21,7 @@ public class Venue {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+    public void setAddress(String address) { this.address = address; }
 
     public Integer getCapacity() {
         return capacity;

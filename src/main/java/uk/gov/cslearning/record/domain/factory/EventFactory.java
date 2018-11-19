@@ -5,7 +5,6 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 
-import java.net.URI;
 import java.nio.file.Paths;
 
 @Component
@@ -29,5 +28,4 @@ public class EventFactory {
         event.setStatus(eventDto.getStatus().getValue());
         return event;
     }
-
 }
