@@ -153,7 +153,7 @@ public class DefaultBookingServiceTest {
 
         when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED);
+        BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED, "");
 
         when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
         when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
@@ -171,7 +171,7 @@ public class DefaultBookingServiceTest {
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
         try {
-            bookingService.updateStatus(bookingId, new BookingStatusDto(BookingStatus.CONFIRMED));
+            bookingService.updateStatus(bookingId, new BookingStatusDto(BookingStatus.CONFIRMED, ""));
             fail("Expected BookingNotFoundException");
         } catch (BookingNotFoundException e) {
             assertEquals("Booking does not exist with id: 99", e.getMessage());
