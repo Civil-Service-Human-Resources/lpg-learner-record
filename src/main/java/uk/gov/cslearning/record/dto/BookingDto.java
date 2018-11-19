@@ -23,9 +23,10 @@ public class BookingDto {
     @EventIsActive(message = "{booking.event.active}")
     private URI event;
 
+    @NotNull
     private BookingStatus status;
 
-    private Instant bookingTime;
+    private Instant bookingTime = Instant.now();
 
     private URI paymentDetails;
 }
