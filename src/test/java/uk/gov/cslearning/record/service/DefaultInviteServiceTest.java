@@ -67,7 +67,7 @@ public class DefaultInviteServiceTest {
         Mockito.when(inviteRepository.findById(id)).thenReturn(Optional.of(new Invite()));
         Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
 
-        Assert.assertEquals(inviteService.findInvite(id), inviteDto);
+        Assert.assertEquals(inviteService.findInvite(id), Optional.of(inviteDto));
 
         Mockito.verify(inviteRepository).findById(id);
         Mockito.verify(inviteDtoFactory).create(invite);
@@ -79,7 +79,7 @@ public class DefaultInviteServiceTest {
 
         Mockito.when(inviteRepository.findById(id)).thenReturn(Optional.empty());
 
-        Assert.assertNull(inviteService.findInvite(id));
+        Assert.assertEquals(inviteService.findInvite(id), Optional.empty());
 
         Mockito.verify(inviteRepository).findById(id);
     }
@@ -105,21 +105,8 @@ public class DefaultInviteServiceTest {
         Mockito.when(inviteFactory.create(inviteDto, event)).thenReturn(invite);
         Mockito.when(inviteRepository.save(invite)).thenReturn(invite);
         Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
-        Mockito.when(identityService.getIdentityByEmailAddress("test@test.com")).thenReturn(new Identity());
 
-        Assert.assertEquals(inviteService.save(inviteDto), inviteDto);
+        Assert.assertEquals(inviteService.save(inviteDto), Optional.of(inviteDto));
         Mockito.verify(inviteRepository).save(invite);
-        Mockito.verify(identityService).getIdentityByEmailAddress("test@test.com");
-    }
-
-    @Test
-    public void shouldReturnNullIfIdentityNotFound(){
-        InviteDto inviteDto = new InviteDto();
-        inviteDto.setLearnerEmail("test@test.com");
-
-        Mockito.when(identityService.getIdentityByEmailAddress("test@test.com")).thenReturn(null);
-
-        Assert.assertNull(inviteService.save(inviteDto));
-        Mockito.verify(identityService).getIdentityByEmailAddress("test@test.com");
     }
 }

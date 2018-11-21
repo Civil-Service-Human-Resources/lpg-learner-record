@@ -9,7 +9,6 @@ import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/event")

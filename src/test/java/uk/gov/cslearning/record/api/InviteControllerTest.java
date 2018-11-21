@@ -8,10 +8,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.InviteService;
+import uk.gov.cslearning.record.service.identity.IdentityService;
+import uk.gov.cslearning.record.service.identity.Identity;
 
 import javax.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -33,6 +36,9 @@ public class InviteControllerTest {
 
     @Mock
     private InviteService inviteService;
+
+    @Mock
+    private IdentityService identityService;
 
     @Before
     public void setup(){
@@ -62,7 +68,7 @@ public class InviteControllerTest {
         InviteDto inviteDto = new InviteDto();
         inviteDto.setId(99);
 
-        when(inviteService.findInvite(99)).thenReturn(inviteDto);
+        when(inviteService.findInvite(99)).thenReturn(Optional.of(inviteDto));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/event/SGI/invitee/99").with(csrf())
@@ -75,7 +81,8 @@ public class InviteControllerTest {
 
     @Test
     public void shouldAddInvitee() throws Exception{
-        when(inviteService.save(any())).thenReturn(new InviteDto());
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
+        when(inviteService.save(any())).thenReturn(Optional.of(new InviteDto()));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
@@ -84,5 +91,32 @@ public class InviteControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldReturnNotFoundIfEmailNotFound() throws Exception{
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(null);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
+                        .content("{\"learnerEmail\": \"user@test.com\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturnConflictIfLearnerIsAlreadyInvited() throws Exception{
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
+        when(inviteService.save(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
+                        .content("{\"learnerEmail\": \"user@test.com\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isConflict());
     }
 }
