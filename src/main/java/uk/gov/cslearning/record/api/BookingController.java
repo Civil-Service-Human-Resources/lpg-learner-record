@@ -48,6 +48,13 @@ public class BookingController {
         ).build();
     }
 
+    @PatchMapping(value = "/event/{eventUid}/learner/{learnerUid}")
+    public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventUid, @PathVariable String learnerUid, @Valid @RequestBody BookingStatusDto bookingStatus) {
+        BookingDto result = bookingService.updateStatus(eventUid, learnerUid, bookingStatus);
+
+        return ResponseEntity.ok(result);
+    }
+
     @PatchMapping(value = "/event/{eventId}/booking/{bookingId}")
     public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventId, @PathVariable int bookingId, @Valid @RequestBody BookingStatusDto bookingStatus) {
         BookingDto result = bookingService.updateStatus(bookingId, bookingStatus);

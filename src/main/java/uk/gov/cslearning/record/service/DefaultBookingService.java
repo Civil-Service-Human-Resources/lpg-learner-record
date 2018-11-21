@@ -69,11 +69,23 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus) {
-        BookingDto booking = find(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException(bookingId));
 
-        booking.setStatus(bookingStatus.getStatus());
+        return updateStatus(booking, bookingStatus);
+    }
 
-        return bookingStatus.getStatus().equals(BookingStatus.CONFIRMED) ? register(booking) : unregister(booking);
+    @Override
+    public BookingDto updateStatus(String eventUid, String bookingUid, BookingStatusDto bookingStatus) {
+        Booking booking = bookingRepository.findByEventUidLearnerUid(eventUid, bookingUid).orElseThrow(() -> new BookingNotFoundException(eventUid, bookingUid));
+        return updateStatus(booking, bookingStatus);
+    }
+
+    private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
+        BookingDto bookingDto = bookingDtoFactory.create(booking);
+
+        bookingDto.setStatus(bookingStatusDto.getStatus());
+
+        return bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED) ? register(bookingDto) : unregister(bookingDto);
     }
 
     @Override

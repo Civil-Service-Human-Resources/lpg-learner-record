@@ -342,4 +342,50 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
     }
+
+    @Test
+    public void shouldUpdateBookingWithEventUidAndLearnerUid() throws Exception {
+        String learnerUid = "learner-uid";
+        String eventUid = "event-uid";
+        int bookingId = 99;
+        BookingStatus status = BookingStatus.CONFIRMED;
+        Instant bookingTime =
+                LocalDateTime.of(2018,
+                        1,
+                        1,
+                        13,
+                        59,
+                        12,
+                        500).toInstant(ZoneOffset.UTC);
+        URI paymentDetails = new URI("payment-details");
+        URI event = new URI("http://event");
+
+        BookingDto booking = new BookingDto();
+        booking.setId(bookingId);
+        booking.setStatus(status);
+        booking.setBookingTime(bookingTime);
+        booking.setPaymentDetails(paymentDetails);
+        booking.setEvent(event);
+        booking.setLearner(learnerUid);
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+
+        when(bookingService.updateStatus(eq(eventUid), eq(learnerUid), eq(bookingStatus))).thenReturn(booking);
+
+        mockMvc.perform(
+                patch(String.format("/event/%s/learner/%s", eventUid, learnerUid)).with(csrf())
+                        .content(objectMapper.writeValueAsString(bookingStatus))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(bookingId)))
+                .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
+                .andExpect(jsonPath("$.status", equalTo(status.getValue())))
+                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
+                .andExpect(jsonPath("$.bookingTime",
+                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
+
+        verify(bookingService).updateStatus(eventUid, learnerUid, bookingStatus);
+    }
 }

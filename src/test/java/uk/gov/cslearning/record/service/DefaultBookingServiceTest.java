@@ -165,6 +165,35 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
+    public void shouldUpdateBookingStatusWithEventUidAndLearnerUid() {
+        String eventUid = "event-uid";
+        String learnerUid = "learner-uid";
+
+        Booking booking = mock(Booking.class);
+        Booking updatedBooking = mock(Booking.class);
+        Booking savedBooking = mock(Booking.class);
+
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
+        bookingDto.setLearner("test-uid");
+        BookingDto savedBookingDto = new BookingDto();
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
+
+        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED);
+
+        when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
+        when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
+
+        verify(xApiService).register(bookingDto);
+    }
+
+    @Test
     public void shouldThrowBookingNotFoundException() {
         int bookingId = 99;
 

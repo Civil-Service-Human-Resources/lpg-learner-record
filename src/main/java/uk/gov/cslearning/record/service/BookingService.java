@@ -17,8 +17,10 @@ public interface BookingService {
     @Transactional
     BookingDto register(BookingDto booking);
 
-    @Transactional
     BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus);
+
+    @Transactional
+    BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus);
 
     @Transactional
     BookingDto unregister(BookingDto booking);
