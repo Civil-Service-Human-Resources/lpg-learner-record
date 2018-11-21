@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.service;
 
-
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Invite;
@@ -8,7 +7,6 @@ import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
 import uk.gov.cslearning.record.repository.InviteRepository;
-import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.nio.file.Paths;
@@ -43,25 +41,18 @@ public class DefaultInviteService implements InviteService{
     }
 
     @Override
-    public InviteDto findInvite(int id){
-        Optional<Invite> invite = inviteRepository.findById(id);
-
-        return invite.isPresent() ? inviteDtoFactory.create(invite.get()) : null;
+    public Optional<InviteDto> findInvite(int id){
+        return inviteRepository.findById(id).map(inviteDtoFactory::create);
     }
 
     @Override
-    public InviteDto save(InviteDto inviteDto){
-        Identity identity = identityService.getIdentityByEmailAddress(inviteDto.getLearnerEmail());
-        if(identity == null) {
-            return null;
-        }
-
+    public Optional<InviteDto> save(InviteDto inviteDto){
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
-        Optional<Invite> invite = inviteRepository.findByEventIdLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
 
+        Optional<Invite> invite = inviteRepository.findByEventIdAndLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
         if (!invite.isPresent()) {
-            return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+            return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
         }
-        return inviteDtoFactory.create(invite.get());
+        return Optional.empty();
     }
 }
