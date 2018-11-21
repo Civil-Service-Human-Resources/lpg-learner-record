@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.InviteDto;
+import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
@@ -18,9 +19,12 @@ public class InviteController {
 
     private final IdentityService identityService;
 
-    public InviteController(InviteService inviteService, IdentityService identityService){
+    private final BookingService bookingService;
+
+    public InviteController(InviteService inviteService, IdentityService identityService, BookingService bookingService){
         this.inviteService = inviteService;
         this.identityService = identityService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping("/{eventId}/invitee")
@@ -41,6 +45,9 @@ public class InviteController {
     public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
         if(identityService.getIdentityByEmailAddress(inviteDto.getLearnerEmail()) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if(bookingService.isLearnerBookedOnEvent(inviteDto.getLearnerEmail(), eventUid).isPresent()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         return inviteService.save(inviteDto)

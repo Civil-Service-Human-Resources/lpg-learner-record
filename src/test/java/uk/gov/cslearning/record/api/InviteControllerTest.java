@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cslearning.record.dto.InviteDto;
+import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 import uk.gov.cslearning.record.service.identity.Identity;
@@ -39,6 +40,9 @@ public class InviteControllerTest {
 
     @Mock
     private IdentityService identityService;
+
+    @Mock
+    private BookingService bookingService;
 
     @Before
     public void setup(){
@@ -82,6 +86,7 @@ public class InviteControllerTest {
     @Test
     public void shouldAddInvitee() throws Exception{
         when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
+        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
         when(inviteService.save(any())).thenReturn(Optional.of(new InviteDto()));
 
         mockMvc.perform(
@@ -109,7 +114,22 @@ public class InviteControllerTest {
     @Test
     public void shouldReturnConflictIfLearnerIsAlreadyInvited() throws Exception{
         when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
+        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
         when(inviteService.save(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())
+                        .content("{\"learnerEmail\": \"user@test.com\"}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void shouldReturnConflictIfLearnerIsAlreadyBooked() throws Exception{
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
+        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())

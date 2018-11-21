@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -237,5 +238,16 @@ public class DefaultBookingServiceTest {
 
         verifyZeroInteractions(xApiService);
         verify(bookingRepository).saveBooking(booking);
+    }
+
+    @Test
+    public void shouldReturnLearnerIfBooked() {
+        String learnerEmail = "test@domain.com";
+        String eventUid = "eventUid";
+        Learner learner = new Learner();
+
+        when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid)).thenReturn(Optional.of(learner));
+
+        assertEquals(Optional.of(learner), bookingService.isLearnerBookedOnEvent(learnerEmail, eventUid));
     }
 }
