@@ -45,6 +45,16 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
+    public Optional<BookingDto> find(String eventUid, String learnerUid) {
+
+        BookingDto bookingDto = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid).map(
+                bookingDtoFactory::create
+        ).orElse(null);
+
+        return Optional.ofNullable(bookingDto);
+    }
+
+    @Override
     public Iterable<BookingDto> listByEventUid(String eventUid){
         Optional<Event> event = eventRepository.findByUid(eventUid);
 
@@ -83,9 +93,13 @@ public class DefaultBookingService implements BookingService {
     private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
         BookingDto bookingDto = bookingDtoFactory.create(booking);
 
-        bookingDto.setStatus(bookingStatusDto.getStatus());
 
-        return bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED) ? register(bookingDto) : unregister(bookingDto);
+        if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
+            bookingDto.setStatus(bookingStatusDto.getStatus());
+            return register(bookingDto);
+        } else {
+            return unregister(bookingDto);
+        }
     }
 
     @Override

@@ -38,6 +38,16 @@ public class BookingController {
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     }
 
+    @GetMapping(value = "/event/{eventUid}/learner/{learnerUid}", produces = "application/json")
+    public ResponseEntity<BookingDto> getBooking(@PathVariable String eventUid, @PathVariable String learnerUid) {
+        Optional<BookingDto> booking = bookingService.find(eventUid, learnerUid);
+
+        return booking
+                .map(b -> new ResponseEntity<>(b, OK))
+                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    }
+
+
     @PostMapping(value="/event/{eventId}/booking/")
     public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
 

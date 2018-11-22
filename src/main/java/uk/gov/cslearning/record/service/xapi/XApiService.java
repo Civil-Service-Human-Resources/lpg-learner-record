@@ -86,7 +86,7 @@ public class XApiService implements Serializable {
         return more.substring(length);
     }
 
-    public String register(BookingDto bookingDto){
+    public String register(BookingDto bookingDto) {
         return postStatement(statementFactory.createRegisteredStatement(bookingDto));
     }
 

@@ -129,6 +129,41 @@ public class BookingControllerTest {
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 
+
+    @Test
+    public void shouldReturnBookingFromEventUidAndLearnerUid() throws Exception {
+
+        int bookingId = 99;
+        String learnerUid = "learner-uid";
+        String eventUid = "event-uid";
+        BookingStatus status = BookingStatus.CONFIRMED;
+        URI event = new URI("_event");
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        URI paymentDetails = new URI("payment-details");
+
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setId(bookingId);
+        bookingDto.setLearner(learnerUid);
+        bookingDto.setStatus(status);
+        bookingDto.setEvent(event);
+        bookingDto.setBookingTime(bookingTime);
+        bookingDto.setPaymentDetails(paymentDetails);
+
+        when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.of(bookingDto));
+
+        mockMvc.perform(
+                get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(bookingId)))
+                .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
+                .andExpect(jsonPath("$.status", equalTo(status.getValue())))
+                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
+                .andExpect(jsonPath("$.bookingTime",
+                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
+    }
+
     @Test
     public void shouldReturn404IfNotFound() throws Exception {
         int bookingId = 99;
@@ -137,6 +172,19 @@ public class BookingControllerTest {
 
         mockMvc.perform(
                 get("/event/blah/booking/" + bookingId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn404IfNotFoundFromEventUidAndLearnerUid() throws Exception {
+        String eventUid = "event-uid";
+        String learnerUid = "learner-uid";
+
+        when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

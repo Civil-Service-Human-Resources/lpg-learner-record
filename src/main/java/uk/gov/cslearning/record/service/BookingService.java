@@ -12,11 +12,15 @@ public interface BookingService {
     Optional<BookingDto> find(int bookingId);
 
     @Transactional(readOnly = true)
+    Optional<BookingDto> find(String eventUid, String learnerUid);
+
+    @Transactional(readOnly = true)
     Iterable<BookingDto> listByEventUid(String eventUid);
 
     @Transactional
     BookingDto register(BookingDto booking);
 
+    @Transactional
     BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus);
 
     @Transactional
