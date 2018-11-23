@@ -6,7 +6,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.InviteDto;
-import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
@@ -42,15 +41,8 @@ public class InviteController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, BindingResult bindingResult, UriComponentsBuilder builder){
-        if(bindingResult.hasErrors()){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        if(identityService.getIdentityByEmailAddress(inviteDto.getLearnerEmail()) == null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
         return inviteService.save(inviteDto)
                 .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build())
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+                .orElseThrow(() -> new IllegalStateException("Unable to save invite"));
     }
 }
