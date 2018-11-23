@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.InviteDto;
@@ -9,6 +10,7 @@ import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -19,12 +21,9 @@ public class InviteController {
 
     private final IdentityService identityService;
 
-    private final BookingService bookingService;
-
-    public InviteController(InviteService inviteService, IdentityService identityService, BookingService bookingService){
+    public InviteController(InviteService inviteService, IdentityService identityService){
         this.inviteService = inviteService;
         this.identityService = identityService;
-        this.bookingService = bookingService;
     }
 
     @GetMapping("/{eventId}/invitee")
@@ -42,16 +41,16 @@ public class InviteController {
     }
 
     @PostMapping("/{eventId}/invitee")
-    public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
+    public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, BindingResult bindingResult, UriComponentsBuilder builder){
+        if(bindingResult.hasErrors()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         if(identityService.getIdentityByEmailAddress(inviteDto.getLearnerEmail()) == null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        if(bookingService.isLearnerBookedOnEvent(inviteDto.getLearnerEmail(), eventUid).isPresent()){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         return inviteService.save(inviteDto)
                 .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build())
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.CONFLICT));
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 }

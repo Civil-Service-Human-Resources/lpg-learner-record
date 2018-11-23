@@ -2,12 +2,10 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
 import uk.gov.cslearning.record.repository.InviteRepository;
-import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -20,14 +18,12 @@ public class DefaultInviteService implements InviteService{
     private final InviteDtoFactory inviteDtoFactory;
     private final InviteRepository inviteRepository;
     private final EventService eventService;
-    private final IdentityService identityService;
 
-    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventService eventService, IdentityService identityService){
+    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventService eventService){
         this.inviteFactory = inviteFactory;
         this.inviteDtoFactory = inviteDtoFactory;
         this.inviteRepository = inviteRepository;
         this.eventService = eventService;
-        this.identityService = identityService;
     }
 
     @Override
@@ -46,13 +42,14 @@ public class DefaultInviteService implements InviteService{
     }
 
     @Override
+    public Optional<InviteDto> findByEventIdAndLearnerEmail(String eventUid, String learnerEmail){
+        return inviteRepository.findByEventUidAndLearnerEmail(eventUid, learnerEmail).map(inviteDtoFactory::create);
+    }
+
+    @Override
     public Optional<InviteDto> save(InviteDto inviteDto){
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
 
-        Optional<Invite> invite = inviteRepository.findByEventIdAndLearnerEmail(event.getId(), inviteDto.getLearnerEmail());
-        if (!invite.isPresent()) {
-            return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
-        }
-        return Optional.empty();
+        return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
     }
 }

@@ -13,6 +13,9 @@ public interface InviteService {
     @Transactional(readOnly = true)
     Optional<InviteDto> findInvite(int inviteId);
 
+    @Transactional(readOnly = true)
+    Optional<InviteDto> findByEventIdAndLearnerEmail(String eventUid, String learnerEmail);
+
     @Transactional
     Optional<InviteDto> save(InviteDto invite);
 }

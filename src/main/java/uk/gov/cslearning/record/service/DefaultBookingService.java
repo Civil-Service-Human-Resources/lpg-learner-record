@@ -3,7 +3,6 @@ package uk.gov.cslearning.record.service;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -14,8 +13,7 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,8 +91,10 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Optional<Learner> isLearnerBookedOnEvent(String learnerEmail, String eventUid){
-        return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid);
+    public Optional<Booking> isLearnerBookedOnEvent(String learnerEmail, String eventUid){;
+        List<String> status = Arrays.asList("REQUESTED", "CONFIRMED");
+
+        return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
     }
 
     private BookingDto save(BookingDto bookingDto) {
