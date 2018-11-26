@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.InviteService;
-import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -18,11 +17,8 @@ public class InviteController {
 
     private final InviteService inviteService;
 
-    private final IdentityService identityService;
-
-    public InviteController(InviteService inviteService, IdentityService identityService){
+    public InviteController(InviteService inviteService){
         this.inviteService = inviteService;
-        this.identityService = identityService;
     }
 
     @GetMapping("/{eventId}/invitee")
@@ -41,6 +37,13 @@ public class InviteController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, BindingResult bindingResult, UriComponentsBuilder builder){
+        if(bindingResult.getModel().toString().contains("LearnerIsRegistered")){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        else if(bindingResult.getModel().toString().contains("LearnerNotBooked") || bindingResult.getModel().toString().contains("LearnerNotInvited")){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+
         return inviteService.save(inviteDto)
                 .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build())
                 .orElseThrow(() -> new IllegalStateException("Unable to save invite"));
