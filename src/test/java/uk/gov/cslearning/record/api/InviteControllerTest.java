@@ -83,8 +83,8 @@ public class InviteControllerTest {
 
     @Test
     public void shouldAddInvitee() throws Exception{
-        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
-        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.of(new Identity()));
+        when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
         when(inviteService.findByEventIdAndLearnerEmail("SAI", "test@test.com")).thenReturn(Optional.empty());
         when(inviteService.save(any())).thenReturn(Optional.of(new InviteDto()));
 
@@ -99,8 +99,8 @@ public class InviteControllerTest {
 
     @Test
     public void shouldReturnNotFoundIfEmailNotFound() throws Exception{
-        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(null);
-        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.empty());
+        when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
         when(inviteService.findByEventIdAndLearnerEmail("SAI", "test@test.com")).thenReturn(Optional.empty());
 
         mockMvc.perform(
@@ -114,8 +114,8 @@ public class InviteControllerTest {
 
     @Test
     public void shouldReturnConflictIfLearnerIsAlreadyInvited() throws Exception{
-        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
-        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.of(new Identity()));
+        when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
         when(inviteService.findByEventIdAndLearnerEmail("SAI", "user@test.com")).thenReturn(Optional.of(new InviteDto()));
 
         mockMvc.perform(
@@ -124,13 +124,13 @@ public class InviteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isConflict());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void shouldReturnConflictIfLearnerIsAlreadyBooked() throws Exception{
-        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
-        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SAI")).thenReturn(Optional.of(new Booking()));
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.of(new Identity()));
+        when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SAI")).thenReturn(Optional.of(new Booking()));
         when(inviteService.findByEventIdAndLearnerEmail("SAI", "test@test.com")).thenReturn(Optional.empty());
 
         mockMvc.perform(
@@ -139,6 +139,6 @@ public class InviteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isConflict());
+                .andExpect(status().isBadRequest());
     }
 }

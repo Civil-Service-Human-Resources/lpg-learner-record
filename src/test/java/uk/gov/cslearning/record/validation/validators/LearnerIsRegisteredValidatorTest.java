@@ -11,6 +11,8 @@ import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import javax.validation.ConstraintValidatorContext;
 
+import java.util.Optional;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -28,14 +30,14 @@ public class LearnerIsRegisteredValidatorTest {
 
     @Test
     public void shouldReturnTrueIfBookingExists(){
-        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(new Identity());
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.of(new Identity()));
 
         Assert.assertTrue(validator.isValid("user@test.com", mock(ConstraintValidatorContext.class)));
     }
 
     @Test
     public void shouldReturnFalseIfBookingDoesNotExist(){
-        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(null);
+        when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.empty());
 
         Assert.assertFalse(validator.isValid("user@test.com", mock(ConstraintValidatorContext.class)));
     }

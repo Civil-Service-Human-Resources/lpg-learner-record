@@ -36,14 +36,7 @@ public class InviteController {
     }
 
     @PostMapping("/{eventId}/invitee")
-    public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, BindingResult bindingResult, UriComponentsBuilder builder){
-        if(bindingResult.getModel().toString().contains("LearnerIsRegistered")){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        else if(bindingResult.getModel().toString().contains("LearnerNotBooked") || bindingResult.getModel().toString().contains("LearnerNotInvited")){
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-
+    public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
         return inviteService.save(inviteDto)
                 .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build())
                 .orElseThrow(() -> new IllegalStateException("Unable to save invite"));

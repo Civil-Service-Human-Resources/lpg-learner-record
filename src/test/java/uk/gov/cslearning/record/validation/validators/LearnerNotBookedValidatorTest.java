@@ -35,7 +35,7 @@ public class LearnerNotBookedValidatorTest {
         invite.setEvent(new URI("http://test/path/SRTIBDNE"));
         invite.setLearnerEmail("user@test.com");
 
-        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SRTIBDNE")).thenReturn(Optional.of(new Booking()));
+        when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SRTIBDNE")).thenReturn(Optional.of(new Booking()));
 
         Assert.assertFalse(validator.isValid(invite, mock(ConstraintValidatorContext.class)));
     }
@@ -46,7 +46,7 @@ public class LearnerNotBookedValidatorTest {
         invite.setEvent(new URI("http://test/path/SRTIBDNE"));
         invite.setLearnerEmail("user@test.com");
 
-        when(bookingService.isLearnerBookedOnEvent("user@test.com", "SRTIBDNE")).thenReturn(Optional.empty());
+        when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SRTIBDNE")).thenReturn(Optional.empty());
 
         Assert.assertTrue(validator.isValid(invite, mock(ConstraintValidatorContext.class)));
     }

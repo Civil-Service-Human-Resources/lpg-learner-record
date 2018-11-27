@@ -17,6 +17,7 @@ import uk.gov.cslearning.record.service.CivilServant;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 import static java.util.Collections.emptySet;
 
@@ -59,35 +60,32 @@ public class IdentityService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
                 .queryParam("uid", uid);
 
-        Identity identity = getIdentity(builder.toUriString());
+        Optional<Identity> identity = getIdentity(builder.toUriString());
 
-        if (identity != null) {
-            return identity.getUsername();
+        if (identity.isPresent()) {
+            return identity.get().getUsername();
         }
         return null;
     }
 
-    public Identity getIdentityByEmailAddress(String emailAddress){
-
+    public Optional<Identity> getIdentityByEmailAddress(String emailAddress){
         LOGGER.debug("Getting identity with email address {}", emailAddress);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl).queryParam("emailAddress", emailAddress);
 
-        Identity identity = getIdentity(builder.toUriString());
-
-        return identity;
+        return getIdentity(builder.toUriString());
     }
 
-    private Identity getIdentity(String path){
+    private Optional<Identity> getIdentity(String path){
         Identity identity;
         try{
             identity = restOperations.getForObject(path, Identity.class);
         } catch (HttpClientErrorException e) {
             if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return null;
+                return Optional.empty();
             }
             throw new RuntimeException(e);
         }
-        return identity;
+        return Optional.of(identity);
     }
 }

@@ -20,13 +20,8 @@ public class LearnerIsRegisteredValidator implements ConstraintValidator<Learner
 
     public void initialise(LearnerNotInvited constraint) {}
 
+    @Override
     public boolean isValid(String learnerEmail, ConstraintValidatorContext context) {
-        Identity identity = identityService.getIdentityByEmailAddress(learnerEmail);
-
-        if(identity == null){
-            return false;
-        } else {
-            return true;
-        }
+        return identityService.getIdentityByEmailAddress(learnerEmail).isPresent();
     }
 }

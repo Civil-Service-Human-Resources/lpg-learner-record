@@ -20,11 +20,10 @@ public class LearnerNotInvitedValidator implements ConstraintValidator<LearnerNo
 
     public void initialise(LearnerNotInvited constraint) {}
 
+    @Override
     public boolean isValid(InviteDto invite, ConstraintValidatorContext context) {
         String eventUid = Paths.get(invite.getEvent().getPath()).getFileName().toString();
 
-        return inviteService.findByEventIdAndLearnerEmail(eventUid, invite.getLearnerEmail())
-                .map(inviteDto -> false)
-                .orElse(true);
+        return !inviteService.findByEventIdAndLearnerEmail(eventUid, invite.getLearnerEmail()).isPresent();
     }
 }

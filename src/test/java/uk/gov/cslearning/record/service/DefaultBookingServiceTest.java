@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -251,6 +250,6 @@ public class DefaultBookingServiceTest {
 
         when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status)).thenReturn(Optional.of(booking));
 
-        assertEquals(Optional.of(booking), bookingService.isLearnerBookedOnEvent(learnerEmail, eventUid));
+        assertEquals(Optional.of(booking), bookingService.findActiveBookingByEmailAndEvent(learnerEmail, eventUid));
     }
 }

@@ -4,15 +4,17 @@ import com.google.common.collect.Iterables;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.web.client.HttpClientErrorException;
 
+import javax.xml.ws.http.HTTPException;
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -48,19 +50,19 @@ public class IdentityServiceTest {
 
         when(restOperations.getForObject(API_URL + "?emailAddress=test@domain.com", Identity.class)).thenReturn(identity);
 
-        Identity returnedIdentity = identityService.getIdentityByEmailAddress("test@domain.com");
+        Optional<Identity> returnedIdentity = identityService.getIdentityByEmailAddress("test@domain.com");
 
-        assertEquals(returnedIdentity.getUid(), "uid");
-        assertEquals(returnedIdentity.getUsername(), "username");
+        assertEquals(returnedIdentity.get().getUid(), "uid");
+        assertEquals(returnedIdentity.get().getUsername(), "username");
     }
 
     @Test
     public void shouldReturnNullIfIdentityDoesNotExist() {
-        when(restOperations.getForObject(LIST_ALL_URL, Identity[].class)).thenReturn(null);
+        when(restOperations.getForObject(API_URL + "?emailAddress=test@domain.com", Identity.class)).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        Identity returnedIdentity =  identityService.getIdentityByEmailAddress("test@domain.com");
+        Optional<Identity> returnedIdentity =  identityService.getIdentityByEmailAddress("test@domain.com");
 
-        assertNull(returnedIdentity);
+        assertTrue(returnedIdentity.equals(Optional.empty()));
     }
 
     @Test
