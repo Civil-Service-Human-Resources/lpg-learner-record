@@ -38,6 +38,16 @@ public class BookingController {
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     }
 
+    @GetMapping(value = "/event/{eventUid}/learner/{learnerUid}", produces = "application/json")
+    public ResponseEntity<BookingDto> getBooking(@PathVariable String eventUid, @PathVariable String learnerUid) {
+        Optional<BookingDto> booking = bookingService.find(eventUid, learnerUid);
+
+        return booking
+                .map(b -> new ResponseEntity<>(b, OK))
+                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    }
+
+
     @PostMapping(value="/event/{eventId}/booking/")
     public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
 
@@ -46,6 +56,13 @@ public class BookingController {
         return ResponseEntity.created(
                 uriBuilder.path("/event/{eventId}/booking/{bookingId}").build(eventId, result.getId())
         ).build();
+    }
+
+    @PatchMapping(value = "/event/{eventUid}/learner/{learnerUid}")
+    public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventUid, @PathVariable String learnerUid, @Valid @RequestBody BookingStatusDto bookingStatus) {
+        BookingDto result = bookingService.updateStatus(eventUid, learnerUid, bookingStatus);
+
+        return ResponseEntity.ok(result);
     }
 
     @PatchMapping(value = "/event/{eventId}/booking/{bookingId}")

@@ -61,4 +61,40 @@ public class BookingDtoFactoryTest {
 
         assertThat(bookingDto.getStatus(), equalTo(BookingStatus.forValue(status)));
     }
+
+    @Test
+    public void shouldIgnoreMissingPaymentDetails() throws URISyntaxException {
+        int bookingId = 99;
+        String status = "Confirmed";
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+
+        String learnerUuid = "learner-uuid";
+        String learnerEmail = "test@domain.com";
+        Learner learner = new Learner();
+        learner.setUid(learnerUuid);
+        learner.setLearnerEmail(learnerEmail);
+
+        String eventPath = "/courses/abc/modules/def/events/ghi";
+        Event event = new Event();
+        event.setPath(eventPath);
+
+        Booking booking = new Booking();
+        booking.setId(bookingId);
+        booking.setStatus(status);
+        booking.setBookingTime(bookingTime);
+        booking.setLearner(learner);
+        booking.setEvent(event);
+
+        BookingDto bookingDto = bookingDtoFactory.create(booking);
+
+        assertThat(bookingDto.getId(), equalTo(bookingId));
+        assertThat(bookingDto.getBookingTime(), equalTo(bookingTime));
+        assertThat(bookingDto.getEvent(),
+                equalTo(new URI(String.join("", learningCatalogueBaseUri, eventPath))));
+
+        assertThat(bookingDto.getLearner(), equalTo(learnerUuid));
+        assertThat(bookingDto.getLearnerEmail(), equalTo(learnerEmail));
+
+        assertThat(bookingDto.getStatus(), equalTo(BookingStatus.forValue(status)));
+    }
 }

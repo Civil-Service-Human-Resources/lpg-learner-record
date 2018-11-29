@@ -12,8 +12,10 @@ import uk.gov.cslearning.record.domain.Learner;
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -51,5 +53,34 @@ public class BookingRepositoryTest {
         Booking savedBooking = bookingRepository.findById(booking.getId()).get();
         assertEquals(event, savedBooking.getEvent());
         assertEquals(learner, savedBooking.getLearner());
+    }
+
+    @Test
+    public void shouldFindBookingFromEventUidAndLearnerUid() {
+        String learnerUid = "75c2c3b3-722f-4ffb-aec9-3d743a2d5330";
+        String eventUid = "SSB";
+
+        Learner learner = new Learner();
+        learner.setUid(learnerUid);
+        learner.setLearnerEmail("test@domain.com");
+
+        Event event = new Event();
+        event.setPath("test/path");
+        event.setUid(eventUid);
+
+        Booking booking = new Booking();
+        booking.setEvent(event);
+        booking.setLearner(learner);
+        booking.setStatus("CONFIRMED");
+        booking.setPaymentDetails("payment/details");
+        booking.setBookingTime(Instant.now());
+
+        Booking savedBooking = bookingRepository.save(booking);
+
+        Optional<Booking> optional = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid);
+
+        assertTrue(optional.isPresent());
+
+        assertEquals(savedBooking.getId(), optional.get().getId());
     }
 }
