@@ -98,4 +98,31 @@ public class BookingFactoryTest {
         verify(learnerFactory).create(learnerUid, learnerEmail);
         verify(eventFactory).create(event.getPath());
     }
+
+    @Test
+    public void shouldIgnorePaymentDetailsIfNotPresent() throws URISyntaxException {
+        int id = 99;
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        String learnerUid = "learner-uuid";
+        String learnerEmail = "test@domain.com";
+        URI event = new URI("http://learning-catalogue/event-path");
+
+        BookingDto bookingDto = new BookingDto();
+
+        bookingDto.setId(id);
+        bookingDto.setBookingTime(bookingTime);
+        bookingDto.setLearner(learnerUid);
+        bookingDto.setLearnerEmail(learnerEmail);
+        bookingDto.setEvent(event);
+        bookingDto.setStatus(BookingStatus.CONFIRMED);
+
+        Booking booking = bookingFactory.create(bookingDto);
+
+        assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
+        assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
+        assertThat(booking.getId(), equalTo(bookingDto.getId()));
+
+        verify(learnerFactory).create(learnerUid, learnerEmail);
+        verify(eventFactory).create(event.getPath());
+    }
 }

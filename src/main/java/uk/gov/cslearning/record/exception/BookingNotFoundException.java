@@ -4,4 +4,8 @@ public class BookingNotFoundException extends RuntimeException {
     public BookingNotFoundException(int bookingId) {
         super(String.format("Booking does not exist with id: %d", bookingId));
     }
+
+    public BookingNotFoundException(String eventUid, String bookingUid) {
+        super(String.format("Booking does not exist with event: %s and learner: %s", eventUid, bookingUid));
+    }
 }

@@ -131,6 +131,41 @@ public class BookingControllerTest {
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 
+
+    @Test
+    public void shouldReturnBookingFromEventUidAndLearnerUid() throws Exception {
+
+        int bookingId = 99;
+        String learnerUid = "learner-uid";
+        String eventUid = "event-uid";
+        BookingStatus status = BookingStatus.CONFIRMED;
+        URI event = new URI("_event");
+        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        URI paymentDetails = new URI("payment-details");
+
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setId(bookingId);
+        bookingDto.setLearner(learnerUid);
+        bookingDto.setStatus(status);
+        bookingDto.setEvent(event);
+        bookingDto.setBookingTime(bookingTime);
+        bookingDto.setPaymentDetails(paymentDetails);
+
+        when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.of(bookingDto));
+
+        mockMvc.perform(
+                get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(bookingId)))
+                .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
+                .andExpect(jsonPath("$.status", equalTo(status.getValue())))
+                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
+                .andExpect(jsonPath("$.bookingTime",
+                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
+    }
+
     @Test
     public void shouldReturn404IfNotFound() throws Exception {
         int bookingId = 99;
@@ -139,6 +174,19 @@ public class BookingControllerTest {
 
         mockMvc.perform(
                 get("/event/blah/booking/" + bookingId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn404IfNotFoundFromEventUidAndLearnerUid() throws Exception {
+        String eventUid = "event-uid";
+        String learnerUid = "learner-uid";
+
+        when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -342,5 +390,51 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.errors[0]", equalTo("event: Cannot apply booking to a cancelled event.")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
+    }
+
+    @Test
+    public void shouldUpdateBookingWithEventUidAndLearnerUid() throws Exception {
+        String learnerUid = "learner-uid";
+        String eventUid = "event-uid";
+        int bookingId = 99;
+        BookingStatus status = BookingStatus.CONFIRMED;
+        Instant bookingTime =
+                LocalDateTime.of(2018,
+                        1,
+                        1,
+                        13,
+                        59,
+                        12,
+                        500).toInstant(ZoneOffset.UTC);
+        URI paymentDetails = new URI("payment-details");
+        URI event = new URI("http://event");
+
+        BookingDto booking = new BookingDto();
+        booking.setId(bookingId);
+        booking.setStatus(status);
+        booking.setBookingTime(bookingTime);
+        booking.setPaymentDetails(paymentDetails);
+        booking.setEvent(event);
+        booking.setLearner(learnerUid);
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+
+        when(bookingService.updateStatus(eq(eventUid), eq(learnerUid), eq(bookingStatus))).thenReturn(booking);
+
+        mockMvc.perform(
+                patch(String.format("/event/%s/learner/%s", eventUid, learnerUid)).with(csrf())
+                        .content(objectMapper.writeValueAsString(bookingStatus))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(bookingId)))
+                .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
+                .andExpect(jsonPath("$.status", equalTo(status.getValue())))
+                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
+                .andExpect(jsonPath("$.bookingTime",
+                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
+
+        verify(bookingService).updateStatus(eventUid, learnerUid, bookingStatus);
     }
 }

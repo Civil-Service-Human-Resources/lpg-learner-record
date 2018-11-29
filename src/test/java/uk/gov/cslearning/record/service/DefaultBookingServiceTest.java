@@ -61,12 +61,37 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
+    public void shouldFindBookingByEventUidAndLearnerUid() {
+        String eventUid = "event-uid";
+        String learnerUid = "learner-uid";
+
+        Booking booking = new Booking();
+        BookingDto bookingDto = new BookingDto();
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
+        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+
+        assertEquals(Optional.of(bookingDto), bookingService.find(eventUid, learnerUid));
+    }
+
+
+    @Test
     public void shouldReturnEmptyOptionalIfBookingNotFound() {
         int bookingId = 99;
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
         assertEquals(Optional.empty(), bookingService.find(bookingId));
+    }
+
+    @Test
+    public void shouldReturnEmptyOptionalIfBookingNotFoundByEventUidAndLearnerUid() {
+        String eventUid = "event-uid";
+        String learnerUid = "learner-uid";
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.empty());
+
+        assertEquals(Optional.empty(), bookingService.find(eventUid, learnerUid));
     }
 
     @Test
@@ -162,6 +187,35 @@ public class DefaultBookingServiceTest {
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
+
+        verify(xApiService).register(bookingDto);
+    }
+
+    @Test
+    public void shouldUpdateBookingStatusWithEventUidAndLearnerUid() {
+        String eventUid = "event-uid";
+        String learnerUid = "learner-uid";
+
+        Booking booking = mock(Booking.class);
+        Booking updatedBooking = mock(Booking.class);
+        Booking savedBooking = mock(Booking.class);
+
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
+        bookingDto.setLearner("test-uid");
+        BookingDto savedBookingDto = new BookingDto();
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
+
+        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+
+        BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED);
+
+        when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
+        when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
 
         verify(xApiService).register(bookingDto);
     }

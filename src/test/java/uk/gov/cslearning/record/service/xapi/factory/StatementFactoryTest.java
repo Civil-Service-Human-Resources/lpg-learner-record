@@ -31,6 +31,9 @@ public class StatementFactoryTest {
     @Mock
     private VerbFactory verbFactory;
 
+    @Mock
+    private ContextFactory contextFactory;
+
     @InjectMocks
     private StatementFactory statementFactory;
 
@@ -49,11 +52,13 @@ public class StatementFactoryTest {
         IStatementObject object = mock(IStatementObject.class);
         Result result = new Result();
         Verb registered = new Verb();
+        Context context = new Context();
 
         when(actorFactory.create(userId)).thenReturn(actor);
         when(objectFactory.createEventObject(event.toString())).thenReturn(object);
         when(resultFactory.createPurchaseOrderResult(paymentDetails.toString())).thenReturn(result);
         when(verbFactory.createdRegistered()).thenReturn(registered);
+        when(contextFactory.createBookingContext(bookingDto)).thenReturn(context);
 
         Statement statement = statementFactory.createRegisteredStatement(bookingDto);
 
@@ -61,11 +66,13 @@ public class StatementFactoryTest {
         assertEquals(object, statement.getObject());
         assertEquals(result, statement.getResult());
         assertEquals(registered, statement.getVerb());
+        assertEquals(context, statement.getContext());
 
         verify(actorFactory).create(userId);
         verify(objectFactory).createEventObject(event.toString());
         verify(resultFactory).createPurchaseOrderResult(paymentDetails.toString());
         verify(verbFactory).createdRegistered();
+        verify(contextFactory).createBookingContext(bookingDto);
     }
 
     @Test
@@ -82,19 +89,23 @@ public class StatementFactoryTest {
         Actor actor = mock(Actor.class);
         IStatementObject object = mock(IStatementObject.class);
         Verb unregistered = new Verb();
+        Context context = new Context();
 
         when(actorFactory.create(userId)).thenReturn(actor);
         when(objectFactory.createEventObject(event.toString())).thenReturn(object);
         when(verbFactory.createdUnregistered()).thenReturn(unregistered);
+        when(contextFactory.createBookingContext(bookingDto)).thenReturn(context);
 
         Statement statement = statementFactory.createUnregisteredStatement(bookingDto);
 
         assertEquals(actor, statement.getActor());
         assertEquals(object, statement.getObject());
         assertEquals(unregistered, statement.getVerb());
+        assertEquals(context, statement.getContext());
 
         verify(actorFactory).create(userId);
         verify(objectFactory).createEventObject(event.toString());
         verify(verbFactory).createdUnregistered();
+        verify(contextFactory).createBookingContext(bookingDto);
     }
 }
