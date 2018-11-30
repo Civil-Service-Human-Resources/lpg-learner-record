@@ -11,12 +11,14 @@ public class StatementFactory {
     private final ResultFactory resultFactory;
     private final IStatementObjectFactory objectFactory;
     private final VerbFactory verbFactory;
+    private final ContextFactory contextFactory;
 
-    public StatementFactory(ActorFactory actorFactory, ResultFactory resultFactory, IStatementObjectFactory objectFactory, VerbFactory verbFactory) {
+    public StatementFactory(ActorFactory actorFactory, ResultFactory resultFactory, IStatementObjectFactory objectFactory, VerbFactory verbFactory, ContextFactory contextFactory) {
         this.actorFactory = actorFactory;
         this.resultFactory = resultFactory;
         this.objectFactory = objectFactory;
         this.verbFactory = verbFactory;
+        this.contextFactory = contextFactory;
     }
 
     public Statement createRegisteredStatement(BookingDto bookingDto) {
@@ -31,6 +33,7 @@ public class StatementFactory {
         statement.setVerb(verbFactory.createdRegistered());
         statement.setObject(object);
         statement.setResult(result);
+        statement.setContext(contextFactory.createBookingContext(bookingDto));
 
         return statement;
     }
@@ -43,6 +46,7 @@ public class StatementFactory {
         statement.setActor(actor);
         statement.setVerb(verbFactory.createdUnregistered());
         statement.setObject(object);
+        statement.setContext(contextFactory.createBookingContext(bookingDto));
 
         return statement;
     }
