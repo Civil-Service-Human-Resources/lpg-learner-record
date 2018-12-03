@@ -1,14 +1,15 @@
 CREATE TABLE `event` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `uid` varchar(60) UNIQUE NOT NULL,
+  `uid` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
   `status` enum('ACTIVE','CANCELLED'),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_key_uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `learner` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uid` varchar(60) UNIQUE NOT NULL,
+  `uid` varchar(60) NOT NULL,
   `learner_email` varchar(60) UNIQUE NOT NULL,
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
