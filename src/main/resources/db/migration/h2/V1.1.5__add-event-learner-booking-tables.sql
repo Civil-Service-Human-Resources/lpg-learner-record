@@ -3,7 +3,7 @@ CREATE TABLE `event` (
   `uid` varchar(60) NOT NULL,
   `path` varchar(255) NOT NULL,
   `status` enum('ACTIVE','CANCELLED'),
-  PRIMARY KEY(`id`),
+  PRIMARY KEY(`id`)
 );
 
 CREATE TABLE `learner` (
