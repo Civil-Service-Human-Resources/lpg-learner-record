@@ -2,7 +2,6 @@ package uk.gov.cslearning.record.api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.InviteDto;
@@ -37,7 +36,7 @@ public class InviteController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
-        return inviteService.save(inviteDto)
+        return inviteService.inviteLearner(inviteDto)
                 .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build())
                 .orElseThrow(() -> new IllegalStateException("Unable to save invite"));
     }
