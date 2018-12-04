@@ -55,12 +55,15 @@ public class BookingFactoryTest {
         bookingDto.setEvent(event);
         bookingDto.setStatus(BookingStatus.CONFIRMED);
 
+        when(learnerFactory.create(learnerUid, learnerEmail)).thenReturn(learner);
+
         Booking booking = bookingFactory.create(bookingDto);
 
         assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
         assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
         assertThat(booking.getId(), equalTo(bookingDto.getId()));
+        assertThat(booking.getLearner().getId(), equalTo(99));
 
         verify(eventFactory).create(event.getPath());
         verify(learnerFactory).create(learnerUid, learnerEmail);

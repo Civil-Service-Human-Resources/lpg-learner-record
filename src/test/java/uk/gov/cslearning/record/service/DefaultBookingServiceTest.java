@@ -19,6 +19,8 @@ import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
@@ -291,5 +293,17 @@ public class DefaultBookingServiceTest {
 
         verifyZeroInteractions(xApiService);
         verify(bookingRepository).saveBooking(booking);
+    }
+
+    @Test
+    public void shouldReturnLearnerIfBooked() {
+        String learnerEmail = "test@domain.com";
+        String eventUid = "eventUid";
+        Booking booking = new Booking();
+        List<String> status = Arrays.asList(BookingStatus.REQUESTED.getValue(), BookingStatus.CONFIRMED.getValue());
+
+        when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status)).thenReturn(Optional.of(booking));
+
+        assertEquals(Optional.of(booking), bookingService.findActiveBookingByEmailAndEvent(learnerEmail, eventUid));
     }
 }

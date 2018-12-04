@@ -25,12 +25,6 @@ public class BookingRepositoryTest {
     @Autowired
     private BookingRepository bookingRepository;
 
-    @Autowired
-    private LearnerRepository learnerRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
-
     @Test
     public void shouldSaveBooking() {
         Learner learner = new Learner();

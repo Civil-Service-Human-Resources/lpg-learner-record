@@ -31,4 +31,7 @@ public interface BookingService {
 
     @Transactional
     BookingDto unregister(Booking booking);
+
+    @Transactional(readOnly = true)
+    Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);
 }

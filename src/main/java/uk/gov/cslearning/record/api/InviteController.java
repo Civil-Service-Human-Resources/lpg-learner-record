@@ -7,6 +7,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.InviteService;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -26,10 +27,17 @@ public class InviteController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/{eventId}/invitee")
-    public ResponseEntity<Void> addInvitee(@PathVariable("eventId") String eventUid, @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
-        inviteService.save(inviteDto);
+    @GetMapping("/{eventId}/invitee/{inviteId}")
+    public ResponseEntity<InviteDto> getInvitee(@PathVariable("eventId") String eventUid, @PathVariable("inviteId") int inviteId){
+        return inviteService.findInvite(inviteId)
+                .map(i -> new ResponseEntity<>(i, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
 
-        return ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build();
+    @PostMapping("/{eventId}/invitee")
+    public ResponseEntity<Object> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, UriComponentsBuilder builder){
+        return inviteService.save(inviteDto)
+                .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).build())
+                .orElseThrow(() -> new IllegalStateException("Unable to save invite"));
     }
 }

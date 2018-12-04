@@ -13,8 +13,7 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,6 +116,12 @@ public class DefaultBookingService implements BookingService {
         return unregister(bookingDtoFactory.create(booking));
     }
 
+    @Override
+    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){;
+        List<String> status = Arrays.asList(BookingStatus.REQUESTED.getValue(), BookingStatus.CONFIRMED.getValue());
+
+        return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
+    }
 
     private BookingDto save(BookingDto bookingDto) {
         return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));

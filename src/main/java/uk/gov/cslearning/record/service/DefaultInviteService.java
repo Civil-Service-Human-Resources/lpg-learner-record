@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.service;
 
-
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.InviteFactory;
@@ -10,6 +9,7 @@ import uk.gov.cslearning.record.repository.InviteRepository;
 
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,18 +28,28 @@ public class DefaultInviteService implements InviteService{
 
     @Override
     public Collection<InviteDto> findByEventId(String eventId){
-        Collection<InviteDto> result = inviteRepository.findByEventId(eventId)
+        Collection<InviteDto> result = inviteRepository.findAllByEventUid(eventId)
                 .stream().map(
                         inviteDtoFactory::create
                 ).collect(Collectors.toList());
-
 
         return result;
     }
 
     @Override
-    public InviteDto save(InviteDto inviteDto){
+    public Optional<InviteDto> findInvite(int id){
+        return inviteRepository.findById(id).map(inviteDtoFactory::create);
+    }
+
+    @Override
+    public Optional<InviteDto> findByEventIdAndLearnerEmail(String eventUid, String learnerEmail){
+        return inviteRepository.findByEventUidAndLearnerEmail(eventUid, learnerEmail).map(inviteDtoFactory::create);
+    }
+
+    @Override
+    public Optional<InviteDto> save(InviteDto inviteDto){
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
-        return inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event)));
+
+        return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
     }
 }

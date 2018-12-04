@@ -9,7 +9,6 @@ import uk.gov.cslearning.record.validation.annotations.BookingStatusNotEquals;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookingStatusDto {
-
     @BookingStatusNotEquals(value = BookingStatus.REQUESTED, message = "{booking.status.invalid}")
     private BookingStatus status;
 }
