@@ -39,7 +39,7 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    public EventDto updateStatus(String eventUid, EventStatusDto eventStatus) {
+    public Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus) {
         Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
 
         if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
@@ -49,7 +49,7 @@ public class DefaultEventService implements EventService {
         EventDto eventDto = eventDtoFactory.create(event);
         eventDto.setStatus(eventStatus.getStatus());
 
-        return eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto)));
+        return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
     }
 
     @Override
