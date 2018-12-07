@@ -82,7 +82,7 @@ public class EventControllerTest {
         String eventUid = "event-id";
         URI uri = URI.create("http://localhost:9001/courses/course-id/modules/module-id/events/event-id");
 
-        EventStatusDto eventStatusDto = new EventStatusDto(EventStatus.CANCELLED);
+        EventStatusDto eventStatusDto = new EventStatusDto(EventStatus.CANCELLED, "");
 
         EventDto event = new EventDto();
         event.setStatus(EventStatus.CANCELLED);
@@ -107,7 +107,7 @@ public class EventControllerTest {
     @Test
     public void shouldReturnNotFoundIfEventNotFoundOnPatch() throws Exception {
         String eventUid = "event-id";
-        EventStatusDto eventStatus = new EventStatusDto(EventStatus.CANCELLED);
+        EventStatusDto eventStatus = new EventStatusDto(EventStatus.CANCELLED, "");
 
         EventNotFoundException exception = mock(EventNotFoundException.class);
 
