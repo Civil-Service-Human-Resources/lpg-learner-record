@@ -89,7 +89,7 @@ public class EventControllerTest {
         event.setUid(eventUid);
         event.setUri(uri);
 
-        when(eventService.updateStatus(eventUid, eventStatusDto)).thenReturn(event);
+        when(eventService.updateStatus(eventUid, eventStatusDto)).thenReturn(Optional.of(event));
 
         mockMvc.perform(
                 patch("/event/" + eventUid).with(csrf())
