@@ -58,8 +58,15 @@ public class DefaultInviteService implements InviteService{
     @Override
     public Optional<InviteDto> inviteLearner(InviteDto inviteDto){
         Map<String, String> map = new HashMap<>();
-        map.put("courseTitle", inviteDto.)
-        MessageDto message = messageDtoFactory.create(inviteDto.getLearnerEmail(), "8efb52bd-9ada-402e-8fab-84a751bf4a71", )
+        map.put("learnerName", "TEST NAME");
+        map.put("courseTitle", "TEST TITLE");
+        map.put("courseDate", "TEST DATE");
+        map.put("courseLocation", "TEST LOCATION");
+        map.put("accessibility", "TEST ACCESSIBILITY");
+        map.put("bookingReference", "TEST REFERENCE");
+        MessageDto message = messageDtoFactory.create("peterta@kainos.com", "8efb52bd-9ada-402e-8fab-84a751bf4a71", map);
+
+        notificationService.send(message);
 
         return save(inviteDto);
     }
