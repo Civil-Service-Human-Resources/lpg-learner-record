@@ -62,6 +62,8 @@ govNotify:
   template:
     requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}
     completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:template}
+    inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:template}
+
 
 csl.homepage: "https://cslearning.gov.uk/"
 

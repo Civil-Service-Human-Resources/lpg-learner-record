@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.InviteFactory;
@@ -9,6 +10,8 @@ import uk.gov.cslearning.record.notifications.dto.MessageDto;
 import uk.gov.cslearning.record.notifications.dto.factory.MessageDtoFactory;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.InviteRepository;
+import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -25,14 +28,29 @@ public class DefaultInviteService implements InviteService{
     private final EventService eventService;
     private final NotificationService notificationService;
     private final MessageDtoFactory messageDtoFactory;
+    private final LearningCatalogueService learningCatalogueService;
 
-    public DefaultInviteService(InviteFactory inviteFactory, InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository, EventService eventService, NotificationService notificationService, MessageDtoFactory messageDtoFactory){
+    private final String messageTemplateId;
+
+    public DefaultInviteService(
+            InviteFactory inviteFactory,
+            InviteDtoFactory inviteDtoFactory,
+            InviteRepository inviteRepository,
+            EventService eventService,
+            NotificationService notificationService,
+            MessageDtoFactory messageDtoFactory,
+            LearningCatalogueService learningCatalogueService,
+            @Value("govNotify.template.inviteLearner") String messageTemplateId
+    ){
         this.inviteFactory = inviteFactory;
         this.inviteDtoFactory = inviteDtoFactory;
         this.inviteRepository = inviteRepository;
         this.eventService = eventService;
         this.notificationService = notificationService;
         this.messageDtoFactory = messageDtoFactory;
+        this.learningCatalogueService = learningCatalogueService;
+
+        this.messageTemplateId = messageTemplateId;
     }
 
     @Override
@@ -57,14 +75,7 @@ public class DefaultInviteService implements InviteService{
 
     @Override
     public Optional<InviteDto> inviteLearner(InviteDto inviteDto){
-        Map<String, String> map = new HashMap<>();
-        map.put("learnerName", "TEST NAME");
-        map.put("courseTitle", "TEST TITLE");
-        map.put("courseDate", "TEST DATE");
-        map.put("courseLocation", "TEST LOCATION");
-        map.put("accessibility", "TEST ACCESSIBILITY");
-        map.put("bookingReference", "TEST REFERENCE");
-        MessageDto message = messageDtoFactory.create("peterta@kainos.com", "8efb52bd-9ada-402e-8fab-84a751bf4a71", map);
+        MessageDto message = createInviteMessage(inviteDto);
 
         notificationService.send(message);
 
@@ -75,5 +86,23 @@ public class DefaultInviteService implements InviteService{
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
 
         return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
+    }
+
+    private MessageDto createInviteMessage(InviteDto inviteDto) {
+        uk.gov.cslearning.record.service.catalogue.Event catalogueEvent = learningCatalogueService.getEvent(inviteDto.getEvent().toString());
+
+        String[] parts = inviteDto.getEvent().getPath().split("/");
+        String courseId = parts[parts.length - 5];
+        Course course = learningCatalogueService.getCourse(courseId);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("learnerName", inviteDto.getLearnerEmail());
+        map.put("courseTitle", course.getTitle());
+        map.put("courseDate", catalogueEvent.getDateRanges().get(0).getDate().toString());
+        map.put("courseLocation", catalogueEvent.getVenue().getLocation());
+        map.put("accessibility", "TEST ACCESSIBILITY");
+        map.put("bookingReference", "TEST REFERENCE");
+
+        return messageDtoFactory.create(inviteDto.getLearnerEmail(), messageTemplateId, map);
     }
 }
