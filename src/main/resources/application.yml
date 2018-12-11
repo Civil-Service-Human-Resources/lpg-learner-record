@@ -64,6 +64,10 @@ govNotify:
     completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:template}
     inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:template}
 
+lpg-ui:
+  serviceUrl: ${LPG-UI_SERVICE_URL:http://localhost:3001}
+  bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
+
 
 csl.homepage: "https://cslearning.gov.uk/"
 
