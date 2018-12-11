@@ -132,6 +132,13 @@ public class DefaultBookingService implements BookingService {
         return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
     }
 
+    @Override
+    public List<BookingDto> findAll() {
+        return bookingRepository.findAll().stream()
+                .map(bookingDtoFactory::create)
+                .collect(Collectors.toList());
+    }
+
     private BookingDto save(BookingDto bookingDto) {
         return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
     }
