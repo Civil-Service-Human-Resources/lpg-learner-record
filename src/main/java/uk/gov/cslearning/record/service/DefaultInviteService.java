@@ -61,9 +61,7 @@ public class DefaultInviteService implements InviteService{
 
     @Override
     public Optional<InviteDto> inviteLearner(InviteDto inviteDto){
-        MessageDto message = messageService.createInviteMessage(inviteDto);
-
-        notificationService.send(message);
+        notificationService.send(messageService.createInviteMessage(inviteDto));
 
         return save(inviteDto);
     }
