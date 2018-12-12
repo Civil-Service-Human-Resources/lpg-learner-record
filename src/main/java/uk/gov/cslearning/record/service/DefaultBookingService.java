@@ -13,6 +13,7 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,8 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
+        deleteCancelledBooking(bookingDto);
+
         return save(bookingDto);
     }
 
@@ -117,7 +120,7 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){;
+    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){
         List<String> status = Arrays.asList(BookingStatus.REQUESTED.getValue(), BookingStatus.CONFIRMED.getValue());
 
         return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
@@ -125,5 +128,16 @@ public class DefaultBookingService implements BookingService {
 
     private BookingDto save(BookingDto bookingDto) {
         return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
+    }
+
+    private void deleteCancelledBooking(BookingDto bookingDto) {
+        String learnerId = bookingDto.getLearner();
+        String eventId = Paths.get(bookingDto.getEvent().toString()).getFileName().toString();
+        Booking oldBooking = find(eventId, learnerId).map(bookingFactory::create).orElse(null);
+
+        if(oldBooking != null) {
+            List<String> status = Arrays.asList(BookingStatus.CANCELLED.getValue());
+            bookingRepository.deleteBookingWithStatus(oldBooking, status);
+        }
     }
 }

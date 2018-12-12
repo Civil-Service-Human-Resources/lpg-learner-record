@@ -18,6 +18,8 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -126,12 +128,14 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldRegisterAndSaveBooking() {
+    public void shouldRegisterAndSaveBooking() throws URISyntaxException{
         BookingDto unsavedBookingDto = new BookingDto();
         unsavedBookingDto.setStatus(BookingStatus.CONFIRMED);
         Booking unsavedBooking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
+
+        unsavedBookingDto.setEvent(new URI("/test/path/to/eventId"));
 
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
         when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
@@ -146,13 +150,45 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldSaveBookingButNotRegisterIfNotConfirmed() {
+    public void shouldDeleteCancelledBookingAndRegister() throws URISyntaxException{
+        BookingDto unsavedBookingDto = new BookingDto();
+        unsavedBookingDto.setStatus(BookingStatus.CONFIRMED);
+        Booking unsavedBooking = new Booking();
+        BookingDto savedBookingDto = new BookingDto();
+        Booking savedBooking = new Booking();
+
+        Booking cancelledBooking = new Booking();
+        BookingDto cancelledBookingDto = new BookingDto();
+
+        unsavedBookingDto.setLearner("learnerId");
+        unsavedBookingDto.setEvent(new URI("/test/path/to/eventId"));
+
+        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
+        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+        when(bookingRepository.findByEventUidLearnerUid("eventId", "learnerId")).thenReturn(Optional.of(cancelledBooking));
+        when(bookingDtoFactory.create(cancelledBooking)).thenReturn(cancelledBookingDto);
+        when(bookingFactory.create(cancelledBookingDto)).thenReturn(cancelledBooking);
+
+        assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
+
+        InOrder order = inOrder(xApiService, bookingRepository);
+
+        order.verify(xApiService).register(unsavedBookingDto);
+        order.verify(bookingRepository).deleteBookingWithStatus(cancelledBooking, Arrays.asList(BookingStatus.CANCELLED.getValue()));
+        order.verify(bookingRepository).saveBooking(unsavedBooking);
+    }
+
+    @Test
+    public void shouldSaveBookingButNotRegisterIfNotConfirmed() throws URISyntaxException {
         BookingDto unsavedBookingDto = new BookingDto();
         unsavedBookingDto.setStatus(BookingStatus.REQUESTED);
         unsavedBookingDto.setLearner("test-uid");
         Booking unsavedBooking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
+
+        unsavedBookingDto.setEvent(new URI("/test/path/to/eventId"));
 
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
         when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
@@ -165,7 +201,7 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldUpdateBookingStatus() {
+    public void shouldUpdateBookingStatus() throws URISyntaxException{
         int bookingId = 99;
         Booking booking = mock(Booking.class);
         Booking updatedBooking = mock(Booking.class);
@@ -175,6 +211,8 @@ public class DefaultBookingServiceTest {
         bookingDto.setStatus(BookingStatus.REQUESTED);
         bookingDto.setLearner("test-uid");
         BookingDto savedBookingDto = new BookingDto();
+
+        bookingDto.setEvent(new URI("/test/path/to/eventId"));
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
 
@@ -192,7 +230,7 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldUpdateBookingStatusWithEventUidAndLearnerUid() {
+    public void shouldUpdateBookingStatusWithEventUidAndLearnerUid() throws URISyntaxException{
         String eventUid = "event-uid";
         String learnerUid = "learner-uid";
 
@@ -204,6 +242,8 @@ public class DefaultBookingServiceTest {
         bookingDto.setStatus(BookingStatus.REQUESTED);
         bookingDto.setLearner("test-uid");
         BookingDto savedBookingDto = new BookingDto();
+
+        bookingDto.setEvent(new URI("/test/path/to/eventId"));
 
         when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
 
@@ -278,12 +318,14 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldNotCallXApiIfStatusIsRequested() {
+    public void shouldNotCallXApiIfStatusIsRequested() throws URISyntaxException{
         BookingDto bookingDto = new BookingDto();
         bookingDto.setStatus(BookingStatus.REQUESTED);
         Booking booking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
+
+        bookingDto.setEvent(new URI("/test/path/to/eventId"));
 
         when(bookingFactory.create(bookingDto)).thenReturn(booking);
         when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
