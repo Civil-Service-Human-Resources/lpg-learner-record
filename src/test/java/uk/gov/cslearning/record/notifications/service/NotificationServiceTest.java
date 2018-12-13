@@ -2,9 +2,12 @@ package uk.gov.cslearning.record.notifications.service;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.cslearning.record.notifications.dto.MessageDto;
+import uk.gov.cslearning.record.service.MessageService;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +21,9 @@ public class NotificationServiceTest {
 
     private final RestTemplate restTemplate = mock(RestTemplate.class);
 
-    private final NotificationService notificationService = new NotificationService(restTemplate, notificationsUrl);
+    private final RequestEntityFactory requestEntityFactory = mock(RequestEntityFactory.class);
+
+    private final NotificationService notificationService = new NotificationService(restTemplate, requestEntityFactory, notificationsUrl);
 
     @Test
     public void shouldReturnTrueWhenMailSent() {
@@ -26,11 +31,15 @@ public class NotificationServiceTest {
         ResponseEntity response = mock(ResponseEntity.class);
         when(response.getStatusCode()).thenReturn(HttpStatus.OK);
 
-        when(restTemplate.postForEntity(notificationsUrl, messageDto, Void.class)).thenReturn(response);
+        RequestEntity requestEntity = mock(RequestEntity.class);
+        when(requestEntityFactory.createPostRequest(notificationsUrl, messageDto)).thenReturn(requestEntity);
+
+        when(restTemplate.exchange(requestEntity, Void.class)).thenReturn(response);
 
         assertTrue(notificationService.send(messageDto));
 
-        verify(restTemplate).postForEntity(notificationsUrl, messageDto, Void.class);
+        verify(requestEntityFactory).createPostRequest(notificationsUrl, messageDto);
+        verify(restTemplate).exchange(requestEntity, Void.class);
     }
 
     @Test
@@ -39,10 +48,14 @@ public class NotificationServiceTest {
         ResponseEntity response = mock(ResponseEntity.class);
         when(response.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
 
-        when(restTemplate.postForEntity(notificationsUrl, messageDto, Void.class)).thenReturn(response);
+        RequestEntity requestEntity = mock(RequestEntity.class);
+        when(requestEntityFactory.createPostRequest(notificationsUrl, messageDto)).thenReturn(requestEntity);
+
+        when(restTemplate.exchange(requestEntity, Void.class)).thenReturn(response);
 
         assertFalse(notificationService.send(messageDto));
 
-        verify(restTemplate).postForEntity(notificationsUrl, messageDto, Void.class);
+        verify(requestEntityFactory).createPostRequest(notificationsUrl, messageDto);
+        verify(restTemplate).exchange(requestEntity, Void.class);
     }
 }

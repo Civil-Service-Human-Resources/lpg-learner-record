@@ -67,7 +67,7 @@ public class LearningCatalogueService {
         }
     }
 
-    public Event getEvent(String path) {
+    public Event getEventByUrl(String path) {
         try{
             RequestEntity requestEntity = requestEntityFactory.createGetRequest(path);
             ResponseEntity<Event> responseEntity = restTemplate.exchange(requestEntity, Event.class);

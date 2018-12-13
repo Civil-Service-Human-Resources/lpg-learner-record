@@ -27,10 +27,10 @@ public interface BookingService {
     BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus);
 
     @Transactional
-    BookingDto unregister(BookingDto booking);
+    BookingDto unregister(BookingDto booking, String cancellationReason);
 
     @Transactional
-    BookingDto unregister(Booking booking);
+    BookingDto unregister(Booking booking, String cancellationReason);
 
     @Transactional(readOnly = true)
     Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);

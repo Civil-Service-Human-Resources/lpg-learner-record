@@ -43,7 +43,7 @@ public class DefaultEventService implements EventService {
         Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
 
         if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
-            event.getBookings().forEach(bookingService::unregister);
+            event.getBookings().forEach(booking -> bookingService.unregister(booking, eventStatus.getCancellationReason()));
         }
 
         EventDto eventDto = eventDtoFactory.create(event);

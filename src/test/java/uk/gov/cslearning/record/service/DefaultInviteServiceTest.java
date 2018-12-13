@@ -83,30 +83,4 @@ public class DefaultInviteServiceTest {
 
         Mockito.verify(inviteRepository).findById(id);
     }
-
-    @Test
-    public void shouldSaveInvite(){
-        String eventId = "test-id";
-        URI eventURI = UriComponentsBuilder.fromPath("http://test/test-id").build().toUri();
-        InviteDto inviteDto = new InviteDto();
-        inviteDto.setId(99);
-        inviteDto.setEvent(eventURI);
-        inviteDto.setLearnerEmail("test@test.com");
-
-        Event event = new Event();
-        event.setId(1);
-        event.setUid(eventId);
-        event.setPath(eventURI.getPath());
-
-        Invite invite = new Invite();
-        invite.setEvent(event);
-
-        Mockito.when(eventService.getEvent("test-id", "/test/test-id")).thenReturn(event);
-        Mockito.when(inviteFactory.create(inviteDto, event)).thenReturn(invite);
-        Mockito.when(inviteRepository.save(invite)).thenReturn(invite);
-        Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
-
-        Assert.assertEquals(inviteService.save(inviteDto), Optional.of(inviteDto));
-        Mockito.verify(inviteRepository).save(invite);
-    }
 }

@@ -78,7 +78,7 @@ public class DefaultEventServiceTest {
         when(eventRepository.findByUid(eventUid)).thenReturn(Optional.empty());
 
         try {
-            eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED));
+            eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, ""));
             fail("Expected EventNotFoundException");
         } catch (EventNotFoundException e) {
             assertEquals("Event does not exist with catalogue id: " + eventUid, e.getMessage());
@@ -121,11 +121,11 @@ public class DefaultEventServiceTest {
         when(eventRepository.save(updatedEvent)).thenReturn(savedEvent);
         when(eventDtoFactory.create(savedEvent)).thenReturn(savedEventDto);
 
-        assertEquals(savedEventDto, eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED)));
+        assertEquals(savedEventDto, eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "cancellation reason")));
 
         verify(eventDto).setStatus(EventStatus.CANCELLED);
-        verify(bookingService).unregister(booking1);
-        verify(bookingService).unregister(booking2);
+        verify(bookingService).unregister(booking1, "cancellation reason");
+        verify(bookingService).unregister(booking2, "cancellation reason");
     }
 
 }

@@ -9,6 +9,7 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.notifications.dto.MessageDto;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
@@ -101,25 +102,31 @@ public class DefaultBookingService implements BookingService {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             return register(bookingDto);
         } else {
-            return unregister(bookingDto);
+            return unregister(bookingDto, "");
         }
     }
 
     @Override
-    public BookingDto unregister(BookingDto bookingDto) {
+    public BookingDto unregister(BookingDto bookingDto, String cancellationReason) {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.unregister(bookingDto);
         }
 
-        notificationService.send(messageService.createUnregisterMessage(bookingDto));
+        MessageDto message;
+        if(cancellationReason.equals("")) {
+            message = messageService.createUnregisterMessage(bookingDto);
+        } else {
+            message = messageService.createCancelEventMessage(bookingDto, cancellationReason);
+        }
+        notificationService.send(message);
 
         bookingDto.setStatus(BookingStatus.CANCELLED);
         return save(bookingDto);
     }
 
     @Override
-    public BookingDto unregister(Booking booking) {
-        return unregister(bookingDtoFactory.create(booking));
+    public BookingDto unregister(Booking booking, String cancellationReason) {
+        return unregister(bookingDtoFactory.create(booking), cancellationReason);
     }
 
     @Override
