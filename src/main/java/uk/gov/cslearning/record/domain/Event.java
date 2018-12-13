@@ -4,6 +4,7 @@ package uk.gov.cslearning.record.domain;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import uk.gov.cslearning.record.dto.CancellationReason;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,4 +30,7 @@ public class Event {
     @ToString.Exclude
     @OneToMany(mappedBy = "event")
     private List<Booking> bookings = new ArrayList<>();
+
+    @Column(nullable = false)
+    private CancellationReason cancellationReason;
 }
