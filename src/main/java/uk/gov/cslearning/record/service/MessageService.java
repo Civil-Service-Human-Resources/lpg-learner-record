@@ -28,6 +28,7 @@ public class MessageService {
     private final String inviteMessageTemplateId;
     private final String unregisterMessageTemplateId;
     private final String cancelEventMessageTemplateId;
+    private final String bookingConfirmedMessageTemplateId;
 
     public MessageService(LearningCatalogueService learningCatalogueService,
                           MessageDtoFactory messageDtoFactory,
@@ -35,7 +36,8 @@ public class MessageService {
                           @Value("${catalogue.serviceUrl}") String learningCatalogueBaseUrl,
                           @Value("${govNotify.template.inviteLearner}") String inviteMessageTemplateId,
                           @Value("${govNotify.template.cancelBooking}") String unregisterMessageTemplateId,
-                          @Value("${govNotify.template.cancelEvent}") String cancelEventMessageTemplateId
+                          @Value("${govNotify.template.cancelEvent}") String cancelEventMessageTemplateId,
+                          @Value("${govNotify.template.bookingConfirmed}") String bookingConfirmedMessageTemplateId
     ){
         this.learningCatalogueService = learningCatalogueService;
         this.messageDtoFactory = messageDtoFactory;
@@ -46,6 +48,7 @@ public class MessageService {
         this.inviteMessageTemplateId = inviteMessageTemplateId;
         this.unregisterMessageTemplateId = unregisterMessageTemplateId;
         this.cancelEventMessageTemplateId = cancelEventMessageTemplateId;
+        this.bookingConfirmedMessageTemplateId = bookingConfirmedMessageTemplateId;
     }
 
     public MessageDto createInviteMessage(InviteDto inviteDto){
@@ -88,6 +91,20 @@ public class MessageService {
         map.put("bookingReference", bookingReference);
 
         return messageDtoFactory.create(booking.getLearner().getLearnerEmail(), cancelEventMessageTemplateId, map);
+    }
+
+    public MessageDto createBookedMessage(BookingDto bookingDto) {
+        Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
+        Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
+
+        String eventUid = Paths.get(bookingDto.getEvent().toString()).getFileName().toString();
+        String bookingReference = createBookingReference(bookingDto.getLearner(), eventUid);
+
+        Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
+        map.put("accessibility", "");
+        map.put("bookingReference", bookingReference);
+
+        return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingConfirmedMessageTemplateId, map);
     }
 
     private Course getCourseByEventUrl(String eventUrl){

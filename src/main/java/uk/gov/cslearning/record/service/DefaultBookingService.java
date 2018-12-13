@@ -79,6 +79,8 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
+        notificationService.send(messageService.createBookedMessage(bookingDto));
+
         return save(bookingDto);
     }
 

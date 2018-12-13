@@ -65,6 +65,7 @@ govNotify:
     inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:template}
     cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:template}
     cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:template}
+    bookingConfirmed: ${GOV_NOTIFY_BOOKING_CONFIRMED:template}
 
 lpg-ui:
   serviceUrl: ${LPG-UI_SERVICE_URL:http://localhost:3001}

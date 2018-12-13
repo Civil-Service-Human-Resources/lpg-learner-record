@@ -141,15 +141,20 @@ public class DefaultBookingServiceTest {
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
 
+        MessageDto messageDto = new MessageDto();
+
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
         when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+        when(messageService.createBookedMessage(unsavedBookingDto)).thenReturn(messageDto);
+        when(notificationService.send(messageDto)).thenReturn(true);
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
         InOrder order = inOrder(xApiService, bookingRepository);
 
         order.verify(xApiService).register(unsavedBookingDto);
+        order.verify(notificationService).send(messageDto);
         order.verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
