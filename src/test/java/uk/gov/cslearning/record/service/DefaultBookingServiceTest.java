@@ -151,7 +151,7 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
-        InOrder order = inOrder(xApiService, bookingRepository);
+        InOrder order = inOrder(xApiService, bookingRepository, notificationService);
 
         order.verify(xApiService).register(unsavedBookingDto);
         order.verify(notificationService).send(messageDto);
