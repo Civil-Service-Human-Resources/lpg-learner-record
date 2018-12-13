@@ -62,10 +62,10 @@ govNotify:
   template:
     requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}
     completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:template}
-    inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:template}
-    cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:template}
-    cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:template}
-    bookingConfirmed: ${GOV_NOTIFY_BOOKING_CONFIRMED:template}
+    inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:cf623c5b-b9e9-4899-b419-4f851e581056}
+    cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:cc525c34-1a31-4fa1-ab19-862fd223caab}
+    cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:26e0e8ae-7617-40f7-be37-ca63b8a0d257}
+    bookingConfirmed: ${GOV_NOTIFY_BOOKING_CONFIRMED:8efb52bd-9ada-402e-8fab-84a751bf4a71}
 
 lpg-ui:
   serviceUrl: ${LPG-UI_SERVICE_URL:http://localhost:3001}
