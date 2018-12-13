@@ -27,7 +27,7 @@ public interface BookingService {
     BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus);
 
     @Transactional
-    BookingDto unregister(BookingDto booking, String cancellationReason);
+    BookingDto unregister(BookingDto booking);
 
     @Transactional
     BookingDto unregister(Booking booking, String cancellationReason);
