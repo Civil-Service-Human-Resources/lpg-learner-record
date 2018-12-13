@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.notifications.dto.MessageDto;
@@ -22,6 +23,7 @@ public class MessageService {
     private final MessageDtoFactory messageDtoFactory;
 
     private final String bookingUrlFormat;
+    private final String learningCatalogueBaseUrl;
 
     private final String inviteMessageTemplateId;
     private final String unregisterMessageTemplateId;
@@ -30,6 +32,7 @@ public class MessageService {
     public MessageService(LearningCatalogueService learningCatalogueService,
                           MessageDtoFactory messageDtoFactory,
                           @Value("${lpg-ui.bookingUrlFormat}") String bookingUrlFormat,
+                          @Value("${catalogue.serviceUrl}") String learningCatalogueBaseUrl,
                           @Value("${govNotify.template.inviteLearner}") String inviteMessageTemplateId,
                           @Value("${govNotify.template.cancelBooking}") String unregisterMessageTemplateId,
                           @Value("${govNotify.template.cancelEvent}") String cancelEventMessageTemplateId
@@ -38,6 +41,7 @@ public class MessageService {
         this.messageDtoFactory = messageDtoFactory;
 
         this.bookingUrlFormat = bookingUrlFormat;
+        this.learningCatalogueBaseUrl = learningCatalogueBaseUrl;
 
         this.inviteMessageTemplateId = inviteMessageTemplateId;
         this.unregisterMessageTemplateId = unregisterMessageTemplateId;
@@ -45,7 +49,7 @@ public class MessageService {
     }
 
     public MessageDto createInviteMessage(InviteDto inviteDto){
-        Course course = getCourseByEventUrl(inviteDto.getEvent());
+        Course course = getCourseByEventUrl(inviteDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(inviteDto.getEvent().toString());
 
         String[] parts = inviteDto.getEvent().getPath().split("/");
@@ -59,9 +63,11 @@ public class MessageService {
     }
 
     public MessageDto createUnregisterMessage(BookingDto bookingDto){
-        Course course = getCourseByEventUrl(bookingDto.getEvent());
+        Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
-        String bookingReference = createBookingReference(bookingDto.getLearner(), bookingDto.getEvent());
+
+        String eventUid = Paths.get(bookingDto.getEvent().toString()).getFileName().toString();
+        String bookingReference = createBookingReference(bookingDto.getLearner(), eventUid);
 
         Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
         map.put("bookingReference", bookingReference);
@@ -69,20 +75,23 @@ public class MessageService {
         return messageDtoFactory.create(bookingDto.getLearnerEmail(), unregisterMessageTemplateId, map);
     }
 
-    public MessageDto createCancelEventMessage(BookingDto bookingDto, String cancellationReason){
-        Course course = getCourseByEventUrl(bookingDto.getEvent());
-        Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
-        String bookingReference = createBookingReference(bookingDto.getLearner(), bookingDto.getEvent());
+    public MessageDto createCancelEventMessage(Booking booking, String cancellationReason){
+        String eventUrl = learningCatalogueBaseUrl + booking.getEvent().getPath();
 
-        Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
+        Course course = getCourseByEventUrl(eventUrl);
+        Event event = learningCatalogueService.getEventByUrl(eventUrl);
+
+        String bookingReference = createBookingReference(booking.getLearner().getUid(), booking.getEvent().getUid());
+
+        Map<String, String> map = createGenericMapForEvent(event, course, booking.getLearner().getLearnerEmail());
         map.put("cancellationReason", cancellationReason);
         map.put("bookingReference", bookingReference);
 
-        return messageDtoFactory.create(bookingDto.getLearnerEmail(), cancelEventMessageTemplateId, map);
+        return messageDtoFactory.create(booking.getLearner().getLearnerEmail(), cancelEventMessageTemplateId, map);
     }
 
-    private Course getCourseByEventUrl(URI eventUrl){
-        String[] parts = eventUrl.getPath().split("/");
+    private Course getCourseByEventUrl(String eventUrl){
+        String[] parts = eventUrl.split("/");
         String courseId = parts[parts.length - 5];
 
         return learningCatalogueService.getCourse(courseId);
@@ -98,8 +107,7 @@ public class MessageService {
         return map;
     }
 
-    private String createBookingReference(String learnerId, URI eventUri){
-        String eventId = Paths.get(eventUri.toString()).getFileName().toString();
+    private String createBookingReference(String learnerId, String eventId){
         return learnerId + "-" + eventId;
     }
 }

@@ -251,18 +251,12 @@ public class DefaultBookingServiceTest {
         Booking booking = new Booking();
         Booking savedBooking = new Booking();
 
-        MessageDto messageDto = new MessageDto();
-
-        when(messageService.createUnregisterMessage(bookingDto)).thenReturn(messageDto);
-        when(notificationService.send(messageDto)).thenReturn(true);
         when(bookingFactory.create(bookingDto)).thenReturn(booking);
         when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
-        assertEquals(savedBookingDto, bookingService.unregister(bookingDto, ""));
+        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(messageService).createUnregisterMessage(bookingDto);
-        verify(notificationService).send(messageDto);
         verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
@@ -282,7 +276,7 @@ public class DefaultBookingServiceTest {
 
         MessageDto messageDto = new MessageDto();
 
-        when(messageService.createCancelEventMessage(bookingDto, "cancellation reason")).thenReturn(messageDto);
+        when(messageService.createCancelEventMessage(booking1, "cancellation reason")).thenReturn(messageDto);
         when(notificationService.send(messageDto)).thenReturn(true);
         when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto);
         when(bookingFactory.create(bookingDto)).thenReturn(booking2);
@@ -291,7 +285,7 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(booking1, "cancellation reason"));
 
-        verify(messageService).createCancelEventMessage(bookingDto, "cancellation reason");
+        verify(messageService).createCancelEventMessage(booking1, "cancellation reason");
         verify(notificationService).send(messageDto);
         verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking2);

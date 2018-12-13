@@ -67,9 +67,9 @@ public class LearningCatalogueService {
         }
     }
 
-    public Event getEventByUrl(String path) {
+    public Event getEventByUrl(String url) {
         try{
-            RequestEntity requestEntity = requestEntityFactory.createGetRequest(path);
+            RequestEntity requestEntity = requestEntityFactory.createGetRequest(url);
             ResponseEntity<Event> responseEntity = restTemplate.exchange(requestEntity, Event.class);
             return responseEntity.getBody();
         } catch (RequestEntityException | RestClientException e) {

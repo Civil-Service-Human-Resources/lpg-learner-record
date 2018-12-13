@@ -3,6 +3,8 @@ package uk.gov.cslearning.record.service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.notifications.dto.MessageDto;
@@ -27,12 +29,13 @@ public class MessageServiceTest {
     private final MessageDtoFactory messageDtoFactory = mock(MessageDtoFactory.class);
 
     private final String bookingUrlFormat = "test/format/%s/%s";
+    private final String learningCatalogueBaseUrl = "http://host";
 
     private final String inviteMessageTemplateId = "inviteTemplateId";
     private final String unregisterMessageTemplateId = "unregisterTemplateId";
     private final String cancelEventMessageTemplateId = "cancelEventTemplateId";
 
-    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, inviteMessageTemplateId, unregisterMessageTemplateId, cancelEventMessageTemplateId);
+    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, learningCatalogueBaseUrl, inviteMessageTemplateId, unregisterMessageTemplateId, cancelEventMessageTemplateId);
 
     @Test
     public void shouldCreateInviteMessage() throws URISyntaxException {
@@ -105,10 +108,16 @@ public class MessageServiceTest {
 
     @Test
     public void shouldCreateCancelEventMessage() throws URISyntaxException {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
-        bookingDto.setLearnerEmail("test@domain.com");
-        bookingDto.setLearner("learnerId");
+        uk.gov.cslearning.record.domain.Event recordEvent = new uk.gov.cslearning.record.domain.Event();
+        recordEvent.setPath("/course/courseId/module/moduleId/event/eventId");
+
+        Learner learner = new Learner();
+        learner.setLearnerEmail("test@domain.com");
+        learner.setUid("learnerId");
+
+        Booking booking = new Booking();
+        booking.setLearner(learner);
+        booking.setEvent(recordEvent);
 
         String cancellationReason = "cancellation reason";
 
@@ -130,13 +139,13 @@ public class MessageServiceTest {
         MessageDto messageDto = new MessageDto();
 
         when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
+        when(learningCatalogueService.getEventByUrl("http://host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
         when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
 
-        assertEquals(messageService.createCancelEventMessage(bookingDto, cancellationReason), messageDto);
+        assertEquals(messageService.createCancelEventMessage(booking, cancellationReason), messageDto);
 
         verify(learningCatalogueService).getCourse("courseId");
-        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
+        verify(learningCatalogueService).getEventByUrl("http://host/course/courseId/module/moduleId/event/eventId");
         verify(messageDtoFactory).create(any(), any(), any());
     }
 }

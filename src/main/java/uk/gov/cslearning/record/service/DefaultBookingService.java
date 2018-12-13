@@ -102,23 +102,16 @@ public class DefaultBookingService implements BookingService {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             return register(bookingDto);
         } else {
-            return unregister(bookingDto, "");
+            notificationService.send(messageService.createUnregisterMessage(bookingDto));
+            return unregister(bookingDto);
         }
     }
 
     @Override
-    public BookingDto unregister(BookingDto bookingDto, String cancellationReason) {
+    public BookingDto unregister(BookingDto bookingDto) {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.unregister(bookingDto);
         }
-
-        MessageDto message;
-        if(cancellationReason.equals("")) {
-            message = messageService.createUnregisterMessage(bookingDto);
-        } else {
-            message = messageService.createCancelEventMessage(bookingDto, cancellationReason);
-        }
-        notificationService.send(message);
 
         bookingDto.setStatus(BookingStatus.CANCELLED);
         return save(bookingDto);
@@ -126,7 +119,8 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto unregister(Booking booking, String cancellationReason) {
-        return unregister(bookingDtoFactory.create(booking), cancellationReason);
+        notificationService.send(messageService.createCancelEventMessage(booking, cancellationReason));
+        return unregister(bookingDtoFactory.create(booking));
     }
 
     @Override
