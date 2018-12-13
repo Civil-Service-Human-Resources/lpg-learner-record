@@ -18,4 +18,7 @@ public interface InviteService {
 
     @Transactional
     Optional<InviteDto> inviteLearner(InviteDto invite);
+
+    @Transactional
+    Optional<InviteDto> save(InviteDto invite);
 }

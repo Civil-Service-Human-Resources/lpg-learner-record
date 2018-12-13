@@ -66,7 +66,8 @@ public class DefaultInviteService implements InviteService{
         return save(inviteDto);
     }
 
-    private Optional<InviteDto> save(InviteDto inviteDto){
+    @Override
+    public Optional<InviteDto> save(InviteDto inviteDto){
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
 
         return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
