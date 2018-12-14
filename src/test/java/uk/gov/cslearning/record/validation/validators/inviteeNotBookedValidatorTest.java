@@ -17,16 +17,16 @@ import java.util.Optional;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class LearnerNotBookedValidatorTest {
+public class inviteeNotBookedValidatorTest {
     @Mock
     private BookingService bookingService;
 
-    private LearnerNotBookedValidator validator;
+    private InviteeNotBookedValidator validator;
 
     @Before
     public void init(){
         MockitoAnnotations.initMocks(this);
-        validator = new LearnerNotBookedValidator(bookingService);
+        validator = new InviteeNotBookedValidator(bookingService);
     }
 
     @Test

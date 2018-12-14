@@ -20,6 +20,7 @@ CREATE TABLE `booking` (
   `booking_time` datetime NOT NULL,
   `status` enum('REQUESTED', 'CONFIRMED','CANCELLED'),
   `payment_details` varchar(255),
+  UNIQUE KEY `unique_learner_event` (`learner_id`, `event_id`),
   CONSTRAINT `FK_booking_learnerId_learner_id` FOREIGN KEY(`learner_id`) REFERENCES `learner`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_booking_eventId_event_id` FOREIGN KEY(`event_id`) REFERENCES  `event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   PRIMARY KEY(`id`)

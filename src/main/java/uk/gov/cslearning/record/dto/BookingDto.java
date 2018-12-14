@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import uk.gov.cslearning.record.validation.annotations.AttendeeNotBooked;
 import uk.gov.cslearning.record.validation.annotations.EventIsActive;
 
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import java.time.Instant;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@AttendeeNotBooked
 public class BookingDto {
     private Integer id;
 
