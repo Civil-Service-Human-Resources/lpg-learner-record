@@ -246,6 +246,7 @@ public class BookingControllerTest {
         booking.setStatus(status);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
+        booking.setEvent(new URI("test/path/to/eventId"));
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())
@@ -253,13 +254,11 @@ public class BookingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", equalTo("event: A booking requires an event")))
-                .andExpect(jsonPath("$.errors[1]", equalTo("learner: A booking requires a learner")))
-                .andExpect(jsonPath("$.errors[2]", equalTo("learnerEmail: A booking requires a learner email address")))
+                .andExpect(jsonPath("$.errors[0]", equalTo("learner: A booking requires a learner")))
+                .andExpect(jsonPath("$.errors[1]", equalTo("learnerEmail: A booking requires a learner email address")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
-        verifyZeroInteractions(bookingService);
     }
 
     @Test
