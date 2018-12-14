@@ -120,6 +120,7 @@ public class DefaultBookingService implements BookingService {
     public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){;
         List<String> status = Arrays.asList(BookingStatus.REQUESTED.getValue(), BookingStatus.CONFIRMED.getValue());
 
+        
         return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
     }
 
