@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 @Service

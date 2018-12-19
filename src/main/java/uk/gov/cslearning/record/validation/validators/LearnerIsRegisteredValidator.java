@@ -1,8 +1,6 @@
 package uk.gov.cslearning.record.validation.validators;
 
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.dto.InviteDto;
-import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 import uk.gov.cslearning.record.validation.annotations.LearnerIsRegistered;
 import uk.gov.cslearning.record.validation.annotations.LearnerNotInvited;

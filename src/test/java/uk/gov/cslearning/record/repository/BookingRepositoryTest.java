@@ -12,7 +12,6 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;

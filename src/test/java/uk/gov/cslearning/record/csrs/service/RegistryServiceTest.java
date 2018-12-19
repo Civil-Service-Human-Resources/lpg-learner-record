@@ -13,9 +13,7 @@ import java.net.URI;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class RegistryServiceTest {
     private URI getCurrentUrl;

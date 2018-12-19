@@ -14,22 +14,20 @@ import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.InviteService;
-import uk.gov.cslearning.record.service.identity.IdentityService;
 import uk.gov.cslearning.record.service.identity.Identity;
+import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import javax.ws.rs.core.MediaType;
-
 import java.util.ArrayList;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
-import static org.hamcrest.Matchers.equalTo;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({InviteController.class, ErrorDtoFactory.class})

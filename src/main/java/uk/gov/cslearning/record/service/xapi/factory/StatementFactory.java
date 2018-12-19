@@ -1,6 +1,9 @@
 package uk.gov.cslearning.record.service.xapi.factory;
 
-import gov.adlnet.xapi.model.*;
+import gov.adlnet.xapi.model.Actor;
+import gov.adlnet.xapi.model.IStatementObject;
+import gov.adlnet.xapi.model.Result;
+import gov.adlnet.xapi.model.Statement;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.dto.BookingDto;
 

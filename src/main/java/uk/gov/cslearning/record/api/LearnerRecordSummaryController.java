@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.domain.*;
+import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.security.SecurityUtil;
 
