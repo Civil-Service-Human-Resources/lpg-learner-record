@@ -13,7 +13,8 @@ import javax.validation.ConstraintValidatorContext;
 import java.net.URI;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

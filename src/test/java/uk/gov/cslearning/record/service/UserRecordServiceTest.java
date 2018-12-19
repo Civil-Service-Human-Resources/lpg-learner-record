@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
@@ -22,9 +24,6 @@ import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.XApiService;
-
-import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

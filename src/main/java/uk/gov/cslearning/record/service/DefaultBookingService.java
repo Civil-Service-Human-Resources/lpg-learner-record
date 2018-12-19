@@ -1,8 +1,8 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -15,7 +15,10 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

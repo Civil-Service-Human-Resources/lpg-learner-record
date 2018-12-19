@@ -6,7 +6,7 @@ import uk.gov.cslearning.record.notifications.dto.MessageDto;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class MessageDtoFactoryTest {
 

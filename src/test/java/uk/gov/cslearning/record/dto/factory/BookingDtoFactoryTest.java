@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class BookingDtoFactoryTest {
     private final String learningCatalogueBaseUri = "http://learning-catalogue";

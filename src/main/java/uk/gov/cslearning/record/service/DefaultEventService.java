@@ -2,13 +2,13 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.factory.EventFactory;
 import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.dto.factory.EventDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
-import uk.gov.cslearning.record.domain.factory.EventFactory;
 import uk.gov.cslearning.record.repository.EventRepository;
 
 import java.util.Optional;
