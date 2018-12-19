@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -435,44 +434,5 @@ public class BookingControllerTest {
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
 
         verify(bookingService).updateStatus(eventUid, learnerUid, bookingStatus);
-    }
-
-    @Test
-    public void shouldListAllBookings() throws Exception {
-        String learnerUid = "learner-uid";
-        int bookingId = 99;
-        BookingStatus status = BookingStatus.CONFIRMED;
-        Instant bookingTime =
-                LocalDateTime.of(2018,
-                        1,
-                        1,
-                        13,
-                        59,
-                        12,
-                        500).toInstant(ZoneOffset.UTC);
-        URI paymentDetails = new URI("payment-details");
-        URI event = new URI("http://event");
-
-        BookingDto booking = new BookingDto();
-        booking.setId(bookingId);
-        booking.setStatus(status);
-        booking.setBookingTime(bookingTime);
-        booking.setPaymentDetails(paymentDetails);
-        booking.setEvent(event);
-        booking.setLearner(learnerUid);
-
-        when(bookingService.findAll()).thenReturn(Collections.singletonList(booking));
-
-        mockMvc.perform(
-                get("/booking/").with(csrf())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", equalTo(bookingId)))
-                .andExpect(jsonPath("$[0].learner", equalTo(learnerUid)))
-                .andExpect(jsonPath("$[0].status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$[0].event", equalTo(event.toString())))
-                .andExpect(jsonPath("$[0].paymentDetails", equalTo(paymentDetails.toString())))
-                .andExpect(jsonPath("$[0].bookingTime",
-                        equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
     }
 }
