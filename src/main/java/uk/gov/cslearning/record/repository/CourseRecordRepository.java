@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,9 +10,10 @@ import uk.gov.cslearning.record.domain.CourseRecord;
 
 import javax.persistence.LockModeType;
 import java.util.Collection;
+import java.util.List;
 
 @Repository
-public interface CourseRecordRepository extends CrudRepository<CourseRecord, Long> {
+public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM CourseRecord r WHERE r.identity.userId = ?1")
@@ -25,6 +27,6 @@ public interface CourseRecordRepository extends CrudRepository<CourseRecord, Lon
     Integer countRegisteredForEvent(@Param("eventId") String eventId);
 
     @Query("SELECT cr FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId is not null")
-    Iterable<CourseRecord> listEventRecords();
+    List<CourseRecord> listEventRecords();
 
 }
