@@ -49,7 +49,7 @@ public class ModuleRecordControllerTest {
 
         when(moduleRecordService.listRecordsForPeriod(LocalDate.parse(from), LocalDate.parse(to))).thenReturn(results);
 
-        mockMvc.perform(get("/module-records")
+        mockMvc.perform(get("/reporting/module-records")
                 .param("from", from)
                 .param("to", to)
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
