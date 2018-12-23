@@ -28,13 +28,13 @@ public class DefaultEventService implements EventService {
     }
 
     private void createEventIfNotPresent(String eventUid, String path) {
-        if(!eventRepository.findByUid(eventUid).isPresent()){
+        if (!eventRepository.findByUid(eventUid).isPresent()) {
             eventRepository.save(eventFactory.create(path));
         }
     }
 
     @Override
-    public Event getEvent(String eventUid, String path){
+    public Event getEvent(String eventUid, String path) {
         createEventIfNotPresent(eventUid, path);
         return eventRepository.findByUid(eventUid).get();
     }
@@ -64,7 +64,7 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    public EventDto create(EventDto eventDto){
+    public EventDto create(EventDto eventDto) {
         return eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto)));
     }
 }

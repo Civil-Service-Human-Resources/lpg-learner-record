@@ -8,7 +8,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
@@ -37,7 +36,7 @@ public class DefaultInviteServiceTest {
     private DefaultInviteService inviteService;
 
     @Test
-    public void shouldFindInvitesEventById(){
+    public void shouldFindInvitesEventById() {
         String eventId = "test-id";
         URI eventURI = UriComponentsBuilder.fromPath("http://test/test-id").build().toUri();
         Invite invite = new Invite();
@@ -54,7 +53,7 @@ public class DefaultInviteServiceTest {
     }
 
     @Test
-    public void shouldFindInvite(){
+    public void shouldFindInvite() {
         int id = 99;
         Invite invite = new Invite();
         InviteDto inviteDto = new InviteDto();
@@ -69,7 +68,7 @@ public class DefaultInviteServiceTest {
     }
 
     @Test
-    public void shouldReturnNullIfInviteNotPresent(){
+    public void shouldReturnNullIfInviteNotPresent() {
         int id = 99;
 
         Mockito.when(inviteRepository.findById(id)).thenReturn(Optional.empty());
