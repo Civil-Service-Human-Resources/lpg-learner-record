@@ -24,6 +24,6 @@ public class LearnerRecordEventController {
 
     @GetMapping
     public ResponseEntity<Collection<LearnerRecordEvent>> list() {
-        return new ResponseEntity<>(learnerRecordEventService.listEvents(), OK);
+        return ResponseEntity.ok(learnerRecordEventService.listEvents());
     }
 }
