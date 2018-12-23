@@ -10,8 +10,6 @@ import uk.gov.cslearning.record.service.LearnerRecordEventService;
 
 import java.util.Collection;
 
-import static org.springframework.http.HttpStatus.OK;
-
 @RestController
 @RequestMapping("/events")
 @PreAuthorize("hasAnyAuthority('DOWNLOAD_BOOKING_FEED')")

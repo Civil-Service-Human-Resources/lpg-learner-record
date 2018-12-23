@@ -4,10 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
-import uk.gov.cslearning.record.dto.*;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
+import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.dto.BookingStatus;
+import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
-import uk.gov.cslearning.record.notifications.dto.MessageDto;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
@@ -66,10 +68,10 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Iterable<BookingDto> listByEventUid(String eventUid){
+    public Iterable<BookingDto> listByEventUid(String eventUid) {
         Optional<Event> event = eventRepository.findByUid(eventUid);
 
-        if(event.isPresent()) {
+        if (event.isPresent()) {
             Iterable<BookingDto> bookings = event.get().getBookings().stream().map(
                     bookingDtoFactory::create
             ).collect(Collectors.toList());
@@ -107,6 +109,7 @@ public class DefaultBookingService implements BookingService {
     private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
         BookingDto bookingDto = bookingDtoFactory.create(booking);
 
+
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             return register(bookingDto);
@@ -135,9 +138,9 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){
+    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid) {
         List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
-      
+
         return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
     }
 
