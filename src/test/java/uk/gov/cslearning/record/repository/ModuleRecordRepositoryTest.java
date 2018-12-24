@@ -9,7 +9,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
-import uk.gov.cslearning.record.service.catalogue.Course;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
