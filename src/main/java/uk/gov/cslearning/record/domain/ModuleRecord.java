@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
@@ -62,6 +64,18 @@ public class ModuleRecord {
     private String paymentDetails;
 
     private BookingStatus bookingStatus;
+
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private CourseRecord courseRecord;
+
+    public CourseRecord getCourseRecord() {
+        return courseRecord;
+    }
+
+    public void setCourseRecord(CourseRecord courseRecord) {
+        this.courseRecord = courseRecord;
+    }
 
     public ModuleRecord() {
     }
