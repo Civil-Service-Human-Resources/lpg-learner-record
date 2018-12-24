@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.dto.factory;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Test;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
