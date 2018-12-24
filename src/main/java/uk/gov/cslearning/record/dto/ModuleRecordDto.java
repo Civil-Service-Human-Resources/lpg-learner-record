@@ -6,4 +6,5 @@ import lombok.Data;
 public class ModuleRecordDto {
     private String moduleId;
     private String state;
+    private String learner;
 }

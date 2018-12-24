@@ -18,9 +18,15 @@ import static java.util.Collections.unmodifiableCollection;
 @Entity
 public class CourseRecord {
 
-    @JsonIgnore
-    @EmbeddedId
-    private CourseRecordIdentity identity;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String courseId;
+
+    @Column(nullable = false)
+    private String userId;
 
     private String courseTitle;
 
@@ -35,7 +41,7 @@ public class CourseRecord {
     @JsonIgnore
     private String department;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
     private Collection<ModuleRecord> moduleRecords;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -47,8 +53,9 @@ public class CourseRecord {
     public CourseRecord(String courseId, String userId) {
         checkArgument(courseId != null);
         checkArgument(userId != null);
-        this.identity = new CourseRecordIdentity(courseId, userId);
         this.moduleRecords = new HashSet<>();
+        this.courseId = courseId;
+        this.userId = userId;
     }
 
     public String getCourseTitle() {
@@ -57,10 +64,6 @@ public class CourseRecord {
 
     public void setCourseTitle(String courseTitle) {
         this.courseTitle = courseTitle;
-    }
-
-    public CourseRecordIdentity getIdentity() {
-        return identity;
     }
 
     public LocalDateTime getLastUpdated() {
@@ -73,12 +76,12 @@ public class CourseRecord {
 
     @JsonProperty("courseId")
     public String getCourseId() {
-        return identity.getCourseId();
+        return courseId;
     }
 
     @JsonProperty("userId")
     public String getUserId() {
-        return identity.getUserId();
+        return userId;
     }
 
     public String getPreference() {
@@ -113,6 +116,22 @@ public class CourseRecord {
         this.department = department;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
         return unmodifiableCollection(moduleRecords);
@@ -120,6 +139,7 @@ public class CourseRecord {
 
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
+        moduleRecord.setCourseRecord(this);
         moduleRecords.add(moduleRecord);
     }
 
@@ -171,14 +191,14 @@ public class CourseRecord {
         CourseRecord that = (CourseRecord) o;
 
         return new EqualsBuilder()
-                .append(identity, that.identity)
+                .append(id, that.id)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(identity)
+                .append(id)
                 .toHashCode();
     }
 }

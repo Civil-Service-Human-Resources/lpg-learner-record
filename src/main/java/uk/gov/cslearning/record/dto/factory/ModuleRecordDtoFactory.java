@@ -11,6 +11,7 @@ public class ModuleRecordDtoFactory {
         ModuleRecordDto moduleRecordDto = new ModuleRecordDto();
         moduleRecordDto.setModuleId(moduleRecord.getModuleId());
         moduleRecordDto.setState(moduleRecord.getState().toString());
+        moduleRecordDto.setLearner(moduleRecord.getCourseRecord().getUserId());
 
         return moduleRecordDto;
     }

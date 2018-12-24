@@ -27,9 +27,12 @@ public class CourseRecordRepositoryTest {
     public void shouldSaveCourseRecord() {
 
         CourseRecord courseRecord = new CourseRecord("courseId", "userId");
-        courseRecordRepository.save(courseRecord);
+        Long id = courseRecordRepository.save(courseRecord).getId();
 
-        assertThat(courseRecord.getIdentity(), notNullValue());
+        CourseRecord result = courseRecordRepository.findById(id).get();
+
+        assertThat(result.getCourseId(), is("courseId"));
+        assertThat(result.getUserId(), is("userId"));
     }
 
     @Test
@@ -40,7 +43,8 @@ public class CourseRecordRepositoryTest {
 
         courseRecord = courseRecordRepository.save(courseRecord);
 
-        assertThat(courseRecord.getIdentity(), notNullValue());
+        assertThat(courseRecord.getCourseId(), is("courseId"));
+        assertThat(courseRecord.getUserId(), is("userId"));
         assertThat(courseRecord.getModuleRecord("moduleId").getId(), notNullValue());
     }
 

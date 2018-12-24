@@ -26,10 +26,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Transactional
 public class CourseTest {
 
-    final String courseId = "courseId";
-    final String userId = "userId";
-    final String moduleId = "moduleId";
+    final String courseId = "course-id";
+    final String userId = "user-id";
+    final String moduleId = "module-id";
     final String department = "dep";
+
     @Autowired
     private CourseRecordRepository courseRecordRepository;
 
