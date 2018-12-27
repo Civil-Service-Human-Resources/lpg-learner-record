@@ -18,15 +18,9 @@ import static java.util.Collections.unmodifiableCollection;
 @Entity
 public class CourseRecord {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String courseId;
-
-    @Column(nullable = false)
-    private String userId;
+    @JsonIgnore
+    @EmbeddedId
+    private CourseRecordIdentity identity;
 
     private String courseTitle;
 
@@ -53,9 +47,8 @@ public class CourseRecord {
     public CourseRecord(String courseId, String userId) {
         checkArgument(courseId != null);
         checkArgument(userId != null);
+        this.identity = new CourseRecordIdentity(courseId, userId);
         this.moduleRecords = new HashSet<>();
-        this.courseId = courseId;
-        this.userId = userId;
     }
 
     public String getCourseTitle() {
@@ -64,6 +57,10 @@ public class CourseRecord {
 
     public void setCourseTitle(String courseTitle) {
         this.courseTitle = courseTitle;
+    }
+
+    public CourseRecordIdentity getIdentity() {
+        return identity;
     }
 
     public LocalDateTime getLastUpdated() {
@@ -76,12 +73,12 @@ public class CourseRecord {
 
     @JsonProperty("courseId")
     public String getCourseId() {
-        return courseId;
+        return identity.getCourseId();
     }
 
     @JsonProperty("userId")
     public String getUserId() {
-        return userId;
+        return identity.getUserId();
     }
 
     public String getPreference() {
@@ -114,22 +111,6 @@ public class CourseRecord {
 
     public void setDepartment(String department) {
         this.department = department;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     @JsonProperty("modules")
@@ -191,14 +172,14 @@ public class CourseRecord {
         CourseRecord that = (CourseRecord) o;
 
         return new EqualsBuilder()
-                .append(id, that.id)
+                .append(identity, that.identity)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(id)
+                .append(identity)
                 .toHashCode();
     }
 }
