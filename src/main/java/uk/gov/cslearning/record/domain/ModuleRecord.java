@@ -66,6 +66,10 @@ public class ModuleRecord {
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumns({
+            @JoinColumn(name = "course_id", referencedColumnName = "courseId"),
+            @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    })
     private CourseRecord courseRecord;
 
     public CourseRecord getCourseRecord() {
