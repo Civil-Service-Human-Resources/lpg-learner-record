@@ -29,4 +29,6 @@ public class BookingDto {
     private Instant bookingTime = Instant.now();
 
     private URI paymentDetails;
+
+    private String poNumber;
 }

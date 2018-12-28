@@ -24,16 +24,18 @@ public class StatementFactory {
     public Statement createRegisteredStatement(BookingDto bookingDto) {
         Actor actor = actorFactory.create(bookingDto.getLearner());
 
-        Result result = resultFactory.createPurchaseOrderResult(bookingDto.getPaymentDetails().toString());
-
         IStatementObject object = objectFactory.createEventObject(bookingDto.getEvent().toString());
 
         Statement statement = new Statement();
         statement.setActor(actor);
         statement.setVerb(verbFactory.createdRegistered());
         statement.setObject(object);
-        statement.setResult(result);
         statement.setContext(contextFactory.createBookingContext(bookingDto));
+
+        if(bookingDto.getPaymentDetails() != null) {
+            Result result = resultFactory.createPurchaseOrderResult(bookingDto.getPaymentDetails().toString());
+            statement.setResult(result);
+        }
 
         return statement;
     }
