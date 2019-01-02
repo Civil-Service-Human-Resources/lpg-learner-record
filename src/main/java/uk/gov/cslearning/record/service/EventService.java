@@ -13,7 +13,7 @@ public interface EventService {
     Event getEvent(String eventUid, String path);
 
     @Transactional
-    EventDto updateStatus(String eventUid, EventStatusDto eventStatus);
+    Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus);
 
     @Transactional(readOnly = true)
     Optional<EventDto> findByUid(String eventUid);
