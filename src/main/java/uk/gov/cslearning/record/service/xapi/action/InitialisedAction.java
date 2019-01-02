@@ -23,10 +23,12 @@ public class InitialisedAction extends Action {
 
     @Override
     public void replay(CourseRecord courseRecord, ModuleRecord moduleRecord) {
-        courseRecord.setState(State.IN_PROGRESS);
-        moduleRecord.setState(State.IN_PROGRESS);
-        moduleRecord.setResult(null);
-        moduleRecord.setScore(null);
-        moduleRecord.setCompletionDate(null);
+        if(moduleRecord.getState() != State.COMPLETED) {
+            courseRecord.setState(State.IN_PROGRESS);
+            moduleRecord.setState(State.IN_PROGRESS);
+            moduleRecord.setResult(null);
+            moduleRecord.setScore(null);
+            moduleRecord.setCompletionDate(null);
+        }
     }
 }
