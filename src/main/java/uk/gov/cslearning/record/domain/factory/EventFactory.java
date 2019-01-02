@@ -27,6 +27,7 @@ public class EventFactory {
         event.setPath(path);
         event.setUid(Paths.get(path).getFileName().toString());
         event.setStatus(eventDto.getStatus().getValue());
+        event.setCancellationReason(eventDto.getCancellationReason());
         return event;
     }
 
