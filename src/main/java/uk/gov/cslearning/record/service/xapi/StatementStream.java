@@ -147,9 +147,7 @@ public class StatementStream {
                             }
                         }
 
-                        if(moduleRecord.getState() != State.COMPLETED) {
-                            replay(statement, courseRecord, moduleRecord);
-                        }
+                        replay(statement, courseRecord, moduleRecord);
 
                         if (checkComplete(courseRecord, catalogueCourse)) {
                             courseRecord.setState(State.COMPLETED);
