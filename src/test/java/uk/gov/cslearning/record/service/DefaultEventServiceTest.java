@@ -122,6 +122,7 @@ public class DefaultEventServiceTest {
         when(eventDtoFactory.create(savedEvent)).thenReturn(savedEventDto);
 
         assertEquals(savedEventDto, eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "cancellation reason")));
+        assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "")));
 
         verify(eventDto).setStatus(EventStatus.CANCELLED);
         verify(bookingService).unregister(booking1, "cancellation reason");

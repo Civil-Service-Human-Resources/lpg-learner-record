@@ -20,8 +20,9 @@ public class EventController {
 
     @PatchMapping(path = "/event/{eventUid}")
     public ResponseEntity cancelEvent(@PathVariable String eventUid, @RequestBody EventStatusDto eventStatus) {
-        EventDto event = eventService.updateStatus(eventUid, eventStatus);
-        return ResponseEntity.ok(event);
+        return eventService.updateStatus(eventUid, eventStatus).
+            map(e -> new ResponseEntity(e, OK))
+            .orElseGet(() -> new ResponseEntity(NOT_FOUND));
     }
 
     @GetMapping(path = "/event/{eventUid}")
