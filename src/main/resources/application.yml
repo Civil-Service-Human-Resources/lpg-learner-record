@@ -68,7 +68,7 @@ govNotify:
     bookingConfirmed: ${GOV_NOTIFY_BOOKING_CONFIRMED:8efb52bd-9ada-402e-8fab-84a751bf4a71}
 
 lpg-ui:
-  serviceUrl: ${LPG-UI_SERVICE_URL:http://localhost:3001}
+  serviceUrl: ${LPG_UI_URL:http://localhost:3001}
   bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
 
