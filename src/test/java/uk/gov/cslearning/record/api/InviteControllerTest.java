@@ -86,7 +86,7 @@ public class InviteControllerTest {
         when(identityService.getIdentityByEmailAddress("user@test.com")).thenReturn(Optional.of(new Identity()));
         when(bookingService.findActiveBookingByEmailAndEvent("user@test.com", "SAI")).thenReturn(Optional.empty());
         when(inviteService.findByEventIdAndLearnerEmail("SAI", "test@test.com")).thenReturn(Optional.empty());
-        when(inviteService.save(any())).thenReturn(Optional.of(new InviteDto()));
+        when(inviteService.inviteLearner(any())).thenReturn(Optional.of(new InviteDto()));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/event/SAI/invitee").with(csrf())

@@ -14,6 +14,7 @@ import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,9 +35,17 @@ public class ApiExceptionHandler {
     protected ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         LOGGER.error("Bad Request: ", e);
 
-        List<String> errors = e.getBindingResult().getFieldErrors().stream()
+        List<String> fieldErrors = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> String.join(": ", error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.toList());
+
+        List<String> globalErrors = e.getBindingResult().getGlobalErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .collect(Collectors.toList());
+
+        List<String> errors = new ArrayList<>();
+        errors.addAll(fieldErrors);
+        errors.addAll(globalErrors);
 
         return ResponseEntity.badRequest().body(errorDtoFactory.create(HttpStatus.BAD_REQUEST, errors));
     }

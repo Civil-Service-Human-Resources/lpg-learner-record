@@ -67,6 +67,17 @@ public class LearningCatalogueService {
         }
     }
 
+    public Event getEventByUrl(String url) {
+        try{
+            RequestEntity requestEntity = requestEntityFactory.createGetRequest(url);
+            ResponseEntity<Event> responseEntity = restTemplate.exchange(requestEntity, Event.class);
+            return responseEntity.getBody();
+        } catch (RequestEntityException | RestClientException e) {
+            LOGGER.error("Could not get event from learning catalogue: ", e.getLocalizedMessage());
+            return null;
+        }
+    }
+
     public static class Results {
 
         private List<Course> results;

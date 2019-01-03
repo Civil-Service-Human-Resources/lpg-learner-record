@@ -30,7 +30,7 @@ public interface BookingService {
     BookingDto unregister(BookingDto booking);
 
     @Transactional
-    BookingDto unregister(Booking booking);
+    BookingDto unregister(Booking booking, String cancellationReason);
 
     @Transactional(readOnly = true)
     Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);

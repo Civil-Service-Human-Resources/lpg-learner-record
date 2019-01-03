@@ -121,11 +121,11 @@ public class DefaultEventServiceTest {
         when(eventRepository.save(updatedEvent)).thenReturn(savedEvent);
         when(eventDtoFactory.create(savedEvent)).thenReturn(savedEventDto);
 
-        assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "")));
+        assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "cancellation reason")));
 
         verify(eventDto).setStatus(EventStatus.CANCELLED);
-        verify(bookingService).unregister(booking1);
-        verify(bookingService).unregister(booking2);
+        verify(bookingService).unregister(booking1, "cancellation reason");
+        verify(bookingService).unregister(booking2, "cancellation reason");
     }
 
 }
