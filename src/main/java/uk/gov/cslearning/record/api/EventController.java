@@ -31,5 +31,4 @@ public class EventController {
                 .map(b -> new ResponseEntity<>(b, OK))
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     }
-
 }
