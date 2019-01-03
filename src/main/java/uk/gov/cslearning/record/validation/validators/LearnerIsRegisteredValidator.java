@@ -4,13 +4,14 @@ import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
+import uk.gov.cslearning.record.validation.annotations.LearnerIsRegistered;
 import uk.gov.cslearning.record.validation.annotations.LearnerNotInvited;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 @Component
-public class LearnerIsRegisteredValidator implements ConstraintValidator<LearnerNotInvited, String> {
+public class LearnerIsRegisteredValidator implements ConstraintValidator<LearnerIsRegistered, String> {
 
     private final IdentityService identityService;
 
@@ -18,7 +19,7 @@ public class LearnerIsRegisteredValidator implements ConstraintValidator<Learner
         this.identityService = identityService;
     }
 
-    public void initialise(LearnerNotInvited constraint) {}
+    public void initialise(LearnerIsRegistered constraint) {}
 
     @Override
     public boolean isValid(String learnerEmail, ConstraintValidatorContext context) {

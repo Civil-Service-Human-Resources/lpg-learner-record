@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.EventStatusDto;
@@ -39,17 +40,23 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    public EventDto updateStatus(String eventUid, EventStatusDto eventStatus) {
+    public Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus) {
         Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
 
         if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
-            event.getBookings().forEach(bookingService::unregister);
+            event.getBookings().forEach(booking -> bookingService.unregister(booking, eventStatus.getCancellationReason()));
         }
 
         EventDto eventDto = eventDtoFactory.create(event);
         eventDto.setStatus(eventStatus.getStatus());
 
-        return eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto)));
+        if(eventStatus.getCancellationReason().equals("Short notice unavailability of the venue")){
+            eventDto.setCancellationReason(CancellationReason.VENUE);
+        } else if(eventStatus.getCancellationReason().equals("The event is no longer available")){
+            eventDto.setCancellationReason(CancellationReason.UNAVAILABLE);
+        }
+
+        return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
     }
 
     @Override

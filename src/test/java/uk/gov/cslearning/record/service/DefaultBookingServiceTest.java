@@ -14,6 +14,8 @@ import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.notifications.dto.MessageDto;
+import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
@@ -44,6 +46,12 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private EventRepository eventRepository;
+
+    @Mock
+    private MessageService messageService;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -133,15 +141,20 @@ public class DefaultBookingServiceTest {
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
 
+        MessageDto messageDto = new MessageDto();
+
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
         when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+        when(messageService.createBookedMessage(unsavedBookingDto)).thenReturn(messageDto);
+        when(notificationService.send(messageDto)).thenReturn(true);
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
-        InOrder order = inOrder(xApiService, bookingRepository);
+        InOrder order = inOrder(xApiService, bookingRepository, notificationService);
 
         order.verify(xApiService).register(unsavedBookingDto);
+        order.verify(notificationService).send(messageDto);
         order.verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
@@ -266,13 +279,19 @@ public class DefaultBookingServiceTest {
 
         Booking savedBooking = new Booking();
 
+        MessageDto messageDto = new MessageDto();
+
+        when(messageService.createCancelEventMessage(booking1, "cancellation reason")).thenReturn(messageDto);
+        when(notificationService.send(messageDto)).thenReturn(true);
         when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto);
         when(bookingFactory.create(bookingDto)).thenReturn(booking2);
         when(bookingRepository.saveBooking(booking2)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
 
-        assertEquals(savedBookingDto, bookingService.unregister(booking1));
+        assertEquals(savedBookingDto, bookingService.unregister(booking1, "cancellation reason"));
 
+        verify(messageService).createCancelEventMessage(booking1, "cancellation reason");
+        verify(notificationService).send(messageDto);
         verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking2);
     }

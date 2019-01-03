@@ -11,7 +11,7 @@ import java.net.URI;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@LearnerNotInvited(message = "{invite.learner.notInvite}")
+@LearnerNotInvited(message = "{invite.learner.notInvited}")
 @InviteeNotBooked(message = "{invite.learner.notBooked}")
 public class InviteDto {
 

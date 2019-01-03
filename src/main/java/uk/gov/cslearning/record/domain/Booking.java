@@ -30,4 +30,7 @@ public class Booking {
     private String status;
 
     private Instant bookingTime;
+
+    @Column
+    private String poNumber;
 }

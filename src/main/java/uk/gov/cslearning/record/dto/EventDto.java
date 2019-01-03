@@ -12,4 +12,5 @@ public class EventDto {
     private String uid;
     private URI uri;
     private EventStatus status;
+    private CancellationReason cancellationReason;
 }

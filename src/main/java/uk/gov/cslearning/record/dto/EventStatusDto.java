@@ -11,4 +11,6 @@ import uk.gov.cslearning.record.validation.annotations.EventStatusNotEquals;
 public class EventStatusDto {
     @EventStatusNotEquals(value = EventStatus.ACTIVE, message = "{event.status.invalid}")
     private EventStatus status;
+
+    private String cancellationReason;
 }

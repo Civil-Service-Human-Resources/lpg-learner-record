@@ -1,18 +1,16 @@
 package uk.gov.cslearning.record.validation.validators;
 
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.validation.annotations.InviteeNotBooked;
-import uk.gov.cslearning.record.validation.annotations.LearnerNotInvited;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.nio.file.Paths;
 
 @Component
-public class InviteeNotBookedValidator implements ConstraintValidator<LearnerNotInvited, InviteDto> {
+public class InviteeNotBookedValidator implements ConstraintValidator<InviteeNotBooked, InviteDto> {
 
     private final BookingService bookingService;
 

@@ -17,5 +17,8 @@ public interface InviteService {
     Optional<InviteDto> findByEventIdAndLearnerEmail(String eventUid, String learnerEmail);
 
     @Transactional
+    Optional<InviteDto> inviteLearner(InviteDto invite);
+
+    @Transactional
     Optional<InviteDto> save(InviteDto invite);
 }

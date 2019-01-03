@@ -14,8 +14,6 @@ import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
 import uk.gov.cslearning.record.repository.InviteRepository;
-import uk.gov.cslearning.record.service.identity.Identity;
-import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -34,9 +32,6 @@ public class DefaultInviteServiceTest {
 
     @Mock
     private EventService eventService;
-
-    @Mock
-    private IdentityService identityService;
 
     @InjectMocks
     private DefaultInviteService inviteService;
