@@ -34,7 +34,7 @@ public class EventController {
     }
 
     @PostMapping(path = "/event")
-    public ResponseEntity<EventDto> find(@RequestBody EventDto event, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<EventDto> create(@RequestBody EventDto event, UriComponentsBuilder uriBuilder) {
         EventDto result = eventService.create(event);
 
         return ResponseEntity.created(
