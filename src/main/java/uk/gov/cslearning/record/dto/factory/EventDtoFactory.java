@@ -23,6 +23,7 @@ public class EventDtoFactory {
         eventDto.setStatus(EventStatus.forValue(event.getStatus()));
         eventDto.setUri(UriBuilder.fromUri(learningCatalogueBaseUrl).path(event.getPath()).build());
         eventDto.setUid(event.getUid());
+        eventDto.setCancellationReason(event.getCancellationReason());
         return eventDto;
     }
 }
