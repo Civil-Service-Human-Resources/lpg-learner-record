@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -33,7 +32,7 @@ public class BookingDtoFactory {
             bookingDto.setPaymentDetails(UriBuilder.fromUri(csrsBaseUrl).path(booking.getPaymentDetails()).build());
         }
 
-        bookingDto.setStatus(BookingStatus.forValue(booking.getStatus()));
+        bookingDto.setStatus(booking.getStatus());
 
         return bookingDto;
     }
