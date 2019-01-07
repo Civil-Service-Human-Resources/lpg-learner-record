@@ -25,6 +25,7 @@ public class Event {
     private String path;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private String status;
 
     @ToString.Exclude
@@ -32,5 +33,6 @@ public class Event {
     private List<Booking> bookings = new ArrayList<>();
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CancellationReason cancellationReason;
 }
