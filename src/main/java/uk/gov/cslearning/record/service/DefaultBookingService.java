@@ -104,7 +104,7 @@ public class DefaultBookingService implements BookingService {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             return register(bookingDto);
         } else {
-            notificationService.send(messageService.createUnregisterMessage(bookingDto));
+            notificationService.send(messageService.createUnregisterMessage(bookingDto, bookingStatusDto.getCancellationReason()));
             return unregister(bookingDto);
         }
     }
