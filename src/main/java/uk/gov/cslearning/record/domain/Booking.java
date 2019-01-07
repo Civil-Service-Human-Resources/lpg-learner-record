@@ -27,6 +27,7 @@ public class Booking {
     private String paymentDetails;
 
     @Column(nullable = false, length = 9)
+    @Enumerated(EnumType.STRING)
     private String status;
 
     private Instant bookingTime;
