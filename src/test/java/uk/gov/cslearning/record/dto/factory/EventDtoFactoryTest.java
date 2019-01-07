@@ -17,7 +17,7 @@ public class EventDtoFactoryTest {
 
     @Test
     public void shouldReturnEventDto() {
-        String status = "Active";
+        EventStatus status = EventStatus.ACTIVE;
         String path = "/path/to/event";
         String uid = "event-uid";
 
@@ -29,7 +29,7 @@ public class EventDtoFactoryTest {
 
         EventDto eventDto = eventDtoFactory.create(event);
 
-        assertEquals(EventStatus.forValue(status), eventDto.getStatus());
+        assertEquals(status, eventDto.getStatus());
         assertEquals(URI.create(String.join("", catalogueUrl, path)), eventDto.getUri());
         assertEquals(uid, eventDto.getUid());
         assertEquals(CancellationReason.UNAVAILABLE, eventDto.getCancellationReason());

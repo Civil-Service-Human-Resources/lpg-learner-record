@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
+import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
@@ -38,7 +39,7 @@ public class BookingRepositoryTest {
         Booking booking = new Booking();
         booking.setEvent(event);
         booking.setLearner(learner);
-        booking.setStatus("CONFIRMED");
+        booking.setStatus(BookingStatus.CONFIRMED);
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(Instant.now());
 
@@ -65,7 +66,7 @@ public class BookingRepositoryTest {
         Booking booking = new Booking();
         booking.setEvent(event);
         booking.setLearner(learner);
-        booking.setStatus("CONFIRMED");
+        booking.setStatus(BookingStatus.CONFIRMED);
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(Instant.now());
 

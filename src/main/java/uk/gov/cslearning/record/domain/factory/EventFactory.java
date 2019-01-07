@@ -5,7 +5,6 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 
-import java.net.URI;
 import java.nio.file.Paths;
 
 @Component
@@ -15,7 +14,7 @@ public class EventFactory {
         Event event = new Event();
         event.setPath(path);
         event.setUid(Paths.get(path).getFileName().toString());
-        event.setStatus(EventStatus.ACTIVE.getValue());
+        event.setStatus(EventStatus.ACTIVE);
         return event;
     }
 
@@ -26,7 +25,7 @@ public class EventFactory {
         event.setId(eventDto.getId());
         event.setPath(path);
         event.setUid(Paths.get(path).getFileName().toString());
-        event.setStatus(eventDto.getStatus().getValue());
+        event.setStatus(eventDto.getStatus());
         event.setCancellationReason(eventDto.getCancellationReason());
         return event;
     }
