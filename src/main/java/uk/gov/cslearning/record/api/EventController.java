@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.service.EventService;
@@ -30,5 +31,14 @@ public class EventController {
         return eventService.findByUid(eventUid)
                 .map(b -> new ResponseEntity<>(b, OK))
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    }
+
+    @PostMapping(path = "/event")
+    public ResponseEntity<EventDto> create(@RequestBody EventDto event, UriComponentsBuilder uriBuilder) {
+        EventDto result = eventService.create(event);
+
+        return ResponseEntity.created(
+                uriBuilder.path("/event/{eventId}").build(result.getUid())
+        ).build();
     }
 }

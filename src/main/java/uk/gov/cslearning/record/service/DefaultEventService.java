@@ -67,4 +67,9 @@ public class DefaultEventService implements EventService {
 
         return Optional.ofNullable(event);
     }
+
+    @Override
+    public EventDto create(EventDto eventDto){
+        return eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto)));
+    }
 }

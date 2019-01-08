@@ -17,4 +17,7 @@ public interface EventService {
 
     @Transactional(readOnly = true)
     Optional<EventDto> findByUid(String eventUid);
+
+    @Transactional
+    EventDto create(EventDto eventDto);
 }

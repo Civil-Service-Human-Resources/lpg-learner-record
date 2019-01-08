@@ -25,7 +25,7 @@ public class BookingDtoFactoryTest {
     @Test
     public void shouldReturnBookingDto() throws URISyntaxException {
         int bookingId = 99;
-        String status = "Confirmed";
+        BookingStatus status = BookingStatus.CONFIRMED;
         String paymentDetails = "/purchase-order/abcde12345";
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
 
@@ -59,13 +59,13 @@ public class BookingDtoFactoryTest {
         assertThat(bookingDto.getPaymentDetails(),
                 equalTo(new URI(String.join("", csrsBaseUri, paymentDetails))));
 
-        assertThat(bookingDto.getStatus(), equalTo(BookingStatus.forValue(status)));
+        assertThat(bookingDto.getStatus(), equalTo(status));
     }
 
     @Test
     public void shouldIgnoreMissingPaymentDetails() throws URISyntaxException {
         int bookingId = 99;
-        String status = "Confirmed";
+        BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
 
         String learnerUuid = "learner-uuid";
@@ -95,6 +95,6 @@ public class BookingDtoFactoryTest {
         assertThat(bookingDto.getLearner(), equalTo(learnerUuid));
         assertThat(bookingDto.getLearnerEmail(), equalTo(learnerEmail));
 
-        assertThat(bookingDto.getStatus(), equalTo(BookingStatus.forValue(status)));
+        assertThat(bookingDto.getStatus(), equalTo(status));
     }
 }
