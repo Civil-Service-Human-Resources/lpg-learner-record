@@ -15,6 +15,10 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -138,6 +142,16 @@ public class DefaultBookingService implements BookingService {
     @Override
     public List<BookingDto> findAll() {
         return bookingRepository.findAll().stream()
+                .map(bookingDtoFactory::create)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookingDto> findAllForPeriod(LocalDate from, LocalDate to) {
+        Instant periodStart = ZonedDateTime.of(from.atStartOfDay(), ZoneOffset.ofHours(0)).toInstant();
+        Instant periodEnd = ZonedDateTime.of(to.plusDays(1).atStartOfDay(), ZoneOffset.ofHours(0)).toInstant();
+
+        return bookingRepository.findAllByBookingTimeBetween(periodStart, periodEnd).stream()
                 .map(bookingDtoFactory::create)
                 .collect(Collectors.toList());
     }
