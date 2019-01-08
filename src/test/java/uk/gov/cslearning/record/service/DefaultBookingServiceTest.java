@@ -20,6 +20,10 @@ import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -343,5 +347,31 @@ public class DefaultBookingServiceTest {
         when(bookingRepository.findAll()).thenReturn(Arrays.asList(booking1, booking2, booking3));
 
         assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAll());
+    }
+
+    @Test
+    public void shouldListAllBookingsForPeriod() {
+        LocalDate from = LocalDate.parse("2018-01-01");
+        LocalDate to = LocalDate.parse("2018-01-07");
+
+        Instant start = Instant.parse("2018-01-01T00:00:00Z");
+        Instant end = Instant.parse("2018-01-08T00:00:00Z");
+
+        Booking booking1 = new Booking();
+        Booking booking2 = new Booking();
+        Booking booking3 = new Booking();
+
+        BookingDto bookingDto1 = new BookingDto();
+        BookingDto bookingDto2 = new BookingDto();
+        BookingDto bookingDto3 = new BookingDto();
+
+        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto1);
+        when(bookingDtoFactory.create(booking2)).thenReturn(bookingDto2);
+        when(bookingDtoFactory.create(booking3)).thenReturn(bookingDto3);
+
+        when(bookingRepository.findAllByBookingTimeBetween(eq(start), eq(end)))
+                .thenReturn(Arrays.asList(booking1, booking2, booking3));
+
+        assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAllForPeriod(from, to));
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,4 +19,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
 
     @Query("select b from Booking b where b.event.uid = :eventUid and b.learner.uid = :learnerUid")
     Optional<Booking> findByEventUidLearnerUid(@Param("eventUid") String eventUid, @Param("learnerUid") String learnerUid);
+
+    List<Booking> findAllByBookingTimeBetween(Instant from, Instant to);
 }

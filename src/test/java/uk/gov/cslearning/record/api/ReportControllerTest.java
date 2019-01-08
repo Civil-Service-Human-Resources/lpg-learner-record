@@ -16,6 +16,7 @@ import uk.gov.cslearning.record.service.BookingService;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -42,7 +43,7 @@ public class ReportControllerTest {
     private BookingService bookingService;
 
     @Test
-    public void shouldListAllBookings() throws Exception {
+    public void shouldListAllBookingsForPeriod() throws Exception {
         String learnerUid = "learner-uid";
         int bookingId = 99;
         BookingStatus status = BookingStatus.CONFIRMED;
@@ -65,11 +66,16 @@ public class ReportControllerTest {
         booking.setEvent(event);
         booking.setLearner(learnerUid);
 
-        when(bookingService.findAll()).thenReturn(Collections.singletonList(booking));
+        when(bookingService.findAllForPeriod(LocalDate.parse("2018-01-01"), LocalDate.parse("2018-01-31")))
+                .thenReturn(Collections.singletonList(booking));
 
         mockMvc.perform(
-                get("/reporting/bookings").with(csrf())
+                get("/reporting/bookings")
+                        .param("from", "2018-01-01")
+                        .param("to", "2018-01-31")
+                        .with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
+
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", equalTo(bookingId)))
                 .andExpect(jsonPath("$[0].learner", equalTo(learnerUid)))

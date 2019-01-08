@@ -1,12 +1,15 @@
 package uk.gov.cslearning.record.api;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.service.BookingService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -20,9 +23,12 @@ public class ReportController {
         this.bookingService = bookingService;
     }
 
-    @GetMapping("/reporting/bookings")
-    public ResponseEntity<List<BookingDto>> listBookings() {
-        List<BookingDto> bookings = bookingService.findAll();
+    @GetMapping(value = "/reporting/bookings", params = {"from", "to"})
+    public ResponseEntity<List<BookingDto>> listBookings(
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
+    ) {
+        List<BookingDto> bookings = bookingService.findAllForPeriod(from, to);
 
         return new ResponseEntity<>(bookings, OK);
     }
