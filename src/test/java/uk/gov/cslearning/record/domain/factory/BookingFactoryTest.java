@@ -59,7 +59,7 @@ public class BookingFactoryTest {
 
         Booking booking = bookingFactory.create(bookingDto);
 
-        assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
+        assertThat(booking.getStatus(), equalTo(BookingStatus.CONFIRMED));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
         assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
         assertThat(booking.getId(), equalTo(bookingDto.getId()));
@@ -90,7 +90,7 @@ public class BookingFactoryTest {
 
         Booking booking = bookingFactory.create(bookingDto);
 
-        assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
+        assertThat(booking.getStatus(), equalTo(BookingStatus.CONFIRMED));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
         assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
         assertThat(booking.getId(), equalTo(bookingDto.getId()));
@@ -118,7 +118,7 @@ public class BookingFactoryTest {
 
         Booking booking = bookingFactory.create(bookingDto);
 
-        assertThat(booking.getStatus(), equalTo(bookingDto.getStatus().getValue()));
+        assertThat(booking.getStatus(), equalTo(BookingStatus.CONFIRMED));
         assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
         assertThat(booking.getId(), equalTo(bookingDto.getId()));
 

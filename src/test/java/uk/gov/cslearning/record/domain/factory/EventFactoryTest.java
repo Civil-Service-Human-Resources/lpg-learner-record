@@ -38,7 +38,7 @@ public class EventFactoryTest {
 
         Event event = eventFactory.create(eventDto);
 
-        assertEquals(EventStatus.ACTIVE.getValue(), event.getStatus());
+        assertEquals(EventStatus.ACTIVE, event.getStatus());
         assertEquals(uid, event.getUid());
         assertEquals(uri.getPath(), event.getPath());
     }
