@@ -26,7 +26,7 @@ public class BookingFactory {
 
         booking.setLearner(learnerFactory.create(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
         booking.setId(bookingDto.getId());
-        booking.setStatus(bookingDto.getStatus().getValue());
+        booking.setStatus(bookingDto.getStatus());
         booking.setPoNumber(bookingDto.getPoNumber());
 
         return booking;

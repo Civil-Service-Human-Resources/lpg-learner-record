@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.dto.factory;
 
 import org.junit.Test;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 
@@ -16,7 +17,7 @@ public class EventDtoFactoryTest {
 
     @Test
     public void shouldReturnEventDto() {
-        String status = "Active";
+        EventStatus status = EventStatus.ACTIVE;
         String path = "/path/to/event";
         String uid = "event-uid";
 
@@ -24,11 +25,13 @@ public class EventDtoFactoryTest {
         event.setStatus(status);
         event.setPath(path);
         event.setUid(uid);
+        event.setCancellationReason(CancellationReason.UNAVAILABLE);
 
         EventDto eventDto = eventDtoFactory.create(event);
 
-        assertEquals(EventStatus.forValue(status), eventDto.getStatus());
+        assertEquals(status, eventDto.getStatus());
         assertEquals(URI.create(String.join("", catalogueUrl, path)), eventDto.getUri());
         assertEquals(uid, eventDto.getUid());
+        assertEquals(CancellationReason.UNAVAILABLE, eventDto.getCancellationReason());
     }
 }

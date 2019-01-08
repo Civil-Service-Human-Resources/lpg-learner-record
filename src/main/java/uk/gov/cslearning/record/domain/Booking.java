@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -27,7 +28,8 @@ public class Booking {
     private String paymentDetails;
 
     @Column(nullable = false, length = 9)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 
     private Instant bookingTime;
 
