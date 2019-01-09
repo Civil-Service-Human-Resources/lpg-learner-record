@@ -35,17 +35,9 @@ public class ApiExceptionHandler {
     protected ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         LOGGER.error("Bad Request: ", e);
 
-        List<String> fieldErrors = e.getBindingResult().getFieldErrors().stream()
-                .map(error -> String.join(": ", error.getField(), error.getDefaultMessage()))
-                .collect(Collectors.toList());
-
-        List<String> globalErrors = e.getBindingResult().getGlobalErrors().stream()
+        List<String> errors = e.getBindingResult().getAllErrors().stream()
                 .map(error -> error.getDefaultMessage())
                 .collect(Collectors.toList());
-
-        List<String> errors = new ArrayList<>();
-        errors.addAll(fieldErrors);
-        errors.addAll(globalErrors);
 
         return ResponseEntity.badRequest().body(errorDtoFactory.create(HttpStatus.BAD_REQUEST, errors));
     }
