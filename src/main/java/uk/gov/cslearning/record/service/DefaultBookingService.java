@@ -77,9 +77,8 @@ public class DefaultBookingService implements BookingService {
     public BookingDto register(BookingDto bookingDto) {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.register(bookingDto);
+            notificationService.send(messageService.createBookedMessage(bookingDto));
         }
-
-        notificationService.send(messageService.createBookedMessage(bookingDto));
 
         return save(bookingDto);
     }
