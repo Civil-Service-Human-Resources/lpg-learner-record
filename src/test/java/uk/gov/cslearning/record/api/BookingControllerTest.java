@@ -286,7 +286,7 @@ public class BookingControllerTest {
         booking.setEvent(event);
         booking.setLearner(learner);
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+        BookingStatusDto bookingStatus = new BookingStatusDto(status, "");
 
         when(bookingService.updateStatus(eq(bookingId), eq(bookingStatus))).thenReturn(booking);
 
@@ -310,7 +310,7 @@ public class BookingControllerTest {
         int bookingId = 930;
         BookingStatus status = BookingStatus.REQUESTED;
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+        BookingStatusDto bookingStatus = new BookingStatusDto(status, "");
 
         mockMvc.perform(
                 patch("/event/blah/booking/" + bookingId).with(csrf())
@@ -417,7 +417,7 @@ public class BookingControllerTest {
         booking.setEvent(event);
         booking.setLearner(learnerUid);
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(status);
+        BookingStatusDto bookingStatus = new BookingStatusDto(status, "");
 
         when(bookingService.updateStatus(eq(eventUid), eq(learnerUid), eq(bookingStatus))).thenReturn(booking);
 
