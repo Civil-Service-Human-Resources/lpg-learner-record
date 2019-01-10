@@ -28,6 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -138,4 +139,19 @@ public class EventControllerTest {
         verify(eventService).findByUid(eventUid);
     }
 
+    @Test
+    public void shouldCreateEvent() throws Exception {
+        EventDto eventDto = new EventDto();
+
+        when(eventService.create(eventDto)).thenReturn(eventDto);
+
+        mockMvc.perform(
+                post("/event").with(csrf())
+                        .content(objectMapper.writeValueAsString(eventDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        verify(eventService).create(eventDto);
+    }
 }

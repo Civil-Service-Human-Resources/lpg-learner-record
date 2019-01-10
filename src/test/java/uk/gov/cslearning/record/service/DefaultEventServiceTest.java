@@ -128,4 +128,19 @@ public class DefaultEventServiceTest {
         verify(bookingService).unregister(booking2, "cancellation reason");
     }
 
+    @Test
+    public void shouldCreateNewEvent(){
+        EventDto eventDto = new EventDto();
+        Event event = new Event();
+
+        when(eventFactory.create(eventDto)).thenReturn(event);
+        when(eventRepository.save(event)).thenReturn(event);
+        when(eventDtoFactory.create(event)).thenReturn(eventDto);
+
+        assertEquals(eventService.create(eventDto), eventDto);
+
+        verify(eventFactory).create(eventDto);
+        verify(eventRepository).save(event);
+        verify(eventDtoFactory).create(event);
+    }
 }

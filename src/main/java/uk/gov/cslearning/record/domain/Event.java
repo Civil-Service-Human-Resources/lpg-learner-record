@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import uk.gov.cslearning.record.dto.CancellationReason;
+import uk.gov.cslearning.record.dto.EventStatus;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,12 +26,14 @@ public class Event {
     private String path;
 
     @Column(nullable = false)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private EventStatus status;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "event")
     private List<Booking> bookings = new ArrayList<>();
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CancellationReason cancellationReason;
 }
