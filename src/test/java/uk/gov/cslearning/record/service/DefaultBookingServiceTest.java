@@ -323,7 +323,7 @@ public class DefaultBookingServiceTest {
         String learnerEmail = "test@domain.com";
         String eventUid = "eventUid";
         Booking booking = new Booking();
-        List<String> status = Arrays.asList(BookingStatus.REQUESTED.getValue(), BookingStatus.CONFIRMED.getValue());
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
         when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status)).thenReturn(Optional.of(booking));
 
