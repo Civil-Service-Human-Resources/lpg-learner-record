@@ -1,10 +1,9 @@
 package uk.gov.cslearning.record.service.xapi.factory;
 
 import gov.adlnet.xapi.model.Activity;
-import gov.adlnet.xapi.model.IStatementObject;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class IStatementObjectFactoryTest {
     private IStatementObjectFactory factory = new IStatementObjectFactory();

@@ -14,12 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
-import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.*;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
-import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.EventService;
 
@@ -37,8 +33,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({BookingController.class, ErrorDtoFactory.class})

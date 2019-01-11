@@ -2,16 +2,11 @@ package uk.gov.cslearning.record.dto.factory;
 
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import uk.gov.cslearning.record.dto.ErrorDto;
-import uk.gov.cslearning.record.dto.ValidationError;
-import uk.gov.cslearning.record.dto.ValidationErrors;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
 
 public class ErrorDtoFactoryTest {
 

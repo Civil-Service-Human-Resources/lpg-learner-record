@@ -10,7 +10,6 @@ import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import javax.validation.ConstraintValidatorContext;
-
 import java.util.Optional;
 
 import static org.mockito.Mockito.mock;

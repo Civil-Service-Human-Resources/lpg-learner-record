@@ -10,7 +10,6 @@ import uk.gov.cslearning.record.service.xapi.ActivityType;
 
 import java.util.*;
 
-import static java.util.Collections.emptyEnumeration;
 import static java.util.Collections.emptyList;
 
 public abstract class Activity {

@@ -12,7 +12,6 @@ import uk.gov.cslearning.record.service.UserRecordService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableCollection;
