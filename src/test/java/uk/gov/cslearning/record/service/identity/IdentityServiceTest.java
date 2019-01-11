@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.HttpClientErrorException;
 
-import javax.xml.ws.http.HTTPException;
 import java.util.Collection;
 import java.util.Optional;
 

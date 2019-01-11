@@ -1,9 +1,7 @@
 package uk.gov.cslearning.record.validation.validators;
 
 import org.junit.Test;
-import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.EventStatus;
-import uk.gov.cslearning.record.validation.annotations.BookingStatusNotEquals;
 import uk.gov.cslearning.record.validation.annotations.EventStatusNotEquals;
 
 import javax.validation.ConstraintValidatorContext;

@@ -1,8 +1,6 @@
 package uk.gov.cslearning.record.validation.validators;
 
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.service.EventService;
 import uk.gov.cslearning.record.validation.annotations.EventIsActive;
@@ -11,7 +9,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.net.URI;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 @Component
 public class EventIsActiveValidator implements ConstraintValidator<EventIsActive, URI> {

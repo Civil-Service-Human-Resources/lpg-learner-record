@@ -5,6 +5,8 @@ import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public interface BookingService {
@@ -34,4 +36,11 @@ public interface BookingService {
 
     @Transactional(readOnly = true)
     Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);
+
+    @Transactional(readOnly = true)
+    List<BookingDto> findAll();
+
+    @Transactional(readOnly = true)
+    List<BookingDto> findAllForPeriod(LocalDate from, LocalDate to);
+
 }

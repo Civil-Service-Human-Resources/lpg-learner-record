@@ -8,7 +8,7 @@ import uk.gov.cslearning.record.dto.EventStatus;
 
 import java.net.URI;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class EventDtoFactoryTest {
     private static final String catalogueUrl = "http://example.org";

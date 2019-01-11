@@ -23,7 +23,7 @@ public class BookingController {
     }
 
     @GetMapping(value = "/event/{eventId}/booking")
-    public ResponseEntity<Iterable<BookingDto>> listEventBookings(@PathVariable String eventId){
+    public ResponseEntity<Iterable<BookingDto>> listEventBookings(@PathVariable String eventId) {
         Iterable<BookingDto> result = bookingService.listByEventUid(eventId);
 
         return new ResponseEntity<>(result, OK);

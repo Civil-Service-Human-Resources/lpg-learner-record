@@ -2,8 +2,6 @@ package uk.gov.cslearning.record.service.xapi.factory;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class StatementClientFactoryTest {
     private final String url = "_url";
     private final String username = "_username";

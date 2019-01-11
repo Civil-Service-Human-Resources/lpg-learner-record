@@ -3,7 +3,7 @@ package uk.gov.cslearning.record.service.xapi.factory;
 import gov.adlnet.xapi.model.Verb;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class VerbFactoryTest {
     private final VerbFactory verbFactory = new VerbFactory();
