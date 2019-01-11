@@ -252,7 +252,6 @@ public class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("A booking requires a learner")))
                 .andExpect(jsonPath("$.errors[1]", equalTo("A booking requires a learner email address")))
-                .andExpect(jsonPath("$.errors[2]", equalTo("A booking requires an event")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
