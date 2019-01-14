@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.persistence.*;
@@ -35,4 +36,8 @@ public class Booking {
 
     @Column
     private String poNumber;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BookingCancellationReason cancellationReason;
 }

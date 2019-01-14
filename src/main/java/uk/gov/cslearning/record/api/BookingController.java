@@ -3,11 +3,13 @@ package uk.gov.cslearning.record.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.service.BookingService;
 
 import javax.validation.Valid;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -70,5 +72,10 @@ public class BookingController {
         BookingDto result = bookingService.updateStatus(bookingId, bookingStatus);
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "/event/booking/cancellationReasons")
+    public ResponseEntity<Map<String, String>> getCancellationReasons() {
+        return new ResponseEntity<>(BookingCancellationReason.getKeyValuePairs(), OK);
     }
 }

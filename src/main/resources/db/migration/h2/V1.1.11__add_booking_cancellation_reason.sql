@@ -1,0 +1,1 @@
+ALTER TABLE booking ADD `cancellation_reason` enum('PAYMENT', 'REQUESTED') DEFAULT NULL;

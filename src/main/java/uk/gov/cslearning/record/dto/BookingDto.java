@@ -37,6 +37,8 @@ public class BookingDto {
 
     private String poNumber;
 
+    private BookingCancellationReason cancellationReason;
+
     public Optional<String> getEventUid(){
         return getEventPath().map(path -> {
             Path uri = Paths.get(path);
