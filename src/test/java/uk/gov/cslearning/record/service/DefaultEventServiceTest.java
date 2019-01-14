@@ -121,7 +121,7 @@ public class DefaultEventServiceTest {
         when(eventDtoFactory.create(savedEvent)).thenReturn(savedEventDto);
         when(eventDto.getCancellationReason()).thenReturn(CancellationReason.UNAVAILABLE);
 
-        assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "UNAVAILABLE")));
+        assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "the event is no longer available")));
 
         verify(eventDto).setStatus(EventStatus.CANCELLED);
         verify(bookingService).unregister(booking1, "the event is no longer available");
