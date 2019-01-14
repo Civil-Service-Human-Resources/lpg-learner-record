@@ -100,7 +100,7 @@ public class MessageServiceTest {
         when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
         when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
 
-        assertEquals(messageService.createUnregisterMessage(bookingDto), messageDto);
+        assertEquals(messageService.createUnregisterMessage(bookingDto, ""), messageDto);
 
         verify(learningCatalogueService).getCourse("courseId");
         verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
