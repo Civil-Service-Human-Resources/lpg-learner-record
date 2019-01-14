@@ -43,14 +43,13 @@ public class DefaultEventService implements EventService {
     public Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus) {
         Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
 
-        if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
-            event.getBookings().forEach(booking -> bookingService.unregister(booking, eventStatus.getCancellationReason()));
-        }
-
         EventDto eventDto = eventDtoFactory.create(event);
         eventDto.setStatus(eventStatus.getStatus());
 
-        eventDto.setCancellationReason(CancellationReason.forValue(eventStatus.getCancellationReason()));
+        if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
+            event.getBookings().forEach(booking -> bookingService.unregister(booking, eventStatus.getCancellationReason()));
+            eventDto.setCancellationReason(CancellationReason.valueOf(eventStatus.getCancellationReason()));
+        }
 
         return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
     }
