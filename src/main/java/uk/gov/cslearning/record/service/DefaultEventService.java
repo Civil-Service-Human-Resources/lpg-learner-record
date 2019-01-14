@@ -50,11 +50,7 @@ public class DefaultEventService implements EventService {
         EventDto eventDto = eventDtoFactory.create(event);
         eventDto.setStatus(eventStatus.getStatus());
 
-        if(eventStatus.getCancellationReason().equals("Short notice unavailability of the venue")){
-            eventDto.setCancellationReason(CancellationReason.VENUE);
-        } else if(eventStatus.getCancellationReason().equals("The event is no longer available")){
-            eventDto.setCancellationReason(CancellationReason.UNAVAILABLE);
-        }
+        eventDto.setCancellationReason(CancellationReason.forValue(eventStatus.getCancellationReason()));
 
         return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
     }
