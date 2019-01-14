@@ -109,7 +109,6 @@ public class DefaultBookingService implements BookingService {
     private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
         BookingDto bookingDto = bookingDtoFactory.create(booking);
 
-
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             return register(bookingDto);
