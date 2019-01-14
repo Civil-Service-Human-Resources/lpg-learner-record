@@ -31,6 +31,9 @@ public class BookingDtoFactory {
         if (null != booking.getPaymentDetails()) {
             bookingDto.setPaymentDetails(UriBuilder.fromUri(csrsBaseUrl).path(booking.getPaymentDetails()).build());
         }
+        if(booking.getCancellationReason() != null) {
+            bookingDto.setCancellationReason(booking.getCancellationReason());
+        }
 
         bookingDto.setStatus(booking.getStatus());
 

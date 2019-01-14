@@ -4,9 +4,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
-import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
-import uk.gov.cslearning.record.dto.BookingStatusDto;
+import uk.gov.cslearning.record.dto.*;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.notifications.dto.MessageDto;
@@ -110,7 +108,8 @@ public class DefaultBookingService implements BookingService {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             return register(bookingDto);
         } else {
-            notificationService.send(messageService.createUnregisterMessage(bookingDto, bookingStatusDto.getCancellationReason()));
+            bookingDto.setCancellationReason(BookingCancellationReason.valueOf(bookingStatusDto.getCancellationReason()));
+            notificationService.send(messageService.createUnregisterMessage(bookingDto, bookingDto.getCancellationReason().getValue()));
             return unregister(bookingDto);
         }
     }
@@ -122,6 +121,7 @@ public class DefaultBookingService implements BookingService {
         }
 
         bookingDto.setStatus(BookingStatus.CANCELLED);
+
         return save(bookingDto);
     }
 

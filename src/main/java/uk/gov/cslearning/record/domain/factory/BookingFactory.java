@@ -29,6 +29,10 @@ public class BookingFactory {
         booking.setStatus(bookingDto.getStatus());
         booking.setPoNumber(bookingDto.getPoNumber());
 
+        if (bookingDto.getCancellationReason() != null) {
+            booking.setCancellationReason(bookingDto.getCancellationReason());
+        }
+
         return booking;
     }
 }
