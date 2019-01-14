@@ -65,7 +65,7 @@ public class MessageService {
         return messageDtoFactory.create(inviteDto.getLearnerEmail(), inviteMessageTemplateId, map);
     }
 
-    public MessageDto createUnregisterMessage(BookingDto bookingDto){
+    public MessageDto createUnregisterMessage(BookingDto bookingDto, String cancellationReason){
         Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
 
@@ -74,6 +74,7 @@ public class MessageService {
 
         Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
         map.put("bookingReference", bookingReference);
+        map.put("cancellationReason", cancellationReason);
 
         return messageDtoFactory.create(bookingDto.getLearnerEmail(), unregisterMessageTemplateId, map);
     }
