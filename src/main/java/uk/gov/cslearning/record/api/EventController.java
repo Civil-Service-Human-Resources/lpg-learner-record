@@ -3,9 +3,13 @@ package uk.gov.cslearning.record.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.service.EventService;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -40,5 +44,10 @@ public class EventController {
         return ResponseEntity.created(
                 uriBuilder.path("/event/{eventId}").build(result.getUid())
         ).build();
+    }
+
+    @GetMapping(path = "/event/cancellationReasons")
+    public ResponseEntity<Iterable<CancellationReason>> getCancellationReasons() {
+        return new ResponseEntity<>(Arrays.asList(CancellationReason.values()), OK);
     }
 }
