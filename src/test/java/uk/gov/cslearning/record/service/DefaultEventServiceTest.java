@@ -124,8 +124,8 @@ public class DefaultEventServiceTest {
         assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "UNAVAILABLE")));
 
         verify(eventDto).setStatus(EventStatus.CANCELLED);
-        verify(bookingService).unregister(booking1, "the event is no longer available");
-        verify(bookingService).unregister(booking2, "the event is no longer available");
+        verify(bookingService).unregister(booking1, "UNAVAILABLE");
+        verify(bookingService).unregister(booking2, "UNAVAILABLE");
     }
 
     @Test
