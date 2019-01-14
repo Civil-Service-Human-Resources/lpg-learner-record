@@ -8,7 +8,7 @@ import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.service.EventService;
 
-import java.util.Arrays;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -46,7 +46,7 @@ public class EventController {
     }
 
     @GetMapping(path = "/event/cancellationReasons")
-    public ResponseEntity<Iterable<CancellationReason>> getCancellationReasons() {
-        return new ResponseEntity<>(Arrays.asList(CancellationReason.values()), OK);
+    public ResponseEntity<Map<String, String>> getCancellationReasons() {
+        return new ResponseEntity<>(CancellationReason.getKeyValuePairs(), OK);
     }
 }
