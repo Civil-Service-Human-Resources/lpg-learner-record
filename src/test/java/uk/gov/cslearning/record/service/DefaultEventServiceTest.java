@@ -10,6 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.EventFactory;
+import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.EventStatusDto;
@@ -118,12 +119,13 @@ public class DefaultEventServiceTest {
         when(eventFactory.create(eventDto)).thenReturn(updatedEvent);
         when(eventRepository.save(updatedEvent)).thenReturn(savedEvent);
         when(eventDtoFactory.create(savedEvent)).thenReturn(savedEventDto);
+        when(eventDto.getCancellationReason()).thenReturn(CancellationReason.UNAVAILABLE);
 
         assertEquals(Optional.of(savedEventDto), eventService.updateStatus(eventUid, new EventStatusDto(EventStatus.CANCELLED, "UNAVAILABLE")));
 
         verify(eventDto).setStatus(EventStatus.CANCELLED);
-        verify(bookingService).unregister(booking1, "UNAVAILABLE");
-        verify(bookingService).unregister(booking2, "UNAVAILABLE");
+        verify(bookingService).unregister(booking1, "the event is no longer available");
+        verify(bookingService).unregister(booking2, "the event is no longer available");
     }
 
     @Test
