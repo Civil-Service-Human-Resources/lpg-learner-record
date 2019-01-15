@@ -4,6 +4,7 @@ import org.junit.Test;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
@@ -28,6 +29,9 @@ public class BookingDtoFactoryTest {
         BookingStatus status = BookingStatus.CONFIRMED;
         String paymentDetails = "/purchase-order/abcde12345";
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant confirmationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant cancellationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        BookingCancellationReason cancellationReason = BookingCancellationReason.PAYMENT;
 
         String learnerUuid = "learner-uuid";
         String learnerEmail = "test@domain.com";
@@ -44,6 +48,9 @@ public class BookingDtoFactoryTest {
         booking.setStatus(status);
         booking.setPaymentDetails(paymentDetails);
         booking.setBookingTime(bookingTime);
+        booking.setConfirmationTime(confirmationTime);
+        booking.setCancellationTime(cancellationTime);
+        booking.setCancellationReason(cancellationReason);
         booking.setLearner(learner);
         booking.setEvent(event);
 
@@ -51,8 +58,11 @@ public class BookingDtoFactoryTest {
 
         assertThat(bookingDto.getId(), equalTo(bookingId));
         assertThat(bookingDto.getBookingTime(), equalTo(bookingTime));
+        assertThat(bookingDto.getConfirmationTime(), equalTo(confirmationTime));
+        assertThat(bookingDto.getCancellationTime(), equalTo(cancellationTime));
         assertThat(bookingDto.getEvent(),
                 equalTo(new URI(String.join("", learningCatalogueBaseUri, eventPath))));
+        assertThat(booking.getCancellationReason(), equalTo(cancellationReason));
 
         assertThat(bookingDto.getLearner(), equalTo(learnerUuid));
         assertThat(bookingDto.getLearnerEmail(), equalTo(learnerEmail));
@@ -67,6 +77,9 @@ public class BookingDtoFactoryTest {
         int bookingId = 99;
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant confirmationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant cancellationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        BookingCancellationReason cancellationReason = BookingCancellationReason.PAYMENT;
 
         String learnerUuid = "learner-uuid";
         String learnerEmail = "test@domain.com";
@@ -84,13 +97,19 @@ public class BookingDtoFactoryTest {
         booking.setBookingTime(bookingTime);
         booking.setLearner(learner);
         booking.setEvent(event);
+        booking.setConfirmationTime(confirmationTime);
+        booking.setCancellationTime(cancellationTime);
+        booking.setCancellationReason(cancellationReason);
 
         BookingDto bookingDto = bookingDtoFactory.create(booking);
 
         assertThat(bookingDto.getId(), equalTo(bookingId));
         assertThat(bookingDto.getBookingTime(), equalTo(bookingTime));
+        assertThat(bookingDto.getConfirmationTime(), equalTo(confirmationTime));
+        assertThat(bookingDto.getCancellationTime(), equalTo(cancellationTime));
         assertThat(bookingDto.getEvent(),
                 equalTo(new URI(String.join("", learningCatalogueBaseUri, eventPath))));
+        assertThat(booking.getCancellationReason(), equalTo(cancellationReason));
 
         assertThat(bookingDto.getLearner(), equalTo(learnerUuid));
         assertThat(bookingDto.getLearnerEmail(), equalTo(learnerEmail));
