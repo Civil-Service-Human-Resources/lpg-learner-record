@@ -185,4 +185,40 @@ public class MessageServiceTest {
         verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
         verify(messageDtoFactory).create(any(), any(), any());
     }
+
+    @Test
+    public void shouldCreateBookingRequestedMessage() throws URISyntaxException {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
+        bookingDto.setLearnerEmail("test@domain.com");
+        bookingDto.setLearner("learnerId");
+        bookingDto.setAccessibilityOptions("Braille");
+
+        Course course = new Course();
+        course.setTitle("title");
+
+        Venue venue = new Venue();
+        venue.setLocation("London");
+
+        DateRange dateRange = new DateRange();
+        dateRange.setDate(LocalDate.now());
+        ArrayList<DateRange> dateRanges = new ArrayList<>();
+        dateRanges.add(dateRange);
+
+        Event event = new Event();
+        event.setDateRanges(dateRanges);
+        event.setVenue(venue);
+
+        MessageDto messageDto = new MessageDto();
+
+        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
+        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
+        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
+
+        assertEquals(messageService.createRegisteredMessage(bookingDto), messageDto);
+
+        verify(learningCatalogueService).getCourse("courseId");
+        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
+        verify(messageDtoFactory).create(any(), any(), any());
+    }
 }
