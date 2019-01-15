@@ -34,8 +34,15 @@ public class Booking {
 
     private Instant bookingTime;
 
+    private Instant confirmationTime;
+
+    private Instant cancellationTime;
+
     @Column
     private String poNumber;
+
+    @Column
+    private String accessibilityOptions;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

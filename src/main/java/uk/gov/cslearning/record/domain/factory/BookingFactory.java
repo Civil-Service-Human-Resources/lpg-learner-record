@@ -18,6 +18,8 @@ public class BookingFactory {
         Booking booking = new Booking();
 
         booking.setBookingTime(bookingDto.getBookingTime());
+        booking.setConfirmationTime(bookingDto.getConfirmationTime());
+        booking.setCancellationTime(bookingDto.getCancellationTime());
         booking.setEvent(eventFactory.create(bookingDto.getEvent().getPath()));
 
         if (null != bookingDto.getPaymentDetails()) {
@@ -28,6 +30,7 @@ public class BookingFactory {
         booking.setId(bookingDto.getId());
         booking.setStatus(bookingDto.getStatus());
         booking.setPoNumber(bookingDto.getPoNumber());
+        booking.setAccessibilityOptions(bookingDto.getAccessibilityOptions());
 
         if (bookingDto.getCancellationReason() != null) {
             booking.setCancellationReason(bookingDto.getCancellationReason());

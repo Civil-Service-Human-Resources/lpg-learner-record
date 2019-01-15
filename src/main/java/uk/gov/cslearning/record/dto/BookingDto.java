@@ -33,12 +33,17 @@ public class BookingDto {
 
     private Instant bookingTime = Instant.now();
 
+    private Instant confirmationTime;
+
+    private Instant cancellationTime;
+
     private URI paymentDetails;
 
     private String poNumber;
 
-    private BookingCancellationReason cancellationReason;
+    private String accessibilityOptions;
 
+    private BookingCancellationReason cancellationReason;
 
     public Optional<String> getEventUid(){
         return getEventPath().map(path -> {

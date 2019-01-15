@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service;
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Booking;
@@ -102,7 +103,7 @@ public class MessageService {
         String bookingReference = createBookingReference(bookingDto.getLearner(), eventUid);
 
         Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
-        map.put("accessibility", "");
+        map.put("accessibility", bookingDto.getAccessibilityOptions());
         map.put("bookingReference", bookingReference);
 
         return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingConfirmedMessageTemplateId, map);

@@ -26,6 +26,8 @@ public class BookingDtoFactory {
         bookingDto.setLearner(booking.getLearner().getUid());
         bookingDto.setLearnerEmail(booking.getLearner().getLearnerEmail());
         bookingDto.setBookingTime(booking.getBookingTime());
+        bookingDto.setConfirmationTime(booking.getConfirmationTime());
+        bookingDto.setCancellationTime(booking.getCancellationTime());
         bookingDto.setPoNumber(booking.getPoNumber());
 
         if (null != booking.getPaymentDetails()) {
@@ -36,6 +38,7 @@ public class BookingDtoFactory {
         }
 
         bookingDto.setStatus(booking.getStatus());
+        bookingDto.setAccessibilityOptions(booking.getAccessibilityOptions());
 
         return bookingDto;
     }
