@@ -30,6 +30,7 @@ public class MessageService {
     private final String unregisterMessageTemplateId;
     private final String cancelEventMessageTemplateId;
     private final String bookingConfirmedMessageTemplateId;
+    private final String bookingRequestedMessageTemplateId;
 
     public MessageService(LearningCatalogueService learningCatalogueService,
                           MessageDtoFactory messageDtoFactory,
@@ -38,7 +39,8 @@ public class MessageService {
                           @Value("${govNotify.template.inviteLearner}") String inviteMessageTemplateId,
                           @Value("${govNotify.template.cancelBooking}") String unregisterMessageTemplateId,
                           @Value("${govNotify.template.cancelEvent}") String cancelEventMessageTemplateId,
-                          @Value("${govNotify.template.bookingConfirmed}") String bookingConfirmedMessageTemplateId
+                          @Value("${govNotify.template.bookingConfirmed}") String bookingConfirmedMessageTemplateId,
+                          @Value("${govNotify.template.bookingRequested}") String bookingRequestedMessageTemplateId
     ){
         this.learningCatalogueService = learningCatalogueService;
         this.messageDtoFactory = messageDtoFactory;
@@ -50,6 +52,7 @@ public class MessageService {
         this.unregisterMessageTemplateId = unregisterMessageTemplateId;
         this.cancelEventMessageTemplateId = cancelEventMessageTemplateId;
         this.bookingConfirmedMessageTemplateId = bookingConfirmedMessageTemplateId;
+        this.bookingRequestedMessageTemplateId = bookingRequestedMessageTemplateId;
     }
 
     public MessageDto createInviteMessage(InviteDto inviteDto){
@@ -95,7 +98,26 @@ public class MessageService {
         return messageDtoFactory.create(booking.getLearner().getLearnerEmail(), cancelEventMessageTemplateId, map);
     }
 
+    public MessageDto createRegisteredMessage(BookingDto bookingDto) {
+        Map<String, String> map = createGenericMapForBooking(bookingDto);
+
+        return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingRequestedMessageTemplateId, map);
+    }
+
     public MessageDto createBookedMessage(BookingDto bookingDto) {
+        Map<String, String> map = createGenericMapForBooking(bookingDto);
+
+        return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingConfirmedMessageTemplateId, map);
+    }
+
+    private Course getCourseByEventUrl(String eventUrl){
+        String[] parts = eventUrl.split("/");
+        String courseId = parts[parts.length - 5];
+
+        return learningCatalogueService.getCourse(courseId);
+    }
+
+    private Map<String, String> createGenericMapForBooking(BookingDto bookingDto) {
         Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
 
@@ -106,14 +128,7 @@ public class MessageService {
         map.put("accessibility", bookingDto.getAccessibilityOptions());
         map.put("bookingReference", bookingReference);
 
-        return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingConfirmedMessageTemplateId, map);
-    }
-
-    private Course getCourseByEventUrl(String eventUrl){
-        String[] parts = eventUrl.split("/");
-        String courseId = parts[parts.length - 5];
-
-        return learningCatalogueService.getCourse(courseId);
+        return map;
     }
 
     private Map<String, String> createGenericMapForEvent(Event event, Course course, String learnerEmail){
