@@ -1,6 +1,6 @@
 package uk.gov.cslearning.record.validation.annotations;
 
-import uk.gov.cslearning.record.validation.validators.LearnerNotBookedValidator;
+import uk.gov.cslearning.record.validation.validators.InviteeNotBookedValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = LearnerNotBookedValidator.class)
-public @interface LearnerNotBooked {
+@Constraint(validatedBy = InviteeNotBookedValidator.class)
+public @interface InviteeNotBooked {
 
     String message() default "Learner not booked.";
 
