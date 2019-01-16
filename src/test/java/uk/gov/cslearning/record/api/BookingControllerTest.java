@@ -65,8 +65,10 @@ public class BookingControllerTest {
     public void shouldListAllBookingsOnEvent() throws Exception {
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(11);
+        bookingDto1.setEvent(URI.create("http://path/to/eventUid"));
         BookingDto bookingDto2 = new BookingDto();
         bookingDto2.setId(21);
+        bookingDto2.setEvent(URI.create("http://path/to/eventUid"));
 
         ArrayList<BookingDto> bookings = new ArrayList<>();
         bookings.add(bookingDto1);
@@ -326,7 +328,7 @@ public class BookingControllerTest {
         String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        URI event = new URI("http://event");
+        URI event = new URI("http://path/to/eventuid");
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();

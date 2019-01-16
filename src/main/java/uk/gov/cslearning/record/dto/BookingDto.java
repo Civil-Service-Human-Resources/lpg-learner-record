@@ -7,6 +7,8 @@ import uk.gov.cslearning.record.validation.annotations.EventIsActive;
 
 import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 
 @Data
@@ -33,4 +35,21 @@ public class BookingDto {
     private URI paymentDetails;
 
     private String poNumber;
+
+    public String getEventUid(){
+        String path = getEventPath();
+
+        if (path != null && !path.equals("")) {
+            Path uri = Paths.get(path);
+            return uri.getFileName().toString();
+        }
+        return null;
+    }
+
+    public String getEventPath() {
+        if(event != null && event.getPath() != null) {
+            return event.getPath();
+        }
+        return null;
+    }
 }

@@ -24,7 +24,11 @@ public class AttendeeNotBookedValidator implements ConstraintValidator<LearnerNo
 
     @Override
     public boolean isValid(BookingDto booking, ConstraintValidatorContext context) {
-        String eventUid = Paths.get(booking.getEvent().getPath()).getFileName().toString();
+        String eventUid = booking.getEventUid();
+
+        if (eventUid == null) {
+            return false;
+        }
 
         return !bookingService.findActiveBookingByEmailAndEvent(booking.getLearnerEmail(), eventUid).isPresent();
     }
