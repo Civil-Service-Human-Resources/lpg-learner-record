@@ -133,9 +133,9 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){;
+    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid){
         List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
-
+      
         return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status);
     }
 

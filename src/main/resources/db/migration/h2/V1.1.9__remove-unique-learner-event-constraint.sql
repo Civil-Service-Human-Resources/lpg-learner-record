@@ -1,0 +1,1 @@
+ALTER TABLE booking DROP INDEX unique_learner_event;

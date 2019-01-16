@@ -65,8 +65,10 @@ public class BookingControllerTest {
     public void shouldListAllBookingsOnEvent() throws Exception {
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(11);
+        bookingDto1.setEvent(URI.create("http://path/to/eventUid"));
         BookingDto bookingDto2 = new BookingDto();
         bookingDto2.setId(21);
+        bookingDto2.setEvent(URI.create("http://path/to/eventUid"));
 
         ArrayList<BookingDto> bookings = new ArrayList<>();
         bookings.add(bookingDto1);
@@ -242,6 +244,7 @@ public class BookingControllerTest {
         booking.setStatus(status);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
+        booking.setEvent(new URI("test/path/to/eventId"));
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())
@@ -251,11 +254,9 @@ public class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("A booking requires a learner")))
                 .andExpect(jsonPath("$.errors[1]", equalTo("A booking requires a learner email address")))
-                .andExpect(jsonPath("$.errors[2]", equalTo("A booking requires an event")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
-        verifyZeroInteractions(bookingService);
     }
 
     @Test
@@ -327,7 +328,7 @@ public class BookingControllerTest {
         String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        URI event = new URI("http://event");
+        URI event = new URI("http://path/to/eventuid");
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();

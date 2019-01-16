@@ -2,14 +2,19 @@ package uk.gov.cslearning.record.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import uk.gov.cslearning.record.validation.annotations.AttendeeNotBooked;
 import uk.gov.cslearning.record.validation.annotations.EventIsActive;
 
 import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Optional;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@AttendeeNotBooked
 public class BookingDto {
     private Integer id;
 
@@ -31,4 +36,18 @@ public class BookingDto {
     private URI paymentDetails;
 
     private String poNumber;
+
+    public Optional<String> getEventUid(){
+        return getEventPath().map(path -> {
+            Path uri = Paths.get(path);
+            return uri.getFileName().toString();
+        });
+    }
+
+    public Optional<String> getEventPath() {
+        if(event != null && !event.getPath().isEmpty()) {
+            return Optional.of(event.getPath());
+        }
+        return Optional.empty();
+    }
 }
