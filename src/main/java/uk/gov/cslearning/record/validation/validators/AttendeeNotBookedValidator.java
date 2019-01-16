@@ -10,6 +10,7 @@ import uk.gov.cslearning.record.validation.annotations.LearnerNotInvited;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Component
 public class AttendeeNotBookedValidator implements ConstraintValidator<LearnerNotInvited, BookingDto> {
@@ -24,12 +25,11 @@ public class AttendeeNotBookedValidator implements ConstraintValidator<LearnerNo
 
     @Override
     public boolean isValid(BookingDto booking, ConstraintValidatorContext context) {
-        String eventUid = booking.getEventUid();
+        Optional<String> eventUid = booking.getEventUid();
 
-        if (eventUid == null) {
-            return false;
+        if (eventUid.isPresent()) {
+            return !bookingService.findActiveBookingByEmailAndEvent(booking.getLearnerEmail(), eventUid.get()).isPresent();
         }
-
-        return !bookingService.findActiveBookingByEmailAndEvent(booking.getLearnerEmail(), eventUid).isPresent();
+        return false;
     }
 }

@@ -10,6 +10,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Optional;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -36,20 +37,20 @@ public class BookingDto {
 
     private String poNumber;
 
-    public String getEventUid(){
-        String path = getEventPath();
+    public Optional<String> getEventUid(){
+        Optional<String> path = getEventPath();
 
-        if (path != null && !path.equals("")) {
-            Path uri = Paths.get(path);
-            return uri.getFileName().toString();
+        if (path.isPresent()) {
+            Path uri = Paths.get(path.get());
+            return Optional.of(uri.getFileName().toString());
         }
-        return null;
+        return Optional.empty();
     }
 
-    public String getEventPath() {
-        if(event != null && event.getPath() != null) {
-            return event.getPath();
+    public Optional<String> getEventPath() {
+        if(event != null && event.getPath() != null && !event.getPath().equals("")) {
+            return Optional.of(event.getPath());
         }
-        return null;
+        return Optional.empty();
     }
 }
