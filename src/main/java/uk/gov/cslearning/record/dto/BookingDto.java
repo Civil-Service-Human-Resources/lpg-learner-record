@@ -38,17 +38,14 @@ public class BookingDto {
     private String poNumber;
 
     public Optional<String> getEventUid(){
-        Optional<String> path = getEventPath();
-
-        if (path.isPresent()) {
-            Path uri = Paths.get(path.get());
-            return Optional.of(uri.getFileName().toString());
-        }
-        return Optional.empty();
+        return getEventPath().map(path -> {
+            Path uri = Paths.get(path);
+            return uri.getFileName().toString();
+        });
     }
 
     public Optional<String> getEventPath() {
-        if(event != null && event.getPath() != null && !event.getPath().equals("")) {
+        if(event != null && !event.getPath().isEmpty()) {
             return Optional.of(event.getPath());
         }
         return Optional.empty();
