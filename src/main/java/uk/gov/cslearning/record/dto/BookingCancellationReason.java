@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum BookingCancellationReason {
-    PAYMENT("the booking has not been paid"),REQUESTED("the learner has requested that the booking be cancelled");
+    PAYMENT("the booking has not been paid"),
+    REQUESTED("the learner has requested that the booking be cancelled"),
+    BEREAVEMENT("Family bereavement"),
+    ILLNESS("Illness"),
+    PRIORITIES("Other work priorities");
 
     private final String value;
 
@@ -25,10 +29,19 @@ public enum BookingCancellationReason {
                 .orElseThrow(() -> new UnknownStatusException(value));
     }
 
-    public static Map<String, String> getKeyValuePairs(){
+    public static Map<String, String> getManagementKeyValuePairs(){
         Map<String, String> map = new HashMap<>();
         map.put("PAYMENT", PAYMENT.getValue());
         map.put("REQUESTED", REQUESTED.getValue());
+
+        return map;
+    }
+
+    public static Map<String, String> getUserKeyValuePairs(){
+        Map<String, String> map = new HashMap<>();
+        map.put(BEREAVEMENT.name(), BEREAVEMENT.getValue());
+        map.put(ILLNESS.name(), ILLNESS.getValue());
+        map.put(PRIORITIES.name(), PRIORITIES.getValue());
 
         return map;
     }
