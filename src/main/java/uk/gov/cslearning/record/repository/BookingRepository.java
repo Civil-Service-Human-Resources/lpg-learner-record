@@ -17,8 +17,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
     @Query("SELECT b FROM Booking b WHERE b.learner.learnerEmail = :email AND b.event.uid = :eventUid AND b.status IN :status")
     Optional<Booking> findByLearnerEmailAndEventUid(@Param("email") String learnerEmail, @Param("eventUid") String eventUid, @Param("status") List<BookingStatus> status);
 
-    @Query("select b from Booking b where b.event.uid = :eventUid and b.learner.uid = :learnerUid")
-    Optional<Booking> findByEventUidLearnerUid(@Param("eventUid") String eventUid, @Param("learnerUid") String learnerUid);
+    @Query("select b from Booking b where b.event.uid = :eventUid and b.learner.uid = :learnerUid AND b.status IN :status")
+    Optional<Booking> findByEventUidLearnerUid(@Param("eventUid") String eventUid, @Param("learnerUid") String learnerUid, @Param("status") List<BookingStatus> status);
 
     List<Booking> findAllByBookingTimeBetween(Instant from, Instant to);
 }

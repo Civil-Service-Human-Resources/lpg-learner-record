@@ -74,7 +74,9 @@ public class BookingRepositoryTest {
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        Optional<Booking> optional = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid);
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
+
+        Optional<Booking> optional = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status);
 
         assertTrue(optional.isPresent());
 
