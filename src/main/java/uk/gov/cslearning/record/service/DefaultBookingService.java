@@ -56,8 +56,9 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public Optional<BookingDto> find(String eventUid, String learnerUid) {
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
 
-        BookingDto bookingDto = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid).map(
+        BookingDto bookingDto = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status).map(
                 bookingDtoFactory::create
         ).orElse(null);
 
@@ -97,7 +98,9 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto updateStatus(String eventUid, String bookingUid, BookingStatusDto bookingStatus) {
-        Booking booking = bookingRepository.findByEventUidLearnerUid(eventUid, bookingUid).orElseThrow(() -> new BookingNotFoundException(eventUid, bookingUid));
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
+
+        Booking booking = bookingRepository.findByEventUidLearnerUid(eventUid, bookingUid, status).orElseThrow(() -> new BookingNotFoundException(eventUid, bookingUid));
         return updateStatus(booking, bookingStatus);
     }
 

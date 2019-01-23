@@ -80,7 +80,9 @@ public class DefaultBookingServiceTest {
         Booking booking = new Booking();
         BookingDto bookingDto = new BookingDto();
 
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
         when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
 
         assertEquals(Optional.of(bookingDto), bookingService.find(eventUid, learnerUid));
@@ -101,7 +103,9 @@ public class DefaultBookingServiceTest {
         String eventUid = "event-uid";
         String learnerUid = "learner-uid";
 
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.empty());
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.empty());
 
         assertEquals(Optional.empty(), bookingService.find(eventUid, learnerUid));
     }
@@ -222,7 +226,9 @@ public class DefaultBookingServiceTest {
         bookingDto.setLearner("test-uid");
         BookingDto savedBookingDto = new BookingDto();
 
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
 
         when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
 
