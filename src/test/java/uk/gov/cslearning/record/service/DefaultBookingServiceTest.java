@@ -226,7 +226,7 @@ public class DefaultBookingServiceTest {
         bookingDto.setLearner("test-uid");
         BookingDto savedBookingDto = new BookingDto();
 
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
         when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
 
