@@ -8,6 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.transaction.Transactional;
@@ -71,10 +72,11 @@ public class BookingRepositoryTest {
         booking.setStatus(BookingStatus.CONFIRMED);
         booking.setPaymentDetails("payment/details");
         booking.setBookingTime(Instant.now());
+        booking.setCancellationReason(BookingCancellationReason.PAYMENT);
 
         Booking savedBooking = bookingRepository.save(booking);
 
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
         Optional<Booking> optional = bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status);
 
