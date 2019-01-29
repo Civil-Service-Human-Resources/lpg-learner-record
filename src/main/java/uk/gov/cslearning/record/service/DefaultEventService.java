@@ -51,11 +51,6 @@ public class DefaultEventService implements EventService {
             event.getBookings().forEach(booking -> bookingService.unregister(booking, eventDto.getCancellationReason().getValue()));
         }
 
-        if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
-            eventDto.setCancellationReason(CancellationReason.valueOf(eventStatus.getCancellationReason()));
-            event.getBookings().forEach(booking -> bookingService.unregister(booking, eventDto.getCancellationReason().getValue()));
-        }
-
         return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
     }
 
