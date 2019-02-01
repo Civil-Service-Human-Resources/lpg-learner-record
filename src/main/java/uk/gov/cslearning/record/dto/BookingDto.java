@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-//@AttendeeNotBooked
+@AttendeeNotBooked
 public class BookingDto {
     private Integer id;
 

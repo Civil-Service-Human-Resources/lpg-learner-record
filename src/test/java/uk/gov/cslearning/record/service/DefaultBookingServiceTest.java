@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatus;
@@ -379,5 +380,14 @@ public class DefaultBookingServiceTest {
                 .thenReturn(Arrays.asList(booking1, booking2, booking3));
 
         assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAllForPeriod(from, to));
+    }
+
+    @Test
+    public void shouldDeleteAllByLearner() {
+        Learner learner = new Learner();
+
+        bookingService.deleteAllByLearner(learner);
+
+        verify(bookingRepository).deleteBookingsByLearner(learner);
     }
 }
