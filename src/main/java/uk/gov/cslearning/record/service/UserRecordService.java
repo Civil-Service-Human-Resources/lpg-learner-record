@@ -111,4 +111,10 @@ public class UserRecordService {
             courseRecordRepository.saveAll(courseRecords);
         }
     }
+
+    @Transactional
+    public void deleteUserRecord(String uid) {
+        xApiService.deleteAllStatementsByLearnerId(uid);
+        courseRecordRepository.deleteAllByUid(uid);
+    }
 }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.config.XApiProperties;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.service.CustomStatementClient;
 import uk.gov.cslearning.record.service.xapi.exception.XApiException;
 import uk.gov.cslearning.record.service.xapi.factory.StatementClientFactory;
 import uk.gov.cslearning.record.service.xapi.factory.StatementFactory;
@@ -93,12 +94,32 @@ public class XApiService implements Serializable {
         return postStatement(statementFactory.createUnregisteredStatement(bookingDto));
     }
 
+    public void deleteAllStatementsByLearnerId(String uid) {
+        try {
+            Collection<Statement> statements = getStatements(uid, "", null);
+            for (Statement statement : statements) {
+                deleteStatement(statement);
+            }
+        } catch (IOException e) {
+            throw new XApiException("Unable to get statements from xApi", e);
+        }
+    }
+
     private String postStatement(Statement statement) {
         StatementClient statementClient = statementClientFactory.create();
         try {
             return statementClient.postStatement(statement);
         } catch (IOException e) {
             throw new XApiException("Unable to post statement to XApi", e);
+        }
+    }
+
+    private void deleteStatement(Statement statement) {
+        CustomStatementClient customStatementClient = statementClientFactory.createCustom();
+        try {
+            customStatementClient.deleteStatement(statement);
+        } catch (IOException e) {
+            throw new XApiException("Unable to delete statement from XApi", e);
         }
     }
 }
