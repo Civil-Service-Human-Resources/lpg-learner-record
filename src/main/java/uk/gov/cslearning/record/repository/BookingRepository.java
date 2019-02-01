@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import java.time.Instant;
@@ -19,6 +20,8 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
 
     @Query("select b from Booking b where b.event.uid = :eventUid and b.learner.uid = :learnerUid AND b.status IN :status")
     Optional<Booking> findByEventUidLearnerUid(@Param("eventUid") String eventUid, @Param("learnerUid") String learnerUid, @Param("status") List<BookingStatus> status);
+
+    void deleteBookingsByLearner(Learner learner);
 
     List<Booking> findAllByBookingTimeBetween(Instant from, Instant to);
 }
