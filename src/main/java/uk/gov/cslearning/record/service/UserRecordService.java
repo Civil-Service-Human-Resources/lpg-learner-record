@@ -13,6 +13,7 @@ import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.StatementRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
@@ -40,9 +41,11 @@ public class UserRecordService {
 
     private LearningCatalogueService learningCatalogueService;
 
+    private final StatementRepository statementRepository;
+
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService) {
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService, StatementRepository statementRepository) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
@@ -51,6 +54,7 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
+        this.statementRepository = statementRepository;
     }
 
     @Transactional
@@ -114,7 +118,11 @@ public class UserRecordService {
 
     @Transactional
     public void deleteUserRecord(String uid) {
-        xApiService.deleteAllStatementsByLearnerId(uid);
+        statementRepository.count();
+
+        uk.gov.cslearning.record.Statement statement = new Statement();
+        statementRepository.save(statement);
+
         courseRecordRepository.deleteAllByUid(uid);
     }
 }

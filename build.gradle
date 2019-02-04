@@ -109,12 +109,16 @@ dependencies {
 
     compile 'org.projectlombok:lombok:1.18.4'
 
+    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
     testCompile 'org.powermock:powermock-api-mockito2:1.7.4'
     testCompile 'org.powermock:powermock-module-junit4:1.7.4'
 
     testCompile 'org.mockito:mockito-core:2.8.47'
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
 
 }
 
