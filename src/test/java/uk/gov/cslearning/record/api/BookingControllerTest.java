@@ -436,4 +436,22 @@ public class BookingControllerTest {
 
         verify(bookingService).updateStatus(eventUid, learnerUid, bookingStatus);
     }
+
+    @Test
+    public void shouldReturnActiveBooking() throws Exception {
+        String eventUid = "event-id";
+        String learnerUid = "learner-id";
+        BookingDto booking = new BookingDto();
+        booking.setId(1);
+
+        when(bookingService.findByLearnerUidAndEventUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
+
+        mockMvc.perform((
+                get(String.format("/event/%s/booking/%s/active", eventUid, learnerUid)).with(csrf()))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(1)));
+
+        verify(bookingService).findByLearnerUidAndEventUid(eventUid, learnerUid);
+    }
 }
