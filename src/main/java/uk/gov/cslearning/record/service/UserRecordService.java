@@ -13,7 +13,7 @@ import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.repository.StatementRepository;
+import uk.gov.cslearning.record.repository.StatementsRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
@@ -41,11 +41,11 @@ public class UserRecordService {
 
     private LearningCatalogueService learningCatalogueService;
 
-    private final StatementRepository statementRepository;
+    private final StatementsRepository statementsRepository;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService, StatementRepository statementRepository) {
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService, StatementsRepository statementsRepository) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
@@ -54,7 +54,7 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
-        this.statementRepository = statementRepository;
+        this.statementsRepository = statementsRepository;
     }
 
     @Transactional
@@ -118,11 +118,7 @@ public class UserRecordService {
 
     @Transactional
     public void deleteUserRecord(String uid) {
-        statementRepository.count();
-
-        uk.gov.cslearning.record.Statement statement = new Statement();
-        statementRepository.save(statement);
-
+        statementsRepository.deleteAllByLearnerUid(uid);
         courseRecordRepository.deleteAllByUid(uid);
     }
 }
