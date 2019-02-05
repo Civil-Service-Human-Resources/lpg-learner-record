@@ -55,7 +55,8 @@ public class RegistryService {
         LOGGER.debug("URL {}", String.format(findByUidUrlFormat, uid));
 
         try {
-            CivilServant civilServant = restOperations.getForObject(String.format(findByUidUrlFormat, uid), CivilServant.class);
+//            CivilServant civilServant = restOperations.getForObject(String.format(findByUidUrlFormat, uid), CivilServant.class);
+            CivilServant civilServant = null;
             return Optional.ofNullable(civilServant);
         } catch (HttpClientErrorException e){
             LOGGER.error(String.format("Cannot find profile details for civil servant with UID %s", uid), e);

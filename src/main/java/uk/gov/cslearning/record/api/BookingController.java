@@ -49,6 +49,15 @@ public class BookingController {
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     }
 
+    @GetMapping(value = "/event/{eventUid}/booking/{learnerUid}/active")
+    public ResponseEntity<BookingDto> getActiveBooking(@PathVariable String eventUid, @PathVariable String learnerUid) {
+        Optional<BookingDto> booking = bookingService.findByLearnerUidAndEventUid(eventUid, learnerUid);
+
+        return booking
+                .map(b -> new ResponseEntity<>(b, OK))
+                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    }
+
 
     @PostMapping(value="/event/{eventId}/booking/")
     public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
@@ -79,7 +88,7 @@ public class BookingController {
         return new ResponseEntity<>(BookingCancellationReason.getManagementKeyValuePairs(), OK);
     }
 
-    @GetMapping(value ="/event/booking/userCancellationReasons")
+    @GetMapping(value = "/event/booking/userCancellationReasons")
     public ResponseEntity<Map<String, String>> getUserCancellationReasons() {
         return new ResponseEntity<>(BookingCancellationReason.getUserKeyValuePairs(), OK);
     }
