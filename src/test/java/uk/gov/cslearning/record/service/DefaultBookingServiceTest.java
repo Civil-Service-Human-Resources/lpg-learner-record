@@ -380,4 +380,23 @@ public class DefaultBookingServiceTest {
 
         assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAllForPeriod(from, to));
     }
+
+    @Test
+    public void shouldReturnBookingForLearnerUidAndEventUid() {
+        String learnerUid = "learner-id";
+        String eventUid = "event-uid";
+
+        Booking booking = new Booking();
+        BookingDto bookingDto = new BookingDto();
+
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
+
+        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
+        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
+
+        assertEquals(bookingService.findByLearnerUidAndEventUid(eventUid, learnerUid), Optional.of(bookingDto));
+
+        verify(bookingRepository).findByEventUidLearnerUid(eventUid, learnerUid, status);
+        verify(bookingDtoFactory).create(booking);
+    }
 }
