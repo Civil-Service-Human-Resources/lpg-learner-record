@@ -82,6 +82,16 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
+    public Optional<BookingDto> findByLearnerUidAndEventUid(String eventUid, String learnerUid){
+        Optional<Booking> booking = findActiveBookingByLearnerUidAndEventUid(learnerUid, eventUid);
+
+        if(booking.isPresent()) {
+            return Optional.of(bookingDtoFactory.create(booking.get()));
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public BookingDto register(BookingDto bookingDto) {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.register(bookingDto);
@@ -100,10 +110,9 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public BookingDto updateStatus(String eventUid, String bookingUid, BookingStatusDto bookingStatus) {
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
+    public BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus) {
+        Booking booking = findActiveBookingByLearnerUidAndEventUid(eventUid, learnerUid).orElseThrow(() -> new BookingNotFoundException(eventUid, learnerUid));
 
-        Booking booking = bookingRepository.findByEventUidLearnerUid(eventUid, bookingUid, status).orElseThrow(() -> new BookingNotFoundException(eventUid, bookingUid));
         return updateStatus(booking, bookingStatus);
     }
 
@@ -162,6 +171,12 @@ public class DefaultBookingService implements BookingService {
         return bookingRepository.findAllByBookingTimeBetween(periodStart, periodEnd).stream()
                 .map(bookingDtoFactory::create)
                 .collect(Collectors.toList());
+    }
+
+    private Optional<Booking> findActiveBookingByLearnerUidAndEventUid(String learnerUid, String eventUid) {
+        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
+
+        return bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status);
     }
 
     private BookingDto save(BookingDto bookingDto) {
