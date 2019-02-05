@@ -111,7 +111,7 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus) {
-        Booking booking = findActiveBookingByLearnerUidAndEventUid(eventUid, learnerUid).orElseThrow(() -> new BookingNotFoundException(eventUid, learnerUid));
+        Booking booking = findActiveBookingByLearnerUidAndEventUid(learnerUid, eventUid).orElseThrow(() -> new BookingNotFoundException(eventUid, learnerUid));
 
         return updateStatus(booking, bookingStatus);
     }
