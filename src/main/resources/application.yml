@@ -17,6 +17,11 @@ spring:
       spec:
         - maximumSize: 500
         - expireAfterAccess: 1d
+  data.mongodb:
+    host: ${MONGODB:localhost}
+    database: learninglocker
+    port: 27017
+
 server:
   port: 9000
 
@@ -86,6 +91,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-#  data.mongodb:
-#    uri: ${MONGODB:mongodb://localhost:27017}
-#    database: learninglocker

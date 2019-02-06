@@ -54,15 +54,6 @@ public class LearnerRecordController {
         return new ResponseEntity<>(new Records(records), OK);
     }
 
-    @DeleteMapping(path = "/{uid}")
-    @PreAuthorize("isAuthenticated()")
-    @Transactional
-    public ResponseEntity deleteUserRecord(@PathVariable String uid) {
-        userRecordService.deleteUserRecord(uid);
-
-        return ResponseEntity.noContent().build();
-    }
-
     public static final class Records {
 
         private Collection<CourseRecord> records;

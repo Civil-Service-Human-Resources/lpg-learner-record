@@ -117,7 +117,7 @@ public class UserRecordService {
     }
 
     @Transactional
-    public void deleteUserRecord(String uid) {
+    public void deleteUserRecords(String uid) {
         statementsRepository.deleteAllByLearnerUid(uid);
         courseRecordRepository.deleteAllByUid(uid);
     }

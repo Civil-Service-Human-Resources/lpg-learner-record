@@ -10,9 +10,12 @@ public class DefaultLearnerService implements LearnerService {
 
     private final BookingService bookingService;
 
-    public DefaultLearnerService(LearnerRepository learnerRepository, BookingService bookingService) {
+    private final UserRecordService userRecordService;
+
+    public DefaultLearnerService(LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService) {
         this.learnerRepository = learnerRepository;
         this.bookingService = bookingService;
+        this.userRecordService = userRecordService;
     }
 
     public void deleteLearnerByUid(String uid) {
@@ -20,5 +23,7 @@ public class DefaultLearnerService implements LearnerService {
             bookingService.deleteAllByLearner(learner);
             learnerRepository.delete(learner);
         });
+
+        userRecordService.deleteUserRecords(uid);
     }
 }
