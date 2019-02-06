@@ -20,6 +20,7 @@ import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.StatementsRepository;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
@@ -53,13 +54,16 @@ public class UserRecordServiceTest {
     @Mock
     private RegistryService registryService;
 
+    @Mock
+    private StatementsRepository statementsRepository;
+
     @Autowired
     private CourseRecordRepository courseRecordRepository;
 
     @Before
     public void setup() {
         userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService,
-                learningCatalogueService);
+                learningCatalogueService, statementsRepository);
     }
 
     @Test

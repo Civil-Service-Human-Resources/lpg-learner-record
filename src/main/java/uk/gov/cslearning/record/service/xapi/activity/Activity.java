@@ -66,7 +66,7 @@ public abstract class Activity {
     String getActivityId() {
         gov.adlnet.xapi.model.Activity activity = ((gov.adlnet.xapi.model.Activity) statement.getObject());
         if (activity == null) {
-            LOGGER.warn("Statements has no activity ID", statement);
+            LOGGER.warn("Statement has no activity ID", statement);
             return null;
         }
         return stripPrefix(activity.getId());

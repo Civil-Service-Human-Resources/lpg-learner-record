@@ -21,6 +21,9 @@ public class DefaultLearnerServiceTest {
     @Mock
     private BookingService bookingService;
 
+    @Mock
+    private UserRecordService userRecordService;
+
     @InjectMocks
     private DefaultLearnerService defaultLearnerService;
 
@@ -36,5 +39,6 @@ public class DefaultLearnerServiceTest {
         verify(learnerRepository).findByUid(uid);
         verify(bookingService).deleteAllByLearner(learner);
         verify(learnerRepository).delete(learner);
+        verify(userRecordService).deleteUserRecords(uid);
     }
 }
