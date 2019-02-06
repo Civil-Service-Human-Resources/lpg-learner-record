@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import edu.emory.mathcs.backport.java.util.Arrays;
 import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.ActivityDefinition;
 import gov.adlnet.xapi.model.Statement;
@@ -10,6 +11,7 @@ import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +29,7 @@ import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -35,6 +38,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.cslearning.record.service.xapi.activity.Activity.COURSE_ID_PREFIX;
 
@@ -57,7 +61,7 @@ public class UserRecordServiceTest {
     @Mock
     private StatementsRepository statementsRepository;
 
-    @Autowired
+    @Mock
     private CourseRecordRepository courseRecordRepository;
 
     @Before
@@ -74,13 +78,15 @@ public class UserRecordServiceTest {
         final String activityId = COURSE_ID_PREFIX + "/" + courseId;
 
         CourseRecord courseRecord = new CourseRecord(courseId, "userId");
-        courseRecordRepository.save(courseRecord);
+        ArrayList<CourseRecord> savedCourseRecords = new ArrayList<>();
+        savedCourseRecords.add(courseRecord);
 
         Statement statement = createStatement(activityId, uk.gov.cslearning.record.service.xapi.Verb.ARCHIVED);
 
         when(learningCatalogueService.getCourse(eq(courseId))).thenReturn(createCourse(courseId));
         when(xApiService.getStatements(eq(userId), eq(null), any())).thenReturn(ImmutableSet.of(statement));
         when(registryService.getCivilServantByUid(userId)).thenReturn(Optional.of(new CivilServant()));
+        when(courseRecordRepository.findByUserId(userId)).thenReturn(savedCourseRecords);
 
         Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, Lists.newArrayList(activityId));
 
@@ -91,6 +97,16 @@ public class UserRecordServiceTest {
         assertThat(updatedCourseRecord.getCourseId(), equalTo(courseId));
         assertThat(updatedCourseRecord.getUserId(), equalTo(userId));
         assertThat(updatedCourseRecord.getState(), equalTo(State.ARCHIVED));
+    }
+
+    @Test
+    public void shouldDeleteUserRecords() throws Exception {
+        String uid = "userId";
+
+        userRecordService.deleteUserRecords(uid);
+
+        verify(statementsRepository).deleteAllByLearnerUid(uid);
+        verify(courseRecordRepository).deleteAllByUid(uid);
     }
 
     private Course createCourse(String courseId) {
