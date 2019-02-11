@@ -24,7 +24,6 @@ public class DefaultLearnerService implements LearnerService {
             learnerRepository.delete(learner);
         });
 
-
         userRecordService.deleteUserRecords(uid);
     }
 }
