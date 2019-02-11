@@ -2,18 +2,16 @@ package uk.gov.cslearning.record.service;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.ActivityDefinition;
 import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.Verb;
 import org.assertj.core.util.Lists;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +105,15 @@ public class UserRecordServiceTest {
 
         verify(statementsRepository).deleteAllByLearnerUid(uid);
         verify(courseRecordRepository).deleteAllByUid(uid);
+    }
+
+    @Test
+    public void shouldDeleteStatementsOlderThanDateTime() {
+        DateTime dateTime = new DateTime();
+
+        userRecordService.deleteStatementsOlderThan(dateTime);
+
+        verify(statementsRepository).deleteAllByAge(dateTime);
     }
 
     private Course createCourse(String courseId) {
