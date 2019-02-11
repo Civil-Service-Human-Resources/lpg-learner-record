@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.Statement;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.Statements;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.StatementsRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -120,5 +122,15 @@ public class UserRecordService {
     public void deleteUserRecords(String uid) {
         statementsRepository.deleteAllByLearnerUid(uid);
         courseRecordRepository.deleteAllByUid(uid);
+    }
+
+    @Transactional
+    public Collection<Statements> listStatements() {
+        return statementsRepository.findAll();
+    }
+
+    @Transactional
+    public void deleteStatementsOlderThan(DateTime dateTime) {
+        statementsRepository.deleteAllByAge(dateTime);
     }
 }
