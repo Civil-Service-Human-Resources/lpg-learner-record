@@ -111,7 +111,7 @@ public class UserRecordServiceTest {
     public void shouldDeleteStatementsOlderThanDateTime() {
         DateTime dateTime = new DateTime();
 
-        userRecordService.deleteStatementsOlderThan();
+        userRecordService.deleteOldStatements();
 
         verify(statementsRepository).deleteAllByAge(dateTime);
     }
