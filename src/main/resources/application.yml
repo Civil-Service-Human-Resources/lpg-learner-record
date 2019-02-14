@@ -79,6 +79,9 @@ lpg-ui:
 
 csl.homepage: "https://cslearning.gov.uk/"
 
+data:
+  retentionTime: ${DATA_RETENTION_TIME:36}
+
 ---
 
 spring:

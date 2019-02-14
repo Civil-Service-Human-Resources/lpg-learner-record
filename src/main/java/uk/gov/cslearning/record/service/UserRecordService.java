@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -45,8 +46,10 @@ public class UserRecordService {
 
     private final StatementsRepository statementsRepository;
 
+    private final int dataRetentionTime;
+
     @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
+    public UserRecordService(@Value("${data.retentionTime}") int dataRetentionTime, CourseRecordRepository courseRecordRepository, XApiService xApiService,
                              RegistryService registryService, LearningCatalogueService learningCatalogueService, StatementsRepository statementsRepository) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
@@ -57,6 +60,7 @@ public class UserRecordService {
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
         this.statementsRepository = statementsRepository;
+        this.dataRetentionTime = dataRetentionTime;
     }
 
     @Transactional
@@ -126,7 +130,7 @@ public class UserRecordService {
 
     @Transactional
     public void deleteOldStatements() {
-        DateTime dateTime = DateTime.now().minusYears(3);
+        DateTime dateTime = DateTime.now().minusMonths(dataRetentionTime);
         statementsRepository.deleteAllByAge(dateTime);
     }
 }
