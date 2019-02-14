@@ -125,11 +125,6 @@ public class UserRecordService {
     }
 
     @Transactional
-    public Collection<Statements> listStatements() {
-        return statementsRepository.findAll();
-    }
-
-    @Transactional
     public void deleteOldStatements() {
         DateTime dateTime = DateTime.now().minusYears(3);
         statementsRepository.deleteAllByAge(dateTime);
