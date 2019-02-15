@@ -35,7 +35,7 @@ public class CourseRecord {
     @JsonIgnore
     private String department;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
     private Collection<ModuleRecord> moduleRecords;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -120,6 +120,7 @@ public class CourseRecord {
 
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
+        moduleRecord.setCourseRecord(this);
         moduleRecords.add(moduleRecord);
     }
 
