@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -63,6 +64,22 @@ public class ModuleRecord {
 
     private BookingStatus bookingStatus;
 
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumns({
+            @JoinColumn(name = "course_id", referencedColumnName = "courseId"),
+            @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    })
+    private CourseRecord courseRecord;
+
+    public CourseRecord getCourseRecord() {
+        return courseRecord;
+    }
+
+    public void setCourseRecord(CourseRecord courseRecord) {
+        this.courseRecord = courseRecord;
+    }
+
     public ModuleRecord() {
     }
 
@@ -73,6 +90,10 @@ public class ModuleRecord {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getModuleId() {

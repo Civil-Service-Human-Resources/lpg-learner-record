@@ -11,7 +11,10 @@ import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import javax.transaction.Transactional;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
