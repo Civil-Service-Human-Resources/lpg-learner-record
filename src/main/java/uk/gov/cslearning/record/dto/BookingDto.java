@@ -33,13 +33,19 @@ public class BookingDto {
 
     private Instant bookingTime = Instant.now();
 
+    private Instant confirmationTime;
+
+    private Instant cancellationTime;
+
     private URI paymentDetails;
 
     private String poNumber;
 
+    private String accessibilityOptions;
+
     private BookingCancellationReason cancellationReason;
 
-    public Optional<String> getEventUid(){
+    public Optional<String> getEventUid() {
         return getEventPath().map(path -> {
             Path uri = Paths.get(path);
             return uri.getFileName().toString();
@@ -47,7 +53,7 @@ public class BookingDto {
     }
 
     public Optional<String> getEventPath() {
-        if(event != null && !event.getPath().isEmpty()) {
+        if (event != null && !event.getPath().isEmpty()) {
             return Optional.of(event.getPath());
         }
         return Optional.empty();

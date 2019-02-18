@@ -18,11 +18,11 @@ public class Booking {
     private Integer id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name="learnerId")
+    @JoinColumn(name = "learnerId")
     private Learner learner;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name="eventId")
+    @JoinColumn(name = "eventId")
     private Event event;
 
     @Column
@@ -34,8 +34,15 @@ public class Booking {
 
     private Instant bookingTime;
 
+    private Instant confirmationTime;
+
+    private Instant cancellationTime;
+
     @Column
     private String poNumber;
+
+    @Column
+    private String accessibilityOptions;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

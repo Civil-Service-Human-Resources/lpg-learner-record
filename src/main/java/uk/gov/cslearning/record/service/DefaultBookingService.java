@@ -86,8 +86,9 @@ public class DefaultBookingService implements BookingService {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             xApiService.register(bookingDto);
             notificationService.send(messageService.createBookedMessage(bookingDto));
+        } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
+            notificationService.send(messageService.createRegisteredMessage(bookingDto));
         }
-
         return save(bookingDto);
     }
 
@@ -112,6 +113,7 @@ public class DefaultBookingService implements BookingService {
 
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             bookingDto.setStatus(bookingStatusDto.getStatus());
+            bookingDto.setConfirmationTime(Instant.now());
             return register(bookingDto);
         } else {
             bookingDto.setCancellationReason(BookingCancellationReason.valueOf(bookingStatusDto.getCancellationReason()));
@@ -127,6 +129,7 @@ public class DefaultBookingService implements BookingService {
         }
 
         bookingDto.setStatus(BookingStatus.CANCELLED);
+        bookingDto.setCancellationTime(Instant.now());
 
         return save(bookingDto);
     }
