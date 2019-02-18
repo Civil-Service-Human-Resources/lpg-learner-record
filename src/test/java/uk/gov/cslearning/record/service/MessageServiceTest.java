@@ -16,11 +16,9 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageServiceTest {
@@ -35,8 +33,9 @@ public class MessageServiceTest {
     private final String unregisterMessageTemplateId = "unregisterTemplateId";
     private final String cancelEventMessageTemplateId = "cancelEventTemplateId";
     private final String bookingConfirmedMessageTemplateID = "bookingConfirmedTemplateId";
+    private final String bookingRequestedMessageTemplateId = "bookingRequestedTemplateId";
 
-    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, learningCatalogueBaseUrl, inviteMessageTemplateId, unregisterMessageTemplateId, cancelEventMessageTemplateId, bookingConfirmedMessageTemplateID);
+    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, learningCatalogueBaseUrl, inviteMessageTemplateId, unregisterMessageTemplateId, cancelEventMessageTemplateId, bookingConfirmedMessageTemplateID, bookingRequestedMessageTemplateId);
 
     @Test
     public void shouldCreateInviteMessage() throws URISyntaxException {
@@ -179,6 +178,42 @@ public class MessageServiceTest {
         when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
 
         assertEquals(messageService.createBookedMessage(bookingDto), messageDto);
+
+        verify(learningCatalogueService).getCourse("courseId");
+        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
+        verify(messageDtoFactory).create(any(), any(), any());
+    }
+
+    @Test
+    public void shouldCreateBookingRequestedMessage() throws URISyntaxException {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
+        bookingDto.setLearnerEmail("test@domain.com");
+        bookingDto.setLearner("learnerId");
+        bookingDto.setAccessibilityOptions("Braille");
+
+        Course course = new Course();
+        course.setTitle("title");
+
+        Venue venue = new Venue();
+        venue.setLocation("London");
+
+        DateRange dateRange = new DateRange();
+        dateRange.setDate(LocalDate.now());
+        ArrayList<DateRange> dateRanges = new ArrayList<>();
+        dateRanges.add(dateRange);
+
+        Event event = new Event();
+        event.setDateRanges(dateRanges);
+        event.setVenue(venue);
+
+        MessageDto messageDto = new MessageDto();
+
+        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
+        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
+        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
+
+        assertEquals(messageService.createRegisteredMessage(bookingDto), messageDto);
 
         verify(learningCatalogueService).getCourse("courseId");
         verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
