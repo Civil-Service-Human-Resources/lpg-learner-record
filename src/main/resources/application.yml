@@ -14,9 +14,8 @@ spring:
   cache:
     cache-names: courseId
     caffeine:
-      spec:
-        - maximumSize: 500
-        - expireAfterAccess: 1d
+      spec: maximumSize=500, expireAfterAccess=1h
+
 server:
   port: 9000
 
