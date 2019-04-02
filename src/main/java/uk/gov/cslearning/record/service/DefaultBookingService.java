@@ -82,10 +82,10 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public Optional<BookingDto> findByLearnerUidAndEventUid(String eventUid, String learnerUid){
+    public Optional<BookingDto> findByLearnerUidAndEventUid(String eventUid, String learnerUid) {
         Optional<Booking> booking = findActiveBookingByLearnerUidAndEventUid(learnerUid, eventUid);
 
-        if(booking.isPresent()) {
+        if (booking.isPresent()) {
             return Optional.of(bookingDtoFactory.create(booking.get()));
         }
         return Optional.empty();
@@ -93,8 +93,8 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto register(BookingDto bookingDto) {
+        xApiService.register(bookingDto);
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
-            xApiService.register(bookingDto);
             notificationService.send(messageService.createBookedMessage(bookingDto));
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
             notificationService.send(messageService.createRegisteredMessage(bookingDto));
@@ -177,6 +177,15 @@ public class DefaultBookingService implements BookingService {
         List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
         return bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status);
+    }
+
+    @Override
+    public Iterable<BookingDto> listByLearnerUid(String learnerUid) {
+        return bookingRepository
+                .findAllByLearnerUid(learnerUid)
+                .stream()
+                .map(bookingDtoFactory::create)
+                .collect(Collectors.toList());
     }
 
     private BookingDto save(BookingDto bookingDto) {

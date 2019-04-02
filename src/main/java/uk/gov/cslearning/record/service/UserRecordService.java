@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
@@ -40,9 +43,11 @@ public class UserRecordService {
 
     private LearningCatalogueService learningCatalogueService;
 
+    private BookingService bookingService;
+
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService) {
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService, BookingService bookingService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
@@ -51,6 +56,7 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
+        this.bookingService = bookingService;
     }
 
     @Transactional
@@ -58,6 +64,22 @@ public class UserRecordService {
         LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 
         Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
+
+        Iterable<BookingDto> bookingDtos = bookingService.listByLearnerUid(userId);
+
+        for (CourseRecord courseRecord : courseRecords) {
+            for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
+                if (moduleRecord.getEventId() != null) {
+                    for (BookingDto bookingDto : bookingDtos) {
+                        bookingDto.getEventUid().ifPresent(s -> {
+                            if (moduleRecord.getEventId().equals(s)) {
+                                moduleRecord.setBookingStatus(BookingStatus.values()[bookingDto.getStatus().ordinal()]);
+                            }
+                        });
+                    }
+                }
+            }
+        }
 
         LocalDateTime since = courseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
@@ -67,6 +89,7 @@ public class UserRecordService {
 
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, null, since);
+
 
             StatementStream stream = new StatementStream(learningCatalogueService);
 

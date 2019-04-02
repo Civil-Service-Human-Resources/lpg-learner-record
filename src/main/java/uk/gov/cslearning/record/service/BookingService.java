@@ -20,6 +20,9 @@ public interface BookingService {
     Iterable<BookingDto> listByEventUid(String eventUid);
 
     @Transactional(readOnly = true)
+    Iterable<BookingDto> listByLearnerUid(String learnerUid);
+
+    @Transactional(readOnly = true)
     Optional<BookingDto> findByLearnerUidAndEventUid(String eventUid, String learnerUid);
 
     @Transactional
