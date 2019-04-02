@@ -65,22 +65,6 @@ public class UserRecordService {
 
         Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
 
-        Iterable<BookingDto> bookingDtos = bookingService.listByLearnerUid(userId);
-
-        for (CourseRecord courseRecord : courseRecords) {
-            for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
-                if (moduleRecord.getEventId() != null) {
-                    for (BookingDto bookingDto : bookingDtos) {
-                        bookingDto.getEventUid().ifPresent(s -> {
-                            if (moduleRecord.getEventId().equals(s)) {
-                                moduleRecord.setBookingStatus(BookingStatus.values()[bookingDto.getStatus().ordinal()]);
-                            }
-                        });
-                    }
-                }
-            }
-        }
-
         LocalDateTime since = courseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
                 .filter(Objects::nonNull)
@@ -111,6 +95,21 @@ public class UserRecordService {
                 return courseRecords.stream()
                         .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
                         .collect(Collectors.toSet());
+            }
+            Iterable<BookingDto> bookingDtos = bookingService.listByLearnerUid(userId);
+
+            for (CourseRecord courseRecord : courseRecords) {
+                for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
+                    if (moduleRecord.getEventId() != null) {
+                        for (BookingDto bookingDto : bookingDtos) {
+                            bookingDto.getEventUid().ifPresent(s -> {
+                                if (moduleRecord.getEventId().equals(s)) {
+                                    moduleRecord.setBookingStatus(BookingStatus.values()[bookingDto.getStatus().ordinal()]);
+                                }
+                            });
+                        }
+                    }
+                }
             }
             return courseRecords;
         } catch (IOException e) {
