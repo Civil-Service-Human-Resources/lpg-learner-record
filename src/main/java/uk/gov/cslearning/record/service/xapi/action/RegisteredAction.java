@@ -46,8 +46,6 @@ public class RegisteredAction extends Action {
                 if (courseRecord.getState() == State.REGISTERED) {
                     courseRecord.setState(State.APPROVED);
                 }
-            } else {
-                moduleRecord.setBookingStatus(BookingStatus.REQUESTED);
             }
         } else {
             LOGGER.warn("Registered action taken on module that is not an event. Course ID: {}, module ID: {}",
