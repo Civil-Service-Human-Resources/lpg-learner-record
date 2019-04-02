@@ -8,7 +8,6 @@ import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
     Optional<Booking> findByEventUidLearnerUid(@Param("eventUid") String eventUid, @Param("learnerUid") String learnerUid, @Param("status") List<BookingStatus> status);
 
     List<Booking> findAllByBookingTimeBetween(Instant from, Instant to);
+
+    @Query("select b from Booking b where b.learner.uid = :learnerUid")
+    List<Booking> findAllByLearnerUid(@Param("learnerUid") String learnerUid);
 }
