@@ -53,7 +53,7 @@ public class LearnerRecordEventFactoryTest {
         LocalDateTime updatedAt = LocalDateTime.now().minusHours(12);
         String paymentMethod = "payment-method";
         String paymentDetails = "payment-details";
-        BookingStatus bookingStatus = BookingStatus.APPROVED;
+        BookingStatus bookingStatus = BookingStatus.CONFIRMED;
         State state = State.APPROVED;
 
         CourseRecord courseRecord = new CourseRecord(courseId, userId);

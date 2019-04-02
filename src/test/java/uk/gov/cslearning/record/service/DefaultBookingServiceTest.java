@@ -22,8 +22,6 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -181,7 +179,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
-        verifyZeroInteractions(xApiService);
         verify(bookingRepository).saveBooking(unsavedBooking);
     }
 
@@ -320,7 +317,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.register(bookingDto));
 
-        verifyZeroInteractions(xApiService);
         verify(bookingRepository).saveBooking(booking);
     }
 

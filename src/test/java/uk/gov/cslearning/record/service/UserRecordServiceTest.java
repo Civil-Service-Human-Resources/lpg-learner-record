@@ -56,10 +56,13 @@ public class UserRecordServiceTest {
     @Autowired
     private CourseRecordRepository courseRecordRepository;
 
+    @Autowired
+    private BookingService bookingService;
+
     @Before
     public void setup() {
         userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService,
-                learningCatalogueService);
+                learningCatalogueService, bookingService);
     }
 
     @Test
