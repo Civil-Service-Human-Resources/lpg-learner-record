@@ -17,7 +17,14 @@ public enum Verb {
     SKIPPED("http://id.tincanapi.com/verb/skipped"),
     TERMINATED("http://adlnet.gov/expapi/verbs/terminated"),
     UNREGISTERED("http://id.tincanapi.com/verb/unregistered"),
+    APPROVED("http://id.tincanapi.com/verb/approved"),
     VIEWED("http://id.tincanapi.com/verb/viewed");
+
+    private String uri;
+
+    Verb(String uri) {
+        this.uri = uri;
+    }
 
     public static Verb fromUri(String uri) {
         for (Verb verb : values()) {
@@ -26,12 +33,6 @@ public enum Verb {
             }
         }
         return null;
-    }
-
-    private String uri;
-
-    Verb(String uri) {
-        this.uri = uri;
     }
 
     public String getUri() {

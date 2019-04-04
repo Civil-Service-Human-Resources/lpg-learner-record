@@ -35,10 +35,24 @@ public class StatementFactory {
         statement.setObject(object);
         statement.setContext(contextFactory.createBookingContext(bookingDto));
 
-        if(bookingDto.getPaymentDetails() != null) {
+        if (bookingDto.getPaymentDetails() != null) {
             Result result = resultFactory.createPurchaseOrderResult(bookingDto.getPaymentDetails().toString());
             statement.setResult(result);
         }
+
+        return statement;
+    }
+
+    public Statement createApprovedStatement(BookingDto bookingDto) {
+        Actor actor = actorFactory.create(bookingDto.getLearner());
+
+        IStatementObject object = objectFactory.createEventObject(bookingDto.getEvent().toString());
+
+        Statement statement = new Statement();
+        statement.setActor(actor);
+        statement.setVerb(verbFactory.createdApproved());
+        statement.setObject(object);
+        statement.setContext(contextFactory.createBookingContext(bookingDto));
 
         return statement;
     }

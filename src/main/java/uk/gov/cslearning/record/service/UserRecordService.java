@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.ModuleRecord;
-import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
@@ -96,21 +93,7 @@ public class UserRecordService {
                         .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
                         .collect(Collectors.toSet());
             }
-            Iterable<BookingDto> bookingDtos = bookingService.listByLearnerUid(userId);
 
-            for (CourseRecord courseRecord : courseRecords) {
-                for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
-                    if (moduleRecord.getEventId() != null) {
-                        for (BookingDto bookingDto : bookingDtos) {
-                            bookingDto.getEventUid().ifPresent(s -> {
-                                if (moduleRecord.getEventId().equals(s)) {
-                                    moduleRecord.setBookingStatus(BookingStatus.values()[bookingDto.getStatus().ordinal()]);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
             return courseRecords;
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);

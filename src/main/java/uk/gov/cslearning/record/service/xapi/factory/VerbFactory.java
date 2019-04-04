@@ -8,11 +8,15 @@ import java.util.HashMap;
 @Component
 public class VerbFactory {
     public Verb createdRegistered() {
-        return createVerb("registered","http://adlnet.gov/expapi/verbs/registered");
+        return createVerb("registered", "http://adlnet.gov/expapi/verbs/registered");
     }
 
     public Verb createdUnregistered() {
-        return createVerb("unregistered","http://id.tincanapi.com/verb/unregistered");
+        return createVerb("unregistered", "http://id.tincanapi.com/verb/unregistered");
+    }
+
+    public Verb createdApproved() {
+        return createVerb("approved", "http://id.tincanapi.com/verb/approved");
     }
 
     private Verb createVerb(String name, String id) {
