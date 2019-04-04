@@ -93,10 +93,12 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto register(BookingDto bookingDto) {
-        xApiService.register(bookingDto);
-        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
+
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
+            xApiService.approve(bookingDto);
             notificationService.send(messageService.createBookedMessage(bookingDto));
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
+            xApiService.register(bookingDto);
             notificationService.send(messageService.createRegisteredMessage(bookingDto));
         }
         return save(bookingDto);

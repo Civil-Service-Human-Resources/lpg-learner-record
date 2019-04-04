@@ -27,13 +27,11 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 @Service
 public class XApiService implements Serializable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(XApiService.class);
-
     public static final DateTimeFormatter DATE_FORMATTER = new DateTimeFormatterBuilder()
             .append(ISO_LOCAL_DATE_TIME)
             .appendLiteral('Z')
             .toFormatter();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(XApiService.class);
     private static final String HOMEPAGE = "https://cslearning.gov.uk/";
 
     private final XApiProperties xApiProperties;
@@ -87,6 +85,10 @@ public class XApiService implements Serializable {
 
     public String register(BookingDto bookingDto) {
         return postStatement(statementFactory.createRegisteredStatement(bookingDto));
+    }
+
+    public String approve(BookingDto bookingDto) {
+        return postStatement(statementFactory.createApprovedStatement(bookingDto));
     }
 
     public String unregister(BookingDto bookingDto) {
