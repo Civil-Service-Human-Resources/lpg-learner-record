@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -65,20 +67,13 @@ public class ModuleRecord {
     private BookingStatus bookingStatus;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumns({
             @JoinColumn(name = "course_id", referencedColumnName = "courseId"),
             @JoinColumn(name = "user_id", referencedColumnName = "userId")
     })
     private CourseRecord courseRecord;
-
-    public CourseRecord getCourseRecord() {
-        return courseRecord;
-    }
-
-    public void setCourseRecord(CourseRecord courseRecord) {
-        this.courseRecord = courseRecord;
-    }
 
     public ModuleRecord() {
     }
@@ -86,6 +81,14 @@ public class ModuleRecord {
     public ModuleRecord(String moduleId) {
         checkArgument(moduleId != null);
         this.moduleId = moduleId;
+    }
+
+    public CourseRecord getCourseRecord() {
+        return courseRecord;
+    }
+
+    public void setCourseRecord(CourseRecord courseRecord) {
+        this.courseRecord = courseRecord;
     }
 
     public Long getId() {
@@ -180,12 +183,12 @@ public class ModuleRecord {
         this.updatedAt = updatedAt;
     }
 
-    public void setBookingStatus(BookingStatus bookingStatus) {
-        this.bookingStatus = bookingStatus;
-    }
-
     public BookingStatus getBookingStatus() {
         return bookingStatus;
+    }
+
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
     }
 
     public String getModuleTitle() {
