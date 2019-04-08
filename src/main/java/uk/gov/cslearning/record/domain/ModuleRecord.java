@@ -67,6 +67,7 @@ public class ModuleRecord {
     private BookingStatus bookingStatus;
 
     @JsonIgnore
+//    @ManyToOne(cascade = CascadeType.PERSIST)
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumns({

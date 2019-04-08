@@ -24,7 +24,7 @@ public class ModuleRecordService {
     @Transactional(readOnly = true)
     public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
         return moduleRecordRepository
-                .findAllByCreatedAtBetween(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay()).stream()
+                .findAllByCreatedAtBetweenAndCourseRecordIsNotNull(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay()).stream()
                 .map(moduleRecordDtoFactory::create)
                 .collect(Collectors.toList());
     }

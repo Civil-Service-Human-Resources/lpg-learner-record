@@ -40,7 +40,7 @@ public class ModuleRecordServiceTest {
         ModuleRecordDto moduleRecordDto1 = new ModuleRecordDto();
         ModuleRecordDto moduleRecordDto2 = new ModuleRecordDto();
 
-        when(moduleRecordRepository.findAllByCreatedAtBetween(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
+        when(moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNull(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
                 .thenReturn(Arrays.asList(moduleRecord1, moduleRecord2));
 
         when(moduleRecordDtoFactory.create(moduleRecord1)).thenReturn(moduleRecordDto1);
@@ -55,7 +55,7 @@ public class ModuleRecordServiceTest {
         LocalDate from = LocalDate.now().minusDays(7);
         LocalDate to = LocalDate.now();
 
-        when(moduleRecordRepository.findAllByCreatedAtBetween(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
+        when(moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNull(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
                 .thenReturn(new ArrayList<>());
 
         assertEquals(new ArrayList<>(), moduleRecordService.listRecordsForPeriod(from, to));

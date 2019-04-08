@@ -49,7 +49,7 @@ public class ModuleRecordRepositoryTest {
 
         LocalDateTime end = LocalDateTime.now().minusDays(1).minusMinutes(1);
 
-        List<ModuleRecord> results = moduleRecordRepository.findAllByCreatedAtBetween(queryStart, end);
+        List<ModuleRecord> results = moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNull(queryStart, end);
 
         assertEquals(1, results.size());
         assertEquals(Collections.singletonList(moduleRecord2), results);
