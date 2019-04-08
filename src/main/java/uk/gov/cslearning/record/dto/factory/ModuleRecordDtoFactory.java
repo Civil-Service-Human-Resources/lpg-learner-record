@@ -10,7 +10,6 @@ import java.util.Optional;
 @Component
 public class ModuleRecordDtoFactory {
     public ModuleRecordDto create(ModuleRecord moduleRecord) {
-
         ModuleRecordDto moduleRecordDto = new ModuleRecordDto();
         moduleRecordDto.setModuleId(moduleRecord.getModuleId());
         moduleRecordDto.setState(moduleRecord.getState().toString());

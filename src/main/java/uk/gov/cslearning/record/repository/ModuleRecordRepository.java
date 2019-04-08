@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long> {
-    List<ModuleRecord> findAllByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
+    List<ModuleRecord> findAllByCreatedAtBetweenAndCourseRecordIsNotNull(LocalDateTime from, LocalDateTime to);
 }
