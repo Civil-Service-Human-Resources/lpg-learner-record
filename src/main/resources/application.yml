@@ -14,6 +14,10 @@ spring:
     cache-names: courseId
     caffeine:
       spec: maximumSize=500, expireAfterAccess=1h
+  data.mongodb:
+      host: ${MONGO_URL:localhost}
+      database: learninglocker
+      port: 27017
 
 server:
   port: 9000
@@ -71,6 +75,9 @@ lpg-ui:
   bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
 csl.homepage: "https://cslearning.gov.uk/"
+
+data:
+  retentionTime: ${DATA_RETENTION_TIME:36}
 
 ---
 

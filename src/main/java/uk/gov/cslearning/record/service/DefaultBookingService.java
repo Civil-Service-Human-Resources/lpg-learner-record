@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
@@ -192,5 +193,10 @@ public class DefaultBookingService implements BookingService {
 
     private BookingDto save(BookingDto bookingDto) {
         return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
+    }
+
+    @Override
+    public void deleteAllByLearner(Learner learner) {
+        bookingRepository.deleteBookingsByLearner(learner);
     }
 }
