@@ -2,9 +2,11 @@ package uk.gov.cslearning.record.service;
 
 import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.Statement;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -13,6 +15,7 @@ import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.StatementsRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
@@ -31,20 +34,17 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class UserRecordService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
-
+    private final StatementsRepository statementsRepository;
+    private final int dataRetentionTime;
     private CourseRecordRepository courseRecordRepository;
-
     private XApiService xApiService;
-
     private RegistryService registryService;
-
     private LearningCatalogueService learningCatalogueService;
-
     private BookingService bookingService;
 
     @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService, BookingService bookingService) {
+    public UserRecordService(@Value("${data.retentionTime}") int dataRetentionTime, CourseRecordRepository courseRecordRepository, XApiService xApiService,
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService, BookingService bookingService, StatementsRepository statementsRepository) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
@@ -54,6 +54,8 @@ public class UserRecordService {
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
         this.bookingService = bookingService;
+        this.statementsRepository = statementsRepository;
+        this.dataRetentionTime = dataRetentionTime;
     }
 
     @Transactional
@@ -115,5 +117,17 @@ public class UserRecordService {
             }
             courseRecordRepository.saveAll(courseRecords);
         }
+    }
+
+    @Transactional
+    public void deleteUserRecords(String uid) {
+        statementsRepository.deleteAllByLearnerUid(uid);
+        courseRecordRepository.deleteAllByUid(uid);
+    }
+
+    @Transactional
+    public void deleteOldStatements() {
+        DateTime dateTime = DateTime.now().minusMonths(dataRetentionTime);
+        statementsRepository.deleteAllByAge(dateTime);
     }
 }

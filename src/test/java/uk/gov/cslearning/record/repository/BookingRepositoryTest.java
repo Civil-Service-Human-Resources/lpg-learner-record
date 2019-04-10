@@ -103,4 +103,45 @@ public class BookingRepositoryTest {
         assertEquals(3, bookings.size());
         assertEquals(Arrays.asList(booking2, booking3, booking4), bookings);
     }
+
+    @Test
+    public void shouldDeleteBookingsByLearner() {
+        Event event = new Event();
+        event.setUid("SDBBL");
+        event.setPath("test/path");
+
+        Instant baseInstant = ZonedDateTime.of(LocalDate.now().atStartOfDay(), ZoneId.systemDefault()).toInstant();
+
+        Learner learner1 = new Learner();
+        learner1.setUid("learner1-test-uid");
+        learner1.setLearnerEmail("test@domain.com");
+
+        Learner learner2 = new Learner();
+        learner2.setUid("learner2-test-uid");
+        learner2.setLearnerEmail("test2@domain.com");
+
+        Booking booking1 = new Booking();
+        booking1.setLearner(learner1);
+        booking1.setBookingTime(baseInstant.minus(1, ChronoUnit.DAYS));
+        booking1.setEvent(event);
+
+        Booking booking2 = new Booking();
+        booking2.setLearner(learner1);
+        booking2.setBookingTime(baseInstant.minus(2, ChronoUnit.DAYS));
+        booking2.setEvent(event);
+
+        Booking booking3 = new Booking();
+        booking3.setLearner(learner2);
+        booking3.setBookingTime(baseInstant.minus(3, ChronoUnit.DAYS));
+        booking3.setEvent(event);
+
+        bookingRepository.saveAll(Arrays.asList(booking1, booking2, booking3));
+
+        bookingRepository.deleteBookingsByLearner(learner1);
+
+        List<Booking> bookings = bookingRepository.findAll();
+
+        assertEquals(1, bookings.size());
+        assertEquals(booking3, bookings.get(0));
+    }
 }

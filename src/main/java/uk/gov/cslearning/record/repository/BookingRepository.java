@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingStatus;
 
 import java.time.Instant;
@@ -23,4 +24,6 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
 
     @Query("select b from Booking b where b.learner.uid = :learnerUid")
     List<Booking> findAllByLearnerUid(@Param("learnerUid") String learnerUid);
+
+    void deleteBookingsByLearner(Learner learner);
 }

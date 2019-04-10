@@ -1,9 +1,11 @@
 package uk.gov.cslearning.record.service.scheduler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import uk.gov.cslearning.record.service.UserRecordService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,9 +19,12 @@ public class Scheduler {
     @Autowired
     private LearningJob learningJob;
 
+    @Autowired
+    private UserRecordService userRecordService;
+
     // cron to run every day at 02:00
     @Scheduled(cron = "0 0 2 * * *")
-    public void learningJob() throws Exception{
+    public void learningJob() throws Exception {
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
         learningJob.sendReminderNotificationForIncompleteCourses();
@@ -28,12 +33,20 @@ public class Scheduler {
     }
 
     @Scheduled(cron = "0 0 3 * * *")
-    public void sendNotificationForCompletedLearning() throws Exception{
-        LOGGER.info("Executing  sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
+    public void sendNotificationForCompletedLearning() throws Exception {
+        LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
         learningJob.sendLineManagerNotificationForCompletedLearning();
 
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }
 
+    @Scheduled(cron = "0 0 12 * * *")
+    public void deleteOldStatements() throws Exception {
+        LOGGER.info("Executing deleteOldStatements at {}", dateFormat.format(new Date()));
+
+        userRecordService.deleteOldStatements();
+
+        LOGGER.info("deleteOldStatements complete at {}", dateFormat.format(new Date()));
+    }
 }
