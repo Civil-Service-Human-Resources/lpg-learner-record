@@ -8,7 +8,7 @@ import uk.gov.cslearning.record.domain.Statements;
 
 @Repository
 public interface StatementsRepository extends MongoRepository<Statements, String> {
-    @Query(value = "{'person.display' : { $regex : '?0'} }", delete = true)
+    @Query(value = "{'statement.actor.account.name' : ?0}", delete = true)
     void deleteAllByLearnerUid(String id);
 
     void deleteAllByAge(DateTime dateTime);
