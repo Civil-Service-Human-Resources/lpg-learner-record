@@ -1,9 +1,7 @@
 package uk.gov.cslearning.record.config;
 
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
@@ -24,6 +22,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
     @Override
     @Bean
     public MongoClient mongoClient() {
-        return new MongoClient(new MongoClientURI(mongoProperties.getUri()));
+        return new MongoClient(mongoProperties.getUri());
+//        return new MongoClient(new MongoClientURI(mongoProperties.getUri()));
     }
 }

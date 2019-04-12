@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,16 +60,13 @@ public class UserRecordServiceTest {
     @Mock
     private CourseRecordRepository courseRecordRepository;
 
-    @Autowired
-    private BookingService bookingService;
-
     @Mock
     private StatementsRepository statementsRepository;
 
     @Before
     public void setup() {
         userRecordService = new UserRecordService(dataRetentionTime, courseRecordRepository, xApiService, registryService,
-                learningCatalogueService, bookingService, statementsRepository);
+                learningCatalogueService, statementsRepository);
     }
 
     @Test

@@ -40,11 +40,10 @@ public class UserRecordService {
     private XApiService xApiService;
     private RegistryService registryService;
     private LearningCatalogueService learningCatalogueService;
-    private BookingService bookingService;
 
     @Autowired
     public UserRecordService(@Value("${data.retentionTime}") int dataRetentionTime, CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService, BookingService bookingService, StatementsRepository statementsRepository) {
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService, StatementsRepository statementsRepository) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
@@ -53,7 +52,6 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
-        this.bookingService = bookingService;
         this.statementsRepository = statementsRepository;
         this.dataRetentionTime = dataRetentionTime;
     }
