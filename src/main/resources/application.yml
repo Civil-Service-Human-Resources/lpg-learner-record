@@ -16,7 +16,7 @@ spring:
       spec: maximumSize=500, expireAfterAccess=1h
   data:
     mongodb:
-      uri: ${COSMOS_CONNECTION_STRING:localhost}
+      uri: ${COSMOS_CONNECTION_STRING:mongodb://localhost:27017}
       database: ${DATABASE:learninglocker}
 
 server:
