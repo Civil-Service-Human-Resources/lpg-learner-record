@@ -21,4 +21,7 @@ public interface InviteService {
 
     @Transactional
     Optional<InviteDto> save(InviteDto invite);
+
+    @Transactional
+    void deleteByLearnerEmail(String learnerEmail);
 }

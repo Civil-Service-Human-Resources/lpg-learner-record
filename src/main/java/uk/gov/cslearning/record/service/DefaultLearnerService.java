@@ -12,15 +12,24 @@ public class DefaultLearnerService implements LearnerService {
 
     private final UserRecordService userRecordService;
 
-    public DefaultLearnerService(LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService) {
+    private final InviteService inviteService;
+
+    private final NotificationService notificationService;
+
+
+    public DefaultLearnerService(LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
         this.learnerRepository = learnerRepository;
         this.bookingService = bookingService;
         this.userRecordService = userRecordService;
+        this.inviteService = inviteService;
+        this.notificationService = notificationService;
     }
 
     public void deleteLearnerByUid(String uid) {
         learnerRepository.findByUid(uid).ifPresent(learner -> {
             bookingService.deleteAllByLearner(learner);
+            inviteService.deleteByLearnerEmail(learner.getLearnerEmail());
+            notificationService.deleteByLearnerUid(learner.getUid());
             learnerRepository.delete(learner);
         });
 

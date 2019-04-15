@@ -71,4 +71,9 @@ public class DefaultInviteService implements InviteService {
 
         return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
     }
+
+    @Override
+    public void deleteByLearnerEmail(String learnerEmail) {
+        inviteRepository.deleteAllByLearnerEmail(learnerEmail);
+    }
 }

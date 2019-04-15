@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface NotificationRepository extends CrudRepository<Notification, Long> {
 
     Optional<Notification> findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(String identityUid, String courseId, NotificationType type);
+
+    void deleteAllByIdentityUid(String uid);
 }
