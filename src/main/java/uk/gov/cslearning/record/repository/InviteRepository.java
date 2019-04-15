@@ -13,4 +13,6 @@ public interface InviteRepository extends CrudRepository<Invite, Integer> {
     Collection<Invite> findAllByEventUid(String eventUid);
 
     Optional<Invite> findByEventUidAndLearnerEmail(String eventUid, String learnerEmail);
+
+    void deleteAllByLearnerEmail(String leanerEmail);
 }

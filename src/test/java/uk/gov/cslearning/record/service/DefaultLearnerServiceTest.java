@@ -25,13 +25,23 @@ public class DefaultLearnerServiceTest {
     @Mock
     private UserRecordService userRecordService;
 
+    @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private InviteService inviteService;
+
     @InjectMocks
     private DefaultLearnerService defaultLearnerService;
 
     @Test
     public void shouldDeleteLearnerAndBookings() {
         String uid = "learner-test-uid";
+        String learnerEmail = "test@example.com";
+
         Learner learner = new Learner();
+        learner.setUid(uid);
+        learner.setLearnerEmail(learnerEmail);
 
         when(learnerRepository.findByUid(uid)).thenReturn(Optional.of(learner));
 
@@ -41,5 +51,7 @@ public class DefaultLearnerServiceTest {
         verify(bookingService).deleteAllByLearner(learner);
         verify(learnerRepository).delete(learner);
         verify(userRecordService).deleteUserRecords(uid);
+        verify(inviteService).deleteByLearnerEmail(learner.getLearnerEmail());
+        verify(notificationService).deleteByLearnerUid(uid);
     }
 }
