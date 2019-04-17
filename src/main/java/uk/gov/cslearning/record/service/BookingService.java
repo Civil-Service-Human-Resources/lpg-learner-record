@@ -6,6 +6,7 @@ import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -52,4 +53,10 @@ public interface BookingService {
 
     @Transactional
     void deleteAllByLearner(Learner learner);
+
+    @Transactional
+    void deleteAllByAge(Instant instant);
+
+    @Transactional
+    List<Booking> findAllByAge(Instant instant);
 }

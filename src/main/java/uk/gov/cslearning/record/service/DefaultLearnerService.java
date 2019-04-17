@@ -1,7 +1,14 @@
 package uk.gov.cslearning.record.service;
 
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.repository.LearnerRepository;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class DefaultLearnerService implements LearnerService {
@@ -16,13 +23,15 @@ public class DefaultLearnerService implements LearnerService {
 
     private final NotificationService notificationService;
 
+    private final int dataRetentionTime;
 
-    public DefaultLearnerService(LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
+    public DefaultLearnerService(@Value("${data.retentionTime}") int dataRetentionTime, LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
         this.learnerRepository = learnerRepository;
         this.bookingService = bookingService;
         this.userRecordService = userRecordService;
         this.inviteService = inviteService;
         this.notificationService = notificationService;
+        this.dataRetentionTime = dataRetentionTime;
     }
 
     public void deleteLearnerByUid(String uid) {
@@ -34,5 +43,15 @@ public class DefaultLearnerService implements LearnerService {
         });
 
         userRecordService.deleteUserRecords(uid);
+    }
+
+    public void deleteOldStatements() {
+        DateTime dateTime = DateTime.now().minusMonths(dataRetentionTime);
+        Instant instant = DateTimeFormatter.ISO_DATE_TIME.parse(dateTime.toString(), Instant::from);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+        bookingService.deleteAllByAge(instant);
+        notificationService.deleteAllByAge(localDateTime);
+        userRecordService.deleteOldRecords(dateTime, localDateTime);
     }
 }

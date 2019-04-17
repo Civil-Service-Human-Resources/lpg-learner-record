@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.domain;
+package uk.gov.cslearning.record.domain.collections;
 
 import lombok.Data;
 

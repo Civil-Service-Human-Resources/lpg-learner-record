@@ -7,6 +7,7 @@ import gov.adlnet.xapi.model.ActivityDefinition;
 import gov.adlnet.xapi.model.Statement;
 import gov.adlnet.xapi.model.Verb;
 import org.assertj.core.util.Lists;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,6 @@ import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.repository.StatementsRepository;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
@@ -44,8 +44,6 @@ import static uk.gov.cslearning.record.service.xapi.activity.Activity.COURSE_ID_
 @Transactional
 public class UserRecordServiceTest {
 
-    private int dataRetentionTime = 36;
-
     private UserRecordService userRecordService;
 
     @Mock
@@ -61,12 +59,12 @@ public class UserRecordServiceTest {
     private CourseRecordRepository courseRecordRepository;
 
     @Mock
-    private StatementsRepository statementsRepository;
+    private CollectionsService collectionsService;
 
     @Before
     public void setup() {
-        userRecordService = new UserRecordService(dataRetentionTime, courseRecordRepository, xApiService, registryService,
-                learningCatalogueService, statementsRepository);
+        userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService,
+                learningCatalogueService, collectionsService);
     }
 
     @Test
@@ -106,15 +104,15 @@ public class UserRecordServiceTest {
 
         userRecordService.deleteUserRecords(uid);
 
-        verify(statementsRepository).deleteAllByLearnerUid(uid);
+        verify(collectionsService).deleteAllByLearnerUid(uid);
         verify(courseRecordRepository).deleteAllByUid(uid);
     }
 
     @Test
     public void shouldDeleteStatementsOlderThanDateTime() {
-        userRecordService.deleteOldStatements();
+        userRecordService.deleteOldRecords(DateTime.now().minusMonths(36));
 
-        verify(statementsRepository).deleteAllByAge(any());
+        verify(collectionsService).deleteAllByAge(any());
     }
 
     private Course createCourse(String courseId) {

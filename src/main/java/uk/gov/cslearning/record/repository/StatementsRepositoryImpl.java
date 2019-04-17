@@ -4,7 +4,9 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import uk.gov.cslearning.record.domain.Statements;
+import uk.gov.cslearning.record.domain.collections.Statements;
+
+import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
@@ -20,5 +22,11 @@ public class StatementsRepositoryImpl implements CustomStatementsRepository {
     public void deleteAllByAge(DateTime dateTime) {
         Query query = new Query(where("timestamp").lte(dateTime));
         mongoTemplate.remove(query, Statements.class);
+    }
+
+    @Override
+    public List<Statements> findAllByAge(DateTime dateTime) {
+        Query query = new Query(where("timestamp").lte(dateTime));
+        return mongoTemplate.find(query, Statements.class);
     }
 }

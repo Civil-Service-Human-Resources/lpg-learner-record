@@ -2,10 +2,7 @@ package uk.gov.cslearning.record.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.service.LearnerService;
 
 @RestController
@@ -22,6 +19,13 @@ public class LearnerController {
     @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE')")
     public ResponseEntity deleteLearner(@PathVariable String uid) {
         learnerService.deleteLearnerByUid(uid);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/foo/persona")
+    public ResponseEntity foo() {
+        learnerService.deleteOldStatements();
 
         return ResponseEntity.noContent().build();
     }

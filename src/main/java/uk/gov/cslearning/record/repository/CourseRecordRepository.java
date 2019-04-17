@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 
 import javax.persistence.LockModeType;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,4 +35,6 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Modifying
     @Query("DELETE FROM CourseRecord r WHERE r.identity.userId = ?1")
     void deleteAllByUid(String uid);
+
+    void deleteAllByLastUpdatedBefore(LocalDateTime dateTime);
 }
