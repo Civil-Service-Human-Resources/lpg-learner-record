@@ -1,8 +1,8 @@
 package uk.gov.cslearning.record.service;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Learner;
@@ -15,6 +15,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultLearnerServiceTest {
+
+    private final int dataRetentionTime = 36;
 
     @Mock
     private LearnerRepository learnerRepository;
@@ -31,8 +33,13 @@ public class DefaultLearnerServiceTest {
     @Mock
     private InviteService inviteService;
 
-    @InjectMocks
     private DefaultLearnerService defaultLearnerService;
+
+
+    @Before
+    public void setUp() throws Exception {
+        defaultLearnerService = new DefaultLearnerService(dataRetentionTime, learnerRepository, bookingService, userRecordService, inviteService, notificationService);
+    }
 
     @Test
     public void shouldDeleteLearnerAndBookings() {

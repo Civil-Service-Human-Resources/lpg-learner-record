@@ -25,7 +25,10 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.ActivityType;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -110,7 +113,11 @@ public class UserRecordServiceTest {
 
     @Test
     public void shouldDeleteStatementsOlderThanDateTime() {
-        userRecordService.deleteOldRecords(DateTime.now().minusMonths(36));
+        DateTime dateTime = DateTime.now().minusMonths(36);
+        Instant instant = DateTimeFormatter.ISO_DATE_TIME.parse(dateTime.toString(), Instant::from);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+        userRecordService.deleteOldRecords(dateTime, localDateTime);
 
         verify(collectionsService).deleteAllByAge(any());
     }
