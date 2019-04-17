@@ -403,6 +403,6 @@ public class DefaultBookingServiceTest {
 
         bookingService.deleteAllByLearner(learner);
 
-        verify(bookingRepository).deleteBookingsByLearner(learner);
+        verify(bookingRepository).deleteAllByLearner(learner);
     }
 }

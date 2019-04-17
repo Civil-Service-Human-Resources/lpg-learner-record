@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.service.UserRecordService;
+import uk.gov.cslearning.record.service.LearnerService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,7 +20,7 @@ public class Scheduler {
     private LearningJob learningJob;
 
     @Autowired
-    private UserRecordService userRecordService;
+    private LearnerService learnerService;
 
     // cron to run every day at 02:00
     @Scheduled(cron = "0 0 2 * * *")
@@ -43,10 +43,10 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 12 * * *")
     public void deleteOldStatements() throws Exception {
-        LOGGER.info("Executing deleteOldStatements at {}", dateFormat.format(new Date()));
+        LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
 
-        userRecordService.deleteOldStatements();
+        learnerService.deleteOldStatements();
 
-        LOGGER.info("deleteOldStatements complete at {}", dateFormat.format(new Date()));
+        LOGGER.info("deleteOldRecords complete at {}", dateFormat.format(new Date()));
     }
 }

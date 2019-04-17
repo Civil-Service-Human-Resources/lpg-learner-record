@@ -8,4 +8,7 @@ public interface LearnerService {
 
     @Transactional
     void deleteLearnerByUid(String uid);
+
+    @Transactional
+    void deleteOldStatements();
 }

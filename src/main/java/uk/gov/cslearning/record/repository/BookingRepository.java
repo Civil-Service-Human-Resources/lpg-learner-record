@@ -25,5 +25,9 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
     @Query("select b from Booking b where b.learner.uid = :learnerUid")
     List<Booking> findAllByLearnerUid(@Param("learnerUid") String learnerUid);
 
-    void deleteBookingsByLearner(Learner learner);
+    void deleteAllByLearner(Learner learner);
+
+    void deleteAllByBookingTimeBefore(Instant instant);
+
+    List<Booking> findAllByBookingTimeBefore(Instant instant);
 }

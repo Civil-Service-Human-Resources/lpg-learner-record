@@ -137,7 +137,7 @@ public class BookingRepositoryTest {
 
         bookingRepository.saveAll(Arrays.asList(booking1, booking2, booking3));
 
-        bookingRepository.deleteBookingsByLearner(learner1);
+        bookingRepository.deleteAllByLearner(learner1);
 
         List<Booking> bookings = bookingRepository.findAll();
 

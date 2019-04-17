@@ -197,6 +197,16 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public void deleteAllByLearner(Learner learner) {
-        bookingRepository.deleteBookingsByLearner(learner);
+        bookingRepository.deleteAllByLearner(learner);
+    }
+
+    @Override
+    public void deleteAllByAge(Instant instant) {
+        bookingRepository.deleteAllByBookingTimeBefore(instant);
+    }
+
+    public List<Booking> findAllByAge(Instant instant) {
+
+        return bookingRepository.findAllByBookingTimeBefore(instant);
     }
 }
