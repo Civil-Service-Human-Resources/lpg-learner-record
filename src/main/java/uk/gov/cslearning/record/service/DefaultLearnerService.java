@@ -25,7 +25,7 @@ public class DefaultLearnerService implements LearnerService {
 
     private final int dataRetentionTime;
 
-    public DefaultLearnerService(@Value("${data.retentionTime}") int dataRetentionTime, LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
+    public DefaultLearnerService(@Value("${retention.timeInMonths}") int dataRetentionTime, LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
         this.learnerRepository = learnerRepository;
         this.bookingService = bookingService;
         this.userRecordService = userRecordService;
