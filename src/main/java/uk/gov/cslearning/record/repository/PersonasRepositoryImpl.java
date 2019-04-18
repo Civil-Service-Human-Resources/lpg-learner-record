@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import uk.gov.cslearning.record.domain.collections.Personas;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -31,11 +30,5 @@ public class PersonasRepositoryImpl implements CustomStatementsRepository {
     public void deleteAllByAge(DateTime dateTime) {
         Query query = new Query(where("updatedAt").lte(dateTime));
         mongoTemplate.remove(query, Personas.class);
-    }
-
-    @Override
-    public List<Personas> findAllByAge(DateTime dateTime) {
-        Query query = new Query(where("updatedAt").lte(dateTime));
-        return mongoTemplate.find(query, Personas.class);
     }
 }

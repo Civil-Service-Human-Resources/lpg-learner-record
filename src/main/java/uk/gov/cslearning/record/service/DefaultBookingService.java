@@ -204,9 +204,4 @@ public class DefaultBookingService implements BookingService {
     public void deleteAllByAge(Instant instant) {
         bookingRepository.deleteAllByBookingTimeBefore(instant);
     }
-
-    public List<Booking> findAllByAge(Instant instant) {
-
-        return bookingRepository.findAllByBookingTimeBefore(instant);
-    }
 }
