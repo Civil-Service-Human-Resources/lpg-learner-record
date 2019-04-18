@@ -56,7 +56,4 @@ public interface BookingService {
 
     @Transactional
     void deleteAllByAge(Instant instant);
-
-    @Transactional
-    List<Booking> findAllByAge(Instant instant);
 }

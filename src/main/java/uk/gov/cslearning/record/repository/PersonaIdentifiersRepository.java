@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.collections.Personaidentifiers;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,6 +17,4 @@ public interface PersonaIdentifiersRepository extends MongoRepository<Personaide
     Optional<Personaidentifiers> findByLearnerUid(String id);
 
     void deleteAllByAge(DateTime dateTime);
-
-    List<Personaidentifiers> findAllByAge(DateTime dateTime);
 }

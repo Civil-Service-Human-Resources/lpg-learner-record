@@ -6,15 +6,10 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.collections.Statements;
 
-import java.util.List;
-
 @Repository
 public interface StatementsRepository extends MongoRepository<Statements, String> {
     @Query(value = "{'statement.actor.account.name' : ?0}", delete = true)
     void deleteAllByLearnerUid(String id);
 
     void deleteAllByAge(DateTime dateTime);
-
-    List<Statements> findAllByAge(DateTime dateTime);
-
 }

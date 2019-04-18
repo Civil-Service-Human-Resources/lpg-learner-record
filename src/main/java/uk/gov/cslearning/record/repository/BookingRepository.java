@@ -28,6 +28,4 @@ public interface BookingRepository extends JpaRepository<Booking, Integer>, Cust
     void deleteAllByLearner(Learner learner);
 
     void deleteAllByBookingTimeBefore(Instant instant);
-
-    List<Booking> findAllByBookingTimeBefore(Instant instant);
 }
