@@ -36,5 +36,7 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Query("DELETE FROM CourseRecord r WHERE r.identity.userId = ?1")
     void deleteAllByUid(String uid);
 
+    @Transactional
+    @Modifying
     void deleteAllByLastUpdatedBefore(LocalDateTime dateTime);
 }

@@ -8,6 +8,4 @@ public interface CustomStatementsRepository {
     void deleteAllByAge(DateTime dateTime);
 
     List<?> findAllByAge(DateTime dateTime);
-
-
 }
