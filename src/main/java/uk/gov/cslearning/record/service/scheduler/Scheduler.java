@@ -41,11 +41,11 @@ public class Scheduler {
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }
 
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "0 0 4 * * *")
     public void deleteOldStatements() throws Exception {
         LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
 
-        learnerService.deleteOldStatements();
+        new Thread(() -> learnerService.deleteOldStatements()).start();
 
         LOGGER.info("deleteOldRecords complete at {}", dateFormat.format(new Date()));
     }
