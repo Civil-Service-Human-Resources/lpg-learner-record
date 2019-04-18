@@ -35,10 +35,10 @@ public class DefaultLearnerService implements LearnerService {
     }
 
     public void deleteLearnerByUid(String uid) {
+        notificationService.deleteByLearnerUid(uid);
         learnerRepository.findByUid(uid).ifPresent(learner -> {
             bookingService.deleteAllByLearner(learner);
             inviteService.deleteByLearnerEmail(learner.getLearnerEmail());
-            notificationService.deleteByLearnerUid(learner.getUid());
             learnerRepository.delete(learner);
         });
 
