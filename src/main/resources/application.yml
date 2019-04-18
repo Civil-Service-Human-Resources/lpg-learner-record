@@ -1,6 +1,4 @@
 spring:
-  datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -78,8 +76,8 @@ lpg-ui:
 
 csl.homepage: "https://cslearning.gov.uk/"
 
-data:
-  retentionTime: ${DATA_RETENTION_TIME:36}
+retention:
+  timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}
 
 ---
 
