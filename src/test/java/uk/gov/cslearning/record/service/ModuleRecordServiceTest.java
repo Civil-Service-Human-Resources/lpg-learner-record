@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
 import uk.gov.cslearning.record.dto.factory.ModuleRecordDtoFactory;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
@@ -34,17 +33,14 @@ public class ModuleRecordServiceTest {
         LocalDate from = LocalDate.now().minusDays(7);
         LocalDate to = LocalDate.now();
 
-        ModuleRecord moduleRecord1 = new ModuleRecord();
-        ModuleRecord moduleRecord2 = new ModuleRecord();
+        ModuleRecordDto moduleRecord1 = new ModuleRecordDto();
+        ModuleRecordDto moduleRecord2 = new ModuleRecordDto();
 
         ModuleRecordDto moduleRecordDto1 = new ModuleRecordDto();
         ModuleRecordDto moduleRecordDto2 = new ModuleRecordDto();
 
-        when(moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNull(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
+        when(moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
                 .thenReturn(Arrays.asList(moduleRecord1, moduleRecord2));
-
-        when(moduleRecordDtoFactory.create(moduleRecord1)).thenReturn(moduleRecordDto1);
-        when(moduleRecordDtoFactory.create(moduleRecord2)).thenReturn(moduleRecordDto2);
 
         assertEquals(Arrays.asList(moduleRecordDto1, moduleRecordDto2),
                 moduleRecordService.listRecordsForPeriod(from, to));
@@ -55,7 +51,7 @@ public class ModuleRecordServiceTest {
         LocalDate from = LocalDate.now().minusDays(7);
         LocalDate to = LocalDate.now();
 
-        when(moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNull(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
+        when(moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
                 .thenReturn(new ArrayList<>());
 
         assertEquals(new ArrayList<>(), moduleRecordService.listRecordsForPeriod(from, to));
