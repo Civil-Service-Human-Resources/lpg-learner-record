@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.repository;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.dto.ModuleRecordDto;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -40,6 +41,7 @@ public class ModuleRecordRepositoryTest {
         ModuleRecord moduleRecord2 = new ModuleRecord("moduleRecord2");
         moduleRecord2.setCreatedAt(queryStart);
         moduleRecord2.setCourseRecord(courseRecord);
+        moduleRecord2.setState(State.REGISTERED);
 
         ModuleRecord moduleRecord3 = new ModuleRecord("moduleRecord3");
         moduleRecord3.setCreatedAt(LocalDateTime.now().minusDays(3));
@@ -49,10 +51,10 @@ public class ModuleRecordRepositoryTest {
 
         LocalDateTime end = LocalDateTime.now().minusDays(1).minusMinutes(1);
 
-        List<ModuleRecord> results = moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNull(queryStart, end);
+        List<ModuleRecordDto> results = moduleRecordRepository.findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(queryStart, end);
 
         assertEquals(1, results.size());
-        assertEquals(Collections.singletonList(moduleRecord2), results);
+        assertEquals(moduleRecord2.getModuleId(), results.get(0).getModuleId());
     }
 
     @Test
