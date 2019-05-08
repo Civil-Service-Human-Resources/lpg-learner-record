@@ -70,7 +70,6 @@ lpg-ui:
   serviceUrl: ${LPG_UI_URL:http://localhost:3001}
   bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
-
 csl.homepage: "https://cslearning.gov.uk/"
 
 ---
