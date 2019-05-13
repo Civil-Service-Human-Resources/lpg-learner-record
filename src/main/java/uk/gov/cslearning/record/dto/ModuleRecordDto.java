@@ -11,14 +11,16 @@ public class ModuleRecordDto {
     private String state;
     private String learner;
     private LocalDateTime stateChangeDate;
+    private LocalDateTime completedAt;
 
     public ModuleRecordDto() {
     }
 
-    public ModuleRecordDto(String moduleId, State state, String learner, LocalDateTime stateChangeDate) {
+    public ModuleRecordDto(String moduleId, State state, String learner, LocalDateTime stateChangeDate, LocalDateTime completedAt) {
         this.moduleId = moduleId;
         this.state = String.valueOf(state);
         this.learner = learner;
         this.stateChangeDate = stateChangeDate;
+        this.completedAt = completedAt;
     }
 }
