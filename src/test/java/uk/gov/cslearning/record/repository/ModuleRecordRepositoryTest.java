@@ -35,16 +35,16 @@ public class ModuleRecordRepositoryTest {
         LocalDateTime queryStart = LocalDateTime.now().minusDays(2);
 
         ModuleRecord moduleRecord1 = new ModuleRecord("moduleRecord1");
-        moduleRecord1.setCreatedAt(LocalDateTime.now().minusDays(1));
+        moduleRecord1.setUpdatedAt(LocalDateTime.now().minusDays(1));
         moduleRecord1.setCourseRecord(courseRecord);
 
         ModuleRecord moduleRecord2 = new ModuleRecord("moduleRecord2");
-        moduleRecord2.setCreatedAt(queryStart);
+        moduleRecord2.setUpdatedAt(queryStart);
         moduleRecord2.setCourseRecord(courseRecord);
         moduleRecord2.setState(State.REGISTERED);
 
         ModuleRecord moduleRecord3 = new ModuleRecord("moduleRecord3");
-        moduleRecord3.setCreatedAt(LocalDateTime.now().minusDays(3));
+        moduleRecord3.setUpdatedAt(LocalDateTime.now().minusDays(3));
         moduleRecord3.setCourseRecord(courseRecord);
 
         moduleRecordRepository.saveAll(Arrays.asList(moduleRecord1, moduleRecord2, moduleRecord3));
