@@ -21,7 +21,7 @@ public class LearnerController {
     @DeleteMapping("/{uid}")
     @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE')")
     public ResponseEntity deleteLearner(@PathVariable String uid) {
-        learnerService.deleteLearnerByUid(uid);
+        new Thread(() -> learnerService.deleteLearnerByUid(uid)).start();
 
         return ResponseEntity.noContent().build();
     }
