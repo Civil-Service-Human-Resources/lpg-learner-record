@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.service.LearnerService;
 
-import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -25,6 +24,9 @@ public class LearnerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private LearnerService learnerService;
 
     @Before
     public void setup() {
