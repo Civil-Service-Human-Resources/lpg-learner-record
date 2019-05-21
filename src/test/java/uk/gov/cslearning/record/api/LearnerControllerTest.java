@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({LearnerController.class, ErrorDtoFactory.class})
-@WithMockUser(username = "user")
+@WithMockUser(username = "user", authorities = "IDENTITY_DELETE")
 public class LearnerControllerTest {
 
     @Autowired
