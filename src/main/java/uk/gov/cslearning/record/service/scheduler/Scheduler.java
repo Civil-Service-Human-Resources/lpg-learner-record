@@ -45,7 +45,7 @@ public class Scheduler {
     public void deleteOldStatements() throws Exception {
         LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
 
-        new Thread(() -> learnerService.deleteOldStatements()).start();
+        learnerService.deleteOldStatements();
 
         LOGGER.info("deleteOldRecords complete at {}", dateFormat.format(new Date()));
     }
