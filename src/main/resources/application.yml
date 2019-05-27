@@ -18,6 +18,8 @@ spring:
     mongodb:
       uri: ${COSMOS_CONNECTION_STRING:mongodb://localhost:27017}
       database: ${DATABASE:learninglocker}
+      socketTimeout: ${SOCKET_TIMEOUT_IN_MILLISECONDS:60000}
+      connectionTimeout: ${CONNECTION_TIMEOUT_IN_SECONDS:30}
 
 server:
   port: 9000

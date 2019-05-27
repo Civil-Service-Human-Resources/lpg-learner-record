@@ -13,4 +13,8 @@ public class MongoProperties implements Serializable {
     private String uri;
 
     private String database;
+
+    private int socketTimeout;
+
+    private int connectionTimeout;
 }
