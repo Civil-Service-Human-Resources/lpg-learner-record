@@ -26,7 +26,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
     public MongoClient mongoClient() {
         MongoClientOptions.Builder options = MongoClientOptions.builder();
         options.socketTimeout(mongoProperties.getSocketTimeoutInMilliseconds());
-        options.connectTimeout(mongoProperties.getConnectionTimeoutInSeconds());
+        options.connectTimeout(mongoProperties.getConnectionTimeoutInMilliseconds());
         options.maxConnectionIdleTime(mongoProperties.getMaxConnectionIdleTimeInMilliseconds());
 
         return new MongoClient(new MongoClientURI(mongoProperties.getUri(), options));
