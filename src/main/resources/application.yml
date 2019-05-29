@@ -20,7 +20,7 @@ spring:
       database: ${DATABASE:learninglocker}
       socketTimeoutInMilliseconds: ${SOCKET_TIMEOUT_IN_MILLISECONDS:60000}
       connectionTimeoutInSeconds: ${CONNECTION_TIMEOUT_IN_SECONDS:30}
-      maxConnectionIdleTimeInMilliseconds: ${MAX_CONNECTION_IDLE_TIME_IN_MILLISECONDS:30}
+      maxConnectionIdleTimeInMilliseconds: ${MAX_CONNECTION_IDLE_TIME_IN_MILLISECONDS:30000}
 
 server:
   port: 9000
