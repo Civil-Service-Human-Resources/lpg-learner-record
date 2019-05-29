@@ -14,7 +14,9 @@ public class MongoProperties implements Serializable {
 
     private String database;
 
-    private int socketTimeout;
+    private int socketTimeoutInMilliseconds;
 
-    private int connectionTimeout;
+    private int connectionTimeoutInSeconds;
+
+    private int maxConnectionIdleTimeInMilliseconds;
 }
