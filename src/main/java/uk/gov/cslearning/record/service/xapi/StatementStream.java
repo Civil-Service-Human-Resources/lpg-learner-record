@@ -3,9 +3,13 @@ package uk.gov.cslearning.record.service.xapi;
 import gov.adlnet.xapi.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.notifications.dto.factory.MessageDtoFactory;
+import uk.gov.cslearning.record.service.CompletedLearningService;
+import uk.gov.cslearning.record.service.MessageService;
 import uk.gov.cslearning.record.service.catalogue.Event;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.catalogue.Module;
@@ -21,15 +25,20 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+@Service
 public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
 
-    private LearningCatalogueService learningCatalogueService;
+    private final LearningCatalogueService learningCatalogueService;
+    private final CompletedLearningService completedLearningService;
+    private final MessageService messageService;
 
-    public StatementStream(LearningCatalogueService learningCatalogueService) {
+    public StatementStream(LearningCatalogueService learningCatalogueService, MessageService messageService, CompletedLearningService completedLearningService) {
         checkArgument(learningCatalogueService != null);
         this.learningCatalogueService = learningCatalogueService;
+        this.completedLearningService = completedLearningService;
+        this.messageService = messageService;
     }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
@@ -150,6 +159,8 @@ public class StatementStream {
                         replay(statement, courseRecord, moduleRecord);
 
                         if (checkComplete(courseRecord, catalogueCourse)) {
+//                            MessageDtoFactory messageDtoFactory = messageService.getMessageDtoFactory();
+//                            completedLearningService.sendLineManagerMessage(messageDtoFactory, courseRecord.getUserId(), courseRecord.getCourseTitle());
                             courseRecord.setState(State.COMPLETED);
                         }
                     }

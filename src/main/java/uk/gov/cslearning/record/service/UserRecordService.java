@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
@@ -37,10 +38,15 @@ public class UserRecordService {
     private XApiService xApiService;
     private RegistryService registryService;
     private LearningCatalogueService learningCatalogueService;
+    private final NotificationService notificationService;
+    private final MessageService messageService;
+    private final CompletedLearningService completedLearningService;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService, CollectionsService collectionsService) {
+                             RegistryService registryService, LearningCatalogueService learningCatalogueService,
+                             CollectionsService collectionsService, NotificationService notificationService,
+                             MessageService messageService, CompletedLearningService completedLearningService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(registryService != null);
@@ -50,6 +56,9 @@ public class UserRecordService {
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
+        this.notificationService = notificationService;
+        this.messageService = messageService;
+        this.completedLearningService = completedLearningService;
     }
 
     @Transactional
@@ -67,8 +76,7 @@ public class UserRecordService {
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, null, since);
 
-
-            StatementStream stream = new StatementStream(learningCatalogueService);
+            StatementStream stream = new StatementStream(learningCatalogueService, messageService, completedLearningService);
 
             Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,
                     statement -> ((Activity) statement.getObject()).getId(),

@@ -19,6 +19,7 @@ import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -50,6 +51,12 @@ public class UserRecordServiceTest {
     private UserRecordService userRecordService;
 
     @Mock
+    private NotificationService notificationService;
+
+    @Mock
+    private MessageService messageService;
+
+    @Mock
     private LearningCatalogueService learningCatalogueService;
 
     @Mock
@@ -67,7 +74,7 @@ public class UserRecordServiceTest {
     @Before
     public void setup() {
         userRecordService = new UserRecordService(courseRecordRepository, xApiService, registryService,
-                learningCatalogueService, collectionsService);
+                learningCatalogueService, collectionsService, notificationService, messageService);
     }
 
     @Test

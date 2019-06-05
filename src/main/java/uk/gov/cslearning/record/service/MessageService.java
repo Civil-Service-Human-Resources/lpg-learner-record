@@ -19,6 +19,11 @@ import java.util.Map;
 public class MessageService {
 
     private final LearningCatalogueService learningCatalogueService;
+
+    public MessageDtoFactory getMessageDtoFactory() {
+        return messageDtoFactory;
+    }
+
     private final MessageDtoFactory messageDtoFactory;
 
     private final String bookingUrlFormat;
