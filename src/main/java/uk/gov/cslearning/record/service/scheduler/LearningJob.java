@@ -77,33 +77,27 @@ public class LearningJob {
 
         for (Identity identity : identities) {
             LOGGER.debug("Got identity {}", identity);
-            Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
-
-            if (optionalCivilServant.isPresent()) {
-
-                CivilServant civilServant = optionalCivilServant.get();
-
+            registryService.getCivilServantByUid(identity.getUid()).ifPresent(civilServant -> {
                 if (civilServant.getLineManagerUid() == null) {
                     LOGGER.debug("User {} has no line manager, skipping", identity);
-                    continue;
+                    return;
                 }
 
-                List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
+                if (civilServant.getOrganisationalUnit() != null) {
+                    List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
+                    LOGGER.debug("Found {} required courses", courses.size());
 
-                LOGGER.debug("Found {} required courses", courses.size());
-
-                for (Course course : courses) {
-                    Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-                    for (CourseRecord courseRecord : courseRecords) {
-                        LOGGER.debug("Course complete: {}", courseRecord.isComplete());
-                        if (courseRecord.isComplete()) {
-                            checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
+                    for (Course course : courses) {
+                        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
+                        for (CourseRecord courseRecord : courseRecords) {
+                            LOGGER.debug("Course complete: {}", courseRecord.isComplete());
+                            if (courseRecord.isComplete()) {
+                                checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
+                            }
                         }
                     }
                 }
-            } else {
-                LOGGER.info("Identity {} has no profile, skipping", identity);
-            }
+            });
         }
     }
 
@@ -118,8 +112,9 @@ public class LearningJob {
             Optional<CivilServant> optionalLineManager = registryService.getCivilServantByUid(civilServant.getLineManagerUid());
             if (optionalLineManager.isPresent()) {
                 CivilServant lineManager = optionalLineManager.get();
+                String emailAddress = identityService.getEmailAddress(lineManager.getLineManagerUid());
 
-                notifyService.notifyOnComplete(civilServant.getLineManagerEmailAddress(), govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+                notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
 
                 Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
                 notificationRepository.save(notification);
