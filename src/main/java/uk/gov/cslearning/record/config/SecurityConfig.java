@@ -35,11 +35,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated();
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/notifications/**");
-    }
-
     @Bean
     public OAuth2ProtectedResourceDetails resourceDetails(OAuthProperties oAuthProperties) {
 

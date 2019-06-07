@@ -14,7 +14,6 @@ import uk.gov.service.notify.NotificationClientException;
 
 @RestController
 @RequestMapping("/notifications")
-@Profile("test")
 public class NotificationsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationsController.class);
