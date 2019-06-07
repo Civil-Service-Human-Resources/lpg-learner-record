@@ -116,7 +116,7 @@ public class LearningJob {
             Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
             notificationRepository.save(notification);
         } else {
-            LOGGER.error("User has line manager but line manager does not exist!");
+            LOGGER.info("User has already been sent notification");
         }
     }
 
