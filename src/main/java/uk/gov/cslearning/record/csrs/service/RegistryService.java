@@ -20,14 +20,10 @@ import java.util.Optional;
 public class RegistryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistryService.class);
-
-    private OAuth2RestOperations restOperations;
-
-    private String findByUidUrlFormat;
-
-    private URI getCurrentUrl;
-
     private final RequestEntityFactory requestEntityFactory;
+    private OAuth2RestOperations restOperations;
+    private String findByUidUrlFormat;
+    private URI getCurrentUrl;
 
     @Autowired
     public RegistryService(OAuth2RestOperations restOperations,
@@ -57,8 +53,8 @@ public class RegistryService {
         try {
             CivilServant civilServant = restOperations.getForObject(String.format(findByUidUrlFormat, uid), CivilServant.class);
             return Optional.ofNullable(civilServant);
-        } catch (HttpClientErrorException e){
-            LOGGER.error(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
+        } catch (HttpClientErrorException e) {
+//            LOGGER.info(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
         }
 
         return Optional.empty();

@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class NotifyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
-    private static final String EMAIL_PERMISSION = "email";
+    private static final String EMAIL_PERMISSION = "email address";
     private static final String REQUIRED_LEARNING_PERMISSION = "requiredLearning";
     private static final String LEARNER_PERMISSION = "learner";
     private static final String MANAGER_PERMISSION = "manager";
@@ -54,7 +54,7 @@ public class NotifyService {
             NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.debug("Complete notify email sent: {}", response.getBody());
+            LOGGER.info("Complete notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
         }

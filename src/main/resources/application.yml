@@ -66,7 +66,7 @@ govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}
   template:
     requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}
-    completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:template}
+    completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:3f50f0eb-4c47-4e37-8a44-1628faa41924}
     inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:cf623c5b-b9e9-4899-b419-4f851e581056}
     cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:cc525c34-1a31-4fa1-ab19-862fd223caab}
     cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:26e0e8ae-7617-40f7-be37-ca63b8a0d257}
