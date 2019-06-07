@@ -18,6 +18,7 @@ import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.Identity;
+import uk.gov.cslearning.record.service.identity.IdentityService;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
@@ -52,6 +53,9 @@ public class LearningJobTest {
 
     @Mock
     private NotifyService notifyService;
+
+    @Mock
+    private IdentityService identityService;
 
     @Mock
     private RegistryService registryService;
@@ -207,8 +211,8 @@ public class LearningJobTest {
                 .thenReturn(Optional.of(managerCivilServant));
 
         LocalDateTime now = LocalDateTime.now();
-
-        learningJob.checkAndNotifyLineManager(civilServant, identity, course1, now );
+        when(identityService.getEmailAddress("managerUid")).thenReturn("test@example.com");
+        learningJob.checkAndNotifyLineManager(civilServant, identity, course1, now);
 
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> courseCaptor = ArgumentCaptor.forClass(String.class);
@@ -221,7 +225,7 @@ public class LearningJobTest {
         assertThat(emailCaptor.getValue(), equalTo(MANAGER_EMAIL));
         assertThat(courseCaptor.getValue(), equalTo(COURSE_TITLE_1));
         assertThat(learnerCaptor.getValue(), equalTo("test user"));
-        assertThat(managerCaptor.getValue(), equalTo("manager"));
+        assertThat(managerCaptor.getValue(), equalTo("test@example.com"));
     }
 
     @Test
