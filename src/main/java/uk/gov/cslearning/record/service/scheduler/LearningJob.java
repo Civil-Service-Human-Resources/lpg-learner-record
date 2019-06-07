@@ -109,20 +109,14 @@ public class LearningJob {
                 .orElse(true);
 
         if (shouldSendNotification) {
-            Optional<CivilServant> optionalLineManager = registryService.getCivilServantByUid(civilServant.getLineManagerUid());
-            if (optionalLineManager.isPresent()) {
-                CivilServant lineManager = optionalLineManager.get();
-                String emailAddress = identityService.getEmailAddress(lineManager.getLineManagerUid());
+            String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
 
-                notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), lineManager.getFullName(), course.getTitle());
+            notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, course.getTitle());
 
-                Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
-                notificationRepository.save(notification);
-            } else {
-                LOGGER.error("User has line manager but line manager does not exist!");
-            }
+            Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
+            notificationRepository.save(notification);
         } else {
-            LOGGER.debug("Notification already sent.");
+            LOGGER.error("User has line manager but line manager does not exist!");
         }
     }
 
