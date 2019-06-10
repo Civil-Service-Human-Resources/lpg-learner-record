@@ -80,19 +80,18 @@ public class LearningJob {
             registryService.getCivilServantByUid(identity.getUid()).ifPresent(civilServant -> {
                 if (civilServant.getLineManagerUid() == null) {
                     LOGGER.debug("User {} has no line manager, skipping", identity);
-                    return;
-                }
+                } else {
+                    if (civilServant.getOrganisationalUnit() != null) {
+                        List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
+                        LOGGER.debug("Found {} required courses", courses.size());
 
-                if (civilServant.getOrganisationalUnit() != null) {
-                    List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
-                    LOGGER.debug("Found {} required courses", courses.size());
-
-                    for (Course course : courses) {
-                        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-                        for (CourseRecord courseRecord : courseRecords) {
-                            LOGGER.debug("Course complete: {}", courseRecord.isComplete());
-                            if (courseRecord.isComplete()) {
-                                checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
+                        for (Course course : courses) {
+                            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
+                            for (CourseRecord courseRecord : courseRecords) {
+                                LOGGER.debug("Course complete: {}", courseRecord.isComplete());
+                                if (courseRecord.isComplete()) {
+                                    checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
+                                }
                             }
                         }
                     }
