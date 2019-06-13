@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -11,12 +12,15 @@ import javax.ws.rs.core.UriBuilder;
 public class BookingDtoFactory {
     private final String learningCatalogueBaseUrl;
     private final String csrsBaseUrl;
+    private final IdentityService identityService;
 
     public BookingDtoFactory(
             @Value("${catalogue.serviceUrl}") String learningCatalogueBaseUrl,
-            @Value("${registry.serviceUrl}") String csrsBaseUrl) {
+            @Value("${registry.serviceUrl}") String csrsBaseUrl,
+            IdentityService identityService) {
         this.learningCatalogueBaseUrl = learningCatalogueBaseUrl;
         this.csrsBaseUrl = csrsBaseUrl;
+        this.identityService = identityService;
     }
 
     public BookingDto create(Booking booking) {
@@ -24,7 +28,7 @@ public class BookingDtoFactory {
         bookingDto.setId(booking.getId());
         bookingDto.setEvent(UriBuilder.fromUri(learningCatalogueBaseUrl).path(booking.getEvent().getPath()).build());
         bookingDto.setLearner(booking.getLearner().getUid());
-        bookingDto.setLearnerEmail(booking.getLearner().getLearnerEmail());
+        bookingDto.setLearnerEmail(identityService.getEmailAddress(booking.getLearner().getUid()));
         bookingDto.setBookingTime(booking.getBookingTime());
         bookingDto.setConfirmationTime(booking.getConfirmationTime());
         bookingDto.setCancellationTime(booking.getCancellationTime());
