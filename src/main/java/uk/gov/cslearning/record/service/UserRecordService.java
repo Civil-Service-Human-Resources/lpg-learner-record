@@ -76,7 +76,7 @@ public class UserRecordService {
 
             courseRecordRepository.saveAll(updatedCourseRecords);
 
-            setUserDepartmentAndProfession(userId, updatedCourseRecords);
+//            setUserDepartmentAndProfession(userId, updatedCourseRecords);
 
             for (CourseRecord courseRecord : updatedCourseRecords) {
                 if (!courseRecords.contains(courseRecord)) {
