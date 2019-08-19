@@ -6,12 +6,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
-import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -23,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -35,19 +30,18 @@ public class UserRecordService {
     private final CollectionsService collectionsService;
     private CourseRecordRepository courseRecordRepository;
     private XApiService xApiService;
-    private RegistryService registryService;
     private LearningCatalogueService learningCatalogueService;
 
     @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository, XApiService xApiService,
-                             RegistryService registryService, LearningCatalogueService learningCatalogueService, CollectionsService collectionsService) {
+    public UserRecordService(CourseRecordRepository courseRecordRepository,
+                             XApiService xApiService,
+                             LearningCatalogueService learningCatalogueService,
+                             CollectionsService collectionsService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
-        checkArgument(registryService != null);
         checkArgument(learningCatalogueService != null);
         this.courseRecordRepository = courseRecordRepository;
         this.xApiService = xApiService;
-        this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
     }
@@ -67,7 +61,6 @@ public class UserRecordService {
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, null, since);
 
-
             StatementStream stream = new StatementStream(learningCatalogueService);
 
             Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,
@@ -75,8 +68,6 @@ public class UserRecordService {
                     courseRecords);
 
             courseRecordRepository.saveAll(updatedCourseRecords);
-
-//            setUserDepartmentAndProfession(userId, updatedCourseRecords);
 
             for (CourseRecord courseRecord : updatedCourseRecords) {
                 if (!courseRecords.contains(courseRecord)) {
@@ -93,23 +84,6 @@ public class UserRecordService {
             return courseRecords;
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);
-        }
-    }
-
-    @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void setUserDepartmentAndProfession(String userId, Collection<CourseRecord> courseRecords) {
-        if (!courseRecords.isEmpty()) {
-            LOGGER.debug("Updating course records with additional user information.");
-            Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(userId);
-            if (optionalCivilServant.isPresent()) {
-                CivilServant civilServant = optionalCivilServant.get();
-                for (CourseRecord courseRecord : courseRecords) {
-                    courseRecord.setDepartment(civilServant.getOrganisationalUnit().getCode());
-                    courseRecord.setProfession(civilServant.getProfession().getName());
-                }
-            }
-            courseRecordRepository.saveAll(courseRecords);
         }
     }
 
