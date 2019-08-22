@@ -97,22 +97,6 @@ public class CourseRecord {
         this.state = state;
     }
 
-    public String getProfession() {
-        return profession;
-    }
-
-    public void setProfession(String profession) {
-        this.profession = profession;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
-    }
-
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
         return unmodifiableCollection(moduleRecords);

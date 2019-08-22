@@ -21,10 +21,6 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Query("SELECT r FROM CourseRecord r WHERE r.identity.userId = ?1")
     Collection<CourseRecord> findByUserId(String userId);
 
-    Iterable<CourseRecord> findByProfession(String profession);
-
-    Iterable<CourseRecord> findByDepartment(String department);
-
     @Query("SELECT COUNT(mr) FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1 and mr.state = 'REGISTERED'")
     Integer countRegisteredForEvent(@Param("eventId") String eventId);
 
