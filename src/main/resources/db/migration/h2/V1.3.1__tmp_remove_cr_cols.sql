@@ -1,2 +1,1 @@
-ALTER TABLE 'course_record'
-DROP COLUMN 'profession', DROP COLUMN 'department';
+ALTER TABLE `course_record` DROP COLUMN `department`;
