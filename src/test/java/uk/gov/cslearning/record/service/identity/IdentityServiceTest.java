@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.HttpClientErrorException;
+import uk.gov.cslearning.record.domain.IdentityDTO;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -59,7 +60,7 @@ public class IdentityServiceTest {
     public void shouldReturnNullIfIdentityDoesNotExist() {
         when(restOperations.getForObject(API_URL + "?emailAddress=test@domain.com", Identity.class)).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        Optional<Identity> returnedIdentity =  identityService.getIdentityByEmailAddress("test@domain.com");
+        Optional<Identity> returnedIdentity = identityService.getIdentityByEmailAddress("test@domain.com");
 
         assertTrue(returnedIdentity.equals(Optional.empty()));
     }
@@ -67,13 +68,13 @@ public class IdentityServiceTest {
     @Test
     public void shouldReturnIdentities() {
 
-        Identity identity = new Identity();
+        IdentityDTO identity = new IdentityDTO();
         identity.setUid("uid");
         identity.setUsername("username");
 
-        when(restOperations.getForObject(LIST_ALL_URL, Identity[].class)).thenReturn(new Identity[]{identity});
+        when(restOperations.getForObject(LIST_ALL_URL, IdentityDTO[].class)).thenReturn(new IdentityDTO[]{identity});
 
-        Collection<Identity> identities = identityService.listAll();
+        Collection<IdentityDTO> identities = identityService.listAll();
 
         assertThat(identities, hasSize(1));
         assertThat(Iterables.get(identities, 0).getUid(), equalTo("uid"));

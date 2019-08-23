@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.domain.IdentityDTO;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -40,9 +41,9 @@ public class IdentityService {
         return restOperations.getAccessToken();
     }
 
-    public Collection<Identity> listAll() {
+    public Collection<IdentityDTO> listAll() {
         LOGGER.debug("Retrieving all identities");
-        Identity[] identities = restOperations.getForObject(listAllIdentitiesUrl, Identity[].class);
+        IdentityDTO[] identities = restOperations.getForObject(listAllIdentitiesUrl, IdentityDTO[].class);
         if (identities != null) {
             return Sets.newHashSet(identities);
         }
@@ -64,7 +65,7 @@ public class IdentityService {
         return null;
     }
 
-    public Optional<Identity> getIdentityByEmailAddress(String emailAddress){
+    public Optional<Identity> getIdentityByEmailAddress(String emailAddress) {
         LOGGER.debug("Getting identity with email address {}", emailAddress);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl).queryParam("emailAddress", emailAddress);
@@ -72,12 +73,12 @@ public class IdentityService {
         return getIdentity(builder.toUriString());
     }
 
-    private Optional<Identity> getIdentity(String path){
+    private Optional<Identity> getIdentity(String path) {
         Identity identity;
-        try{
+        try {
             identity = restOperations.getForObject(path, Identity.class);
         } catch (HttpClientErrorException e) {
-            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return Optional.empty();
             }
             throw new RuntimeException(e);

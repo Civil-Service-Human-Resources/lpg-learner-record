@@ -12,12 +12,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.IdentityDTO;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
-import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -69,7 +69,7 @@ public class LearningJobTest {
 
     private Map<Long, List<Course>> incompleteCourses;
 
-    private Identity identity;
+    private IdentityDTO identity;
 
     @Before
     public void setUp() {
@@ -82,7 +82,7 @@ public class LearningJobTest {
         incompleteCourses.put(7L, incompleteCoursesWeek);
         incompleteCourses.put(30L, incompleteCoursesMonth);
 
-        identity = new Identity();
+        identity = new IdentityDTO();
         identity.setUid("uid");
 
         when(notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(anyString(), anyString(), any()))
@@ -159,7 +159,7 @@ public class LearningJobTest {
 
     @Test
     public void testArgumentsOfLearningNotifications() throws NotificationClientException {
-        Identity identity = new Identity();
+        IdentityDTO identity = new IdentityDTO();
         identity.setUid("uid");
         identity.setUsername(EMAIL);
 
@@ -191,7 +191,7 @@ public class LearningJobTest {
 
     @Test
     public void testArgumentsOfLearningNotificationsForCompletedCourses() throws NotificationClientException {
-        Identity identity = new Identity();
+        IdentityDTO identity = new IdentityDTO();
         identity.setUid("uid");
 
         Course course1 = new Course();
