@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.client.HttpClientErrorException;
-import uk.gov.cslearning.record.domain.IdentityDTO;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -68,13 +67,13 @@ public class IdentityServiceTest {
     @Test
     public void shouldReturnIdentities() {
 
-        IdentityDTO identity = new IdentityDTO();
+        Identity identity = new Identity();
         identity.setUid("uid");
         identity.setUsername("username");
 
-        when(restOperations.getForObject(LIST_ALL_URL, IdentityDTO[].class)).thenReturn(new IdentityDTO[]{identity});
+        when(restOperations.getForObject(LIST_ALL_URL, Identity[].class)).thenReturn(new Identity[]{identity});
 
-        Collection<IdentityDTO> identities = identityService.listAll();
+        Collection<Identity> identities = identityService.listAll();
 
         assertThat(identities, hasSize(1));
         assertThat(Iterables.get(identities, 0).getUid(), equalTo("uid"));

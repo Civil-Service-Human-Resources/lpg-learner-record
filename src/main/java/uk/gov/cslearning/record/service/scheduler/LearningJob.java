@@ -11,7 +11,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.IdentityDTO;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.NotificationRepository;
@@ -19,6 +18,7 @@ import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
+import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
 import java.time.LocalDate;
@@ -73,9 +73,9 @@ public class LearningJob {
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
 
-        Collection<IdentityDTO> identities = identityService.listAll();
+        Collection<Identity> identities = identityService.listAll();
 
-        for (IdentityDTO identity : identities) {
+        for (Identity identity : identities) {
             LOGGER.debug("Got identity {}", identity);
             registryService.getCivilServantByUid(identity.getUid()).ifPresent(civilServant -> {
                 if (civilServant.getLineManagerUid() == null) {
@@ -100,7 +100,7 @@ public class LearningJob {
         }
     }
 
-    void checkAndNotifyLineManager(CivilServant civilServant, IdentityDTO identity, Course course, LocalDateTime completedDate) {
+    void checkAndNotifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) {
         LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", identity, course);
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.COMPLETE);
@@ -121,9 +121,9 @@ public class LearningJob {
 
     @Transactional
     public void sendReminderNotificationForIncompleteCourses() {
-        Collection<IdentityDTO> identities = identityService.listAll();
+        Collection<Identity> identities = identityService.listAll();
 
-        for (IdentityDTO identity : identities) {
+        for (Identity identity : identities) {
             LOGGER.debug("Got identity with uid {} and email {}", identity.getUid(), identity.getUsername());
 
             Optional<CivilServant> optionalCivilServant = registryService.getCivilServantByUid(identity.getUid());
@@ -162,7 +162,7 @@ public class LearningJob {
     }
 
 
-    void checkAndAdd(Course course, IdentityDTO identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
+    void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
         if (nextRequiredBy.isBefore(now)) {
             return;
         }
@@ -179,7 +179,7 @@ public class LearningJob {
         }
     }
 
-    void sendNotificationForPeriod(IdentityDTO identity, Long period, List<Course> courses) {
+    void sendNotificationForPeriod(Identity identity, Long period, List<Course> courses) {
         StringBuilder requiredLearning = new StringBuilder();
         for (Course c : courses) {
             requiredLearning

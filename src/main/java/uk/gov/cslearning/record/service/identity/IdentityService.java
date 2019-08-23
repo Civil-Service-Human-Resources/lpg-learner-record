@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cslearning.record.domain.IdentityDTO;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -41,9 +40,9 @@ public class IdentityService {
         return restOperations.getAccessToken();
     }
 
-    public Collection<IdentityDTO> listAll() {
+    public Collection<Identity> listAll() {
         LOGGER.debug("Retrieving all identities");
-        IdentityDTO[] identities = restOperations.getForObject(listAllIdentitiesUrl, IdentityDTO[].class);
+        Identity[] identities = restOperations.getForObject(listAllIdentitiesUrl, Identity[].class);
         if (identities != null) {
             return Sets.newHashSet(identities);
         }
