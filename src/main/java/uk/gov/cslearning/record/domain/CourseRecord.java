@@ -29,12 +29,6 @@ public class CourseRecord {
 
     private String preference;
 
-    @JsonIgnore
-    private String profession;
-
-    @JsonIgnore
-    private String department;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
     private Collection<ModuleRecord> moduleRecords;
 
