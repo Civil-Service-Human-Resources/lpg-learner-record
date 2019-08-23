@@ -49,7 +49,7 @@ oauth:
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
 
 identity:
-  listAllUrl: "${oauth.serviceUrl}/api/identities"
+  listAllUrl: "${oauth.serviceUrl}/api/identities/map"
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
 
 registry:
