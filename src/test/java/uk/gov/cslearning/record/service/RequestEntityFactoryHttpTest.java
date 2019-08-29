@@ -21,7 +21,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SecurityContextHolder.class)
 @PowerMockIgnore("javax.security.auth.*")
-public class RequestEntityFactoryTest {
+public class RequestEntityFactoryHttpTest {
     private RequestEntityFactory requestEntityFactory = new RequestEntityFactory();
 
     @Test

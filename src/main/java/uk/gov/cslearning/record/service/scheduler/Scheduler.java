@@ -37,7 +37,7 @@ public class Scheduler {
     public void sendNotificationForCompletedLearning() throws Exception {
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
-//        learningJob.sendLineManagerNotificationForCompletedLearning();
+        learningJob.sendLineManagerNotificationForCompletedLearning();
         LOGGER.info("Skipping sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));

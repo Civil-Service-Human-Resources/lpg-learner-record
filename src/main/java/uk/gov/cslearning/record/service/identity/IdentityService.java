@@ -64,7 +64,7 @@ public class IdentityService {
         return null;
     }
 
-    public Optional<Identity> getIdentityByEmailAddress(String emailAddress){
+    public Optional<Identity> getIdentityByEmailAddress(String emailAddress) {
         LOGGER.debug("Getting identity with email address {}", emailAddress);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl).queryParam("emailAddress", emailAddress);
@@ -72,16 +72,17 @@ public class IdentityService {
         return getIdentity(builder.toUriString());
     }
 
-    private Optional<Identity> getIdentity(String path){
+    private Optional<Identity> getIdentity(String path) {
         Identity identity;
-        try{
+        try {
             identity = restOperations.getForObject(path, Identity.class);
         } catch (HttpClientErrorException e) {
-            if(e.getStatusCode() == HttpStatus.NOT_FOUND) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return Optional.empty();
             }
             throw new RuntimeException(e);
         }
         return Optional.of(identity);
     }
+
 }

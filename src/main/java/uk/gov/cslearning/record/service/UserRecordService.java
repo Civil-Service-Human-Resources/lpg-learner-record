@@ -98,4 +98,12 @@ public class UserRecordService {
         collectionsService.deleteAllByAge(dateTime);
         courseRecordRepository.deleteAllByLastUpdatedBefore(localDateTime);
     }
+
+    @Transactional
+    public Collection<CourseRecord> getStoredUserRecord(String userId, List<String> activityIds) {
+        Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
+        return courseRecords.stream()
+                .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
+                .collect(Collectors.toSet());
+    }
 }

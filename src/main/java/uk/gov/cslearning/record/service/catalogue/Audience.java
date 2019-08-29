@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.dto.CivilServantDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -86,14 +87,28 @@ public class Audience {
         return relevance;
     }
 
+    public int getRelevance(CivilServantDto civilServant) {
+        int relevance = 0;
+        if (areasOfWork != null && areasOfWork.contains(civilServant.getProfession())) {
+            relevance += 1;
+        }
+        if (departments != null && departments.contains(civilServant.getOrganisation())) {
+            relevance += 1;
+        }
+        if (grades != null && grades.contains(civilServant.getGrade())) {
+            relevance += 1;
+        }
+        return relevance;
+    }
+
     public LocalDate getNextRequiredBy(LocalDate completionDate) {
         LocalDate today = LocalDate.now();
         if (requiredBy == null) {
             return null;
         }
         if (frequency == null) {
-            if (requiredBy.isAfter(today) || requiredBy.isEqual(today)){
-               return requiredBy;
+            if (requiredBy.isAfter(today) || requiredBy.isEqual(today)) {
+                return requiredBy;
             }
             return null;
         }
