@@ -1,4 +1,13 @@
 spring:
+  datasource:
+#    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      jdbc-url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
   jackson:
     default-property-inclusion: non_null
     serialization:

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.dto.CourseRecordDto;
 
 import javax.persistence.LockModeType;
 import java.time.LocalDateTime;
@@ -35,4 +36,9 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Transactional
     @Modifying
     void deleteAllByLastUpdatedBefore(LocalDateTime dateTime);
+
+    @Query("select new uk.gov.cslearning.record.dto.CourseRecordDto(c.courseTitle) " +
+            "from CourseRecord c " +
+            "where c.identity.userId = ?1")
+    Collection<CourseRecordDto> findByUserIdNormalised(String userId);
 }
