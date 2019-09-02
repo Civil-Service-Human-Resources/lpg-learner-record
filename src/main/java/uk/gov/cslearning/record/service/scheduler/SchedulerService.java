@@ -6,9 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import uk.gov.cslearning.record.domain.CompletedLearning;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.dto.CivilServantDto;
 import uk.gov.cslearning.record.dto.IdentityDTO;
+import uk.gov.cslearning.record.service.CompletedLearningService;
 import uk.gov.cslearning.record.service.CourseRecordService;
 import uk.gov.cslearning.record.service.CourseService;
 import uk.gov.cslearning.record.service.UserRecordService;
@@ -16,7 +18,7 @@ import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.CustomHttpService;
 
-import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,17 +38,20 @@ public class SchedulerService {
     private CourseRecordService courseRecordService;
     private CourseService courseService;
     private ScheduledNotificationsService scheduledNotificationsService;
+    private CompletedLearningService completedLearningService;
 
-    public SchedulerService(CustomHttpService customHttpService, LearningCatalogueService learningCatalogueService, UserRecordService userRecordService, CourseRecordService courseRecordService, CourseService courseService, ScheduledNotificationsService scheduledNotificationsService) {
+
+    public SchedulerService(CustomHttpService customHttpService, LearningCatalogueService learningCatalogueService, UserRecordService userRecordService, CourseRecordService courseRecordService, CourseService courseService, ScheduledNotificationsService scheduledNotificationsService, CompletedLearningService completedLearningService) {
         this.customHttpService = customHttpService;
         this.learningCatalogueService = learningCatalogueService;
         this.userRecordService = userRecordService;
         this.courseRecordService = courseRecordService;
         this.courseService = courseService;
         this.scheduledNotificationsService = scheduledNotificationsService;
+        this.completedLearningService = completedLearningService;
     }
 
-    @GetMapping
+    @GetMapping("/completed")
     public ResponseEntity sendLineManagerNotificationForCompletedLearning() {
         LOGGER.info("sendLineManagerNotificationForCompletedLearning");
         Map<String, IdentityDTO> identitiesMap = customHttpService.getIdentitiesMap();
@@ -68,13 +73,8 @@ public class SchedulerService {
 
             courseRecords.forEach(courseRecord -> {
                 if (courseRecord.isComplete()) {
-                    if (scheduledNotificationsService.shoudSendNotification(uid, courseRecord.getCourseId(), courseRecord.getCompletionDate())) {
-                        IdentityDTO lineManagerIdentityDto = identitiesMap.get(civilServantDto.getLineManagerUid());
-                        scheduledNotificationsService.sendNotification(lineManagerIdentityDto.getUsername(), civilServantDto.getName(), uid, courseRecord);
-                        LOGGER.info("Sending notification for user {} and course {}", civilServantDto.getName(), courseRecord.getCourseTitle());
-                    } else {
-                        LOGGER.info("User {} has already been sent notification for course {}", uid, courseRecord.getCourseTitle());
-                    }
+                    CompletedLearning completedLearning = new CompletedLearning(courseRecord, courseRecord.getCompletionDate().toInstant(ZoneOffset.UTC));
+                    completedLearningService.save(completedLearning);
                 }
             });
         });
@@ -92,15 +92,6 @@ public class SchedulerService {
         LOGGER.info("Got csrs map");
         Map<String, List<Course>> organisationalUnitRequiredLearningMap = customHttpService.getOrganisationalUnitRequiredLearning();
         LOGGER.info("Got req learning map");
-
-        civilServantMap.forEach((uid, civilServantDto) -> {
-            Collection<CourseRecord> courseRecordsForRequiredCourses = getCourseRecordsForRequiredCourses(organisationalUnitRequiredLearningMap, uid, civilServantDto);
-            courseRecordsForRequiredCourses.forEach(courseRecord -> {
-                if (courseRecord.isComplete()) {
-                    LocalDate mostRecentlyCompletedForCourse = courseRecordService.getMostRecentlyCompletedForCourse(courseRecordsForRequiredCourses);
-                }
-            });
-        });
 
         return ResponseEntity.ok("ok");
     }

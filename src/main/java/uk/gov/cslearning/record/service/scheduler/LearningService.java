@@ -67,6 +67,8 @@ public class LearningService {
                 } else {
                     LOGGER.info("Completed learning is not required");
                 }
+                LOGGER.info("Removing {}", completedLearning.toString());
+
                 completedLearningService.delete(completedLearning);
             } catch (Exception e) {
                 LOGGER.error("Could not send notification for completedLearning {}", completedLearning.toString());
