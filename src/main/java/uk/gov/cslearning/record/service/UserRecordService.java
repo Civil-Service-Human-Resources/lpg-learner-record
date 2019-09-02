@@ -8,13 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.domain.CompletedLearning;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -31,12 +34,14 @@ public class UserRecordService {
     private CourseRecordRepository courseRecordRepository;
     private XApiService xApiService;
     private LearningCatalogueService learningCatalogueService;
+    private CompletedLearningService completedLearningService;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository,
                              XApiService xApiService,
                              LearningCatalogueService learningCatalogueService,
-                             CollectionsService collectionsService) {
+                             CollectionsService collectionsService,
+                             CompletedLearningService completedLearningService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(learningCatalogueService != null);
@@ -44,6 +49,7 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
+        this.completedLearningService = completedLearningService;
     }
 
     @Transactional
@@ -72,6 +78,10 @@ public class UserRecordService {
             for (CourseRecord courseRecord : updatedCourseRecords) {
                 if (!courseRecords.contains(courseRecord)) {
                     courseRecords.add(courseRecord);
+                    if (courseRecord.getState().equals(State.COMPLETED)) {
+                        CompletedLearning completedLearning = new CompletedLearning(courseRecord, Instant.now());
+                        completedLearningService.save(completedLearning);
+                    }
                 }
             }
 

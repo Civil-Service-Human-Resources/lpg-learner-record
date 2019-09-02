@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
@@ -15,18 +16,21 @@ public class ScheduledNotificationsService {
 
     private DefaultNotificationService notificationService;
     private NotifyService notifyService;
-    private String govNotifyCompletedLearningTemplateId = "";
+    private String govNotifyCompletedLearningTemplateId;
 
-    public ScheduledNotificationsService(DefaultNotificationService notificationService, NotifyService notifyService) {
+    public ScheduledNotificationsService(DefaultNotificationService notificationService,
+                                         NotifyService notifyService,
+                                         @Value("${govNotify.template.completedLearning}") String govNotifyCompletedLearningTemplateId) {
         this.notificationService = notificationService;
         this.notifyService = notifyService;
+        this.govNotifyCompletedLearningTemplateId = govNotifyCompletedLearningTemplateId;
     }
 
-    public Boolean hasNotificationBeenSentBefore(String uid, String courseId, LocalDateTime completedDate) {
+    public Boolean shoudSendNotification(String uid, String courseId, LocalDateTime completedDate) {
         Optional<Notification> optionalNotification = notificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE);
         return optionalNotification
                 .map(notification -> notification.sentBefore(completedDate))
-                .orElse(false);
+                .orElse(true);
     }
 
     public void sendNotification(String lineManagerEmailAddress, String civilServantName, String civilServantUid, CourseRecord courseRecord) {

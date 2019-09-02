@@ -27,8 +27,8 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 @Controller
 @RequestMapping("/test")
-public class CompletedLearningService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CompletedLearningService.class);
+public class SchedulerService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulerService.class);
 
     private CustomHttpService customHttpService;
     private LearningCatalogueService learningCatalogueService;
@@ -37,7 +37,7 @@ public class CompletedLearningService {
     private CourseService courseService;
     private ScheduledNotificationsService scheduledNotificationsService;
 
-    public CompletedLearningService(CustomHttpService customHttpService, LearningCatalogueService learningCatalogueService, UserRecordService userRecordService, CourseRecordService courseRecordService, CourseService courseService, ScheduledNotificationsService scheduledNotificationsService) {
+    public SchedulerService(CustomHttpService customHttpService, LearningCatalogueService learningCatalogueService, UserRecordService userRecordService, CourseRecordService courseRecordService, CourseService courseService, ScheduledNotificationsService scheduledNotificationsService) {
         this.customHttpService = customHttpService;
         this.learningCatalogueService = learningCatalogueService;
         this.userRecordService = userRecordService;
@@ -68,12 +68,12 @@ public class CompletedLearningService {
 
             courseRecords.forEach(courseRecord -> {
                 if (courseRecord.isComplete()) {
-                    if (scheduledNotificationsService.hasNotificationBeenSentBefore(uid, courseRecord.getCourseId(), courseRecord.getCompletionDate())) {
-                        LOGGER.info("User {} has already been sent notification for course {}", uid, courseRecord.getCourseTitle());
-                    } else {
+                    if (scheduledNotificationsService.shoudSendNotification(uid, courseRecord.getCourseId(), courseRecord.getCompletionDate())) {
                         IdentityDTO lineManagerIdentityDto = identitiesMap.get(civilServantDto.getLineManagerUid());
                         scheduledNotificationsService.sendNotification(lineManagerIdentityDto.getUsername(), civilServantDto.getName(), uid, courseRecord);
                         LOGGER.info("Sending notification for user {} and course {}", civilServantDto.getName(), courseRecord.getCourseTitle());
+                    } else {
+                        LOGGER.info("User {} has already been sent notification for course {}", uid, courseRecord.getCourseTitle());
                     }
                 }
             });

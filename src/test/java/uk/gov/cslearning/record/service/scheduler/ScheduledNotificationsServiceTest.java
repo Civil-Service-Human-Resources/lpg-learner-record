@@ -1,8 +1,8 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -22,14 +22,19 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ScheduledNotificationsServiceTest {
 
+    private final String govNotifyTemplateId = "id";
     @Mock
     private DefaultNotificationService defaultNotificationService;
 
     @Mock
     private NotifyService notifyService;
 
-    @InjectMocks
     private ScheduledNotificationsService scheduledNotificationsService;
+
+    @Before
+    public void setUp() throws Exception {
+        scheduledNotificationsService = new ScheduledNotificationsService(defaultNotificationService, notifyService, govNotifyTemplateId);
+    }
 
     @Test
     public void shouldTrueIfNotificationNotSent() {
@@ -46,7 +51,7 @@ public class ScheduledNotificationsServiceTest {
         notification.setSent(LocalDateTime.parse(notificationTime, formatter));
 
         when(defaultNotificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
-        assertTrue(scheduledNotificationsService.hasNotificationBeenSentBefore(uid, courseId, completedDate));
+        assertTrue(scheduledNotificationsService.shoudSendNotification(uid, courseId, completedDate));
     }
 
     @Test
@@ -64,7 +69,7 @@ public class ScheduledNotificationsServiceTest {
         notification.setSent(LocalDateTime.parse(notificationTime, formatter));
 
         when(defaultNotificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
-        assertFalse(scheduledNotificationsService.hasNotificationBeenSentBefore(uid, courseId, completedDate));
+        assertFalse(scheduledNotificationsService.shoudSendNotification(uid, courseId, completedDate));
     }
 
     @Test
@@ -77,7 +82,7 @@ public class ScheduledNotificationsServiceTest {
         CourseRecord courseRecord = new CourseRecord(courseId, uid);
         courseRecord.setCourseTitle(courseTitle);
 
-        doNothing().when(notifyService).notifyOnComplete(lineManagerEmailAddress, "", name, lineManagerEmailAddress, courseTitle);
+        doNothing().when(notifyService).notifyOnComplete(lineManagerEmailAddress, govNotifyTemplateId, name, lineManagerEmailAddress, courseTitle);
 
         scheduledNotificationsService.sendNotification(lineManagerEmailAddress, name, uid, courseRecord);
 

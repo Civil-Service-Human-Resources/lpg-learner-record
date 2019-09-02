@@ -64,10 +64,14 @@ public class UserRecordServiceTest {
     @Mock
     private CollectionsService collectionsService;
 
+
+    @Mock
+    private CompletedLearningService completedLearningService;
+
     @Before
     public void setup() {
         userRecordService = new UserRecordService(courseRecordRepository, xApiService,
-                learningCatalogueService, collectionsService);
+                learningCatalogueService, collectionsService, completedLearningService);
     }
 
     @Test

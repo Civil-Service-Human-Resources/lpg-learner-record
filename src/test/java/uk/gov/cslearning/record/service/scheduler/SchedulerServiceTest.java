@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CompletedLearningServiceTest {
+public class SchedulerServiceTest {
 
     @Mock
     private CustomHttpService customHttpService;
@@ -37,7 +37,7 @@ public class CompletedLearningServiceTest {
     private ScheduledNotificationsService scheduledNotificationsService;
 
     @InjectMocks
-    private CompletedLearningService completedLearningService;
+    private SchedulerService schedulerService;
 
     @Test
     public void shouldSendLineManagerNotificationForCompletedLearning() {
@@ -98,9 +98,9 @@ public class CompletedLearningServiceTest {
         when(customHttpService.getOrganisationalUnitRequiredLearning()).thenReturn(organisationalUnitRequiredLearningMap);
         when(userRecordService.getStoredUserRecord(uid1, Arrays.asList(id1, id2))).thenReturn(courseRecords);
 
-        when(scheduledNotificationsService.hasNotificationBeenSentBefore(uid1, id1, completedDate)).thenReturn(false);
+        when(scheduledNotificationsService.shoudSendNotification(uid1, id1, completedDate)).thenReturn(true);
 
-        completedLearningService.sendLineManagerNotificationForCompletedLearning();
+        schedulerService.sendLineManagerNotificationForCompletedLearning();
 
         verify(scheduledNotificationsService).sendNotification(username, name, uid1, courseRecord);
     }
