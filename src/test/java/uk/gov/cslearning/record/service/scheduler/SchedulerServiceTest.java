@@ -10,6 +10,7 @@ import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.dto.CivilServantDto;
 import uk.gov.cslearning.record.dto.IdentityDTO;
+import uk.gov.cslearning.record.service.CompletedLearningService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.CustomHttpService;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +34,9 @@ public class SchedulerServiceTest {
 
     @Mock
     private UserRecordService userRecordService;
+
+    @Mock
+    private CompletedLearningService completedLearningService;
 
     @Mock
     private ScheduledNotificationsService scheduledNotificationsService;
@@ -98,10 +103,9 @@ public class SchedulerServiceTest {
         when(customHttpService.getOrganisationalUnitRequiredLearning()).thenReturn(organisationalUnitRequiredLearningMap);
         when(userRecordService.getStoredUserRecord(uid1, Arrays.asList(id1, id2))).thenReturn(courseRecords);
 
-        when(scheduledNotificationsService.shoudSendNotification(uid1, id1, completedDate)).thenReturn(true);
-
         schedulerService.sendLineManagerNotificationForCompletedLearning();
 
+        verify(completedLearningService).save(any());
         verify(scheduledNotificationsService).sendNotification(username, name, uid1, courseRecord);
     }
 }
