@@ -106,6 +106,5 @@ public class SchedulerServiceTest {
         schedulerService.sendLineManagerNotificationForCompletedLearning();
 
         verify(completedLearningService).save(any());
-        verify(scheduledNotificationsService).sendNotification(username, name, uid1, courseRecord);
     }
 }
