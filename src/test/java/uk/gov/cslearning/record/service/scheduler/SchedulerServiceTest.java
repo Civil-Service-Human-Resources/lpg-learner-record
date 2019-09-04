@@ -99,7 +99,6 @@ public class SchedulerServiceTest {
         List<CourseRecord> courseRecords = Arrays.asList(courseRecord);
 
         when(customHttpService.getCivilServantMap()).thenReturn(civilServantMap);
-        when(customHttpService.getIdentitiesMap()).thenReturn(identityDTOMap);
         when(customHttpService.getOrganisationalUnitRequiredLearning()).thenReturn(organisationalUnitRequiredLearningMap);
         when(userRecordService.getStoredUserRecord(uid1, Arrays.asList(id1, id2))).thenReturn(courseRecords);
 

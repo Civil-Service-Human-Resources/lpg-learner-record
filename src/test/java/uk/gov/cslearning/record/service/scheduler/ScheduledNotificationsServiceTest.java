@@ -33,7 +33,7 @@ public class ScheduledNotificationsServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        scheduledNotificationsService = new ScheduledNotificationsService(defaultNotificationService, notifyService, govNotifyTemplateId);
+        scheduledNotificationsService = new ScheduledNotificationsService(defaultNotificationService, notifyService, govNotifyTemplateId, govNotifyTemplateId);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ScheduledNotificationsServiceTest {
         notification.setSent(LocalDateTime.parse(notificationTime, formatter));
 
         when(defaultNotificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
-        assertTrue(scheduledNotificationsService.shoudSendNotification(uid, courseId, completedDate));
+        assertTrue(scheduledNotificationsService.shouldSendLineManagerNotification(uid, courseId, completedDate));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ScheduledNotificationsServiceTest {
         notification.setSent(LocalDateTime.parse(notificationTime, formatter));
 
         when(defaultNotificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
-        assertFalse(scheduledNotificationsService.shoudSendNotification(uid, courseId, completedDate));
+        assertFalse(scheduledNotificationsService.shouldSendLineManagerNotification(uid, courseId, completedDate));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ScheduledNotificationsServiceTest {
 
         doNothing().when(notifyService).notifyOnComplete(lineManagerEmailAddress, govNotifyTemplateId, name, lineManagerEmailAddress, courseTitle);
 
-        scheduledNotificationsService.sendNotification(lineManagerEmailAddress, name, uid, courseRecord);
+        scheduledNotificationsService.sendLineManagerNotification(lineManagerEmailAddress, name, uid, courseRecord);
 
         verify(defaultNotificationService).save(isA(Notification.class));
     }
