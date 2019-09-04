@@ -107,7 +107,10 @@ dependencies {
 
     compile 'org.projectlombok:lombok:1.18.4'
 
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    compile 'org.apache.commons:commons-collections4:4.4'
+    compile 'org.springframework.boot:spring-boot-starter-actuator:2.1.7.RELEASE'
+    compile 'javax.interceptor:javax.interceptor-api:3.1'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'

@@ -22,6 +22,12 @@ spring:
       connectionTimeoutInMilliseconds: ${CONNECTION_TIMEOUT_IN_MILLISECONDS:30000}
       maxConnectionIdleTimeInMilliseconds: ${MAX_CONNECTION_IDLE_TIME_IN_MILLISECONDS:30000}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
 server:
   port: 9000
 
@@ -51,16 +57,21 @@ oauth:
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
+  identitiesMapUrl: "${oauth.serviceUrl}/api/identities/map"
 
 registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
   getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
+  civilServantsCodeParamUrl: "${registry.serviceUrl}/report/civilServants?code="
+  civilServantsCodeUrl: "${registry.serviceUrl}/report/civilServants/code"
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
   courseUrlFormat: "${catalogue.serviceUrl}/courses/%s"
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
+  organisationalUnitRequiredLearningUrl: "${catalogue.serviceUrl}/courses/required"
+  organisationalUnitRequiredLearningWithinPeriodParamUrl: "${catalogue.serviceUrl}/courses/required?days=%s"
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}

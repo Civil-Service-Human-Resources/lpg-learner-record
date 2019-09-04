@@ -29,13 +29,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -120,6 +118,28 @@ public class UserRecordServiceTest {
         userRecordService.deleteOldRecords(dateTime, localDateTime);
 
         verify(collectionsService).deleteAllByAge(any());
+    }
+
+    @Test
+    public void shouldGetStoredUserRecordForCourseIds() {
+        String uid = "uid";
+        String activityId1 = "activity1";
+        String activityId2 = "activity2";
+        String activityId3 = "activity3";
+
+        List<String> activityIds = Arrays.asList(activityId1, activityId2);
+
+        CourseRecord courseRecord1 = new CourseRecord(activityId1, uid);
+        CourseRecord courseRecord2 = new CourseRecord(activityId3, uid);
+
+        List<CourseRecord> courseRecords = Arrays.asList(courseRecord1, courseRecord2);
+
+        when(courseRecordRepository.findByUserId(uid)).thenReturn(courseRecords);
+
+        Collection<CourseRecord> storedUserRecord = userRecordService.getStoredUserRecord(uid, activityIds);
+
+        assertTrue(storedUserRecord.contains(courseRecord1));
+        assertFalse(storedUserRecord.contains(courseRecord2));
     }
 
     private Course createCourse(String courseId) {

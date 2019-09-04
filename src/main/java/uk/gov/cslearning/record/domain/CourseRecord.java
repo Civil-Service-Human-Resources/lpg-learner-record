@@ -102,6 +102,10 @@ public class CourseRecord {
         return unmodifiableCollection(moduleRecords);
     }
 
+    public void setModuleRecords(Collection<ModuleRecord> moduleRecords) {
+        this.moduleRecords = moduleRecords;
+    }
+
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
         moduleRecord.setCourseRecord(this);

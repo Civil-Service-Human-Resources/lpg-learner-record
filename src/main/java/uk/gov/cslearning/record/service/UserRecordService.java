@@ -98,4 +98,18 @@ public class UserRecordService {
         collectionsService.deleteAllByAge(dateTime);
         courseRecordRepository.deleteAllByLastUpdatedBefore(localDateTime);
     }
+
+    /**
+     * This method gets the user records without checking for xApi updates as per {@link UserRecordService#getUserRecord(String, List)},
+     * allowing for much quicker read of a user's learner record.
+     * It should only be used in instances where you do not expect the course records to require any update.
+     */
+    @Transactional
+    public Collection<CourseRecord> getStoredUserRecord(String userId, List<String> activityIds) {
+        Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
+
+        return courseRecords.stream()
+                .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
+                .collect(Collectors.toSet());
+    }
 }
