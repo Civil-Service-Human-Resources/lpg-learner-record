@@ -48,7 +48,7 @@ public class CustomHttpService {
         return httpService.getMapOfList(organisationalUnitRequiredLearningUrl, Course.class);
     }
 
-    public Map<String, List<Course>> getRequiredLearningDueWithinPeriod(long days) {
-        return httpService.getMapOfList(String.format(organisationalUnitRequiredLearningWithinPeriodParamUrl, days), Course.class);
+    public Map<String, List<Course>> getRequiredLearningDueWithinPeriod(long from, long to) {
+        return httpService.getMapOfList(String.format(organisationalUnitRequiredLearningWithinPeriodParamUrl, from, to), Course.class);
     }
 }

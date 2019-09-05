@@ -74,9 +74,9 @@ public class SchedulerService {
 
         Map<String, Map<String, List<Course>>> requiredLearningDue = new HashMap<>();
 
-        requiredLearningDue.put(DAY_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(1));
-        requiredLearningDue.put(WEEK_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(7));
-        requiredLearningDue.put(MONTH_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(30));
+        requiredLearningDue.put(DAY_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(0, 1));
+        requiredLearningDue.put(WEEK_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(1, 7));
+        requiredLearningDue.put(MONTH_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(2, 30));
 
         requiredLearningDue.forEach((periodText, organisationalUnitRequiredLearningMap) -> {
             organisationalUnitRequiredLearningMap.forEach((organisationalUnitCode, courses) -> {
@@ -95,8 +95,8 @@ public class SchedulerService {
                     Collection<CourseRecord> storedUserRecords = userRecordService.getStoredUserRecord(civilServantDto.getUid(), courseIds);
                     courses.forEach(course -> {
                         if (!course.isComplete(storedUserRecords)) {
-                            IdentityDto IdentityDto = identitiesMap.get(civilServantDto.getUid());
-                            scheduledNotificationsService.sendRequiredLearningDueNotification(IdentityDto, course, periodText);
+                            IdentityDto identityDto = identitiesMap.get(civilServantDto.getUid());
+                            scheduledNotificationsService.sendRequiredLearningDueNotification(identityDto, course, periodText);
                         }
                     });
 

@@ -71,7 +71,7 @@ catalogue:
   courseUrlFormat: "${catalogue.serviceUrl}/courses/%s"
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
   organisationalUnitRequiredLearningUrl: "${catalogue.serviceUrl}/courses/required"
-  organisationalUnitRequiredLearningWithinPeriodParamUrl: "${catalogue.serviceUrl}/courses/required?days=%s"
+  organisationalUnitRequiredLearningWithinPeriodParamUrl: "${catalogue.serviceUrl}/courses/required?from=%s&to=%s"
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}
