@@ -2,13 +2,12 @@ package uk.gov.cslearning.record.service.scheduler;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
-import uk.gov.cslearning.record.dto.IdentityDto;
+import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNotificationEvent;
+import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.service.DefaultNotificationService;
 import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.catalogue.Course;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -30,6 +29,22 @@ public class ScheduledNotificationsService {
         this.govNotifyRequiredLearningDueTemplateId = govNotifyRequiredLearningDueTemplateId;
     }
 
+    public Boolean hasRequiredLearningDueNotificationBeenSent(RequiredLearningDueNotificationEvent requiredLearningDueNotificationEvent) {
+        NotificationType type = getType(requiredLearningDueNotificationEvent.getPeriod());
+        Optional<Notification> optionalNotification = notificationService.findByIdentityCourseAndType(requiredLearningDueNotificationEvent.getIdentityUid(), requiredLearningDueNotificationEvent.getCourseId(), type);
+        return optionalNotification.isPresent();
+    }
+
+    public void sendRequiredLearningDueNotification(RequiredLearningDueNotificationEvent requiredLearningDueNotificationEvent) {
+        NotificationType type = getType(requiredLearningDueNotificationEvent.getPeriod());
+
+        notifyService.notifyForIncompleteCourses(requiredLearningDueNotificationEvent.getIdentityUsername(), requiredLearningDueNotificationEvent.getCourseTitle(), govNotifyRequiredLearningDueTemplateId, requiredLearningDueNotificationEvent.getPeriod());
+
+        Notification notification = new Notification(requiredLearningDueNotificationEvent.getCourseId(), requiredLearningDueNotificationEvent.getIdentityUid(), type);
+
+        notificationService.save(notification);
+    }
+
     public Boolean shouldSendLineManagerNotification(String uid, String courseId, LocalDateTime completedDate) {
         Optional<Notification> optionalNotification = notificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE);
         return optionalNotification
@@ -37,25 +52,21 @@ public class ScheduledNotificationsService {
                 .orElse(true);
     }
 
-    //update
-    public Boolean hasRequiredLearningDueNotificationBeenSent(String uid, String courseId, LocalDateTime completedDate) {
-        Optional<Notification> optionalNotification = notificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.REMINDER);
-        return optionalNotification.isPresent();
-    }
+    public void sendLineManagerNotification(LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent) {
+        notifyService.notifyOnComplete(lineManagerRequiredLearningNotificationEvent.getLineManagerUsername(), govNotifyCompletedLearningTemplateId, lineManagerRequiredLearningNotificationEvent.getName(), lineManagerRequiredLearningNotificationEvent.getLineManagerUsername(), lineManagerRequiredLearningNotificationEvent.getCourseTitle());
 
-    public void sendLineManagerNotification(String lineManagerEmailAddress, String civilServantName, String civilServantUid, CourseRecord courseRecord) {
-        notifyService.notifyOnComplete(lineManagerEmailAddress, govNotifyCompletedLearningTemplateId, civilServantName, lineManagerEmailAddress, courseRecord.getCourseTitle());
-
-        Notification notification = new Notification(courseRecord.getCourseId(), civilServantUid, NotificationType.COMPLETE);
+        Notification notification = new Notification(lineManagerRequiredLearningNotificationEvent.getCourseId(), lineManagerRequiredLearningNotificationEvent.getUid(), NotificationType.COMPLETE);
 
         notificationService.save(notification);
     }
 
-    public void sendRequiredLearningDueNotification(IdentityDto identity, Course course, String periodText) {
-        notifyService.notifyForIncompleteCourses(identity.getUsername(), course.getTitle(), govNotifyRequiredLearningDueTemplateId, periodText);
-
-        Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
-
-        notificationService.save(notification);
+    public NotificationType getType(String type) {
+        if ("1 day".equals(type)) {
+            return NotificationType.REMINDER_DAY;
+        } else if ("1 week".equals(type)) {
+            return NotificationType.REMINDER_WEEK;
+        } else {
+            return NotificationType.REMINDER_MONTH;
+        }
     }
 }

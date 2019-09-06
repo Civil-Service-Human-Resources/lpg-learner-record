@@ -18,7 +18,7 @@ public class ParameterizedTypeReferenceFactory {
      */
 
     private final Map<String, ParameterizedTypeReference> mapParameterizedTypeReferenceMap = ImmutableMap.of(
-            "uk.gov.cslearning.record.dto.IdentityDTO",
+            "uk.gov.cslearning.record.dto.IdentityDto",
             new ParameterizedTypeReference<Map<String, IdentityDto>>() {
             },
             "uk.gov.cslearning.record.dto.CivilServantDto",

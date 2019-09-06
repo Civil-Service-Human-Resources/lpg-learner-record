@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.domain;
 public enum NotificationType {
 
     COMPLETE,
-
-    REMINDER
+    REMINDER_DAY,
+    REMINDER_WEEK,
+    REMINDER_MONTH
 }

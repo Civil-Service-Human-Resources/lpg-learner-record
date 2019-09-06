@@ -15,6 +15,7 @@ public class NotifyService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
     private static final String EMAIL_PERMISSION = "email address";
+    private static final String NAME_PERMISSION = "email";
     private static final String REQUIRED_LEARNING_PERMISSION = "requiredLearning";
     private static final String LEARNER_PERMISSION = "learner";
     private static final String MANAGER_PERMISSION = "manager";
@@ -28,6 +29,7 @@ public class NotifyService {
         LOGGER.debug("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
+        personalisation.put(NAME_PERMISSION, email);
         personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
         personalisation.put(PERIOD_PERMISSION, period);
 
@@ -35,7 +37,7 @@ public class NotifyService {
             NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.debug("Reminder notify email sent: {}", response.getBody());
+            LOGGER.info("Reminder notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
         }

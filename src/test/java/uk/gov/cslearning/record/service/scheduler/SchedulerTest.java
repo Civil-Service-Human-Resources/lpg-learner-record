@@ -16,23 +16,26 @@ public class SchedulerTest {
     private SchedulerService schedulerService;
 
     @Mock
+    private SchedulerEventNotificationService schedulerEventNotificationService;
+
+    @Mock
     private LearnerService learnerService;
 
     @InjectMocks
     private Scheduler scheduler;
 
     @Test
-    public void shouldSendReminderNotificationForIncompleteLearning() {
-        scheduler.sendReminderNotificationForIncompleteLearning();
+    public void shouldProcessReminderNotificationForIncompleteLearning() {
+        scheduler.processReminderNotificationForIncompleteLearning();
 
-        verify(schedulerService).sendReminderNotificationForIncompleteLearning();
+        verify(schedulerService).processReminderNotificationForIncompleteLearning();
     }
 
     @Test
-    public void sendNotificationForCompletedLearning() {
-        scheduler.sendNotificationForCompletedLearning();
+    public void shouldProcessLineManagerNotificationForCompletedLearning() {
+        scheduler.processLineManagerNotificationForCompletedLearning();
 
-        verify(schedulerService).sendLineManagerNotificationForCompletedLearning();
+        verify(schedulerService).processLineManagerNotificationForCompletedLearning();
     }
 
     @Test
@@ -40,5 +43,19 @@ public class SchedulerTest {
         scheduler.deleteOldStatements();
 
         verify(learnerService).deleteOldStatements();
+    }
+
+    @Test
+    public void shouldSendReminderNotificationForIncompleteLearning() {
+        scheduler.sendReminderNotificationForIncompleteLearning();
+
+        verify(schedulerEventNotificationService).sendReminderNotificationForIncompleteLearning();
+    }
+
+    @Test
+    public void shouldSendLineManagerCompleteNotifications() {
+        scheduler.sendLineManagerCompleteNotifications();
+
+        verify(schedulerEventNotificationService).sendLineManagerCompleteNotifications();
     }
 }

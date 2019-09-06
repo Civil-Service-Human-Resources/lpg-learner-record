@@ -18,6 +18,7 @@ public class CustomHttpServiceTest {
     private String organisationalUnitRequiredLearningUrl = "orgUnitUrl";
     private String organisationalUnitRequiredLearningWithinPeriodParamUrl = "orgUnitReqUrl?days=%s";
     private String civilServantCodeUri = "civilServantCodeUrl";
+    private String civilServantsMapUrl = "civilServantsMapUrl";
     private String civilServantsCodeParamUrl = "civilServantCodeParamUrl?code=%s";
 
     @Mock
@@ -32,6 +33,7 @@ public class CustomHttpServiceTest {
                 organisationalUnitRequiredLearningUrl,
                 organisationalUnitRequiredLearningWithinPeriodParamUrl,
                 civilServantCodeUri,
+                civilServantsMapUrl,
                 civilServantsCodeParamUrl);
     }
 
@@ -66,10 +68,11 @@ public class CustomHttpServiceTest {
 
     @Test
     public void getRequiredLearningDueWithinPeriod() {
-        long days = 7L;
+        long from = 1L;
+        long to = 7L;
 
-        customHttpService.getRequiredLearningDueWithinPeriod(days);
+        customHttpService.getRequiredLearningDueWithinPeriod(from, to);
 
-        verify(httpService).getMapOfList(String.format(organisationalUnitRequiredLearningWithinPeriodParamUrl, days), Course.class);
+        verify(httpService).getMapOfList(String.format(organisationalUnitRequiredLearningWithinPeriodParamUrl, from, to), Course.class);
     }
 }

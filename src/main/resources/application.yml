@@ -63,7 +63,8 @@ registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
   getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
-  civilServantsCodeParamUrl: "${registry.serviceUrl}/report/civilServants?code="
+  civilServantsMapUrl: "${registry.serviceUrl}/report/civilServants"
+  civilServantsCodeParamUrl: "${registry.serviceUrl}/report/civilServants?code=%s"
   civilServantsCodeUrl: "${registry.serviceUrl}/report/civilServants/code"
 
 catalogue:
@@ -76,7 +77,7 @@ catalogue:
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}
   template:
-    requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}
+    requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:ead2c71c-4dea-497f-80de-30d3d3645016}
     completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:3f50f0eb-4c47-4e37-8a44-1628faa41924}
     inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:cf623c5b-b9e9-4899-b419-4f851e581056}
     cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:cc525c34-1a31-4fa1-ab19-862fd223caab}

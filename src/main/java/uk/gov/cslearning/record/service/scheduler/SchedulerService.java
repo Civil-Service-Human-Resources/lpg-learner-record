@@ -5,13 +5,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.CompletedLearningEvent;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNotificationEvent;
+import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.dto.CivilServantDto;
 import uk.gov.cslearning.record.dto.IdentityDto;
 import uk.gov.cslearning.record.service.CompletedLearningEventService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.http.CustomHttpService;
+import uk.gov.cslearning.record.service.scheduler.events.LineManagerRequiredLearningNotificationEventService;
+import uk.gov.cslearning.record.service.scheduler.events.RequiredLearningDueNotificationEventService;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,59 +39,40 @@ public class SchedulerService {
     private CustomHttpService customHttpService;
     private UserRecordService userRecordService;
     private CompletedLearningEventService completedLearningService;
-    private ScheduledNotificationsService scheduledNotificationsService;
+    private RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService;
+    private LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService;
 
-    public SchedulerService(CustomHttpService customHttpService,
-                            UserRecordService userRecordService,
-                            ScheduledNotificationsService scheduledNotificationsService,
-                            CompletedLearningEventService completedLearningService) {
+    public SchedulerService(CustomHttpService customHttpService, UserRecordService userRecordService, CompletedLearningEventService completedLearningService, RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService, LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService) {
         this.customHttpService = customHttpService;
         this.userRecordService = userRecordService;
-        this.scheduledNotificationsService = scheduledNotificationsService;
         this.completedLearningService = completedLearningService;
+        this.requiredLearningDueNotificationEventService = requiredLearningDueNotificationEventService;
+        this.lineManagerRequiredLearningNotificationEventService = lineManagerRequiredLearningNotificationEventService;
     }
 
-    public void sendLineManagerNotificationForCompletedLearning() {
-        LOGGER.info("sendLineManagerNotificationForCompletedLearning");
-
-        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsByOrganisationalUnitCodeMap();
-        LOGGER.info("Got csrs map");
-
-        Map<String, List<Course>> organisationalUnitRequiredLearningMap = customHttpService.getOrganisationalUnitRequiredLearning();
-        LOGGER.info("Got req learning map");
-
-        civilServantMap.forEach((uid, civilServantDto) -> {
-            Collection<CourseRecord> courseRecords = getCourseRecordsForRequiredCourses(organisationalUnitRequiredLearningMap, uid, civilServantDto);
-            LOGGER.info("User has {} course records", courseRecords.size());
-
-            courseRecords.forEach(courseRecord -> {
-                if (courseRecord.isComplete()) {
-                    CompletedLearningEvent completedLearning = new CompletedLearningEvent(courseRecord, courseRecord.getCompletionDate().toInstant(ZoneOffset.UTC));
-                    completedLearningService.save(completedLearning);
-                }
-            });
-        });
-        LOGGER.info("Complete");
-    }
-
-    public void sendReminderNotificationForIncompleteLearning() {
+    public void processReminderNotificationForIncompleteLearning() {
         Map<String, IdentityDto> identitiesMap = customHttpService.getIdentitiesMap();
+        LOGGER.info("Got {} identities", identitiesMap.size());
 
         Map<String, Map<String, List<Course>>> requiredLearningDue = new HashMap<>();
 
         requiredLearningDue.put(DAY_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(0, 1));
         requiredLearningDue.put(WEEK_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(1, 7));
-        requiredLearningDue.put(MONTH_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(2, 30));
+        requiredLearningDue.put(MONTH_PERIOD, customHttpService.getRequiredLearningDueWithinPeriod(7, 30));
+
+        LOGGER.info("Got {} requiredLearningDue for {}", requiredLearningDue.get(DAY_PERIOD).size(), DAY_PERIOD);
+        LOGGER.info("Got {} requiredLearningDue for {}", requiredLearningDue.get(WEEK_PERIOD).size(), WEEK_PERIOD);
+        LOGGER.info("Got {} requiredLearningDue for {}", requiredLearningDue.get(MONTH_PERIOD).size(), MONTH_PERIOD);
 
         requiredLearningDue.forEach((periodText, organisationalUnitRequiredLearningMap) -> {
             organisationalUnitRequiredLearningMap.forEach((organisationalUnitCode, courses) -> {
-                LOGGER.info("Got {} and {} courses", organisationalUnitCode, courses.size());
+                LOGGER.info("{}: Got {} and {} courses", periodText, organisationalUnitCode, courses.size());
 
                 Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantMapByOrganisation(organisationalUnitCode);
-                LOGGER.info("Got {} civil servants", civilServantMap.size());
+                LOGGER.info("{}: Got {} civil servants", periodText, civilServantMap.size());
 
                 civilServantMap.forEach((s, civilServantDto) -> {
-                    LOGGER.info("Processing {} ", civilServantDto.toString());
+                    LOGGER.info("{}: Processing {} ", periodText, civilServantDto.toString());
                     List<String> courseIds = emptyIfNull(courses)
                             .stream()
                             .map(Course::getId)
@@ -96,22 +82,32 @@ public class SchedulerService {
                     courses.forEach(course -> {
                         if (!course.isComplete(storedUserRecords)) {
                             IdentityDto identityDto = identitiesMap.get(civilServantDto.getUid());
-                            scheduledNotificationsService.sendRequiredLearningDueNotification(identityDto, course, periodText);
+
+                            if (identityDto == null) {
+                                return;
+                            }
+
+                            RequiredLearningDueNotificationEvent requiredLearningDueNotificationEvent = new RequiredLearningDueNotificationEvent(identityDto.getUsername(), identityDto.getUid(), course.getId(), course.getTitle(), periodText, Instant.now());
+                            if (requiredLearningDueNotificationEventService.doesExist(requiredLearningDueNotificationEvent)) {
+                                LOGGER.info("{}: Required learning already tracked for {}", periodText, requiredLearningDueNotificationEvent.toString());
+                            } else {
+                                LOGGER.info("{}: Saving required learning due for {}", periodText, requiredLearningDueNotificationEvent.toString());
+                                requiredLearningDueNotificationEventService.save(requiredLearningDueNotificationEvent);
+                            }
                         }
                     });
-
                 });
             });
         });
-        LOGGER.info("complete");
+        LOGGER.info("Complete");
     }
 
-    public void sendLineManagerNotificationForCompletedLearningRetroactive() {
-        LOGGER.info("sendLineManagerNotificationForCompletedLearning");
+    public void processLineManagerNotificationForCompletedLearning() {
+        LOGGER.info("processLineManagerNotificationForCompletedLearning");
 
         Map<String, IdentityDto> identitiesMap = customHttpService.getIdentitiesMap();
         Map<String, List<Course>> organisationalUnitRequiredLearningMap = customHttpService.getOrganisationalUnitRequiredLearning();
-        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsByOrganisationalUnitCodeMap();
+        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsMap();
 
         List<CompletedLearningEvent> completedLearningList = completedLearningService.findAll();
         LOGGER.info("Completed learning count: {}", completedLearningList.size());
@@ -121,20 +117,21 @@ public class SchedulerService {
             CourseRecord courseRecord = completedLearning.getCourseRecord();
             CivilServantDto civilServantDto = civilServantMap.get(courseRecord.getUserId());
 
+            if (civilServantDto == null) {
+                return;
+            }
+
             List<Course> requiredCoursesForOrg = organisationalUnitRequiredLearningMap.get(civilServantDto.getOrganisation());
-            boolean isCompletedLearningRequired = requiredCoursesForOrg
+            boolean isCompletedLearningRequired = emptyIfNull(requiredCoursesForOrg)
                     .stream()
                     .anyMatch(course -> course.getId().equals(courseRecord.getCourseId()));
 
             try {
                 if (isCompletedLearningRequired) {
-                    if (scheduledNotificationsService.shouldSendLineManagerNotification(courseRecord.getUserId(), courseRecord.getCourseId(), courseRecord.getCompletionDate())) {
-                        IdentityDto lineManagerIdentityDto = identitiesMap.get(civilServantDto.getLineManagerUid());
-                        scheduledNotificationsService.sendLineManagerNotification(lineManagerIdentityDto.getUsername(), civilServantDto.getName(), courseRecord.getUserId(), courseRecord);
-                        LOGGER.info("Sending notification for user {} and course {}", civilServantDto.getName(), courseRecord.getCourseTitle());
-                    } else {
-                        LOGGER.info("User {} has already been sent notification for course {}", courseRecord.getUserId(), courseRecord.getCourseTitle());
-                    }
+                    IdentityDto lineManagerIdentityDto = identitiesMap.get(civilServantDto.getLineManagerUid());
+
+                    LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent = new LineManagerRequiredLearningNotificationEvent(lineManagerIdentityDto.getUsername(), civilServantDto.getName(), civilServantDto.getUid(), courseRecord.getCourseId(), courseRecord.getCourseTitle(), Instant.now());
+                    lineManagerRequiredLearningNotificationEventService.save(lineManagerRequiredLearningNotificationEvent);
                 } else {
                     LOGGER.info("Completed learning is not required");
                 }
@@ -146,16 +143,35 @@ public class SchedulerService {
             }
         });
 
-        LOGGER.info("Sending line manager notifications complete");
+        LOGGER.info("Process line manager notifications complete");
     }
 
-    protected Collection<CourseRecord> getCourseRecordsForRequiredCourses(Map<String, List<Course>> organisationalUnitRequiredLearningMap, String uid, CivilServantDto civilServantDto) {
-        List<Course> requiredCourses = organisationalUnitRequiredLearningMap.get(civilServantDto.getOrganisation());
-        List<String> requiredCoursesIds = emptyIfNull(requiredCourses)
-                .stream()
-                .map(Course::getId)
-                .collect(Collectors.toList());
+    public void sendLineManagerNotificationForCompletedLearningRetroactive() {
+        LOGGER.info("sendLineManagerNotificationForCompletedLearning");
 
-        return userRecordService.getStoredUserRecord(uid, requiredCoursesIds);
+        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsByOrganisationalUnitCodeMap();
+        LOGGER.info("Got csrs map");
+
+        Map<String, List<Course>> organisationalUnitRequiredLearningMap = customHttpService.getOrganisationalUnitRequiredLearning();
+        LOGGER.info("Got req learning map");
+
+        civilServantMap.forEach((uid, civilServantDto) -> {
+            List<Course> requiredCourses = organisationalUnitRequiredLearningMap.get(civilServantDto.getOrganisation());
+            List<String> requiredCoursesIds = emptyIfNull(requiredCourses)
+                    .stream()
+                    .map(Course::getId)
+                    .collect(Collectors.toList());
+
+            Collection<CourseRecord> storedUserRecord = userRecordService.getStoredUserRecord(uid, requiredCoursesIds);
+            LOGGER.info("User has {} course records", storedUserRecord.size());
+
+            storedUserRecord.forEach(courseRecord -> {
+                if (courseRecord.isComplete()) {
+                    CompletedLearningEvent completedLearning = new CompletedLearningEvent(courseRecord, courseRecord.getCompletionDate().toInstant(ZoneOffset.UTC));
+                    completedLearningService.save(completedLearning);
+                }
+            });
+        });
+        LOGGER.info("Complete");
     }
 }

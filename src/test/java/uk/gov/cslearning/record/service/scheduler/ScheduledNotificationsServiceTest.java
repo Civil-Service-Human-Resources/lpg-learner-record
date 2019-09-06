@@ -8,11 +8,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
-import uk.gov.cslearning.record.dto.IdentityDto;
+import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNotificationEvent;
+import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.service.DefaultNotificationService;
 import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.catalogue.Course;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -90,7 +91,8 @@ public class ScheduledNotificationsServiceTest {
 
         doNothing().when(notifyService).notifyOnComplete(lineManagerEmailAddress, govNotifyTemplateId, name, lineManagerEmailAddress, courseTitle);
 
-        scheduledNotificationsService.sendLineManagerNotification(lineManagerEmailAddress, name, uid, courseRecord);
+        LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent = new LineManagerRequiredLearningNotificationEvent(lineManagerEmailAddress, name, uid, courseId, courseTitle, Instant.now());
+        scheduledNotificationsService.sendLineManagerNotification(lineManagerRequiredLearningNotificationEvent);
 
         verify(defaultNotificationService).save(isA(Notification.class));
     }
@@ -103,17 +105,10 @@ public class ScheduledNotificationsServiceTest {
         String courseTitle = "courseTitle";
         String periodText = "1 day";
 
-        Course course = new Course();
-        course.setTitle(courseTitle);
-        course.setId(courseId);
-
-        IdentityDto identityDto = new IdentityDto();
-        identityDto.setUid(uid);
-        identityDto.setUsername(username);
-
+        RequiredLearningDueNotificationEvent requiredLearningDueNotificationEvent = new RequiredLearningDueNotificationEvent(username, uid, courseId, courseTitle, periodText, Instant.now());
         doNothing().when(notifyService).notifyForIncompleteCourses(username, courseTitle, govNotifyTemplateId, periodText);
 
-        scheduledNotificationsService.sendRequiredLearningDueNotification(identityDto, course, periodText);
+        scheduledNotificationsService.sendRequiredLearningDueNotification(requiredLearningDueNotificationEvent);
 
         verify(defaultNotificationService).save(isA(Notification.class));
     }
