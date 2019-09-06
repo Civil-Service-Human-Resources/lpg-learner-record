@@ -25,4 +25,8 @@ public class CompletedLearningEventService {
     public void delete(CompletedLearningEvent completedLearning) {
         completedLearningEventRepository.delete(completedLearning);
     }
+
+    public void deleteAll() {
+        completedLearningEventRepository.deleteAll();
+    }
 }

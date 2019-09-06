@@ -11,6 +11,7 @@ CREATE TABLE `line_manager_required_learning_notification_event` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `line_manager_username` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
+  `uid` varchar(50) NOT NULL,
   `course_id` varchar(50) NOT NULL,
   `course_title` varchar(50) NOT NULL,
   `created_at` datetime NOT NULL,

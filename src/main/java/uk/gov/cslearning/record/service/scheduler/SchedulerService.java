@@ -107,7 +107,7 @@ public class SchedulerService {
 
         Map<String, IdentityDto> identitiesMap = customHttpService.getIdentitiesMap();
         Map<String, List<Course>> organisationalUnitRequiredLearningMap = customHttpService.getOrganisationalUnitRequiredLearning();
-        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsMap();
+        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsByOrganisationalUnitCodeMap();
 
         List<CompletedLearningEvent> completedLearningList = completedLearningService.findAll();
         LOGGER.info("Completed learning count: {}", completedLearningList.size());
@@ -137,12 +137,12 @@ public class SchedulerService {
                 }
                 LOGGER.info("Removing {}", completedLearning.toString());
 
-                completedLearningService.delete(completedLearning);
+
             } catch (Exception e) {
                 LOGGER.error("Could not send notification for completedLearning {}", completedLearning.toString());
             }
         });
-
+        completedLearningService.deleteAll();
         LOGGER.info("Process line manager notifications complete");
     }
 

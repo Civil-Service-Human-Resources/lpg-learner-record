@@ -9,7 +9,6 @@ import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotification
 import uk.gov.cslearning.record.service.DefaultNotificationService;
 import uk.gov.cslearning.record.service.NotifyService;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -45,11 +44,8 @@ public class ScheduledNotificationsService {
         notificationService.save(notification);
     }
 
-    public Boolean shouldSendLineManagerNotification(String uid, String courseId, LocalDateTime completedDate) {
-        Optional<Notification> optionalNotification = notificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE);
-        return optionalNotification
-                .map(notification -> notification.sentBefore(completedDate))
-                .orElse(true);
+    public Boolean shouldSendLineManagerNotification(String uid, String courseId) {
+        return notificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE).isPresent();
     }
 
     public void sendLineManagerNotification(LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent) {
