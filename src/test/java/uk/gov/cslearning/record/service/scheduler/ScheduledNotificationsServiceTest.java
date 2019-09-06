@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
@@ -57,26 +56,7 @@ public class ScheduledNotificationsServiceTest {
 
         when(defaultNotificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
 
-        assertTrue(scheduledNotificationsService.shouldSendLineManagerNotification(uid, courseId, completedDate));
-    }
-
-    @Test
-    public void shouldFalseIfNotificationSent() {
-        String uid = "uid";
-        String courseId = "courseId";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-        String completed = "2019-01-01 10:30";
-        String notificationTime = "2019-02-01 11:30";
-
-        LocalDateTime completedDate = LocalDateTime.parse(completed, formatter);
-
-        Notification notification = new Notification();
-        notification.setSent(LocalDateTime.parse(notificationTime, formatter));
-
-        when(defaultNotificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
-
-        assertFalse(scheduledNotificationsService.shouldSendLineManagerNotification(uid, courseId, completedDate));
+        assertTrue(scheduledNotificationsService.hasRequiredLearningDueNotificationBeenSent(uid, courseId));
     }
 
     @Test

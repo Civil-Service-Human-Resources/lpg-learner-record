@@ -236,7 +236,7 @@ public class SchedulerServiceTest {
 
         when(customHttpService.getIdentitiesMap()).thenReturn(identitiesMap);
         when(customHttpService.getOrganisationalUnitRequiredLearning()).thenReturn(dayRequiredCourses);
-        when(customHttpService.getCivilServantsMap()).thenReturn(code1CivilServants);
+        when(customHttpService.getCivilServantsByOrganisationalUnitCodeMap()).thenReturn(code1CivilServants);
         when(completedLearningService.findAll()).thenReturn(Arrays.asList(completedLearningEvent));
 
         schedulerService.processLineManagerNotificationForCompletedLearning();

@@ -51,7 +51,7 @@ public class SchedulerEventNotificationService {
         List<LineManagerRequiredLearningNotificationEvent> lineManagerRequiredLearningNotificationEventList = lineManagerRequiredLearningNotificationEventService.findAll();
 
         lineManagerRequiredLearningNotificationEventList.forEach(lineManagerRequiredLearningNotificationEvent -> {
-            if (scheduledNotificationsService.shouldSendLineManagerNotification(lineManagerRequiredLearningNotificationEvent.getUid(), lineManagerRequiredLearningNotificationEvent.getCourseId())) {
+            if (scheduledNotificationsService.hasRequiredLearningDueNotificationBeenSent(lineManagerRequiredLearningNotificationEvent.getUid(), lineManagerRequiredLearningNotificationEvent.getCourseId())) {
                 LOGGER.info("Line manager complete notification has already been sent");
             } else {
                 scheduledNotificationsService.sendLineManagerNotification(lineManagerRequiredLearningNotificationEvent);

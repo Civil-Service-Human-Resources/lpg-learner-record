@@ -44,7 +44,7 @@ public class ScheduledNotificationsService {
         notificationService.save(notification);
     }
 
-    public Boolean shouldSendLineManagerNotification(String uid, String courseId) {
+    public Boolean hasRequiredLearningDueNotificationBeenSent(String uid, String courseId) {
         return notificationService.findByIdentityCourseAndType(uid, courseId, NotificationType.COMPLETE).isPresent();
     }
 
