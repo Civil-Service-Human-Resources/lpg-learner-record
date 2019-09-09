@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service.scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CompletedLearningEvent;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNotificationEvent;
@@ -50,6 +51,7 @@ public class SchedulerService {
         this.lineManagerRequiredLearningNotificationEventService = lineManagerRequiredLearningNotificationEventService;
     }
 
+    @Transactional
     public void processReminderNotificationForIncompleteLearning() {
         Map<String, IdentityDto> identitiesMap = customHttpService.getIdentitiesMap();
         LOGGER.info("Got {} identities", identitiesMap.size());
@@ -102,6 +104,7 @@ public class SchedulerService {
         LOGGER.info("Complete");
     }
 
+    @Transactional
     public void processLineManagerNotificationForCompletedLearning() {
         LOGGER.info("processLineManagerNotificationForCompletedLearning");
 
@@ -146,6 +149,7 @@ public class SchedulerService {
         LOGGER.info("Process line manager notifications complete");
     }
 
+    @Transactional
     public void sendLineManagerNotificationForCompletedLearningRetroactive() {
         LOGGER.info("sendLineManagerNotificationForCompletedLearning");
 

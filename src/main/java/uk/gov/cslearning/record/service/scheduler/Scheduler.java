@@ -24,7 +24,7 @@ public class Scheduler {
 
     // cron to run every day at 01:00
 //    @Scheduled(cron = "0 0 1 * * *")
-    @Scheduled(cron = "0 * * * * MON-FRI")
+    @Scheduled(cron = "0 0/30 6-18 * * *")
     public void processReminderNotificationForIncompleteLearning() {
         LOGGER.info("Starting processReminderNotificationForIncompleteLearning scheduled job");
 

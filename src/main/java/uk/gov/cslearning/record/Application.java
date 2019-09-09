@@ -38,9 +38,4 @@ public class Application {
     protected ClientCredentialsResourceDetails oAuthDetails() {
         return new ClientCredentialsResourceDetails();
     }
-
-//    @Bean("clientRestTemplate")
-//    protected RestTemplate restTemplate() {
-//        return new OAuth2RestTemplate(oAuthDetails());
-//    }
 }
