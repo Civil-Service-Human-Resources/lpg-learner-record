@@ -49,6 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    @Primary
     public OAuth2RestOperations oAuthRestTemplate(OAuth2ProtectedResourceDetails resourceDetails) {
         AccessTokenRequest atr = new DefaultAccessTokenRequest();
         return new OAuth2RestTemplate(resourceDetails, new DefaultOAuth2ClientContext(atr));
