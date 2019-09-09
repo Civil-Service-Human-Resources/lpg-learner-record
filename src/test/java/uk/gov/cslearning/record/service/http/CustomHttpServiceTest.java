@@ -18,7 +18,6 @@ public class CustomHttpServiceTest {
     private String organisationalUnitRequiredLearningUrl = "orgUnitUrl";
     private String organisationalUnitRequiredLearningWithinPeriodParamUrl = "orgUnitReqUrl?days=%s";
     private String civilServantCodeUri = "civilServantCodeUrl";
-    private String civilServantsMapUrl = "civilServantsMapUrl";
     private String civilServantsCodeParamUrl = "civilServantCodeParamUrl?code=%s";
 
     @Mock
@@ -33,7 +32,6 @@ public class CustomHttpServiceTest {
                 organisationalUnitRequiredLearningUrl,
                 organisationalUnitRequiredLearningWithinPeriodParamUrl,
                 civilServantCodeUri,
-                civilServantsMapUrl,
                 civilServantsCodeParamUrl);
     }
 
