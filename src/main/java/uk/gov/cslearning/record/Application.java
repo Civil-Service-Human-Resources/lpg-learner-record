@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record;
 
 import gov.adlnet.xapi.client.StatementClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -42,6 +43,7 @@ public class Application {
     }
 
     @Bean
+    @Qualifier("clientRestTemplate")
     protected RestTemplate restTemplate() {
         return new OAuth2RestTemplate(oAuthDetails());
     }

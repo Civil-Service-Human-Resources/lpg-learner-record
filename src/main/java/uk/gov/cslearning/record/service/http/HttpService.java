@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,10 @@ import java.util.Map;
 @Service
 public class HttpService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpService.class);
+
+    @Qualifier("clientRestTemplate")
     private final RestTemplate restTemplate;
+
     private final RequestEntityFactoryHttp requestEntityFactoryHttp;
     private final ParameterizedTypeReferenceFactory parameterizedTypeReferenceFactory;
 
