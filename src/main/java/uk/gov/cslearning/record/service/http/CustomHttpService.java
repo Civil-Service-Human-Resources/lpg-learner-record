@@ -16,7 +16,6 @@ public class CustomHttpService {
     private final String organisationalUnitRequiredLearningUrl;
     private final String organisationalUnitRequiredLearningWithinPeriodParamUrl;
     private final String civilServantsCodeParamUrl;
-    private final String civilServantsMapUrl;
     private HttpService httpService;
 
     public CustomHttpService(HttpService httpService,
@@ -24,23 +23,17 @@ public class CustomHttpService {
                              @Value("${catalogue.organisationalUnitRequiredLearningUrl}") String organisationalUnitRequiredLearningUrl,
                              @Value("${catalogue.organisationalUnitRequiredLearningWithinPeriodParamUrl}") String organisationalUnitRequiredLearningWithinPeriodParamUrl,
                              @Value("${registry.civilServantsCodeUrl}") String civilServantCodeUri,
-                             @Value("${registry.civilServantsMapUrl}") String civilServantsMapUrl,
                              @Value("${registry.civilServantsCodeParamUrl}") String civilServantsCodeParamUrl) {
         this.httpService = httpService;
         this.identitiesMapUrl = identitiesMapUrl;
         this.civilServantCodeUri = civilServantCodeUri;
         this.organisationalUnitRequiredLearningUrl = organisationalUnitRequiredLearningUrl;
         this.civilServantsCodeParamUrl = civilServantsCodeParamUrl;
-        this.civilServantsMapUrl = civilServantsMapUrl;
         this.organisationalUnitRequiredLearningWithinPeriodParamUrl = organisationalUnitRequiredLearningWithinPeriodParamUrl;
     }
 
     public Map<String, IdentityDto> getIdentitiesMap() {
         return httpService.getMap(identitiesMapUrl, IdentityDto.class);
-    }
-
-    public Map<String, CivilServantDto> getCivilServantsMap() {
-        return httpService.getMap(civilServantsMapUrl, CivilServantDto.class);
     }
 
     public Map<String, CivilServantDto> getCivilServantsByOrganisationalUnitCodeMap() {

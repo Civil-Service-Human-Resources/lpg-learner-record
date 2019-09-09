@@ -68,7 +68,6 @@ registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
   getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
-  civilServantsMapUrl: "${registry.serviceUrl}/report/civilServants"
   civilServantsCodeParamUrl: "${registry.serviceUrl}/report/civilServants?code=%s"
   civilServantsCodeUrl: "${registry.serviceUrl}/report/civilServants/code"
 

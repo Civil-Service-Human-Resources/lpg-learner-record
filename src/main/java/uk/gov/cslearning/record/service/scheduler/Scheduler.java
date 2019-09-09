@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.service.LearnerService;
 
 @Component
 public class Scheduler {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
 
     private LearnerService learnerService;
@@ -23,8 +24,7 @@ public class Scheduler {
     }
 
     // cron to run every day at 01:00
-//    @Scheduled(cron = "0 0 1 * * *")
-    @Scheduled(cron = "0 0/30 6-18 * * *")
+    @Scheduled(cron = "0 0 1 * * *")
     public void processReminderNotificationForIncompleteLearning() {
         LOGGER.info("Starting processReminderNotificationForIncompleteLearning scheduled job");
 

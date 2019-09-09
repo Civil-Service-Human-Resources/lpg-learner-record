@@ -148,9 +148,6 @@ public class SchedulerServiceTest {
 
         when(customHttpService.getCivilServantMapByOrganisation(code1)).thenReturn(code1CivilServants);
         when(customHttpService.getCivilServantMapByOrganisation(code2)).thenReturn(code2CivilServants);
-
-//        when(userRecordService.getStoredUserRecord(uid1, Arrays.asList(id1))).thenReturn(Arrays.asList(courseRecord1));
-//        when(userRecordService.getStoredUserRecord(uid2, Arrays.asList(id2))).thenReturn(Arrays.asList(courseRecord2));
         when(userRecordService.getStoredUserRecord(uid3, Arrays.asList(id3))).thenReturn(Arrays.asList(courseRecord3));
 
         schedulerService.processReminderNotificationForIncompleteLearning();
