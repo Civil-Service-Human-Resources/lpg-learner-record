@@ -1,7 +1,6 @@
 package uk.gov.cslearning.record;
 
 import gov.adlnet.xapi.client.StatementClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,9 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.MalformedURLException;
 
@@ -36,15 +33,14 @@ public class Application {
         return new StatementClient(url, username, password);
     }
 
-    @Bean
+    @Bean("oAuthDetails")
     @ConfigurationProperties("oauth.client")
     protected ClientCredentialsResourceDetails oAuthDetails() {
         return new ClientCredentialsResourceDetails();
     }
 
-    @Bean
-    @Qualifier("clientRestTemplate")
-    protected RestTemplate restTemplate() {
-        return new OAuth2RestTemplate(oAuthDetails());
-    }
+//    @Bean("clientRestTemplate")
+//    protected RestTemplate restTemplate() {
+//        return new OAuth2RestTemplate(oAuthDetails());
+//    }
 }
