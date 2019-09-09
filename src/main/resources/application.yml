@@ -53,6 +53,11 @@ oauth:
   clientSecret: ${CLIENT_SECRET:test}
   checkTokenUrl: "${oauth.serviceUrl}/oauth/check_token"
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
+  client:
+    grantType: "client_credentials"
+    clientId: ${oauth.clientId}
+    clientSecret: ${oauth.clientSecret}
+    accessTokenUri: ${oauth.tokenUrl}
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"

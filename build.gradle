@@ -111,6 +111,8 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.4'
     compile 'org.springframework.boot:spring-boot-starter-actuator:2.1.7.RELEASE'
     compile 'javax.interceptor:javax.interceptor-api:3.1'
+// https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client
+    compile group: 'org.apache.oltu.oauth2', name: 'org.apache.oltu.oauth2.client', version: '0.31'
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
