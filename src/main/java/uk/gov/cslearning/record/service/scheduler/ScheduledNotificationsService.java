@@ -8,6 +8,8 @@ import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNoti
 import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.service.DefaultNotificationService;
 import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.scheduler.events.LineManagerRequiredLearningNotificationEventService;
+import uk.gov.cslearning.record.service.scheduler.events.RequiredLearningDueNotificationEventService;
 
 import java.util.Optional;
 
@@ -15,15 +17,21 @@ import java.util.Optional;
 public class ScheduledNotificationsService {
     private DefaultNotificationService notificationService;
     private NotifyService notifyService;
+    private RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService;
+    private LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService;
     private String govNotifyCompletedLearningTemplateId;
     private String govNotifyRequiredLearningDueTemplateId;
 
     public ScheduledNotificationsService(DefaultNotificationService notificationService,
                                          NotifyService notifyService,
+                                         RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService,
+                                         LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService,
                                          @Value("${govNotify.template.completedLearning}") String govNotifyCompletedLearningTemplateId,
                                          @Value("${govNotify.template.requiredLearningDue}") String govNotifyRequiredLearningDueTemplateId) {
         this.notificationService = notificationService;
         this.notifyService = notifyService;
+        this.requiredLearningDueNotificationEventService = requiredLearningDueNotificationEventService;
+        this.lineManagerRequiredLearningNotificationEventService = lineManagerRequiredLearningNotificationEventService;
         this.govNotifyCompletedLearningTemplateId = govNotifyCompletedLearningTemplateId;
         this.govNotifyRequiredLearningDueTemplateId = govNotifyRequiredLearningDueTemplateId;
     }
@@ -37,11 +45,13 @@ public class ScheduledNotificationsService {
     public void sendRequiredLearningDueNotification(RequiredLearningDueNotificationEvent requiredLearningDueNotificationEvent) {
         NotificationType type = getType(requiredLearningDueNotificationEvent.getPeriod());
 
-        notifyService.notifyForIncompleteCourses(requiredLearningDueNotificationEvent.getIdentityUsername(), requiredLearningDueNotificationEvent.getCourseTitle(), govNotifyRequiredLearningDueTemplateId, requiredLearningDueNotificationEvent.getPeriod());
+        if (notifyService.isNotifyForIncompleteCoursesSuccessful(requiredLearningDueNotificationEvent.getIdentityUsername(), requiredLearningDueNotificationEvent.getCourseTitle(), govNotifyRequiredLearningDueTemplateId, requiredLearningDueNotificationEvent.getPeriod())) {
+            Notification notification = new Notification(requiredLearningDueNotificationEvent.getCourseId(), requiredLearningDueNotificationEvent.getIdentityUid(), type);
 
-        Notification notification = new Notification(requiredLearningDueNotificationEvent.getCourseId(), requiredLearningDueNotificationEvent.getIdentityUid(), type);
+            notificationService.save(notification);
 
-        notificationService.save(notification);
+            requiredLearningDueNotificationEventService.delete(requiredLearningDueNotificationEvent);
+        }
     }
 
     public Boolean hasRequiredLearningDueNotificationBeenSent(String uid, String courseId) {
@@ -49,14 +59,16 @@ public class ScheduledNotificationsService {
     }
 
     public void sendLineManagerNotification(LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent) {
-        notifyService.notifyOnComplete(lineManagerRequiredLearningNotificationEvent.getLineManagerUsername(), govNotifyCompletedLearningTemplateId, lineManagerRequiredLearningNotificationEvent.getName(), lineManagerRequiredLearningNotificationEvent.getLineManagerUsername(), lineManagerRequiredLearningNotificationEvent.getCourseTitle());
+        if (notifyService.isNotifyOnCompleteSuccessful(lineManagerRequiredLearningNotificationEvent.getLineManagerUsername(), govNotifyCompletedLearningTemplateId, lineManagerRequiredLearningNotificationEvent.getName(), lineManagerRequiredLearningNotificationEvent.getLineManagerUsername(), lineManagerRequiredLearningNotificationEvent.getCourseTitle())) {
+            Notification notification = new Notification(lineManagerRequiredLearningNotificationEvent.getCourseId(), lineManagerRequiredLearningNotificationEvent.getUid(), NotificationType.COMPLETE);
 
-        Notification notification = new Notification(lineManagerRequiredLearningNotificationEvent.getCourseId(), lineManagerRequiredLearningNotificationEvent.getUid(), NotificationType.COMPLETE);
+            notificationService.save(notification);
 
-        notificationService.save(notification);
+            lineManagerRequiredLearningNotificationEventService.delete(lineManagerRequiredLearningNotificationEvent);
+        }
     }
 
-    public NotificationType getType(String type) {
+    private NotificationType getType(String type) {
         if ("1 day".equals(type)) {
             return NotificationType.REMINDER_DAY;
         } else if ("1 week".equals(type)) {

@@ -25,7 +25,7 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public void notifyForIncompleteCourses(String email, String requiredLearning, String templateId, String period) {
+    public boolean isNotifyForIncompleteCoursesSuccessful(String email, String requiredLearning, String templateId, String period) {
         LOGGER.debug("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
@@ -38,12 +38,15 @@ public class NotifyService {
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
             LOGGER.info("Reminder notify email sent: {}", response.getBody());
+            return true;
         } catch (NotificationClientException e) {
-            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
+            LOGGER.error("Could not send email to GOV notify: ", e.getMessage());
         }
+
+        return false;
     }
 
-    public void notifyOnComplete(String email, String templateId, String learner, String manager, String courseTitle) {
+    public boolean isNotifyOnCompleteSuccessful(String email, String templateId, String learner, String manager, String courseTitle) {
         LOGGER.debug("Sending completion notification to {}, for course {}", email, courseTitle);
 
         HashMap<String, String> personalisation = new HashMap<>();
@@ -57,9 +60,12 @@ public class NotifyService {
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
             LOGGER.info("Complete notify email sent: {}", response.getBody());
+
+            return true;
         } catch (NotificationClientException e) {
-            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
+            LOGGER.error("Could not send email to GOV notify: ", e.getMessage());
         }
+
+        return false;
     }
 }
-

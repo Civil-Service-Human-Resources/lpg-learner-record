@@ -42,8 +42,6 @@ public class SchedulerEventNotificationService {
             }
         });
 
-        requiredLearningDueNotificationEventService.deleteAll();
-
         LOGGER.info("Complete");
     }
 
@@ -60,8 +58,6 @@ public class SchedulerEventNotificationService {
                 scheduledNotificationsService.sendLineManagerNotification(lineManagerRequiredLearningNotificationEvent);
             }
         });
-
-        lineManagerRequiredLearningNotificationEventService.deleteAll();
 
         LOGGER.info("Complete");
     }

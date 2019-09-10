@@ -12,6 +12,8 @@ import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNoti
 import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.service.DefaultNotificationService;
 import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.scheduler.events.LineManagerRequiredLearningNotificationEventService;
+import uk.gov.cslearning.record.service.scheduler.events.RequiredLearningDueNotificationEventService;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -20,7 +22,8 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ScheduledNotificationsServiceTest {
@@ -33,11 +36,17 @@ public class ScheduledNotificationsServiceTest {
     @Mock
     private NotifyService notifyService;
 
+    @Mock
+    private RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService;
+
+    @Mock
+    private LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService;
+
     private ScheduledNotificationsService scheduledNotificationsService;
 
     @Before
     public void setUp() {
-        scheduledNotificationsService = new ScheduledNotificationsService(defaultNotificationService, notifyService, govNotifyTemplateId, govNotifyTemplateId);
+        scheduledNotificationsService = new ScheduledNotificationsService(defaultNotificationService, notifyService, requiredLearningDueNotificationEventService, lineManagerRequiredLearningNotificationEventService, govNotifyTemplateId, govNotifyTemplateId);
     }
 
     @Test
@@ -69,7 +78,7 @@ public class ScheduledNotificationsServiceTest {
         CourseRecord courseRecord = new CourseRecord(courseId, uid);
         courseRecord.setCourseTitle(courseTitle);
 
-        doNothing().when(notifyService).notifyOnComplete(lineManagerEmailAddress, govNotifyTemplateId, name, lineManagerEmailAddress, courseTitle);
+        when(notifyService.isNotifyOnCompleteSuccessful(lineManagerEmailAddress, govNotifyTemplateId, name, lineManagerEmailAddress, courseTitle)).thenReturn(true);
 
         LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent = new LineManagerRequiredLearningNotificationEvent(lineManagerEmailAddress, name, uid, courseId, courseTitle, Instant.now());
         scheduledNotificationsService.sendLineManagerNotification(lineManagerRequiredLearningNotificationEvent);
@@ -86,7 +95,7 @@ public class ScheduledNotificationsServiceTest {
         String periodText = "1 day";
 
         RequiredLearningDueNotificationEvent requiredLearningDueNotificationEvent = new RequiredLearningDueNotificationEvent(username, uid, courseId, courseTitle, periodText, Instant.now());
-        doNothing().when(notifyService).notifyForIncompleteCourses(username, courseTitle, govNotifyTemplateId, periodText);
+        when(notifyService.isNotifyForIncompleteCoursesSuccessful(username, courseTitle, govNotifyTemplateId, periodText)).thenReturn(true);
 
         scheduledNotificationsService.sendRequiredLearningDueNotification(requiredLearningDueNotificationEvent);
 
