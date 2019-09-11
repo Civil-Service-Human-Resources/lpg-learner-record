@@ -78,7 +78,7 @@ public class UserRecordService {
             for (CourseRecord courseRecord : updatedCourseRecords) {
                 if (!courseRecords.contains(courseRecord)) {
                     courseRecords.add(courseRecord);
-                    if (courseRecord.getState().equals(State.COMPLETED)) {
+                    if (courseRecord.getState() != null && courseRecord.getState().equals(State.COMPLETED)) {
                         CompletedLearningEvent completedLearning = new CompletedLearningEvent(courseRecord, Instant.now());
                         completedLearningEventService.save(completedLearning);
                     }
