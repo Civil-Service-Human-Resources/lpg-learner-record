@@ -22,7 +22,7 @@ public class LearnerController {
     }
 
     @DeleteMapping("/{uid}")
-    @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE')")
+    @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE', 'CLIENT')")
     public ResponseEntity deleteLearner(@PathVariable String uid) {
         LOGGER.info("Deleting learner with uid {}", uid);
 
