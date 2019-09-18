@@ -1,5 +1,7 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Notification;
@@ -13,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class ScheduledNotificationsService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledNotificationsService.class);
+
     private DefaultNotificationService notificationService;
     private NotifyService notifyService;
     private RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService;
@@ -44,6 +48,8 @@ public class ScheduledNotificationsService {
             notificationService.save(notification);
 
             requiredLearningDueNotificationEventService.delete(requiredLearningDueNotificationEvent);
+        } else {
+            LOGGER.info("Required learning not processed {}", requiredLearningDueNotificationEvent.toString());
         }
     }
 

@@ -30,6 +30,8 @@ public class SchedulerEventNotificationService {
         requiredLearningDueNotificationEventList.forEach(requiredLearningEventDue -> {
             if (scheduledNotificationsService.hasRequiredLearningDueNotificationBeenSent(requiredLearningEventDue)) {
                 LOGGER.info("Required learning due notification has already been sent");
+
+                requiredLearningDueNotificationEventService.delete(requiredLearningEventDue);
             } else {
                 scheduledNotificationsService.sendRequiredLearningDueNotification(requiredLearningEventDue);
             }
