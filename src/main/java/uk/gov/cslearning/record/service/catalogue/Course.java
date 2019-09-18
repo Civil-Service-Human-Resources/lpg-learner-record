@@ -62,7 +62,7 @@ public class Course {
     public Boolean isComplete(Collection<CourseRecord> courseRecords) {
         Collection<State> states = new HashSet<>();
         states.add(State.COMPLETED);
-        LOGGER.info("Checking that course {} is complete against {} records", this.getId(), courseRecords.size());
+        LOGGER.debug("Checking that course {} is complete against {} records", this.getId(), courseRecords.size());
         return this.checkModuleStates(courseRecords, states, true, true);
     }
 
@@ -72,39 +72,39 @@ public class Course {
         Optional<CourseRecord> optionalCourseRecord = courseRecords.stream().filter(a -> a.getCourseId().equals(this.getId())).findFirst(); // get courseRecord
 
         if (optionalCourseRecord.isPresent()) {
-            LOGGER.info("Found record for course {}", this.getId());
+            LOGGER.debug("Found record for course {}", this.getId());
             CourseRecord courseRecord = optionalCourseRecord.get();
 
             for (Module module : modules) {
                 Boolean mandatory = !module.isOptional();
-                LOGGER.info("Checking  module {} which is  {}.", module.getId(), mandatory ? "MANDATORY" : "NOT MANDATORY");
+                LOGGER.debug("Checking  module {} which is  {}.", module.getId(), mandatory ? "MANDATORY" : "NOT MANDATORY");
 
                 ModuleRecord moduleRecord = courseRecord.getModuleRecord(module.getId());
 
                 hasModuleRecord = moduleRecord != null || hasModuleRecord;
 
                 if (moduleRecord != null && moduleRecord.getState() != null && (!onlyMandatory || mandatory)) {
-                    LOGGER.info("Record for module  {} found. State is {} ", module.getId(), moduleRecord.getState());
+                    LOGGER.debug("Record for module  {} found. State is {} ", module.getId(), moduleRecord.getState());
                     if (states.stream().noneMatch(state -> state == moduleRecord.getState()) && mustHave) {
-                        LOGGER.info("FAIL: Module {} state does not match required state(s)!", module.getId());
+                        LOGGER.debug("FAIL: Module {} state does not match required state(s)!", module.getId());
                         return false;
                     } else if (states.stream().anyMatch(state -> state == moduleRecord.getState()) && !mustHave) {
-                        LOGGER.info("PASS: Module {} state matches an optional state", module.getId());
+                        LOGGER.debug("PASS: Module {} state matches an optional state", module.getId());
                         return true;
                     }
 
                 } else if (mandatory) {
-                    LOGGER.info("FAIL: Module {} lacks a needed record!", module.getId());
+                    LOGGER.debug("FAIL: Module {} lacks a needed record!", module.getId());
                     return false;
                 }
             }
             if (hasModuleRecord) {
-                LOGGER.info("PASS: No fails in mandatory modules or none pristine optional course.");
+                LOGGER.debug("PASS: No fails in mandatory modules or none pristine optional course.");
                 return true;
             }
         }
 
-        LOGGER.info("FAIL");
+        LOGGER.debug("FAIL");
         return false;
     }
 

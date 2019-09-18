@@ -2,53 +2,52 @@ package uk.gov.cslearning.record.service.scheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.service.LearnerService;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 @Component
 public class Scheduler {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
-    @Autowired
-    private LearningJob learningJob;
-
-    @Autowired
     private LearnerService learnerService;
 
-    // cron to run every day at 02:00
-    @Scheduled(cron = "0 0 2 * * *")
-    public void learningJob() throws Exception {
-        LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
+    private SchedulerService schedulerService;
 
-//        learningJob.sendReminderNotificationForIncompleteCourses();
-        LOGGER.info("Skipping sendReminderNotificationForIncompleteCourses at {}", dateFormat.format(new Date()));
+    private SchedulerEventNotificationService schedulerEventNotificationService;
 
-        LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
+    public Scheduler(LearnerService learnerService, SchedulerService schedulerService, SchedulerEventNotificationService schedulerEventNotificationService) {
+        this.learnerService = learnerService;
+        this.schedulerService = schedulerService;
+        this.schedulerEventNotificationService = schedulerEventNotificationService;
     }
 
-    @Scheduled(cron = "0 0 3 * * *")
-    public void sendNotificationForCompletedLearning() throws Exception {
-        LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
+    // cron to run every day at 01:00
+    @Scheduled(cron = "0 0 1 * * *")
+    public void processReminderNotificationForIncompleteLearning() {
+        LOGGER.info("Starting processReminderNotificationForIncompleteLearning scheduled job");
 
-//        learningJob.sendLineManagerNotificationForCompletedLearning();
-        LOGGER.info("Skipping sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
+        schedulerService.processReminderNotificationForIncompleteLearning();
 
-        LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
+        LOGGER.info("processReminderNotificationForIncompleteLearning complete");
     }
 
     @Scheduled(cron = "0 0 4 * * *")
-    public void deleteOldStatements() throws Exception {
-        LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
+    public void deleteOldStatements() {
+        LOGGER.info("Starting deleteOldStatements scheduled job");
 
         learnerService.deleteOldStatements();
 
-        LOGGER.info("deleteOldRecords complete at {}", dateFormat.format(new Date()));
+        LOGGER.info("deleteOldStatements complete");
+    }
+
+    @Scheduled(cron = "0 0 5 * * *")
+    public void sendReminderNotificationForIncompleteLearning() {
+        LOGGER.info("Starting sendReminderNotificationForIncompleteLearning scheduled job");
+
+        schedulerEventNotificationService.sendReminderNotificationForIncompleteLearning();
+
+        LOGGER.info("sendReminderNotificationForIncompleteLearning complete");
     }
 }

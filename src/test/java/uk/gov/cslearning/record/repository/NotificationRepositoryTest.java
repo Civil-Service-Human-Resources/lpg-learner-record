@@ -32,7 +32,7 @@ public class NotificationRepositoryTest {
     public void notificationRepositoryShouldSave() {
         Long initialCount = notificationRepository.count();
 
-        notificationRepository.save(createNotification(COURSE_ID, LocalDateTime.now(), IDENTITY_UID, NotificationType.REMINDER));
+        notificationRepository.save(createNotification(COURSE_ID, LocalDateTime.now(), IDENTITY_UID, NotificationType.REMINDER_WEEK));
 
         assertThat(notificationRepository.count(), equalTo(initialCount + 1));
     }
@@ -48,20 +48,20 @@ public class NotificationRepositoryTest {
         LocalDateTime dt3 = LocalDateTime.parse("2018-05-10 10:30", formatter);
 
 
-        notificationRepository.save(createNotification(COURSE_ID, dt1, IDENTITY_UID, NotificationType.REMINDER)); // this is most recent and should be returned
-        notificationRepository.save(createNotification(COURSE_ID, dt2, IDENTITY_UID, NotificationType.REMINDER));
-        notificationRepository.save(createNotification(COURSE_ID, dt3, IDENTITY_UID, NotificationType.REMINDER));
+        notificationRepository.save(createNotification(COURSE_ID, dt1, IDENTITY_UID, NotificationType.REMINDER_WEEK)); // this is most recent and should be returned
+        notificationRepository.save(createNotification(COURSE_ID, dt2, IDENTITY_UID, NotificationType.REMINDER_WEEK));
+        notificationRepository.save(createNotification(COURSE_ID, dt3, IDENTITY_UID, NotificationType.REMINDER_WEEK));
 
         assertThat(notificationRepository.count(), equalTo(initialCount + 3));
 
-        Optional<Notification> notification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(IDENTITY_UID, COURSE_ID, NotificationType.REMINDER);
+        Optional<Notification> notification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(IDENTITY_UID, COURSE_ID, NotificationType.REMINDER_WEEK);
         assertThat(notification.get().getCourseId(), equalTo(COURSE_ID));
         assertThat(notification.get().getSent(), equalTo(dt1));
     }
 
 
     @Test
-    public void notificationRepositoryShouldFindFirstByIdentityUidAndCourseIdAndNotificationType(){
+    public void notificationRepositoryShouldFindFirstByIdentityUidAndCourseIdAndNotificationType() {
 
         Long initialCount = notificationRepository.count();
 
@@ -70,7 +70,7 @@ public class NotificationRepositoryTest {
         LocalDateTime dt1 = LocalDateTime.parse("2018-05-22 10:30", formatter);
         LocalDateTime dt2 = LocalDateTime.parse("2018-05-20 10:30", formatter);
 
-        notificationRepository.save(createNotification(COURSE_ID, dt1, IDENTITY_UID, NotificationType.REMINDER)); // this is most recent however it is not of completed type
+        notificationRepository.save(createNotification(COURSE_ID, dt1, IDENTITY_UID, NotificationType.REMINDER_WEEK)); // this is most recent however it is not of completed type
         notificationRepository.save(createNotification(COURSE_ID, dt2, IDENTITY_UID, NotificationType.COMPLETE)); // most recent of completed type
 
         assertThat(notificationRepository.count(), equalTo(initialCount + 2));

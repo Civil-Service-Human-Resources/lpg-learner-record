@@ -4,9 +4,11 @@ import gov.adlnet.xapi.client.StatementClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 
 import java.net.MalformedURLException;
 
@@ -29,5 +31,11 @@ public class Application {
             @Value("${xapi.password}") String password
     ) throws MalformedURLException {
         return new StatementClient(url, username, password);
+    }
+
+    @Bean("oAuthDetails")
+    @ConfigurationProperties("oauth.client")
+    protected ClientCredentialsResourceDetails oAuthDetails() {
+        return new ClientCredentialsResourceDetails();
     }
 }
