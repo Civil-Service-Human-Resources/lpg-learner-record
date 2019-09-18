@@ -11,8 +11,7 @@ import uk.gov.cslearning.record.service.scheduler.events.RequiredLearningDueNoti
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -41,6 +40,7 @@ public class SchedulerEventNotificationServiceTest {
 
         schedulerEventNotificationService.sendReminderNotificationForIncompleteLearning();
 
+        verify(requiredLearningDueNotificationEventService, times(1)).delete(requiredLearningDueNotificationEvent1);
         verify(scheduledNotificationsService).sendRequiredLearningDueNotification(requiredLearningDueNotificationEvent2);
         verify(scheduledNotificationsService, never()).sendRequiredLearningDueNotification(requiredLearningDueNotificationEvent1);
     }
