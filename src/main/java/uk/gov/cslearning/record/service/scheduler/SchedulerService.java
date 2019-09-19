@@ -5,12 +5,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.scheduler.CompletedLearningEvent;
+import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNotificationEvent;
 import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.dto.CivilServantDto;
 import uk.gov.cslearning.record.dto.IdentityDto;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.http.CustomHttpService;
+import uk.gov.cslearning.record.service.scheduler.events.CompletedLearningEventService;
+import uk.gov.cslearning.record.service.scheduler.events.LineManagerRequiredLearningNotificationEventService;
 import uk.gov.cslearning.record.service.scheduler.events.RequiredLearningDueNotificationEventService;
 
 import java.time.Instant;
@@ -32,11 +36,15 @@ public class SchedulerService {
     private CustomHttpService customHttpService;
     private UserRecordService userRecordService;
     private RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService;
+    private CompletedLearningEventService completedLearningEventService;
+    private LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService;
 
-    public SchedulerService(CustomHttpService customHttpService, UserRecordService userRecordService, RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService) {
+    public SchedulerService(CustomHttpService customHttpService, UserRecordService userRecordService, RequiredLearningDueNotificationEventService requiredLearningDueNotificationEventService, CompletedLearningEventService completedLearningEventService, LineManagerRequiredLearningNotificationEventService lineManagerRequiredLearningNotificationEventService) {
         this.customHttpService = customHttpService;
         this.userRecordService = userRecordService;
         this.requiredLearningDueNotificationEventService = requiredLearningDueNotificationEventService;
+        this.completedLearningEventService = completedLearningEventService;
+        this.lineManagerRequiredLearningNotificationEventService = lineManagerRequiredLearningNotificationEventService;
     }
 
     @Transactional
@@ -90,5 +98,49 @@ public class SchedulerService {
             });
         });
         LOGGER.info("Complete");
+    }
+
+    @Transactional
+    public void processLineManagerNotificationForCompletedLearning() {
+        LOGGER.info("processLineManagerNotificationForCompletedLearning");
+
+        Map<String, IdentityDto> identitiesMap = customHttpService.getIdentitiesMap();
+        Map<String, List<Course>> organisationalUnitRequiredLearningMap = customHttpService.getOrganisationalUnitRequiredLearning();
+        Map<String, CivilServantDto> civilServantMap = customHttpService.getCivilServantsByOrganisationalUnitCodeMap();
+
+        List<CompletedLearningEvent> completedLearningList = completedLearningEventService.findAll();
+        LOGGER.info("Completed learning count: {}", completedLearningList.size());
+
+        completedLearningList.forEach(completedLearning -> {
+            LOGGER.info("Getting completed learning {}", completedLearning.toString());
+            CourseRecord courseRecord = completedLearning.getCourseRecord();
+            CivilServantDto civilServantDto = civilServantMap.get(courseRecord.getUserId());
+
+            if (civilServantDto == null) {
+                return;
+            }
+
+            List<Course> requiredCoursesForOrg = organisationalUnitRequiredLearningMap.get(civilServantDto.getOrganisation());
+            boolean isCompletedLearningRequired = emptyIfNull(requiredCoursesForOrg)
+                    .stream()
+                    .anyMatch(course -> course.getId().equals(courseRecord.getCourseId()));
+
+            try {
+                if (isCompletedLearningRequired) {
+                    IdentityDto lineManagerIdentityDto = identitiesMap.get(civilServantDto.getLineManagerUid());
+
+                    LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent = new LineManagerRequiredLearningNotificationEvent(lineManagerIdentityDto.getUsername(), lineManagerIdentityDto.getUid(), civilServantDto.getName(), civilServantDto.getUid(), courseRecord.getCourseId(), courseRecord.getCourseTitle(), Instant.now());
+                    lineManagerRequiredLearningNotificationEventService.save(lineManagerRequiredLearningNotificationEvent);
+                } else {
+                    LOGGER.info("Completed learning is not required");
+                }
+                LOGGER.info("Removing {}", completedLearning.toString());
+
+
+            } catch (Exception e) {
+                LOGGER.error("Could not send notification for completedLearning {}", completedLearning.toString());
+            }
+        });
+        LOGGER.info("Process line manager notifications complete");
     }
 }

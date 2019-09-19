@@ -12,16 +12,22 @@ import java.util.Map;
 @Service
 public class CustomHttpService {
     private final String identitiesMapUrl;
+    private final String civilServantCodeUri;
+    private final String organisationalUnitRequiredLearningUrl;
     private final String organisationalUnitRequiredLearningWithinPeriodParamUrl;
     private final String civilServantsCodeParamUrl;
     private HttpService httpService;
 
     public CustomHttpService(HttpService httpService,
                              @Value("${identity.identitiesMapUrl}") String identitiesMapUrl,
+                             @Value("${catalogue.organisationalUnitRequiredLearningUrl}") String organisationalUnitRequiredLearningUrl,
                              @Value("${catalogue.organisationalUnitRequiredLearningWithinPeriodParamUrl}") String organisationalUnitRequiredLearningWithinPeriodParamUrl,
+                             @Value("${registry.civilServantsCodeUrl}") String civilServantCodeUri,
                              @Value("${registry.civilServantsCodeParamUrl}") String civilServantsCodeParamUrl) {
         this.httpService = httpService;
         this.identitiesMapUrl = identitiesMapUrl;
+        this.civilServantCodeUri = civilServantCodeUri;
+        this.organisationalUnitRequiredLearningUrl = organisationalUnitRequiredLearningUrl;
         this.civilServantsCodeParamUrl = civilServantsCodeParamUrl;
         this.organisationalUnitRequiredLearningWithinPeriodParamUrl = organisationalUnitRequiredLearningWithinPeriodParamUrl;
     }
@@ -36,5 +42,13 @@ public class CustomHttpService {
 
     public Map<String, List<Course>> getRequiredLearningDueWithinPeriod(long from, long to) {
         return httpService.getMapOfList(String.format(organisationalUnitRequiredLearningWithinPeriodParamUrl, from, to), Course.class);
+    }
+
+    public Map<String, List<Course>> getOrganisationalUnitRequiredLearning() {
+        return httpService.getMapOfList(organisationalUnitRequiredLearningUrl, Course.class);
+    }
+
+    public Map<String, CivilServantDto> getCivilServantsByOrganisationalUnitCodeMap() {
+        return httpService.getMap(civilServantCodeUri, CivilServantDto.class);
     }
 }

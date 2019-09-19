@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.domain.scheduler.LineManagerRequiredLearningNotificationEvent;
 import uk.gov.cslearning.record.domain.scheduler.RequiredLearningDueNotificationEvent;
 import uk.gov.cslearning.record.service.DefaultNotificationService;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -132,5 +133,34 @@ public class ScheduledNotificationsServiceTest {
 
         verify(defaultNotificationService, never()).save(any(Notification.class));
         verify(requiredLearningDueNotificationEventService, never()).delete(requiredLearningDueNotificationEvent);
+    }
+
+    @Test
+    public void shouldReturnFalseIfLineManagerCompleteNotificationNotSent() {
+        String lineManagerUid = "lineManagerUid";
+        String courseId = "courseId";
+
+        LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent = new LineManagerRequiredLearningNotificationEvent();
+        lineManagerRequiredLearningNotificationEvent.setCourseId(courseId);
+        lineManagerRequiredLearningNotificationEvent.setLineManagerUid(lineManagerUid);
+
+        when(defaultNotificationService.findByIdentityCourseAndType(lineManagerUid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.empty());
+
+        assertFalse(scheduledNotificationsService.hasLineManagerNotificationBeenSent(lineManagerRequiredLearningNotificationEvent));
+    }
+
+    @Test
+    public void shouldReturnTrueIfLineManagerCompleteNotificationNotSent() {
+        String lineManagerUid = "lineManagerUid";
+        String courseId = "courseId";
+
+        LineManagerRequiredLearningNotificationEvent lineManagerRequiredLearningNotificationEvent = new LineManagerRequiredLearningNotificationEvent();
+        lineManagerRequiredLearningNotificationEvent.setCourseId(courseId);
+        lineManagerRequiredLearningNotificationEvent.setLineManagerUid(lineManagerUid);
+
+        Notification notification = new Notification();
+        when(defaultNotificationService.findByIdentityCourseAndType(lineManagerUid, courseId, NotificationType.COMPLETE)).thenReturn(Optional.of(notification));
+
+        assertTrue(scheduledNotificationsService.hasLineManagerNotificationBeenSent(lineManagerRequiredLearningNotificationEvent));
     }
 }

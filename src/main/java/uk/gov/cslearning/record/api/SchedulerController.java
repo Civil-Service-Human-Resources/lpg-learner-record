@@ -28,4 +28,16 @@ public class SchedulerController {
         scheduler.sendReminderNotificationForIncompleteLearning();
         return ResponseEntity.ok("OK");
     }
+
+    @GetMapping("process-completed")
+    public ResponseEntity<String> processLineManagerNotificationForCompletedLearning() {
+        scheduler.processLineManagerNotificationForCompletedLearning();
+        return ResponseEntity.ok("OK");
+    }
+
+    @GetMapping("send-completed")
+    public ResponseEntity<String> sendLineManagerCompleteNotifications() {
+        scheduler.sendLineManagerCompleteNotifications();
+        return ResponseEntity.ok("OK");
+    }
 }

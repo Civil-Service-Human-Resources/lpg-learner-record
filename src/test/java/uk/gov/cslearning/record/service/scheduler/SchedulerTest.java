@@ -44,4 +44,18 @@ public class SchedulerTest {
 
         verify(schedulerEventNotificationService).sendReminderNotificationForIncompleteLearning();
     }
+
+    @Test
+    public void shouldProcessLineManagerNotificationForCompletedLearning() {
+        scheduler.processLineManagerNotificationForCompletedLearning();
+
+        verify(schedulerService).processLineManagerNotificationForCompletedLearning();
+    }
+
+    @Test
+    public void shouldSendLineManagerCompleteNotifications() {
+        scheduler.sendLineManagerCompleteNotifications();
+
+        verify(schedulerEventNotificationService).sendLineManagerCompleteNotifications();
+    }
 }

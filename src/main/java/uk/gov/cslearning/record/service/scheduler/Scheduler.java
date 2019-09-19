@@ -33,6 +33,15 @@ public class Scheduler {
         LOGGER.info("processReminderNotificationForIncompleteLearning complete");
     }
 
+    @Scheduled(cron = "0 0 3 * * *")
+    public void processLineManagerNotificationForCompletedLearning() {
+        LOGGER.info("Starting processLineManagerNotificationForCompletedLearning scheduled job");
+
+        schedulerService.processLineManagerNotificationForCompletedLearning();
+
+        LOGGER.info("processLineManagerNotificationForCompletedLearning complete");
+    }
+
     @Scheduled(cron = "0 0 4 * * *")
     public void deleteOldStatements() {
         LOGGER.info("Starting deleteOldStatements scheduled job");
@@ -49,5 +58,14 @@ public class Scheduler {
         schedulerEventNotificationService.sendReminderNotificationForIncompleteLearning();
 
         LOGGER.info("sendReminderNotificationForIncompleteLearning complete");
+    }
+
+    @Scheduled(cron = "0 0 6 * * *")
+    public void sendLineManagerCompleteNotifications() {
+        LOGGER.info("Starting sendLineManagerCompleteNotifications scheduled job");
+
+        schedulerEventNotificationService.sendLineManagerCompleteNotifications();
+
+        LOGGER.info("sendLineManagerCompleteNotifications complete");
     }
 }

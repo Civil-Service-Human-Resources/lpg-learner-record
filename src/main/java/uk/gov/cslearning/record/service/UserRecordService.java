@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.domain.scheduler.CompletedLearningEvent;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
+import uk.gov.cslearning.record.service.scheduler.events.CompletedLearningEventService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -31,12 +35,14 @@ public class UserRecordService {
     private CourseRecordRepository courseRecordRepository;
     private XApiService xApiService;
     private LearningCatalogueService learningCatalogueService;
+    private CompletedLearningEventService completedLearningEventService;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository,
                              XApiService xApiService,
                              LearningCatalogueService learningCatalogueService,
-                             CollectionsService collectionsService) {
+                             CollectionsService collectionsService,
+                             CompletedLearningEventService completedLearningEventService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(learningCatalogueService != null);
@@ -44,6 +50,7 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
+        this.completedLearningEventService = completedLearningEventService;
     }
 
     @Transactional
@@ -72,6 +79,10 @@ public class UserRecordService {
             for (CourseRecord courseRecord : updatedCourseRecords) {
                 if (!courseRecords.contains(courseRecord)) {
                     courseRecords.add(courseRecord);
+                }
+                if (courseRecord.getState() != null && courseRecord.getState().equals(State.COMPLETED)) {
+                    CompletedLearningEvent completedLearning = new CompletedLearningEvent(courseRecord, Instant.now());
+                    completedLearningEventService.save(completedLearning);
                 }
             }
 
