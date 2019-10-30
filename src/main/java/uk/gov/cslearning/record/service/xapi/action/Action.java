@@ -21,7 +21,7 @@ public abstract class Action {
         Set<Class<? extends Action>> classes = reflections.getSubTypesOf(Action.class);
         for (Class<? extends Action> clazz : classes) {
             try {
-                clazz.getDeclaredConstructor(Statement.class).newInstance(null);
+                clazz.getDeclaredConstructor(Statement.class).newInstance();
             } catch (Exception e) {
             }
         }

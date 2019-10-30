@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationInsightsAgent>
+    <AgentLogger>INFO</AgentLogger>
+    <Instrumentation>
+        <BuiltIn enabled="true">
+            <HTTP enabled="true"/>
+            <Logging enabled="true" />
+            <JDBC enabled="true" />
+            <MaxStatementQueryLimitInMS>2000</MaxStatementQueryLimitInMS>
+        </BuiltIn>
+        <Class name="org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint">
+            <Method name="checkToken" reportCaughtExceptions="true" reportExecutionTime="true"/>
+        </Class>
+        <Class name="org.springframework.security.oauth2.provider.endpoint.TokenEndpoint">
+            <Method name="postAccessToken" reportCaughtExceptions="true" reportExecutionTime="true"/>
+        </Class>
+        <Class name="org.springframework.security.oauth2.provider.endpoint.TokenEndpoint">
+            <Method name="getAccessToken" reportCaughtExceptions="true" reportExecutionTime="true"/>
+        </Class>
+    </Instrumentation>
+</ApplicationInsightsAgent>

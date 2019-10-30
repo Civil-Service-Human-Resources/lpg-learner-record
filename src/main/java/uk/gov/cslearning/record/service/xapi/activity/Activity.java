@@ -27,7 +27,7 @@ public abstract class Activity {
         Set<Class<? extends Activity>> classes = reflections.getSubTypesOf(Activity.class);
         for (Class<? extends Activity> clazz : classes) {
             try {
-                clazz.getDeclaredConstructor(Statement.class).newInstance(null);
+                clazz.getDeclaredConstructor(Statement.class).newInstance();
             } catch (Exception e) {
             }
         }
