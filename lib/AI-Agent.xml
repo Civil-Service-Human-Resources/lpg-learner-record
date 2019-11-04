@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationInsightsAgent>
+    <AgentLogger>INFO</AgentLogger>
+    <Instrumentation>
+        <BuiltIn enabled="true">
+            <HTTP enabled="true"/>
+            <Logging enabled="true"/>
+            <JDBC enabled="true"/>
+            <MaxStatementQueryLimitInMS>2000</MaxStatementQueryLimitInMS>
+        </BuiltIn>
+    </Instrumentation>
+</ApplicationInsightsAgent>
