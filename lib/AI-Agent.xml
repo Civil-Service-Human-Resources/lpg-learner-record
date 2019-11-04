@@ -8,14 +8,5 @@
             <JDBC enabled="true" />
             <MaxStatementQueryLimitInMS>2000</MaxStatementQueryLimitInMS>
         </BuiltIn>
-        <Class name="org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint">
-            <Method name="checkToken" reportCaughtExceptions="true" reportExecutionTime="true"/>
-        </Class>
-        <Class name="org.springframework.security.oauth2.provider.endpoint.TokenEndpoint">
-            <Method name="postAccessToken" reportCaughtExceptions="true" reportExecutionTime="true"/>
-        </Class>
-        <Class name="org.springframework.security.oauth2.provider.endpoint.TokenEndpoint">
-            <Method name="getAccessToken" reportCaughtExceptions="true" reportExecutionTime="true"/>
-        </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
