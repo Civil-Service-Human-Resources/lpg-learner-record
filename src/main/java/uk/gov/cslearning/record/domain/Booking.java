@@ -47,4 +47,7 @@ public class Booking {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BookingCancellationReason cancellationReason;
+
+    @Column
+    private String bookingReference;
 }

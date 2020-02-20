@@ -41,6 +41,8 @@ public class BookingDto {
 
     private String poNumber;
 
+    private String bookingReference;
+
     private String accessibilityOptions;
 
     private BookingCancellationReason cancellationReason;
