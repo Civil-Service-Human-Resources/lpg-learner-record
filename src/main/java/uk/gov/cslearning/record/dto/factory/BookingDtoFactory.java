@@ -33,6 +33,7 @@ public class BookingDtoFactory {
         bookingDto.setConfirmationTime(booking.getConfirmationTime());
         bookingDto.setCancellationTime(booking.getCancellationTime());
         bookingDto.setPoNumber(booking.getPoNumber());
+        bookingDto.setBookingReference(booking.getBookingReference());
 
         if (null != booking.getPaymentDetails()) {
             bookingDto.setPaymentDetails(UriBuilder.fromUri(csrsBaseUrl).path(booking.getPaymentDetails()).build());
