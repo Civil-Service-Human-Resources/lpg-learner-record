@@ -117,6 +117,9 @@ dependencies {
 
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
 
+    compile group: 'org.hashids', name: 'hashids', version: '1.0.3'
+
+
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
     testCompile 'org.powermock:powermock-api-mockito2:1.7.4'
