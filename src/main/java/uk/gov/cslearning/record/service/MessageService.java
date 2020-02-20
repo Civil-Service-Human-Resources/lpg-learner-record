@@ -73,7 +73,7 @@ public class MessageService {
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
 
         String eventUid = Paths.get(bookingDto.getEvent().toString()).getFileName().toString();
-        String bookingReference = createBookingReference(bookingDto.getLearner(), eventUid);
+        String bookingReference = bookingDto.getBookingReference();
 
         Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
         map.put("bookingReference", bookingReference);
@@ -88,7 +88,7 @@ public class MessageService {
         Course course = getCourseByEventUrl(eventUrl);
         Event event = learningCatalogueService.getEventByUrl(eventUrl);
 
-        String bookingReference = createBookingReference(booking.getLearner().getUid(), booking.getEvent().getUid());
+        String bookingReference = booking.getBookingReference();
 
         Map<String, String> map = createGenericMapForEvent(event, course, booking.getLearner().getLearnerEmail());
         map.put("cancellationReason", cancellationReason);
@@ -113,7 +113,7 @@ public class MessageService {
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
 
         String eventUid = Paths.get(bookingDto.getEvent().toString()).getFileName().toString();
-        String bookingReference = createBookingReference(bookingDto.getLearner(), eventUid);
+        String bookingReference = bookingDto.getBookingReference();
 
         Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
         map.put("accessibility", bookingDto.getAccessibilityOptions());
@@ -139,7 +139,4 @@ public class MessageService {
         return map;
     }
 
-    private String createBookingReference(String learnerId, String eventId) {
-        return learnerId + "-" + eventId;
-    }
 }
