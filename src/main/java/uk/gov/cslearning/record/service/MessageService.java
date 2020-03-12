@@ -108,6 +108,15 @@ public class MessageService {
         return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingConfirmedMessageTemplateId, map);
     }
 
+    // something like this
+    // do we have all the fields like cost, accessibility, location avaialble to us here?
+    // remember we need to match the variables that are present on the gov notify template
+//    public MessageDto createBookedMessageForLineManager(BookingDto bookingDto) {
+//        Map<String, String> map = createGenericMapForBooking(bookingDto);
+//
+//        return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingConfirmedMessageTemplateId, map);
+//    }
+
     private Map<String, String> createGenericMapForBooking(BookingDto bookingDto) {
         Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());

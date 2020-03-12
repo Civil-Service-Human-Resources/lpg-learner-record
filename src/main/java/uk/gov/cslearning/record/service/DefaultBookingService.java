@@ -98,10 +98,14 @@ public class DefaultBookingService implements BookingService {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             xApiService.approve(bookingDto);
             notificationService.send(messageService.createBookedMessage(bookingDto));
+            // notificationSerice.send(messageService.createLMBookedMessage))
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
             xApiService.register(bookingDto);
             notificationService.send(messageService.createRegisteredMessage(bookingDto));
+            // notificationSerice.send(messageService.createLMCancelledMessage))
         }
+
+        // if we can get this stuff working, then we might extract into a new booking service class/method to tidy up. do this later
         return save(bookingDto);
     }
 
