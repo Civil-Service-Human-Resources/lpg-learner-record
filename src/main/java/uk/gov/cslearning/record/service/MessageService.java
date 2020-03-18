@@ -10,9 +10,12 @@ import uk.gov.cslearning.record.notifications.dto.factory.MessageDtoFactory;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.Event;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
+import uk.gov.cslearning.record.service.catalogue.Module;
 
+import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 @Service
@@ -29,6 +32,8 @@ public class MessageService {
     private final String cancelEventMessageTemplateId;
     private final String bookingConfirmedMessageTemplateId;
     private final String bookingRequestedMessageTemplateId;
+    private final String bookingConfirmedMessageLineManagerTemplateId;
+    private final String bookingRequestMessageLineManagerTemplateId;
 
     public MessageService(LearningCatalogueService learningCatalogueService,
                           MessageDtoFactory messageDtoFactory,
@@ -38,6 +43,8 @@ public class MessageService {
                           @Value("${govNotify.template.cancelBooking}") String unregisterMessageTemplateId,
                           @Value("${govNotify.template.cancelEvent}") String cancelEventMessageTemplateId,
                           @Value("${govNotify.template.bookingConfirmed}") String bookingConfirmedMessageTemplateId,
+                          @Value("${govNotify.template.bookingConfirmedLineManager}") String bookingConfirmedMessageLineManagerTemplateId,
+                          @Value("${govNotify.template.bookingRequestLineManager}") String bookingRequestMessageLineManagerTemplateId,
                           @Value("${govNotify.template.bookingRequested}") String bookingRequestedMessageTemplateId
     ) {
         this.learningCatalogueService = learningCatalogueService;
@@ -50,7 +57,9 @@ public class MessageService {
         this.unregisterMessageTemplateId = unregisterMessageTemplateId;
         this.cancelEventMessageTemplateId = cancelEventMessageTemplateId;
         this.bookingConfirmedMessageTemplateId = bookingConfirmedMessageTemplateId;
+        this.bookingConfirmedMessageLineManagerTemplateId = bookingConfirmedMessageLineManagerTemplateId;
         this.bookingRequestedMessageTemplateId = bookingRequestedMessageTemplateId;
+        this.bookingRequestMessageLineManagerTemplateId = bookingRequestMessageLineManagerTemplateId;
 
     }
 
@@ -102,6 +111,50 @@ public class MessageService {
         return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingRequestedMessageTemplateId, map);
     }
 
+    public MessageDto createBookedMessageForLineManager(BookingDto bookingDto) {
+        return messageDtoFactory.create(bookingDto.getLineManagerEmail(), bookingConfirmedMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto));
+    }
+
+    public MessageDto createRegisteredMessageForLineManager(BookingDto bookingDto) {
+        return messageDtoFactory.create(bookingDto.getLineManagerEmail(), bookingRequestMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto));
+    }
+
+    private Map<String, String> createMapForLineManagerTemplateEmail(BookingDto bookingDto) {
+        Map<String, String> map = new HashMap<String, String>();
+
+        Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
+        Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
+        // this needs to be mocked
+
+        String cost = getCostOfEvent(course,event.getId()).toString();
+
+        map.put("email address", bookingDto.getLineManagerEmail());
+        map.put("learnerName", bookingDto.getLearnerEmail()); // we can use email
+
+        map.put("recipient", bookingDto.getLineManagerEmail());
+        map.put("courseTitle", course.getTitle());
+        map.put("courseDate", event.getDateRanges().get(0).getDate().toString());
+
+        map.put("courseLocation", event.getVenue().getLocation());
+        map.put("cost", cost);
+
+        map.put("accessibility", bookingDto.getAccessibilityOptions());
+        map.put("bookingReference", bookingDto.getBookingReference());
+
+        return map;
+    }
+
+    private BigDecimal getCostOfEvent(Course course, String eventID) {
+
+        for (Module module: course.getModules()) {
+            if(module.getModuleType().equals("face-to-face") && module.getEvents().stream().findFirst().get().getId().equals(eventID)) {
+                return module.getCost();
+            }
+        }
+
+        return null;
+    }
+
     public MessageDto createBookedMessage(BookingDto bookingDto) {
         Map<String, String> map = createGenericMapForBooking(bookingDto);
 
@@ -112,7 +165,6 @@ public class MessageService {
         Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
 
-        String eventUid = Paths.get(bookingDto.getEvent().toString()).getFileName().toString();
         String bookingReference = bookingDto.getBookingReference();
 
         Map<String, String> map = createGenericMapForEvent(event, course, bookingDto.getLearnerEmail());
@@ -138,5 +190,9 @@ public class MessageService {
 
         return map;
     }
+
+
+
+
 
 }

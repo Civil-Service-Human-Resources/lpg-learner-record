@@ -28,6 +28,10 @@ public class BookingDto {
     @EventIsActive(message = "{booking.event.active}")
     private URI event;
 
+    private String lineManagerEmail;
+
+    private String lineManagerName;
+
     @NotNull
     private BookingStatus status;
 
