@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.InviteDto;
@@ -15,7 +16,6 @@ import uk.gov.cslearning.record.service.catalogue.Module;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 @Service
@@ -111,27 +111,27 @@ public class MessageService {
         return messageDtoFactory.create(bookingDto.getLearnerEmail(), bookingRequestedMessageTemplateId, map);
     }
 
-    public MessageDto createBookedMessageForLineManager(BookingDto bookingDto) {
-        return messageDtoFactory.create(bookingDto.getLineManagerEmail(), bookingConfirmedMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto));
+    public MessageDto createBookedMessageForLineManager(BookingDto bookingDto, CivilServant civilServant) {
+        return messageDtoFactory.create(civilServant.getLineManagerEmailAddress(), bookingConfirmedMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto, civilServant));
     }
 
-    public MessageDto createRegisteredMessageForLineManager(BookingDto bookingDto) {
-        return messageDtoFactory.create(bookingDto.getLineManagerEmail(), bookingRequestMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto));
+    public MessageDto createRegisteredMessageForLineManager(BookingDto bookingDto, CivilServant civilServant) {
+        return messageDtoFactory.create(civilServant.getLineManagerEmailAddress(), bookingRequestMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto, civilServant));
     }
 
-    private Map<String, String> createMapForLineManagerTemplateEmail(BookingDto bookingDto) {
+    private Map<String, String> createMapForLineManagerTemplateEmail(BookingDto bookingDto, CivilServant civilServant) {
         Map<String, String> map = new HashMap<String, String>();
 
         Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
         // this needs to be mocked
 
-        String cost = getCostOfEvent(course,event.getId()).toString();
+        String cost = getCostOfEvent(course, event.getId()).toString();
 
-        map.put("email address", bookingDto.getLineManagerEmail());
+        map.put("email address", civilServant.getLineManagerEmailAddress());
         map.put("learnerName", bookingDto.getLearnerEmail()); // we can use email
 
-        map.put("recipient", bookingDto.getLineManagerEmail());
+        map.put("recipient", civilServant.getLineManagerEmailAddress());
         map.put("courseTitle", course.getTitle());
         map.put("courseDate", event.getDateRanges().get(0).getDate().toString());
 
@@ -146,8 +146,8 @@ public class MessageService {
 
     private BigDecimal getCostOfEvent(Course course, String eventID) {
 
-        for (Module module: course.getModules()) {
-            if(module.getModuleType().equals("face-to-face") && module.getEvents().stream().findFirst().get().getId().equals(eventID)) {
+        for (Module module : course.getModules()) {
+            if (module.getModuleType().equals("face-to-face") && module.getEvents().stream().findFirst().get().getId().equals(eventID)) {
                 return module.getCost();
             }
         }
@@ -190,9 +190,6 @@ public class MessageService {
 
         return map;
     }
-
-
-
 
 
 }
