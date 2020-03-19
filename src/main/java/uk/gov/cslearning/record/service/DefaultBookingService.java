@@ -1,6 +1,8 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
@@ -36,8 +38,9 @@ public class DefaultBookingService implements BookingService {
     private final XApiService xApiService;
     private final NotificationService notificationService;
     private final MessageService messageService;
+    private final RegistryService registryService;
 
-    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService) {
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService, RegistryService registryService) {
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
@@ -45,6 +48,7 @@ public class DefaultBookingService implements BookingService {
         this.xApiService = xApiService;
         this.notificationService = notificationService;
         this.messageService = messageService;
+        this.registryService = registryService;
     }
 
     @Override
@@ -94,6 +98,10 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto register(BookingDto bookingDto) {
+        String learnerUid = bookingDto.getLearner();
+
+        Optional<CivilServant> civilServantResourceByUid = registryService.getCivilServantResourceByUid(learnerUid);
+        CivilServant civilServant = civilServantResourceByUid.get();
 
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             xApiService.approve(bookingDto);
@@ -101,18 +109,12 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
-        if(bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            String lineManagerEmail = bookingDto.getLineManagerEmail();
-            bookingDto = save(bookingDto);
-            bookingDto.setLineManagerEmail(lineManagerEmail);
-        }
-
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             notificationService.send(messageService.createBookedMessage(bookingDto));
-            notificationService.send(messageService.createBookedMessageForLineManager(bookingDto));
+            notificationService.send(messageService.createBookedMessageForLineManager(bookingDto, civilServant));
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
             notificationService.send(messageService.createRegisteredMessage(bookingDto));
-            notificationService.send(messageService.createRegisteredMessageForLineManager(bookingDto));
+            notificationService.send(messageService.createRegisteredMessageForLineManager(bookingDto, civilServant));
         }
 
         return bookingDto;
@@ -216,5 +218,11 @@ public class DefaultBookingService implements BookingService {
     @Override
     public void deleteAllByAge(Instant instant) {
         bookingRepository.deleteAllByBookingTimeBefore(instant);
+    }
+
+    @Override
+    public void foo() {
+        Optional<CivilServant> civilServantResourceByUid = registryService.getCivilServantResourceByUid("3c706a70-3fff-4e7b-ae7f-102c1d46f569");
+        System.out.println(civilServantResourceByUid);
     }
 }
