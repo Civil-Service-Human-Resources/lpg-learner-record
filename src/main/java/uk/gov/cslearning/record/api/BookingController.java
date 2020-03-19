@@ -59,7 +59,7 @@ public class BookingController {
     }
 
 
-    @PostMapping(value="/event/{eventId}/booking/")
+    @PostMapping(value = "/event/{eventId}/booking/")
     public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
 
         BookingDto result = bookingService.register(booking);
@@ -90,6 +90,13 @@ public class BookingController {
 
     @GetMapping(value = "/event/booking/userCancellationReasons")
     public ResponseEntity<Map<String, String>> getUserCancellationReasons() {
+        return new ResponseEntity<>(BookingCancellationReason.getUserKeyValuePairs(), OK);
+    }
+
+    @GetMapping(value = "/event/foo")
+    public ResponseEntity<Map<String, String>> foo() {
+        bookingService.foo();
+
         return new ResponseEntity<>(BookingCancellationReason.getUserKeyValuePairs(), OK);
     }
 }
