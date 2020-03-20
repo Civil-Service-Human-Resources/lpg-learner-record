@@ -33,9 +33,13 @@ public class MessageServiceTest {
     private final String unregisterMessageTemplateId = "unregisterTemplateId";
     private final String cancelEventMessageTemplateId = "cancelEventTemplateId";
     private final String bookingConfirmedMessageTemplateID = "bookingConfirmedTemplateId";
+    private final String bookingConfirmedMessageLineManagerTemplateId = "bookingConfirmedMessageLineManagerTemplateId";
+    private final String bookingCancelledMessageLineManagerTemplateId = "bookingCancelledMessageLineManagerTemplateId";
+    private final String bookingRequestMessageLineManagerTemplateId = "bookingRequestMessageLineManagerTemplateId";
     private final String bookingRequestedMessageTemplateId = "bookingRequestedTemplateId";
 
-    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, learningCatalogueBaseUrl, inviteMessageTemplateId, unregisterMessageTemplateId, cancelEventMessageTemplateId, bookingConfirmedMessageTemplateID, bookingRequestedMessageTemplateId);
+    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, learningCatalogueBaseUrl, inviteMessageTemplateId, unregisterMessageTemplateId,
+            cancelEventMessageTemplateId, bookingConfirmedMessageTemplateID, bookingConfirmedMessageLineManagerTemplateId, bookingCancelledMessageLineManagerTemplateId, bookingRequestMessageLineManagerTemplateId, bookingRequestedMessageTemplateId);
 
     @Test
     public void shouldCreateInviteMessage() throws URISyntaxException {
