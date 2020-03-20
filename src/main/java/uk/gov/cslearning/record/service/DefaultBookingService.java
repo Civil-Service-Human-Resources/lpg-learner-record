@@ -109,6 +109,12 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
+        if(bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
+            String lineManagerEmail = bookingDto.getLineManagerEmail();
+            bookingDto = save(bookingDto);
+            bookingDto.setLineManagerEmail(lineManagerEmail);
+        }
+
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             notificationService.send(messageService.createBookedMessage(bookingDto));
             notificationService.send(messageService.createBookedMessageForLineManager(bookingDto, civilServant));
@@ -136,6 +142,10 @@ public class DefaultBookingService implements BookingService {
 
     private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
         BookingDto bookingDto = bookingDtoFactory.create(booking);
+        String learnerUid = bookingDto.getLearner();
+
+        Optional<CivilServant> civilServantResourceByUid = registryService.getCivilServantResourceByUid(learnerUid);
+        CivilServant civilServant = civilServantResourceByUid.get();
 
 
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
@@ -145,6 +155,8 @@ public class DefaultBookingService implements BookingService {
         } else {
             bookingDto.setCancellationReason(BookingCancellationReason.valueOf(bookingStatusDto.getCancellationReason()));
             notificationService.send(messageService.createUnregisterMessage(bookingDto, bookingDto.getCancellationReason().getValue()));
+            notificationService.send(messageService.createCancelledMessageForLineManager(bookingDto, civilServant));
+
             return unregister(bookingDto);
         }
     }

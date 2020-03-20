@@ -45,6 +45,10 @@ public class BookingDto {
 
     private String accessibilityOptions;
 
+    private String lineManagerEmail;
+
+    private String lineManagerName;
+
     private BookingCancellationReason cancellationReason;
 
     public Optional<String> getEventUid() {
