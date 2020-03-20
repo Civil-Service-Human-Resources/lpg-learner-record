@@ -33,6 +33,7 @@ public class MessageService {
     private final String bookingConfirmedMessageTemplateId;
     private final String bookingRequestedMessageTemplateId;
     private final String bookingConfirmedMessageLineManagerTemplateId;
+    private final String bookingCancelledMessageLineManagerTemplateId;
     private final String bookingRequestMessageLineManagerTemplateId;
 
     public MessageService(LearningCatalogueService learningCatalogueService,
@@ -44,6 +45,7 @@ public class MessageService {
                           @Value("${govNotify.template.cancelEvent}") String cancelEventMessageTemplateId,
                           @Value("${govNotify.template.bookingConfirmed}") String bookingConfirmedMessageTemplateId,
                           @Value("${govNotify.template.bookingConfirmedLineManager}") String bookingConfirmedMessageLineManagerTemplateId,
+                          @Value("${govNotify.template.bookingCancelledLineManager}") String bookingCancelledMessageLineManagerTemplateId,
                           @Value("${govNotify.template.bookingRequestLineManager}") String bookingRequestMessageLineManagerTemplateId,
                           @Value("${govNotify.template.bookingRequested}") String bookingRequestedMessageTemplateId
     ) {
@@ -58,6 +60,7 @@ public class MessageService {
         this.cancelEventMessageTemplateId = cancelEventMessageTemplateId;
         this.bookingConfirmedMessageTemplateId = bookingConfirmedMessageTemplateId;
         this.bookingConfirmedMessageLineManagerTemplateId = bookingConfirmedMessageLineManagerTemplateId;
+        this.bookingCancelledMessageLineManagerTemplateId = bookingCancelledMessageLineManagerTemplateId;
         this.bookingRequestedMessageTemplateId = bookingRequestedMessageTemplateId;
         this.bookingRequestMessageLineManagerTemplateId = bookingRequestMessageLineManagerTemplateId;
 
@@ -113,6 +116,10 @@ public class MessageService {
 
     public MessageDto createBookedMessageForLineManager(BookingDto bookingDto, CivilServant civilServant) {
         return messageDtoFactory.create(civilServant.getLineManagerEmailAddress(), bookingConfirmedMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto, civilServant));
+    }
+
+    public MessageDto createCancelledMessageForLineManager(BookingDto bookingDto, CivilServant civilServant) {
+        return messageDtoFactory.create(civilServant.getLineManagerEmailAddress(), bookingCancelledMessageLineManagerTemplateId, createMapForLineManagerTemplateEmail(bookingDto, civilServant));
     }
 
     public MessageDto createRegisteredMessageForLineManager(BookingDto bookingDto, CivilServant civilServant) {
