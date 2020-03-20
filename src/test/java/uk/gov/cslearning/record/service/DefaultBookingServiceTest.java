@@ -6,6 +6,8 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
@@ -55,6 +57,9 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private NotificationService notificationService;
+
+    @Mock
+    private RegistryService registryService;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -147,22 +152,33 @@ public class DefaultBookingServiceTest {
         Booking unsavedBooking = new Booking();
         BookingDto savedBookingDto = new BookingDto();
         Booking savedBooking = new Booking();
-
+        unsavedBookingDto.setLearner("UID");
+        savedBookingDto.setLearner("UID");
+        String learnerUid = unsavedBookingDto.getLearner();
+        CivilServant civilServant = new CivilServant();
+        civilServant.setLineManagerEmailAddress("manager@domain.com");
+        Optional<CivilServant> optionalCivilServant = Optional.of(civilServant);
         MessageDto messageDto = new MessageDto();
 
         when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
         when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
         when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
         when(messageService.createBookedMessage(unsavedBookingDto)).thenReturn(messageDto);
-        when(notificationService.send(messageDto)).thenReturn(true);
+        when(registryService.getCivilServantResourceByUid(learnerUid)).thenReturn(optionalCivilServant);
 
-        assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
+        when(messageService.createBookedMessageForLineManager(unsavedBookingDto, civilServant)).thenReturn(messageDto);
+        when(notificationService.send(messageDto)).thenReturn(true);
+        BookingDto actualBookingDTP = bookingService.register(unsavedBookingDto);
+
+        assertEquals(savedBookingDto.getLearner(), actualBookingDTP.getLearner());
 
         InOrder order = inOrder(xApiService, bookingRepository, notificationService);
 
         order.verify(xApiService).approve(unsavedBookingDto);
-        order.verify(notificationService).send(messageDto);
         order.verify(bookingRepository).saveBooking(unsavedBooking);
+        order.verify(notificationService).send(messageDto);
+
+
     }
 
     @Test
