@@ -145,7 +145,7 @@ public class MessageService {
         map.put("courseLocation", event.getVenue().getLocation());
         map.put("cost", cost);
 
-        map.put("accessibility", bookingDto.getAccessibilityOptions());
+//        map.put("accessibility", bookingDto.getAccessibilityOptions());
         map.put("bookingReference", bookingDto.getBookingReference());
 
         return map;
