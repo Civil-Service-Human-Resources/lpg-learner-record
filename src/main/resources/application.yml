@@ -33,7 +33,7 @@ logging:
     com.zaxxer.hikari: ERROR
 
 notifications:
-  service: ${NOTIFICATION_SERVICE_URL:http://localhost:9005}
+  service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
   email: ${notifications.service}/notifications/email/
 
 xapi:

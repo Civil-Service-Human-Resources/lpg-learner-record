@@ -109,18 +109,14 @@ public class DefaultBookingService implements BookingService {
             xApiService.register(bookingDto);
         }
 
-        if(bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            String lineManagerEmail = bookingDto.getLineManagerEmail();
-            bookingDto = save(bookingDto);
-            bookingDto.setLineManagerEmail(lineManagerEmail);
-        }
+        BookingDto savedBookingDto = save(bookingDto);
 
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
-            notificationService.send(messageService.createBookedMessage(bookingDto));
-            notificationService.send(messageService.createBookedMessageForLineManager(bookingDto, civilServant));
+            notificationService.send(messageService.createBookedMessage(savedBookingDto));
+            notificationService.send(messageService.createBookedMessageForLineManager(savedBookingDto, civilServant));
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            notificationService.send(messageService.createRegisteredMessage(bookingDto));
-            notificationService.send(messageService.createRegisteredMessageForLineManager(bookingDto, civilServant));
+            notificationService.send(messageService.createRegisteredMessage(savedBookingDto));
+            notificationService.send(messageService.createRegisteredMessageForLineManager(savedBookingDto, civilServant));
         }
 
         return bookingDto;
