@@ -7,7 +7,15 @@ import uk.gov.cslearning.record.dto.BookingDto;
 
 @Component
 public class BookingFactory {
-    private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    /**
+     * List of allowed characters that can be used in a booking reference.
+     * <p>
+     * Removing numbers 0 and 1,
+     * as well as letters O, I and L to prevent confusion when printed in different fonts.
+     */
+    private static final String ALLOWED_CHARACTERS = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+
     private final EventFactory eventFactory;
     private final LearnerFactory learnerFactory;
 
@@ -32,18 +40,34 @@ public class BookingFactory {
         booking.setId(bookingDto.getId());
         booking.setStatus(bookingDto.getStatus());
         booking.setPoNumber(bookingDto.getPoNumber());
-        booking.setBookingReference(generateBookingReference(bookingDto.getPoNumber()));
         booking.setAccessibilityOptions(bookingDto.getAccessibilityOptions());
+
+        if (bookingDto.getBookingReference() != null) {
+            booking.setBookingReference(bookingDto.getBookingReference());
+        } else {
+            booking.setBookingReference(generateBookingReference());
+        }
 
         if (bookingDto.getCancellationReason() != null) {
             booking.setCancellationReason(bookingDto.getCancellationReason());
         }
 
+
         return booking;
     }
 
-        public String generateBookingReference(String poNumber) {
-        Hashids hashids = new Hashids(System.currentTimeMillis() + poNumber, 5, ALLOWED_CHARACTERS);
+    /**
+     * Generates a new, unique 5 char booking reference value.
+     * Using System.currentTimeMillis() + "" to convert current time to string
+     * and use as a salt to ensure the generated value is unique.
+     *
+     * @return encrypted 5 char code
+     */
+    private String generateBookingReference() {
+        String salt = System.currentTimeMillis() + "";
+
+        Hashids hashids = new Hashids(salt, 5, ALLOWED_CHARACTERS);
+
         return hashids.encode(1L);
     }
 }

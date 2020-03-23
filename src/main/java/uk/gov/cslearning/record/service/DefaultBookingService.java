@@ -1,9 +1,6 @@
 package uk.gov.cslearning.record.service;
 
-import org.junit.Ignore;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
-import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
@@ -17,6 +14,7 @@ import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
+import uk.gov.cslearning.record.service.booking.BookingNotificationService;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
@@ -39,9 +37,9 @@ public class DefaultBookingService implements BookingService {
     private final XApiService xApiService;
     private final NotificationService notificationService;
     private final MessageService messageService;
-    private final RegistryService registryService;
+    private final BookingNotificationService bookingNotificationService;
 
-    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService, RegistryService registryService) {
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService, BookingNotificationService bookingNotificationService) {
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
@@ -49,7 +47,7 @@ public class DefaultBookingService implements BookingService {
         this.xApiService = xApiService;
         this.notificationService = notificationService;
         this.messageService = messageService;
-        this.registryService = registryService;
+        this.bookingNotificationService = bookingNotificationService;
     }
 
     @Override
@@ -97,13 +95,18 @@ public class DefaultBookingService implements BookingService {
         return Optional.empty();
     }
 
-    @Ignore
+    /**
+     * Saves or updates a booking object.
+     * A booking will be requested/registered if a user is requesting a paid for course without valid PO.
+     * A booking will be confirmed if user provides a valid PO,
+     * or if an admin changes status to 'Booked' on lpg-management,
+     * or if the face-to-face module is free.
+     *
+     * @param bookingDto - passed from client or retrieved from database
+     * @return savedBookingDto - dto for persisted booking
+     */
+    @Override
     public BookingDto register(BookingDto bookingDto) {
-        String learnerUid = bookingDto.getLearner();
-
-        Optional<CivilServant> civilServantResourceByUid = registryService.getCivilServantResourceByUid(learnerUid);
-        CivilServant civilServant = civilServantResourceByUid.get();
-
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             xApiService.approve(bookingDto);
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
@@ -113,14 +116,12 @@ public class DefaultBookingService implements BookingService {
         BookingDto savedBookingDto = save(bookingDto);
 
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
-            notificationService.send(messageService.createBookedMessage(savedBookingDto));
-            notificationService.send(messageService.createBookedMessageForLineManager(savedBookingDto, civilServant));
+            bookingNotificationService.sendConfirmedNotifications(savedBookingDto);
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            notificationService.send(messageService.createRegisteredMessage(savedBookingDto));
-            notificationService.send(messageService.createRegisteredMessageForLineManager(savedBookingDto, civilServant));
+            bookingNotificationService.sendRequestedNotifications(savedBookingDto);
         }
 
-        return bookingDto;
+        return savedBookingDto;
     }
 
     @Override
@@ -139,20 +140,15 @@ public class DefaultBookingService implements BookingService {
 
     private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
         BookingDto bookingDto = bookingDtoFactory.create(booking);
-        String learnerUid = bookingDto.getLearner();
-
-        Optional<CivilServant> civilServantResourceByUid = registryService.getCivilServantResourceByUid(learnerUid);
-        CivilServant civilServant = civilServantResourceByUid.get();
-
 
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             bookingDto.setConfirmationTime(Instant.now());
+
             return register(bookingDto);
         } else {
             bookingDto.setCancellationReason(BookingCancellationReason.valueOf(bookingStatusDto.getCancellationReason()));
-            notificationService.send(messageService.createUnregisterMessage(bookingDto, bookingDto.getCancellationReason().getValue()));
-            notificationService.send(messageService.createCancelledMessageForLineManager(bookingDto, civilServant));
+            bookingNotificationService.sendCancelledNotifications(bookingDto, bookingStatusDto);
 
             return unregister(bookingDto);
         }
@@ -216,7 +212,10 @@ public class DefaultBookingService implements BookingService {
     }
 
     private BookingDto save(BookingDto bookingDto) {
-        return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
+        Booking booking = bookingFactory.create(bookingDto);
+        Booking savedBooking = bookingRepository.saveBooking(booking);
+
+        return bookingDtoFactory.create(savedBooking);
     }
 
     @Override
@@ -227,11 +226,5 @@ public class DefaultBookingService implements BookingService {
     @Override
     public void deleteAllByAge(Instant instant) {
         bookingRepository.deleteAllByBookingTimeBefore(instant);
-    }
-
-    @Override
-    public void foo() {
-        Optional<CivilServant> civilServantResourceByUid = registryService.getCivilServantResourceByUid("3c706a70-3fff-4e7b-ae7f-102c1d46f569");
-        System.out.println(civilServantResourceByUid);
     }
 }
