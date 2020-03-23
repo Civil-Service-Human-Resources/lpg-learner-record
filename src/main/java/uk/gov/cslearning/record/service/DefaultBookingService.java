@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service;
 
+import org.junit.Ignore;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
@@ -96,7 +97,7 @@ public class DefaultBookingService implements BookingService {
         return Optional.empty();
     }
 
-    @Override
+    @Ignore
     public BookingDto register(BookingDto bookingDto) {
         String learnerUid = bookingDto.getLearner();
 
