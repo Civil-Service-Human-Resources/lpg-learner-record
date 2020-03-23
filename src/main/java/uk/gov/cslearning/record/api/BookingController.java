@@ -92,11 +92,4 @@ public class BookingController {
     public ResponseEntity<Map<String, String>> getUserCancellationReasons() {
         return new ResponseEntity<>(BookingCancellationReason.getUserKeyValuePairs(), OK);
     }
-
-    @GetMapping(value = "/event/foo")
-    public ResponseEntity<Map<String, String>> foo() {
-        bookingService.foo();
-
-        return new ResponseEntity<>(BookingCancellationReason.getUserKeyValuePairs(), OK);
-    }
 }

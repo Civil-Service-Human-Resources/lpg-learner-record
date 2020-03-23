@@ -34,9 +34,6 @@ public interface BookingService {
     BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus);
 
     @Transactional
-    void foo();
-
-    @Transactional
     BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus);
 
     @Transactional
