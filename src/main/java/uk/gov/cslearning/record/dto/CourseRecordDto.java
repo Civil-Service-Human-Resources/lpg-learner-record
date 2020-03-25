@@ -8,21 +8,25 @@ import java.time.LocalDateTime;
 @Data
 public class CourseRecordDto {
     private String courseId;
+    private String learner;
     private String state;
     private String preference;
     private String profession;
     private String department;
-    private LocalDateTime stateChangeDate;
-    private LocalDateTime completedAt;
+    private LocalDateTime lastUpdated;
+    private String courseTitle;
 
     public CourseRecordDto() {
     }
 
-    public CourseRecordDto(String courseId, State state, String learner, LocalDateTime stateChangeDate, LocalDateTime completedAt) {
+
+    public CourseRecordDto(String courseId, String learner,State state, String preference, LocalDateTime lastUpdated,
+                           String courseTitle) {
         this.courseId = courseId;
-        this.state = String.valueOf(state);
         this.learner = learner;
-        this.stateChangeDate = stateChangeDate;
-        this.completedAt = completedAt;
+        this.state = String.valueOf(state);
+        this.preference = preference;
+        this.lastUpdated = lastUpdated;
+        this.courseTitle = courseTitle;
     }
 }
