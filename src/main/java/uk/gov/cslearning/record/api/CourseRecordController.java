@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reporting/course-records")
+@RequestMapping("/reporting")
 public class CourseRecordController {
 
     private final CourseRecordService courseRecordService;
@@ -22,8 +22,8 @@ public class CourseRecordController {
         this.courseRecordService = courseRecordService;
     }
 
-    @GetMapping(params = {"from", "to"})
-    public ResponseEntity<List<CourseRecordDto>> listForPeriod(
+    @GetMapping(value = "/mandatory-courses", params = {"from", "to"})
+    public ResponseEntity<List<CourseRecordDto>> mandatoryCourses(
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
 

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.dto.CourseRecordDto;
+import uk.gov.cslearning.record.dto.ModuleRecordDto;
 
 import javax.persistence.LockModeType;
 import java.time.LocalDateTime;
@@ -37,7 +38,8 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Modifying
     void deleteAllByLastUpdatedBefore(LocalDateTime dateTime);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<CourseRecordDto> findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to);
-
+    @Query("SELECT new uk.gov.cslearning.record.dto.CourseRecordDto(cr.courseId, cr.identity.userId, cr.state, cr.preference, cr.profession, cr.department, cr.lastUpdated, cr.courseTitle) " +
+            "FROM CourseRecord cr " +
+            "WHERE cr.lastUpdated BETWEEN ?1 AND ?2 ")
+    List<CourseRecordDto> findAllByLastUpdatedBetween(LocalDateTime from, LocalDateTime to);
 }

@@ -21,7 +21,7 @@ public class CourseRecordService {
     @Transactional(readOnly = true)
     public List<CourseRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
         return courseRecordRepository
-                .findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay()).stream()
+                .findAllByLastUpdatedBetween(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay()).stream()
                 .collect(Collectors.toList());
     }
 }
