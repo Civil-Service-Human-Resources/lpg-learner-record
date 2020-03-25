@@ -35,4 +35,8 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Transactional
     @Modifying
     void deleteAllByLastUpdatedBefore(LocalDateTime dateTime);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<CourseRecordDto> findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to);
+
 }
