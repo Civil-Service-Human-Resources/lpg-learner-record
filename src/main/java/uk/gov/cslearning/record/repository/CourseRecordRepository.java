@@ -38,6 +38,6 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
 
     @Query("SELECT cr " +
             "FROM CourseRecord cr " +
-            "WHERE cr.lastUpdated BETWEEN ?1 AND ?2")
+            "WHERE cr.lastUpdated BETWEEN ?1 AND ?2 ORDER BY cr.identity.userId")
     List<CourseRecord> findAllByLastUpdatedBetween(LocalDateTime from, LocalDateTime to);
 }
