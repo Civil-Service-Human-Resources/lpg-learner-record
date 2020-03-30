@@ -47,7 +47,7 @@ oauth:
   clientSecret: ${CLIENT_SECRET:test}
   checkTokenUrl: "${oauth.serviceUrl}/oauth/check_token"
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
-  maxTotalConnections: 300
+  maxTotalConnections: 120
   defaultMaxConnectionsPerRoute: 5
   maxPerServiceUrl: 20
 
