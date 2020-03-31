@@ -8,24 +8,23 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class CourseRecordDtoFactory {
     public List<CourseRecordDto> create(List<CourseRecord> courseRecords) {
-        List<CourseRecordDto> result = new ArrayList<>();
-
-        for (CourseRecord record : courseRecords) {
-            CourseRecordDto courseRecordDto = new CourseRecordDto();
-
-            courseRecordDto.setCourseId(record.getCourseId());
-            courseRecordDto.setCourseTitle(record.getCourseTitle());
-            courseRecordDto.setLastUpdated(record.getLastUpdated());
-            courseRecordDto.setLearner(record.getUserId());
-            courseRecordDto.setPreference(record.getPreference());
-            courseRecordDto.setState(String.valueOf(record.getState()));
-            result.add(courseRecordDto);
-        }
-
-        return result;
+        return courseRecords
+                .stream()
+                .map(record -> {
+                    CourseRecordDto courseRecordDto = new CourseRecordDto();
+                    courseRecordDto.setCourseId(record.getCourseId());
+                    courseRecordDto.setCourseTitle(record.getCourseTitle());
+                    courseRecordDto.setLastUpdated(record.getLastUpdated());
+                    courseRecordDto.setLearner(record.getUserId());
+                    courseRecordDto.setPreference(record.getPreference());
+                    courseRecordDto.setState(String.valueOf(record.getState()));
+                    return courseRecordDto;
+                })
+                .collect(Collectors.toList());
     }
 }
