@@ -12,7 +12,6 @@ import uk.gov.cslearning.record.repository.CourseRecordRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -41,15 +40,13 @@ public class CourseRecordServiceTest {
         courseRecordList.add(courseRecord1);
         courseRecordList.add(courseRecord2);
 
-        List<CourseRecordDto> courseRecordDtoList = new ArrayList<>();
         CourseRecordDto dto1 = new CourseRecordDto();
         CourseRecordDto dto2 = new CourseRecordDto();
-        courseRecordDtoList.add(dto1);
-        courseRecordDtoList.add(dto2);
 
         when(courseRecordRepository.findAllByLastUpdatedBetween(from.atStartOfDay(), to.plusDays(1).atStartOfDay()))
                 .thenReturn(courseRecordList);
-        when(courseRecordDtoFactory.create(courseRecordList)).thenReturn(courseRecordDtoList);
+        when(courseRecordDtoFactory.create(courseRecord1)).thenReturn(dto1);
+        when(courseRecordDtoFactory.create(courseRecord2)).thenReturn(dto2);
 
         assertEquals(courseRecordList.size(),
                 courseRecordService.listRecordsForPeriod(from, to).size());
