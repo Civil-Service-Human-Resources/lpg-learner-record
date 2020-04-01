@@ -238,9 +238,28 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldUnregisterBookingWithBookingDto() {
+    public void shouldUnregisterBookingWithBookingDtoIfConfirmed() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setStatus(BookingStatus.CONFIRMED);
+        BookingDto savedBookingDto = new BookingDto();
+
+        Booking booking = new Booking();
+        Booking savedBooking = new Booking();
+
+        when(bookingFactory.create(bookingDto)).thenReturn(booking);
+        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).saveBooking(booking);
+    }
+
+    @Test
+    public void shouldUnregisterBookingWithBookingDtoIfRequested() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
         BookingDto savedBookingDto = new BookingDto();
 
         Booking booking = new Booking();
