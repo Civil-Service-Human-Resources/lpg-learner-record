@@ -156,7 +156,8 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto unregister(BookingDto bookingDto) {
-        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)
+                || bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
             xApiService.unregister(bookingDto);
         }
 
