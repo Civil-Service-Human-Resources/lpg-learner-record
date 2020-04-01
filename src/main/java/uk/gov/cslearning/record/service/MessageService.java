@@ -131,7 +131,6 @@ public class MessageService {
 
         Course course = getCourseByEventUrl(bookingDto.getEvent().getPath());
         Event event = learningCatalogueService.getEventByUrl(bookingDto.getEvent().toString());
-        // this needs to be mocked
 
         String cost = getCostOfEvent(course, event.getId()).toString();
 
