@@ -214,7 +214,6 @@ public class DefaultBookingService implements BookingService {
     private BookingDto save(BookingDto bookingDto) {
         Booking booking = bookingFactory.create(bookingDto);
         Booking savedBooking = bookingRepository.saveBooking(booking);
-
         return bookingDtoFactory.create(savedBooking);
     }
 
