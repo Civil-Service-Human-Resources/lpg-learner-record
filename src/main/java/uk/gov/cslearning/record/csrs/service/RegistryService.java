@@ -73,7 +73,6 @@ public class RegistryService {
         } catch (HttpClientErrorException e) {
             LOGGER.debug(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
         }
-
         return Optional.empty();
     }
 }
