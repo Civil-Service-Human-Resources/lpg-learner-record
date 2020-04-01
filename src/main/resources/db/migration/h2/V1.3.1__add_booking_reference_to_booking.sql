@@ -1,1 +1,1 @@
-ALTER TABLE booking ADD `booking_reference` VARCHAR(60);
+ALTER TABLE booking ADD `booking_reference` VARCHAR(5);
