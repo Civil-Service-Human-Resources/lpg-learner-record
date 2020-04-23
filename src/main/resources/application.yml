@@ -48,8 +48,8 @@ oauth:
   checkTokenUrl: "${oauth.serviceUrl}/oauth/check_token"
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
   maxTotalConnections: 120
-  defaultMaxConnectionsPerRoute: 5
-  maxPerServiceUrl: 20
+  defaultMaxConnectionsPerRoute: 60
+  maxPerServiceUrl: 60
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
