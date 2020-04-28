@@ -15,6 +15,7 @@ import uk.gov.cslearning.record.service.catalogue.Module;
 
 import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -152,12 +153,19 @@ public class MessageService {
     private BigDecimal getCostOfEvent(Course course, String eventID) {
 
         for (Module module : course.getModules()) {
-            if (module.getModuleType().equals("face-to-face") && module.getEvents().stream().findFirst().get().getId().equals(eventID)) {
+            if (module.getModuleType().equals("face-to-face") &&
+                    checkEvents(module.getEvents(), eventID)) {
                 return module.getCost();
             }
         }
+        return BigDecimal.ZERO;
+    }
 
-        return null;
+    private boolean checkEvents(Collection<Event> events, String eventID) {
+        if (events!= null && !events.isEmpty()) {
+            return events.stream().anyMatch(event -> event.getId().equals(eventID));
+        }
+        return false;
     }
 
     public MessageDto createBookedMessage(BookingDto bookingDto) {
