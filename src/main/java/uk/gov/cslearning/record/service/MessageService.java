@@ -158,11 +158,11 @@ public class MessageService {
                 return module.getCost();
             }
         }
-        return BigDecimal.ZERO;
+        return null;
     }
 
     private boolean checkEvents(Collection<Event> events, String eventID) {
-        if (events!= null && !events.isEmpty()) {
+        if (events != null && !events.isEmpty()) {
             return events.stream().anyMatch(event -> event.getId().equals(eventID));
         }
         return false;
