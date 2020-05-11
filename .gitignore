@@ -7,5 +7,6 @@ build
 out
 logs
 environ/lpg-ansible-mvp
-
+.project
+.settings/*
 
