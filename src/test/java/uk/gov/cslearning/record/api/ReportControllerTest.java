@@ -65,6 +65,7 @@ public class ReportControllerTest {
         booking.setPaymentDetails(paymentDetails);
         booking.setEvent(event);
         booking.setLearner(learnerUid);
+        booking.setBookingReference("AB45C");
 
         when(bookingService.findAllForPeriod(LocalDate.parse("2018-01-01"), LocalDate.parse("2018-01-31")))
                 .thenReturn(Collections.singletonList(booking));
