@@ -41,9 +41,9 @@ public class LearningCatalogueServiceCacheTest {
         when(restTemplate.exchange(eq(requestEntity), eq(Course.class))).thenReturn(responseEntity);
         when(responseEntity.getBody()).thenReturn(course);
 
-        learningCatalogueService.getCourse(courseId);
-        learningCatalogueService.getCourse(courseId);
-        Course result = learningCatalogueService.getCourse(courseId);
+        learningCatalogueService.getCachedCourse(courseId);
+        learningCatalogueService.getCachedCourse(courseId);
+        Course result = learningCatalogueService.getCachedCourse(courseId);
 
         assertEquals(course, result);
 
