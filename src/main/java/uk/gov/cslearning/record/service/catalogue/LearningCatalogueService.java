@@ -55,9 +55,22 @@ public class LearningCatalogueService {
         return emptyList();
     }
 
-    @Cacheable("courseId")
     public Course getCourse(String courseId) {
         try {
+            LOGGER.debug("This function doesn't cache a course");
+            RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(courseUrlFormat, courseId));
+            ResponseEntity<Course> responseEntity = restTemplate.exchange(requestEntity, Course.class);
+            return responseEntity.getBody();
+        } catch (RequestEntityException | RestClientException e) {
+            LOGGER.error("Could not get course from learning catalogue: ", e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    @Cacheable("courseId")
+    public Course getCachedCourse(String courseId) {
+        try {
+            LOGGER.debug("This function caches a course which used for statements");
             RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(courseUrlFormat, courseId));
             ResponseEntity<Course> responseEntity = restTemplate.exchange(requestEntity, Course.class);
             return responseEntity.getBody();
