@@ -78,7 +78,7 @@ public class StatementStream {
                     }
                     CourseRecord courseRecord = records.get(courseId);
                     uk.gov.cslearning.record.service.catalogue.Course catalogueCourse
-                            = learningCatalogueService.getCourse(courseId);
+                            = learningCatalogueService.getCachedCourse(courseId);
 
                     if (catalogueCourse == null) {
                         LOGGER.info("Ignoring statement with no catalogue course, courseId: {}", courseId);
