@@ -23,17 +23,20 @@ public class RegistryService {
     private final RequestEntityFactory requestEntityFactory;
     private OAuth2RestOperations restOperations;
     private String findByUidUrlFormat;
+    private String getResourceByUidUrl;
     private URI getCurrentUrl;
 
     @Autowired
     public RegistryService(OAuth2RestOperations restOperations,
                            RequestEntityFactory requestEntityFactory,
                            @Value("${registry.getCurrentUrl}") URI getCurrentUrl,
+                           @Value("${registry.getResourceByUidUrl}") String getResourceByUidUrl,
                            @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
         this.restOperations = restOperations;
         this.requestEntityFactory = requestEntityFactory;
         this.findByUidUrlFormat = findByUidUrlFormat;
         this.getCurrentUrl = getCurrentUrl;
+        this.getResourceByUidUrl = getResourceByUidUrl;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -57,6 +60,19 @@ public class RegistryService {
             LOGGER.debug(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
         }
 
+        return Optional.empty();
+    }
+
+    public Optional<CivilServant> getCivilServantResourceByUid(String uid) {
+        LOGGER.debug("Getting profile details for civil servant with UID {}", uid);
+        LOGGER.debug("URL {}", String.format(getResourceByUidUrl, uid));
+
+        try {
+            CivilServant civilServant = restOperations.getForObject(String.format(getResourceByUidUrl, uid), CivilServant.class);
+            return Optional.ofNullable(civilServant);
+        } catch (HttpClientErrorException e) {
+            LOGGER.debug(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
+        }
         return Optional.empty();
     }
 }

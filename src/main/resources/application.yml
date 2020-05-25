@@ -33,7 +33,7 @@ logging:
     com.zaxxer.hikari: ERROR
 
 notifications:
-  service: ${NOTIFICATION_SERVICE_URL:http://localhost:9005}
+  service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
   email: ${notifications.service}/notifications/email/
 
 xapi:
@@ -59,6 +59,7 @@ registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
   getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
+  getResourceByUidUrl: "${registry.serviceUrl}/civilServants/resource/%s"
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
@@ -74,6 +75,9 @@ govNotify:
     cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:cc525c34-1a31-4fa1-ab19-862fd223caab}
     cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:26e0e8ae-7617-40f7-be37-ca63b8a0d257}
     bookingConfirmed: ${GOV_NOTIFY_BOOKING_CONFIRMED:8efb52bd-9ada-402e-8fab-84a751bf4a71}
+    bookingConfirmedLineManager: ${GOV_NOTIFY_BOOKING_CONFIRMED_LINE_MANAGER:5e3a76c5-5178-4c8c-9bcd-87886dc0efef}
+    bookingRequestLineManager: ${GOV_NOTIFY_BOOKING_REQUEST_LINE_MANAGER:659f8f61-d326-428e-996d-f890b61a2f96}
+    bookingCancelledLineManager: ${GOV_NOTIFY_BOOKING_CANCELLED_LINE_MANAGER:c00fac77-8448-41c9-b15c-23361ccef419}
     bookingRequested: ${GOV_NOTIFY_BOOKING_REQUESTED:ae678ea1-ae7a-42f3-aa27-037336b346c4}
 
 lpg-ui:

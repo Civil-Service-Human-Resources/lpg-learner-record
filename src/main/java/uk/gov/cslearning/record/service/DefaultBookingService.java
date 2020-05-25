@@ -14,6 +14,7 @@ import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
+import uk.gov.cslearning.record.service.booking.BookingNotificationService;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
@@ -36,8 +37,9 @@ public class DefaultBookingService implements BookingService {
     private final XApiService xApiService;
     private final NotificationService notificationService;
     private final MessageService messageService;
+    private final BookingNotificationService bookingNotificationService;
 
-    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService) {
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService, BookingNotificationService bookingNotificationService) {
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
@@ -45,6 +47,7 @@ public class DefaultBookingService implements BookingService {
         this.xApiService = xApiService;
         this.notificationService = notificationService;
         this.messageService = messageService;
+        this.bookingNotificationService = bookingNotificationService;
     }
 
     @Override
@@ -92,17 +95,33 @@ public class DefaultBookingService implements BookingService {
         return Optional.empty();
     }
 
+    /**
+     * Saves or updates a booking object.
+     * A booking will be requested/registered if a user is requesting a paid for course without valid PO.
+     * A booking will be confirmed if user provides a valid PO,
+     * or if an admin changes status to 'Booked' on lpg-management,
+     * or if the face-to-face module is free.
+     *
+     * @param bookingDto - passed from client or retrieved from database
+     * @return savedBookingDto - dto for persisted booking
+     */
     @Override
     public BookingDto register(BookingDto bookingDto) {
-
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             xApiService.approve(bookingDto);
-            notificationService.send(messageService.createBookedMessage(bookingDto));
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
             xApiService.register(bookingDto);
-            notificationService.send(messageService.createRegisteredMessage(bookingDto));
         }
-        return save(bookingDto);
+
+        BookingDto savedBookingDto = save(bookingDto);
+
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
+            bookingNotificationService.sendConfirmedNotifications(savedBookingDto);
+        } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
+            bookingNotificationService.sendRequestedNotifications(savedBookingDto);
+        }
+
+        return savedBookingDto;
     }
 
     @Override
@@ -122,21 +141,23 @@ public class DefaultBookingService implements BookingService {
     private BookingDto updateStatus(Booking booking, BookingStatusDto bookingStatusDto) {
         BookingDto bookingDto = bookingDtoFactory.create(booking);
 
-
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             bookingDto.setStatus(bookingStatusDto.getStatus());
             bookingDto.setConfirmationTime(Instant.now());
+
             return register(bookingDto);
         } else {
             bookingDto.setCancellationReason(BookingCancellationReason.valueOf(bookingStatusDto.getCancellationReason()));
-            notificationService.send(messageService.createUnregisterMessage(bookingDto, bookingDto.getCancellationReason().getValue()));
+            bookingNotificationService.sendCancelledNotifications(bookingDto, bookingStatusDto);
+
             return unregister(bookingDto);
         }
     }
 
     @Override
     public BookingDto unregister(BookingDto bookingDto) {
-        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
+        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)
+                || bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
             xApiService.unregister(bookingDto);
         }
 
@@ -192,7 +213,9 @@ public class DefaultBookingService implements BookingService {
     }
 
     private BookingDto save(BookingDto bookingDto) {
-        return bookingDtoFactory.create(bookingRepository.saveBooking(bookingFactory.create(bookingDto)));
+        Booking booking = bookingFactory.create(bookingDto);
+        Booking savedBooking = bookingRepository.saveBooking(booking);
+        return bookingDtoFactory.create(savedBooking);
     }
 
     @Override
