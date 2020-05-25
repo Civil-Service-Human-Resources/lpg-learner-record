@@ -19,9 +19,7 @@ public class CourseRecordDto {
     public CourseRecordDto() {
     }
 
-
-    public CourseRecordDto(String courseId, String learner,State state, String preference, LocalDateTime lastUpdated,
-                           String courseTitle) {
+    public CourseRecordDto(String courseId, String learner, State state, String preference, LocalDateTime lastUpdated, String courseTitle) {
         this.courseId = courseId;
         this.learner = learner;
         this.state = String.valueOf(state);
@@ -29,4 +27,5 @@ public class CourseRecordDto {
         this.lastUpdated = lastUpdated;
         this.courseTitle = courseTitle;
     }
+
 }

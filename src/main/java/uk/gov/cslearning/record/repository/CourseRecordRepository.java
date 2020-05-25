@@ -37,7 +37,6 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Modifying
     void deleteAllByLastUpdatedBefore(LocalDateTime dateTime);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    List<CourseRecordDto> findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to);
-
+    @Query("SELECT cr FROM CourseRecord cr WHERE cr.lastUpdated BETWEEN ?1 AND ?2 ORDER BY cr.identity.userId, cr.lastUpdated")
+    List<CourseRecord> findAllByLastUpdatedBetween(LocalDateTime from, LocalDateTime to);
 }
