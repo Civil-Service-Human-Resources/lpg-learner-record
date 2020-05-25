@@ -27,5 +27,4 @@ public class CourseRecordDto {
         this.lastUpdated = lastUpdated;
         this.courseTitle = courseTitle;
     }
-
 }

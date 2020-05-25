@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.dto.factory;
 
-
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.dto.CourseRecordDto;
