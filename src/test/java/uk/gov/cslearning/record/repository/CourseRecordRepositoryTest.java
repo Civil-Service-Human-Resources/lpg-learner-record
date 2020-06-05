@@ -10,10 +10,16 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.dto.CourseRecordDto;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -76,6 +82,28 @@ public class CourseRecordRepositoryTest {
         Iterable<CourseRecord> records = courseRecordRepository.listEventRecords();
 
         assertThat(Iterables.size(records), is(registrations));
+    }
+
+    @Test
+    public void shouldReturnAllCourseRecordsByLastUpdatedBetween() {
+        LocalDateTime queryStart = LocalDateTime.now().minusDays(2);
+
+        CourseRecord courseRecord1 = new CourseRecord("course-id1", "user-id1");
+        courseRecord1.setLastUpdated(LocalDateTime.now().minusDays(1));
+
+        CourseRecord courseRecord2 = new CourseRecord("course-id2", "user-id2");
+        courseRecord2.setLastUpdated(queryStart);
+
+        CourseRecord courseRecord3 = new CourseRecord("course-id3", "user-id3");
+        courseRecord3.setLastUpdated(LocalDateTime.now().minusDays(3));
+
+        courseRecordRepository.saveAll(Arrays.asList(courseRecord1, courseRecord2, courseRecord3));
+
+        LocalDateTime end = LocalDateTime.now().minusDays(1).minusMinutes(1);
+
+        List<CourseRecord> results = courseRecordRepository.findAllByLastUpdatedBetween(queryStart, end);
+
+        assertEquals(1, results.size());
     }
 
     private void createRegistration(String userId, String eventId) {
