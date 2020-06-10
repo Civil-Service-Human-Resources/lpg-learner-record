@@ -36,10 +36,6 @@ public class IdentityService {
         this.identityAPIUrl = identityAPIUrl;
     }
 
-    public OAuth2AccessToken getAccessToken() {
-        return restOperations.getAccessToken();
-    }
-
     public Collection<Identity> listAll() {
         LOGGER.debug("Retrieving all identities");
         Identity[] identities = restOperations.getForObject(listAllIdentitiesUrl, Identity[].class);
