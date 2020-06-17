@@ -151,6 +151,7 @@ public class StatementStream {
 
                         if (checkComplete(courseRecord, catalogueCourse)) {
                             courseRecord.setState(State.COMPLETED);
+                            System.out.println("Course record set to complete. Title: " + courseRecord.getCourseTitle() + ", id: " + courseRecord.getCourseId());
                         }
                     }
                 }
