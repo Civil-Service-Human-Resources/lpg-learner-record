@@ -59,7 +59,7 @@ public class BookingController {
     }
 
 
-    @PostMapping(value="/event/{eventId}/booking/")
+    @PostMapping(value = "/event/{eventId}/booking/")
     public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
 
         BookingDto result = bookingService.register(booking);

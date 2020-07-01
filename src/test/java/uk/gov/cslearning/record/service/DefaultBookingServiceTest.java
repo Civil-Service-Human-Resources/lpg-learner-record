@@ -2,7 +2,6 @@ package uk.gov.cslearning.record.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -19,6 +18,7 @@ import uk.gov.cslearning.record.notifications.dto.MessageDto;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
+import uk.gov.cslearning.record.service.booking.BookingNotificationService;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
@@ -55,6 +55,9 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private NotificationService notificationService;
+
+    @Mock
+    private BookingNotificationService bookingNotificationService;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -141,31 +144,6 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldRegisterAndSaveBooking() {
-        BookingDto unsavedBookingDto = new BookingDto();
-        unsavedBookingDto.setStatus(BookingStatus.CONFIRMED);
-        Booking unsavedBooking = new Booking();
-        BookingDto savedBookingDto = new BookingDto();
-        Booking savedBooking = new Booking();
-
-        MessageDto messageDto = new MessageDto();
-
-        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
-        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-        when(messageService.createBookedMessage(unsavedBookingDto)).thenReturn(messageDto);
-        when(notificationService.send(messageDto)).thenReturn(true);
-
-        assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
-
-        InOrder order = inOrder(xApiService, bookingRepository, notificationService);
-
-        order.verify(xApiService).approve(unsavedBookingDto);
-        order.verify(notificationService).send(messageDto);
-        order.verify(bookingRepository).saveBooking(unsavedBooking);
-    }
-
-    @Test
     public void shouldSaveBookingButNotRegisterIfNotConfirmed() {
         BookingDto unsavedBookingDto = new BookingDto();
         unsavedBookingDto.setStatus(BookingStatus.REQUESTED);
@@ -181,6 +159,7 @@ public class DefaultBookingServiceTest {
         assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
 
         verify(bookingRepository).saveBooking(unsavedBooking);
+        verify(bookingNotificationService).sendRequestedNotifications(savedBookingDto);
     }
 
     @Test
@@ -208,6 +187,8 @@ public class DefaultBookingServiceTest {
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 
         verify(xApiService).approve(bookingDto);
+        verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
+
     }
 
     @Test
@@ -239,6 +220,7 @@ public class DefaultBookingServiceTest {
         assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
 
         verify(xApiService).approve(bookingDto);
+        verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
     }
 
     @Test
@@ -256,9 +238,28 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldUnregisterBookingWithBookingDto() {
+    public void shouldUnregisterBookingWithBookingDtoIfConfirmed() {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setStatus(BookingStatus.CONFIRMED);
+        BookingDto savedBookingDto = new BookingDto();
+
+        Booking booking = new Booking();
+        Booking savedBooking = new Booking();
+
+        when(bookingFactory.create(bookingDto)).thenReturn(booking);
+        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
+        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
+
+        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
+
+        verify(xApiService).unregister(bookingDto);
+        verify(bookingRepository).saveBooking(booking);
+    }
+
+    @Test
+    public void shouldUnregisterBookingWithBookingDtoIfRequested() {
+        BookingDto bookingDto = new BookingDto();
+        bookingDto.setStatus(BookingStatus.REQUESTED);
         BookingDto savedBookingDto = new BookingDto();
 
         Booking booking = new Booking();
@@ -302,23 +303,6 @@ public class DefaultBookingServiceTest {
         verify(notificationService).send(messageDto);
         verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking2);
-    }
-
-    @Test
-    public void shouldNotCallXApiIfStatusIsRequested() {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.REQUESTED);
-        Booking booking = new Booking();
-        BookingDto savedBookingDto = new BookingDto();
-        Booking savedBooking = new Booking();
-
-        when(bookingFactory.create(bookingDto)).thenReturn(booking);
-        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.register(bookingDto));
-
-        verify(bookingRepository).saveBooking(booking);
     }
 
     @Test
