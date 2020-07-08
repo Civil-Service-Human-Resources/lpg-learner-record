@@ -21,6 +21,7 @@ For a complete list of build dependencies check the `build.gradle` file. The mai
 - Spring Boot 2.0 (web, jersey, security, jdbc, cache, config)
 - Spring Data JPA 2.0.5
 - Spring Security OAuth2 2.3.3
+- Spring Security JWT 1.1.1
 - h2 database (in-memory DB for local development) 1.4
 
 ### Test-time
@@ -35,7 +36,7 @@ For a complete list of test dependencies check the `build.gradle` file. The main
 
 #### Other LPG Services
 
-- `identity-service` for OAuth token validation on all requests
+- `identity-service` for creating a JWT token for cross-service requests and retrieving user identity data
 - `civil-servant-registry-service` for getting civil servant user data
 - `learning-catalogue` for fetching the list of required learning for a user's organisation
 - `notification-service` for sending emails for course completion and event reminder
@@ -80,7 +81,7 @@ Significant configuration properties are highlighted here. For the full configur
 - `spring.data.mongodb` the connection settings for accessing the Learning Locker Mongo database (currently Azure CosmosDB in Mongo compatibility mode in production)
 - `notifications` notification service and path
 - `xapi` connection settings for Learning Locker xAPI
-- `oauth` connection settings for the identity-service used to validate bearer tokens
+- `oauth` connection settings for the identity-service used to create bearer tokens
 - `identity` paths for retrieving identity data from the identity-service
 - `registry` connection settings for the civil-servant-registry-service
 - `lpg-ui` URLs for linking back to resources hosted on the main lpg-services frontend
