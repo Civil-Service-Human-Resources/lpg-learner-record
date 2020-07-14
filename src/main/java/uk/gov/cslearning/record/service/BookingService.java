@@ -1,15 +1,15 @@
 package uk.gov.cslearning.record.service;
 
-import org.springframework.transaction.annotation.Transactional;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface BookingService {
     @Transactional(readOnly = true)
@@ -47,9 +47,6 @@ public interface BookingService {
 
     @Transactional(readOnly = true)
     List<BookingDto> findAll();
-
-    @Transactional(readOnly = true)
-    List<BookingDto> findAllForPeriod(LocalDate from, LocalDate to);
 
     @Transactional
     void deleteAllByLearner(Learner learner);
