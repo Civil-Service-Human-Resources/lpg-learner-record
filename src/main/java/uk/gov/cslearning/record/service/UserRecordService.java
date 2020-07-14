@@ -16,6 +16,7 @@ import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -56,12 +57,14 @@ public class UserRecordService {
         LocalDateTime since = courseRecords.stream()
                 .map(CourseRecord::getLastUpdated)
                 .filter(Objects::nonNull)
+                .map(Timestamp::toLocalDateTime)
                 .reduce((a, b) -> a.isAfter(b) ? a : b)
                 .orElse(null);
 
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, null, since);
 
+            Collection<Statement> dayStatements = xApiService.getStatements(userId, null, LocalDateTime.now().minusDays(1));
             StatementStream stream = new StatementStream(learningCatalogueService);
 
             Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,

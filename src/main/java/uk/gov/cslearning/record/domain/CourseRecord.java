@@ -8,6 +8,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,9 +39,8 @@ public class CourseRecord {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
     private Collection<ModuleRecord> moduleRecords;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime lastUpdated;
+    
+    private Timestamp lastUpdated;
 
     public CourseRecord() {
     }
@@ -63,11 +64,11 @@ public class CourseRecord {
         return identity;
     }
 
-    public LocalDateTime getLastUpdated() {
+    public Timestamp getLastUpdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(LocalDateTime lastUpdated) {
+    public void setLastUpdated(Timestamp lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 

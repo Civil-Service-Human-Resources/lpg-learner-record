@@ -13,6 +13,7 @@ import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -193,10 +194,10 @@ public class StatementStream {
         } else {
             LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
         }
-        courseRecord.setLastUpdated(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
+        courseRecord.setLastUpdated(Timestamp.valueOf(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER)));
 
         if (moduleRecord != null) {
-            moduleRecord.setUpdatedAt(courseRecord.getLastUpdated());
+            moduleRecord.setUpdatedAt(courseRecord.getLastUpdated().toLocalDateTime());
         }
     }
 

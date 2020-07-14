@@ -95,7 +95,7 @@ dependencies {
     compile 'com.h2database:h2:1.4.199'
     compile 'org.hibernate:hibernate-core:5.2.16.Final'
     compile 'org.hibernate:hibernate-entitymanager:5.2.16.Final'
-    compile 'mysql:mysql-connector-java:8.0.8-dmr'
+    compile 'mysql:mysql-connector-java:8.0.18'
 
     compile 'org.flywaydb:flyway-core:5.0.7'
 
