@@ -7,7 +7,6 @@ import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ModuleRecordService {
@@ -21,7 +20,6 @@ public class ModuleRecordService {
     @Transactional(readOnly = true)
     public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
         return moduleRecordRepository
-                .findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay()).stream()
-                .collect(Collectors.toList());
+                .findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay());
     }
 }

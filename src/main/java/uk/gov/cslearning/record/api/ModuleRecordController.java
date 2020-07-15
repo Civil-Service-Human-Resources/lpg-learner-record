@@ -26,7 +26,6 @@ public class ModuleRecordController {
     public ResponseEntity<List<ModuleRecordDto>> listForPeriod(
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
-
     ) {
         return ResponseEntity.ok(moduleRecordService.listRecordsForPeriod(from, to));
     }
