@@ -10,10 +10,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
+import edu.emory.mathcs.backport.java.util.Collections;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +29,7 @@ public class RegistryService {
     private OAuth2RestOperations restOperations;
     private String findByUidUrlFormat;
     private String getResourceByUidUrl;
+    private String getAllCivilServants;
     private URI getCurrentUrl;
 
     @Autowired
@@ -31,12 +37,14 @@ public class RegistryService {
                            RequestEntityFactory requestEntityFactory,
                            @Value("${registry.getCurrentUrl}") URI getCurrentUrl,
                            @Value("${registry.getResourceByUidUrl}") String getResourceByUidUrl,
-                           @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
+                           @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat,
+                           @Value("${registry.getAllCivilServants}") String getAllCivilServants) {
         this.restOperations = restOperations;
         this.requestEntityFactory = requestEntityFactory;
         this.findByUidUrlFormat = findByUidUrlFormat;
         this.getCurrentUrl = getCurrentUrl;
         this.getResourceByUidUrl = getResourceByUidUrl;
+        this.getAllCivilServants = getAllCivilServants;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -61,6 +69,23 @@ public class RegistryService {
         }
 
         return Optional.empty();
+    }
+
+    public List<CivilServant> getAllCivilServants() {
+        LOGGER.debug("Getting all civil servants");
+
+        try {
+            CivilServant[] civilServants = restOperations.getForObject(getAllCivilServants, CivilServant[].class);
+            if (civilServants != null) {
+                return Arrays.asList(civilServants);
+            } else {
+                return Collections.emptyList();
+            }
+        } catch (HttpClientErrorException e) {
+            LOGGER.debug(String.format("Error when fetching civil servants: %s", e));
+        }
+
+        return Collections.emptyList();
     }
 
     public Optional<CivilServant> getCivilServantResourceByUid(String uid) {

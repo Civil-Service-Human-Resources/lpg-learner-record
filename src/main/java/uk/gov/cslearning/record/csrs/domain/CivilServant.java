@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.gov.cslearning.record.service.identity.Identity;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CivilServant {
 
@@ -18,6 +20,8 @@ public class CivilServant {
     private String lineManagerEmailAddress;
     private String lineManagerUid;
     private String lineManagerName;
+    private Identity identity;
+    private String identityUid;
 
     public String getFullName() {
         return fullName;
@@ -97,5 +101,21 @@ public class CivilServant {
 
     public void setLineManagerName(String lineManagerName) {
         this.lineManagerName = lineManagerName;
+    }
+
+    public Identity getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(Identity identity) {
+        this.identity = identity;
+    }
+
+    public String getIdentityUid() {
+        return identityUid;
+    }
+
+    public void setIdentityUid(String identityUid) {
+        this.identityUid = identityUid;
     }
 }

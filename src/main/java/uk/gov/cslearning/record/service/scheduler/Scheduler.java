@@ -27,17 +27,17 @@ public class Scheduler {
     public void learningJob() throws Exception {
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
-//        learningJob.sendReminderNotificationForIncompleteCourses();
+        //learningJob.sendReminderNotificationForIncompleteCourses();
         LOGGER.info("Skipping sendReminderNotificationForIncompleteCourses at {}", dateFormat.format(new Date()));
 
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "* */2 * * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
-//        learningJob.sendLineManagerNotificationForCompletedLearning();
+        learningJob.sendLineManagerNotificationForCompletedLearning();
         LOGGER.info("Skipping sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));

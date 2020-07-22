@@ -1,18 +1,21 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.dto.EmailMessageContent;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.UserRecordService;
@@ -21,10 +24,15 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+
+import com.google.common.collect.Lists;
 
 @Component
 public class LearningJob {
@@ -71,45 +79,57 @@ public class LearningJob {
 
     @Transactional
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
-        LOGGER.info("Sending notifications for complete learning.");
+        LOGGER.debug("Sending notifications for complete learning.");
+        Collection<CivilServant> civilServants = registryService.getAllCivilServants();
+        Map<String, List<EmailMessageContent>> emailLineManagerData = new HashMap<>();
+        civilServants.forEach(civilServant -> processCivilServant(civilServant, emailLineManagerData));
+        emailLineManagerData.forEach((lineManagerEmail, emailMessageContents) -> emailMessageContents.forEach(this::checkAndNotifyLineManager));
+    }
 
-        Collection<Identity> identities = identityService.listAll();
+    private void processCivilServant(CivilServant civilServant, Map<String, List<EmailMessageContent>> emailLineManagerData) {
+        List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
+        LOGGER.debug("Found {} required courses", courses.size());
 
-        for (Identity identity : identities) {
-            LOGGER.debug("Got identity {}", identity);
-            registryService.getCivilServantByUid(identity.getUid()).ifPresent(civilServant -> {
-                if (civilServant.getLineManagerUid() == null) {
-                    LOGGER.debug("User {} has no line manager, skipping", identity);
-                } else {
-                    if (civilServant.getOrganisationalUnit() != null) {
-                        List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
-                        LOGGER.debug("Found {} required courses", courses.size());
+        courses.forEach(course -> processCourse(civilServant, course, emailLineManagerData));
+    }
 
-                        for (Course course : courses) {
-                            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-                            for (CourseRecord courseRecord : courseRecords) {
-                                LOGGER.debug("Course complete: {}", courseRecord.isComplete());
-                                if (courseRecord.isComplete()) {
-                                    checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+    private void processCourse(CivilServant civilServant, Course course, Map<String, List<EmailMessageContent>> emailLineManagerData) {
+        Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(civilServant.getIdentity().getUid(), Lists.newArrayList(course.getId()));
+        courseRecords.forEach(courseRecord -> processCourseRecord(civilServant, course, courseRecord, emailLineManagerData));
+    }
+
+    private void processCourseRecord(CivilServant civilServant, Course course, CourseRecord courseRecord, Map<String, List<EmailMessageContent>> emailLineManagerData) {
+        LOGGER.debug("Course complete: {}", courseRecord.isComplete());
+        if (courseRecord.isComplete()) {
+            EmailMessageContent emailMessage = new EmailMessageContent(civilServant, course, courseRecord.getCompletionDate());
+            String emailAddress = civilServant.getLineManagerEmailAddress();
+            if (!emailLineManagerData.containsKey(civilServant.getLineManagerEmailAddress())) {
+                List<EmailMessageContent> emailMessageContent = new ArrayList<>();
+                emailMessageContent.add(emailMessage);
+                emailLineManagerData.put(emailAddress, emailMessageContent);
+            } else {
+                List<EmailMessageContent> emailMessageContent = emailLineManagerData.get(emailAddress);
+                emailMessageContent.add(emailMessage);
+            }
         }
     }
 
-    void checkAndNotifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) {
+    private void assembleMessageForCompletedCourseMail() {
+
+    }
+
+    void checkAndNotifyLineManager(EmailMessageContent emailMessageContent) {
+        CivilServant civilServant = emailMessageContent.getCivilServant();
+        Identity identity = civilServant.getIdentity();
+        Course course = emailMessageContent.getCourse();
         LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", identity, course);
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.COMPLETE);
-        boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
+        boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(emailMessageContent.getCompletedDate()))
                 .orElse(true);
 
         if (shouldSendNotification) {
-            String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
-
+            String emailAddress = civilServant.getLineManagerEmailAddress();
             notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, course.getTitle());
 
             Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
