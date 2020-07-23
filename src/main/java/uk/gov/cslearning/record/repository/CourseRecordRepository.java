@@ -13,6 +13,7 @@ import javax.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long> {
@@ -20,6 +21,9 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM CourseRecord r WHERE r.identity.userId = ?1")
     Collection<CourseRecord> findByUserId(String userId);
+
+    @Query("SELECT cr FROM CourseRecord cr WHERE cr.lastUpdated >= ?1 AND cr.state = 'COMPLETED'")
+    List<CourseRecord> findCompletedByLastUpdated(LocalDateTime since);
 
     @Query("SELECT COUNT(mr) FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1 and mr.state = 'REGISTERED'")
     Integer countRegisteredForEvent(@Param("eventId") String eventId);

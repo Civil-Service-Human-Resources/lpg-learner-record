@@ -37,7 +37,6 @@ public class StatementStream {
     }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id, Collection<CourseRecord> existingCourseRecords) {
-
         Map<String, List<Statement>> groups = new HashMap<>();
         Map<String, CourseRecord> records = existingCourseRecords.stream()
                 .collect(toMap(CourseRecord::getCourseId, c -> c));
