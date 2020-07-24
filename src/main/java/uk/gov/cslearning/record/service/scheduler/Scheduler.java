@@ -23,7 +23,7 @@ public class Scheduler {
     private LearnerService learnerService;
 
     // cron to run every day at 02:00
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void learningJob() throws Exception {
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
@@ -33,7 +33,7 @@ public class Scheduler {
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
-    @Scheduled(cron = "* */2 * * * *")
+    @Scheduled(cron = "0 0 3 * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
