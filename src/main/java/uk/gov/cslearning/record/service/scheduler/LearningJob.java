@@ -11,9 +11,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.JobArchive;
+import uk.gov.cslearning.record.domain.JobName;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.JobArchiveRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -65,6 +68,8 @@ public class LearningJob {
 
     private CourseRefreshService courseRefreshService;
 
+    private JobArchiveRepository jobArchiveRepository;
+
     @Autowired
     public LearningJob(UserRecordService userRecordService,
             IdentityService identityService,
@@ -73,7 +78,8 @@ public class LearningJob {
             NotifyService notifyService,
             NotificationRepository notificationRepository,
             CourseRecordRepository courseRecordRepository,
-            CourseRefreshService courseRefreshService) {
+            CourseRefreshService courseRefreshService,
+            JobArchiveRepository jobArchiveRepository) {
         this.userRecordService = userRecordService;
         this.identityService = identityService;
         this.registryService = registryService;
@@ -82,19 +88,28 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
         this.courseRecordRepository = courseRecordRepository;
         this.courseRefreshService = courseRefreshService;
+        this.jobArchiveRepository = jobArchiveRepository;
     }
 
     @Transactional
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
 
-        LocalDateTime since = LocalDateTime.now().minusDays(4);
+        LocalDateTime now = LocalDateTime.now();
+        Optional<JobArchive> jobArchive = jobArchiveRepository.findLatestByName(JobName.COMPLETED_COURSES_JOB.toString());
+        if (!jobArchive.isPresent() || jobArchive.get().getLastRun().plusDays(1).isBefore(now)) {
+            performCompleteCoursesJob(now);
+            jobArchiveRepository.save(new JobArchive(JobName.COMPLETED_COURSES_JOB.toString(), now));
+        }
+    }
+
+    void performCompleteCoursesJob(LocalDateTime now) {
+        LocalDateTime since = now.minusDays(5);
         courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
-        completedCourseRecords.forEach(courseRecord -> {
-            Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
-            civilServant.ifPresent(cs -> checkAndNotifyLineManager(cs, courseRecord, since));
-        });
+
+        completedCourseRecords.forEach(courseRecord -> registryService.getCivilServantByUid(courseRecord.getUserId())
+            .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
@@ -102,7 +117,7 @@ public class LearningJob {
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(courseRecord.getUserId(), courseRecord.getCourseId(), NotificationType.COMPLETE);
         boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
-                .orElse(true);
+            .orElse(true);
 
         if (shouldSendNotification) {
             String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());

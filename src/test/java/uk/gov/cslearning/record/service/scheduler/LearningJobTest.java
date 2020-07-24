@@ -12,9 +12,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.CourseRecordIdentity;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.JobArchiveRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
+import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.Identity;
@@ -63,6 +68,15 @@ public class LearningJobTest {
     @Mock
     private NotificationRepository notificationRepository;
 
+    @Mock
+    private CourseRecordRepository courseRecordRepository;
+
+    @Mock
+    private CourseRefreshService courseRefreshService;
+
+    @Mock
+    private JobArchiveRepository jobArchiveRepository;
+
     private List<Course> incompleteCoursesDay;
     private List<Course> incompleteCoursesWeek;
     private List<Course> incompleteCoursesMonth;
@@ -91,7 +105,6 @@ public class LearningJobTest {
 
     @Test
     public void incompleteCoursesDayShouldContainCourseIfDueWithinDay() {
-
         Course course = new Course();
         course.setId(COURSE_ID);
 
@@ -122,7 +135,6 @@ public class LearningJobTest {
 
         assertThat(incompleteCoursesWeek.size(), equalTo(1));
         assertThat(incompleteCoursesWeek.get(0).getId(), equalTo(COURSE_ID));
-
     }
 
     @Test
@@ -194,10 +206,9 @@ public class LearningJobTest {
         Identity identity = new Identity();
         identity.setUid("uid");
 
-        Course course1 = new Course();
-        course1.setId("1");
-        course1.setTitle(COURSE_TITLE_1);
-
+        CourseRecord courseRecord = new CourseRecord();
+        courseRecord.setIdentity(new CourseRecordIdentity("1", identity.getUid()));
+        courseRecord.setCourseTitle(COURSE_TITLE_1);
 
         CivilServant civilServant = new CivilServant();
         civilServant.setFullName("test user");
@@ -212,7 +223,7 @@ public class LearningJobTest {
 
         LocalDateTime now = LocalDateTime.now();
         when(identityService.getEmailAddress("managerUid")).thenReturn("test@example.com");
-        learningJob.checkAndNotifyLineManager(civilServant, identity, course1, now);
+        learningJob.checkAndNotifyLineManager(civilServant, courseRecord, now);
 
         ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> courseCaptor = ArgumentCaptor.forClass(String.class);
@@ -255,7 +266,6 @@ public class LearningJobTest {
 
     @Test
     public void shouldBeAddedToWeekListIfDueInLessThanAWeekAndNotificationIsForMonth() {
-
         Course course = new Course();
         course.setId(COURSE_ID);
         course.setTitle(COURSE_TITLE_1);
@@ -277,6 +287,4 @@ public class LearningJobTest {
         assertThat(incompleteCoursesWeek.size(), equalTo(1));
         assertThat(incompleteCoursesMonth.size(), equalTo(0));
     }
-
-
 }

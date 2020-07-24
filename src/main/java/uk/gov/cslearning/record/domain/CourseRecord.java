@@ -51,6 +51,14 @@ public class CourseRecord {
         this.moduleRecords = new HashSet<>();
     }
 
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public void setIdentity(CourseRecordIdentity identity) {
+        this.identity = identity;
+    }
+
     public String getCourseTitle() {
         return courseTitle;
     }
@@ -65,10 +73,6 @@ public class CourseRecord {
 
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
-    }
-
-    public void setLastUpdated(LocalDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
     }
 
     @JsonProperty("courseId")
