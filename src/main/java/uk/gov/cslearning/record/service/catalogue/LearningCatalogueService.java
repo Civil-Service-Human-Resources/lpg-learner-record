@@ -30,15 +30,18 @@ public class LearningCatalogueService {
 
     private final String requiredLearningUrlFormat;
 
+    private final String isLearningRequiredUrlFormat;
 
     public LearningCatalogueService(RestTemplate restTemplate, RequestEntityFactory requestEntityFactory,
                                     @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,
-                                    @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat) {
+                                    @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat,
+                                    @Value("${catalogue.isLearningRequiredUrlFormat}") String isLearningRequiredUrlFormat) {
 
         this.restTemplate = restTemplate;
         this.requestEntityFactory = requestEntityFactory;
         this.requiredLearningUrlFormat = requiredLearningUrlFormat;
         this.courseUrlFormat = courseUrlFormat;
+        this.isLearningRequiredUrlFormat = isLearningRequiredUrlFormat;
     }
 
     public List<Course> getRequiredCoursesByDepartmentCode(String departmentId) {
@@ -53,6 +56,19 @@ public class LearningCatalogueService {
             return results.getResults();
         }
         return emptyList();
+    }
+
+    public boolean isCourseRequired(String courseId, String departmentId) {
+        RequestEntity requestEntity =
+            requestEntityFactory.createGetRequest(String.format(isLearningRequiredUrlFormat, courseId, departmentId));
+
+        Boolean isRequired = restTemplate.exchange(requestEntity, Boolean.class).getBody();
+
+        if (isRequired == null) {
+            return false;
+        }
+
+        return isRequired;
     }
 
     public Course getCourse(String courseId) {
