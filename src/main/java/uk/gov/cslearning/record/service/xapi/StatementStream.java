@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.service.catalogue.Audience;
 import uk.gov.cslearning.record.service.catalogue.Event;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.catalogue.Module;
@@ -92,6 +93,15 @@ public class StatementStream {
                         }
                         courseRecord = new CourseRecord(courseId, userId);
                         courseRecord.setCourseTitle(catalogueCourse.getTitle());
+                        courseRecord.setRequired(false);
+                        Collection<Audience> audiences = catalogueCourse.getAudiences();
+
+                        for (Audience audience : audiences) {
+                            if (audience.getType() == Audience.Type.REQUIRED_LEARNING) {
+                                courseRecord.setRequired(true);
+                                break;
+                            }
+                        }
                         records.put(courseId, courseRecord);
                     }
                     updatedRecords.put(courseId, courseRecord);

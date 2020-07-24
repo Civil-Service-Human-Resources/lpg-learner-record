@@ -1,5 +1,13 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import static java.util.Collections.emptyList;
+
+import java.util.List;
+
+import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.RequestEntityException;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,13 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.RequestEntityException;
-import uk.gov.cslearning.record.service.RequestEntityFactory;
-
-import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 @Service
 public class LearningCatalogueService {
@@ -30,18 +31,14 @@ public class LearningCatalogueService {
 
     private final String requiredLearningUrlFormat;
 
-    private final String isLearningRequiredUrlFormat;
-
     public LearningCatalogueService(RestTemplate restTemplate, RequestEntityFactory requestEntityFactory,
                                     @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,
-                                    @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat,
-                                    @Value("${catalogue.isLearningRequiredUrlFormat}") String isLearningRequiredUrlFormat) {
+                                    @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat) {
 
         this.restTemplate = restTemplate;
         this.requestEntityFactory = requestEntityFactory;
         this.requiredLearningUrlFormat = requiredLearningUrlFormat;
         this.courseUrlFormat = courseUrlFormat;
-        this.isLearningRequiredUrlFormat = isLearningRequiredUrlFormat;
     }
 
     public List<Course> getRequiredCoursesByDepartmentCode(String departmentId) {
@@ -56,19 +53,6 @@ public class LearningCatalogueService {
             return results.getResults();
         }
         return emptyList();
-    }
-
-    public boolean isCourseRequired(String courseId, String departmentId) {
-        RequestEntity requestEntity =
-            requestEntityFactory.createGetRequest(String.format(isLearningRequiredUrlFormat, courseId, departmentId));
-
-        Boolean isRequired = restTemplate.exchange(requestEntity, Boolean.class).getBody();
-
-        if (isRequired == null) {
-            return false;
-        }
-
-        return isRequired;
     }
 
     public Course getCourse(String courseId) {

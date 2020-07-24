@@ -35,6 +35,9 @@ public class CourseRecord {
     @JsonIgnore
     private String department;
 
+    @JsonIgnore
+    private boolean isRequired;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
     private Collection<ModuleRecord> moduleRecords;
 
@@ -99,6 +102,14 @@ public class CourseRecord {
 
     public void setState(State state) {
         this.state = state;
+    }
+
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    public void setRequired(boolean isRequired) {
+        this.isRequired = isRequired;
     }
 
     @JsonProperty("modules")

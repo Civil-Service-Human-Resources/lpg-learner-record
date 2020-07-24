@@ -33,7 +33,7 @@ public class Scheduler {
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "* */2 * * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
