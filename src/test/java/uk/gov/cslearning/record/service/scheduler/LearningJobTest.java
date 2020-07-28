@@ -1,5 +1,36 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.CourseRecordIdentity;
+import uk.gov.cslearning.record.domain.Notification;
+import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.NotificationRepository;
+import uk.gov.cslearning.record.service.CourseRefreshService;
+import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.identity.Identity;
+import uk.gov.cslearning.record.service.identity.IdentityService;
+import uk.gov.service.notify.NotificationClientException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,33 +41,6 @@ import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
-import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.CourseRecordIdentity;
-import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.NotificationType;
-import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.repository.JobArchiveRepository;
-import uk.gov.cslearning.record.repository.NotificationRepository;
-import uk.gov.cslearning.record.service.CourseRefreshService;
-import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.catalogue.Course;
-import uk.gov.cslearning.record.service.identity.Identity;
-import uk.gov.cslearning.record.service.identity.IdentityService;
-import uk.gov.service.notify.NotificationClientException;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -73,9 +77,6 @@ public class LearningJobTest {
 
     @Mock
     private CourseRefreshService courseRefreshService;
-
-    @Mock
-    private JobArchiveRepository jobArchiveRepository;
 
     private List<Course> incompleteCoursesDay;
     private List<Course> incompleteCoursesWeek;

@@ -1,14 +1,17 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import net.javacrumbs.shedlock.core.LockAssert;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import uk.gov.cslearning.record.service.LearnerService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.service.LearnerService;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component
 public class Scheduler {
@@ -22,9 +25,11 @@ public class Scheduler {
     @Autowired
     private LearnerService learnerService;
 
+    @SchedulerLock(name = "incompletedCoursesJob", lockAtMostFor = "3h")
     // cron to run every day at 02:00
     @Scheduled(cron = "0 0 2 * * *")
     public void learningJob() throws Exception {
+        LockAssert.assertLocked();
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
 //        learningJob.sendReminderNotificationForIncompleteCourses();
@@ -33,12 +38,14 @@ public class Scheduler {
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
-    @Scheduled(cron = "0 0 3 * * *")
+    @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "3h")
+    @Scheduled(cron = "* */2 * * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
+        LockAssert.assertLocked();
+
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
         learningJob.sendLineManagerNotificationForCompletedLearning();
-        LOGGER.info("Skipping sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }

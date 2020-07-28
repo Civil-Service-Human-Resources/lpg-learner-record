@@ -1,22 +1,21 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.JobArchive;
-import uk.gov.cslearning.record.domain.JobName;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.repository.JobArchiveRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
@@ -26,10 +25,15 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
+
+import com.google.common.collect.Lists;
 
 @Component
 public class LearningJob {
@@ -68,8 +72,6 @@ public class LearningJob {
 
     private CourseRefreshService courseRefreshService;
 
-    private JobArchiveRepository jobArchiveRepository;
-
     @Autowired
     public LearningJob(UserRecordService userRecordService,
             IdentityService identityService,
@@ -78,8 +80,7 @@ public class LearningJob {
             NotifyService notifyService,
             NotificationRepository notificationRepository,
             CourseRecordRepository courseRecordRepository,
-            CourseRefreshService courseRefreshService,
-            JobArchiveRepository jobArchiveRepository) {
+            CourseRefreshService courseRefreshService) {
         this.userRecordService = userRecordService;
         this.identityService = identityService;
         this.registryService = registryService;
@@ -88,23 +89,13 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
         this.courseRecordRepository = courseRecordRepository;
         this.courseRefreshService = courseRefreshService;
-        this.jobArchiveRepository = jobArchiveRepository;
     }
 
     @Transactional
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
 
-        LocalDateTime now = LocalDateTime.now();
-        Optional<JobArchive> jobArchive = jobArchiveRepository.findLatestByName(JobName.COMPLETED_COURSES_JOB.toString());
-        if (!jobArchive.isPresent() || jobArchive.get().getLastRun().isBefore(now)) {
-            performCompleteCoursesJob(now);
-            jobArchiveRepository.save(new JobArchive(JobName.COMPLETED_COURSES_JOB.toString(), now));
-        }
-    }
-
-    void performCompleteCoursesJob(LocalDateTime now) {
-        LocalDateTime since = now.minusDays(5);
+        LocalDateTime since = LocalDateTime.now().minusDays(10);
         courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
 
