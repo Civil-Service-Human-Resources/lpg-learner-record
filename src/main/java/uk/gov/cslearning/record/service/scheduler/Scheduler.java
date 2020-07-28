@@ -25,7 +25,7 @@ public class Scheduler {
     @Autowired
     private LearnerService learnerService;
 
-    @SchedulerLock(name = "incompletedCoursesJob", lockAtMostFor = "3h")
+    @SchedulerLock(name = "incompletedCoursesJob", lockAtMostFor = "PT4H")
     // cron to run every day at 02:00
     @Scheduled(cron = "0 0 2 * * *")
     public void learningJob() throws Exception {
@@ -38,8 +38,8 @@ public class Scheduler {
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
-    @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "3h")
-    @Scheduled(cron = "* */2 * * * *")
+    @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
+    @Scheduled(cron = "0 * * * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LockAssert.assertLocked();
 
