@@ -60,6 +60,15 @@ public class IdentityService {
         return null;
     }
 
+    public Optional<Identity> getIdentityByUid(String uid) {
+        LOGGER.debug("Getting identity for uid: {}", uid);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
+            .queryParam("uid", uid);
+
+        return getIdentity(builder.toUriString());
+    }
+
     public Optional<Identity> getIdentityByEmailAddress(String emailAddress){
         LOGGER.debug("Getting identity with email address {}", emailAddress);
 

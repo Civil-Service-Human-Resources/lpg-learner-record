@@ -32,7 +32,7 @@ public class Scheduler {
         LockAssert.assertLocked();
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
-        //learningJob.sendReminderNotificationForIncompleteCourses();
+        learningJob.sendReminderNotificationForIncompleteCourses();
         LOGGER.info("Skipping sendReminderNotificationForIncompleteCourses at {}", dateFormat.format(new Date()));
 
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
@@ -45,7 +45,7 @@ public class Scheduler {
 
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
 
-        learningJob.sendLineManagerNotificationForCompletedLearning();
+//        learningJob.sendLineManagerNotificationForCompletedLearning();
 
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }

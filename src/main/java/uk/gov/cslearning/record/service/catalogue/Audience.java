@@ -125,11 +125,11 @@ public class Audience {
 
     private long getYears(String frequency) {
         switch (frequency) {
-            case "YEARLY":
+            case "P1Y":
                 return 1;
-            case "THREE_YEARLY":
+            case "P3Y":
                 return 3;
-            case "FIVE_YEARLY":
+            case "P5Y":
                 return 5;
             default:
                 throw new RuntimeException("Unrecognised frequency " + frequency);
