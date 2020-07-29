@@ -32,14 +32,14 @@ public class Scheduler {
         LockAssert.assertLocked();
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
 
-//        learningJob.sendReminderNotificationForIncompleteCourses();
+        //learningJob.sendReminderNotificationForIncompleteCourses();
         LOGGER.info("Skipping sendReminderNotificationForIncompleteCourses at {}", dateFormat.format(new Date()));
 
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
     @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LockAssert.assertLocked();
 

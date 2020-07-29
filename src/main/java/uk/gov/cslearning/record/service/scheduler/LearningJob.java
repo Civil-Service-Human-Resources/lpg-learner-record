@@ -99,11 +99,8 @@ public class LearningJob {
         courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
 
-        completedCourseRecords.forEach(courseRecord -> {
-            if (courseRecord.isRequired()) {
-                registryService.getCivilServantByUid(courseRecord.getUserId()).ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since));
-            }
-        });
+        completedCourseRecords.forEach(courseRecord ->
+                registryService.getCivilServantByUid(courseRecord.getUserId()).ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
