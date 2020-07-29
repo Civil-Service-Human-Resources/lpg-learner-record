@@ -210,33 +210,4 @@ public class LearningJob {
             notificationRepository.save(notification);
         }
     }
-
-    void sendNotificationForPeriod2(Identity identity, Long period, List<CourseRecord> courses) {
-        StringBuilder requiredLearning = new StringBuilder();
-        for (CourseRecord c : courses) {
-            requiredLearning
-                .append(c.getCourseTitle())
-                .append("\n");
-        }
-
-        String periodText;
-        switch (period.intValue()) {
-            case 1:
-                periodText = DAY_PERIOD;
-                break;
-            case 7:
-                periodText = WEEK_PERIOD;
-                break;
-            default:
-                periodText = MONTH_PERIOD;
-                break;
-        }
-
-        notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
-
-        for (CourseRecord course : courses) {
-            Notification notification = new Notification(course.getCourseId(), identity.getUid(), NotificationType.REMINDER);
-            notificationRepository.save(notification);
-        }
-    }
 }
