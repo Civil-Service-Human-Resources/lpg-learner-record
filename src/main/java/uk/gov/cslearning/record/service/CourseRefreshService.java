@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.Statement;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -20,14 +21,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class CourseRefreshService {
     private final CourseRecordRepository courseRecordRepository;
     private final LearningCatalogueService learningCatalogueService;
+    private final RegistryService registryService;
     private final XApiService xApiService;
 
     @Autowired
     public CourseRefreshService(CourseRecordRepository courseRecordRepository,
             LearningCatalogueService learningCatalogueService,
+            RegistryService registryService,
             XApiService xApiService) {
         this.courseRecordRepository = courseRecordRepository;
         this.learningCatalogueService = learningCatalogueService;
+        this.registryService = registryService;
         this.xApiService = xApiService;
     }
 
@@ -35,7 +39,7 @@ public class CourseRefreshService {
     public void refreshCoursesForATimePeriod(LocalDateTime since) {
         try {
             Collection<Statement> statements = xApiService.getStatements(null, null, since);
-            StatementStream stream = new StatementStream(learningCatalogueService);
+            StatementStream stream = new StatementStream(learningCatalogueService, registryService);
             Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,  statement -> ((Activity) statement.getObject()).getId());
 
             courseRecordRepository.saveAll(updatedCourseRecords);
