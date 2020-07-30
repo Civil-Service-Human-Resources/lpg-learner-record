@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
-
-import com.google.common.collect.Lists;
 
 @Component
 public class LearningJob {
@@ -104,6 +101,20 @@ public class LearningJob {
                 registryService.getCivilServantByUid(courseRecord.getUserId()).ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
     }
 
+    @Transactional
+    public void sendReminderNotificationForIncompleteCourses() {
+        Map<String, List<CourseRecord>> incompletedCourseRecordsGroupedByUid = courseRecordRepository.findIncompleted()
+            .stream()
+            .collect(Collectors.groupingBy(CourseRecord::getUserId));
+        LocalDate now = LocalDate.now();
+
+        for (Map.Entry<String, List<CourseRecord>> courseEntry : incompletedCourseRecordsGroupedByUid.entrySet()) {
+            processIncompleteCoursesByIdentity(courseEntry.getKey(), courseEntry.getValue(), now);
+        }
+
+        LOGGER.info("Sending notifications complete");
+    }
+
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
         LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
 
@@ -120,48 +131,6 @@ public class LearningJob {
             notificationRepository.save(notification);
         } else {
             LOGGER.info("User has already been sent notification");
-        }
-    }
-
-    @Transactional
-    public void sendReminderNotificationForIncompleteCourses() {
-        Map<String, List<CourseRecord>> incompletedCourseRecordsGroupedByUid = courseRecordRepository.findIncompleted()
-            .stream()
-            .collect(Collectors.groupingBy(CourseRecord::getUserId));
-        LocalDate now = LocalDate.now();
-
-        for (Map.Entry<String, List<CourseRecord>> courseEntry : incompletedCourseRecordsGroupedByUid.entrySet()) {
-            processIncompleteCoursesByIdentity(courseEntry.getKey(), courseEntry.getValue(), now);
-        }
-
-        LOGGER.info("Sending notifications complete");
-    }
-
-    void processIncompleteCoursesByIdentity(String userId, List<CourseRecord> courseRecords, LocalDate now) {
-        Map<Long, List<Course>> incompleteCourses = new HashMap<>();
-        LocalDate mostRecentlyCompleted = null;
-        Optional<Identity> identity = identityService.getIdentityByUid(userId);
-
-        if (identity.isPresent()) {
-            for (CourseRecord courseRecord : courseRecords) {
-                Optional<CivilServant> civilServant = registryService.getCivilServantByUid(courseRecord.getUserId());
-                if (civilServant.isPresent()) {
-                    LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                    if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
-                        mostRecentlyCompleted = courseCompletionDate.toLocalDate();
-                    }
-                    Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
-                    LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant.get(), mostRecentlyCompleted);
-
-                    if (nextRequiredBy != null) {
-                        checkAndAdd(course, identity.get(), nextRequiredBy, now, incompleteCourses);
-                    }
-                }
-            }
-
-            for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
-                sendNotificationForPeriod(identity.get(), entry.getKey(), entry.getValue());
-            }
         }
     }
 
@@ -208,6 +177,41 @@ public class LearningJob {
         for (Course course : courses) {
             Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
             notificationRepository.save(notification);
+        }
+    }
+
+    private void processIncompleteCoursesByIdentity(String userId, List<CourseRecord> courseRecords, LocalDate now) {
+        Optional<Identity> fetchedIdentity = identityService.getIdentityByUid(userId);
+        fetchedIdentity.ifPresent(identity -> processIncompleteCoursesByCivilServantAndSendNotifications(identity, courseRecords, now));
+    }
+
+    private void processIncompleteCoursesByCivilServantAndSendNotifications(Identity identity, List<CourseRecord> courseRecords, LocalDate now) {
+        Map<Long, List<Course>> incompleteCourses = new HashMap<>();
+        Optional<CivilServant> fetchedCivilServant = registryService.getCivilServantByUid(identity.getUid());
+
+        fetchedCivilServant.ifPresent(civilServant ->
+            addValidIncompleteCoursesForNotifications(identity, civilServant, courseRecords, now, incompleteCourses));
+
+        for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
+            sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void addValidIncompleteCoursesForNotifications(Identity identity, CivilServant civilServant, List<CourseRecord> courseRecords, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
+        LocalDate mostRecentlyCompleted = null;
+
+        for (CourseRecord courseRecord : courseRecords) {
+            LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
+            if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
+                mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+            }
+
+            Course course = learningCatalogueService.getCourse(courseRecord.getCourseId());
+            LocalDate nextRequiredBy = course.getNextRequiredBy(civilServant, mostRecentlyCompleted);
+
+            if (nextRequiredBy != null) {
+                checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+            }
         }
     }
 }
