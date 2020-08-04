@@ -17,6 +17,7 @@ import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
+import uk.gov.cslearning.record.service.CodeGroupService;
 import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.UserRecordService;
@@ -103,7 +104,7 @@ public class LearningJob {
 
     @Transactional
     public void sendReminderNotificationForIncompleteCourses() {
-        Map<String, CourseGroup> courseRecordsGroupedByUserId = mapToCourseGroup(courseRecordRepository.findIncompleted());
+        Map<String, CourseGroup> courseRecordsGroupedByUserId = CodeGroupService.mapToCourseGroup(courseRecordRepository.findIncompleted());
         LocalDate now = LocalDate.now();
 
         for (Map.Entry<String, CourseGroup> courseEntry : courseRecordsGroupedByUserId.entrySet()) {
@@ -111,40 +112,6 @@ public class LearningJob {
         }
 
         LOGGER.info("Sending notifications complete");
-    }
-
-    private Map<String, CourseGroup> mapToCourseGroup(List<CourseRecord> incompletedCourses) {
-        Map<String, CourseGroup> courseGroups = new HashMap();
-        for (CourseRecord courseRecord : incompletedCourses) {
-            if (!courseGroups.containsKey(courseRecord.getUserId())) {
-                addNewCourseGroup(courseGroups, courseRecord);
-            } else {
-                addCourseToExistingCourseGroup(courseGroups, courseRecord);
-            }
-        }
-
-        return courseGroups;
-    }
-
-    private void addNewCourseGroup(Map<String, CourseGroup> courseGroups, CourseRecord courseRecord) {
-        List<CourseRecord> courseRecords = new ArrayList<>();
-        courseRecords.add(courseRecord);
-        Map<String, List<CourseRecord>> courseRecordsGroupedByCourseId = new HashMap<>();
-        courseRecordsGroupedByCourseId.put(courseRecord.getCourseId(), courseRecords);
-        courseGroups.put(courseRecord.getUserId(), new CourseGroup(courseRecord.getUserId(), courseRecordsGroupedByCourseId));
-    }
-
-    private void addCourseToExistingCourseGroup(Map<String, CourseGroup> courseGroups, CourseRecord courseRecord) {
-        Map<String, List<CourseRecord>> courseRecordsGroupedByCourseId = courseGroups.get(courseRecord.getUserId())
-            .getCourseRecordsGroupedByCourseId();
-        if (!courseRecordsGroupedByCourseId.containsKey(courseRecord.getCourseId())) {
-            List<CourseRecord> courseRecords = new ArrayList<>();
-            courseRecords.add(courseRecord);
-            courseRecordsGroupedByCourseId.put(courseRecord.getCourseId(), courseRecords);
-        } else {
-            List<CourseRecord> courseRecords = courseRecordsGroupedByCourseId.get(courseRecord.getCourseId());
-            courseRecords.add(courseRecord);
-        }
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
@@ -230,12 +197,12 @@ public class LearningJob {
     }
 
     private void addValidIncompleteCoursesForNotifications(Identity identity, CivilServant civilServant, Map<String, List<CourseRecord>> courseRecordsGroupedByCourseId, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
-        for (Map.Entry<String, List<CourseRecord>> entry : courseRecordsGroupedByCourseId.entrySet()) {
-            Course course = learningCatalogueService.getCourse(entry.getKey());
+        for (Map.Entry<String, List<CourseRecord>> courseEntry : courseRecordsGroupedByCourseId.entrySet()) {
+            Course course = learningCatalogueService.getCourse(courseEntry.getKey());
 
             LocalDate mostRecentlyCompleted = null;
 
-            for (CourseRecord courseRecord : entry.getValue()) {
+            for (CourseRecord courseRecord : courseEntry.getValue()) {
                 LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
                 if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
                     mostRecentlyCompleted = courseCompletionDate.toLocalDate();
