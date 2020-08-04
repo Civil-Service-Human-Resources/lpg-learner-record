@@ -186,15 +186,15 @@ public class LearningJob {
     }
 
     private void processIncompleteCoursesByCivilServantAndSendNotifications(Identity identity, List<CourseRecord> courseRecords, LocalDate now) {
-        Map<Long, List<Course>> incompleteCourses = new HashMap<>();
         Optional<CivilServant> fetchedCivilServant = registryService.getCivilServantByUid(identity.getUid());
 
-        fetchedCivilServant.ifPresent(civilServant ->
-            addValidIncompleteCoursesForNotifications(identity, civilServant, courseRecords, now, incompleteCourses));
-
-        for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
-            sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
-        }
+        fetchedCivilServant.ifPresent(civilServant -> {
+            Map<Long, List<Course>> incompleteCourses = new HashMap<>();
+            addValidIncompleteCoursesForNotifications(identity, civilServant, courseRecords, now, incompleteCourses);
+            for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
+                sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
+            }
+        });
     }
 
     private void addValidIncompleteCoursesForNotifications(Identity identity, CivilServant civilServant, List<CourseRecord> courseRecords, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
