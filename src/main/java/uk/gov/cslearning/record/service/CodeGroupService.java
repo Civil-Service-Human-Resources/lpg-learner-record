@@ -9,9 +9,9 @@ import uk.gov.cslearning.record.domain.CourseGroup;
 import uk.gov.cslearning.record.domain.CourseRecord;
 
 public class CodeGroupService {
-    public static Map<String, CourseGroup> mapToCourseGroup(List<CourseRecord> incompletedCourses) {
-        Map<String, CourseGroup> courseGroups = new HashMap();
-        for (CourseRecord courseRecord : incompletedCourses) {
+    public static Map<String, CourseGroup> mapToCourseGroup(List<CourseRecord> courses) {
+        Map<String, CourseGroup> courseGroups = new HashMap<>();
+        for (CourseRecord courseRecord : courses) {
             if (!courseGroups.containsKey(courseRecord.getUserId())) {
                 addNewCourseGroup(courseGroups, courseRecord);
             } else {
