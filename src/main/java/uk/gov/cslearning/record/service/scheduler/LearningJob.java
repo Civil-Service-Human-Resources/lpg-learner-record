@@ -155,7 +155,7 @@ public class LearningJob {
         for (Course c : courses) {
             requiredLearning
                     .append(c.getTitle())
-                    .append("\n");
+                    .append(System.lineSeparator());
         }
 
         String periodText;
