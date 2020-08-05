@@ -152,11 +152,9 @@ public class LearningJob {
 
     void sendNotificationForPeriod(Identity identity, Long period, List<Course> courses) {
         StringBuilder requiredLearning = new StringBuilder();
-        for (Course c : courses) {
-            requiredLearning
-                    .append(c.getTitle())
-                    .append(System.lineSeparator());
-        }
+        courses.forEach(course -> requiredLearning
+            .append(course.getTitle())
+            .append(System.lineSeparator()));
 
         String periodText;
         switch (period.intValue()) {
@@ -172,11 +170,7 @@ public class LearningJob {
         }
 
         notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
-
-        for (Course course : courses) {
-            Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
-            notificationRepository.save(notification);
-        }
+        courses.forEach(course -> notificationRepository.save(new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER)));
     }
 
     private void processIncompleteCoursesByIdentity(CourseGroup courseGroup, LocalDate now) {
@@ -197,12 +191,12 @@ public class LearningJob {
     }
 
     private void addValidIncompleteCoursesForNotifications(Identity identity, CivilServant civilServant, Map<String, List<CourseRecord>> courseRecordsGroupedByCourseId, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
-        for (Map.Entry<String, List<CourseRecord>> courseEntry : courseRecordsGroupedByCourseId.entrySet()) {
-            Course course = learningCatalogueService.getCourse(courseEntry.getKey());
+        courseRecordsGroupedByCourseId.forEach((courseId, courseRecords) -> {
+            Course course = learningCatalogueService.getCourse(courseId);
 
             LocalDate mostRecentlyCompleted = null;
 
-            for (CourseRecord courseRecord : courseEntry.getValue()) {
+            for (CourseRecord courseRecord : courseRecords) {
                 LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
                 if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
                     mostRecentlyCompleted = courseCompletionDate.toLocalDate();
@@ -214,6 +208,6 @@ public class LearningJob {
             if (nextRequiredBy != null) {
                 checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
             }
-        }
+        });
     }
 }
