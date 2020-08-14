@@ -61,11 +61,13 @@ registry:
   getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
   getResourceByUidUrl: "${registry.serviceUrl}/civilServants/resource/%s"
+  getResourceByOrgCodeUrl: "${registry.serviceUrl}/civilServants/organisation/%s"
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
   courseUrlFormat: "${catalogue.serviceUrl}/courses/%s"
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
+  requiredLearningUrlByDaysFormat: "${catalogue.serviceUrl}/courses?mandatory=true&days=%s"
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}

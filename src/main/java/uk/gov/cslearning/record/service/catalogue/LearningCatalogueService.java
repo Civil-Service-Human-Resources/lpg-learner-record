@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.service.catalogue;
 import static java.util.Collections.emptyList;
 
 import java.util.List;
+import java.util.Map;
 
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.RequestEntityException;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class LearningCatalogueService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
+    private static final String DUE_DAYS = "1,7,30";
 
     private final RestTemplate restTemplate;
 
@@ -31,14 +33,18 @@ public class LearningCatalogueService {
 
     private final String requiredLearningUrlFormat;
 
+    private final String requiredLearningUrlByDaysFormat;
+
     public LearningCatalogueService(RestTemplate restTemplate, RequestEntityFactory requestEntityFactory,
                                     @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,
-                                    @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat) {
+                                    @Value("${catalogue.requiredLearningUrlFormat}") String requiredLearningUrlFormat,
+                                    @Value("${catalogue.requiredLearningUrlByDaysFormat}") String requiredLearningUrlByDaysFormat) {
 
         this.restTemplate = restTemplate;
         this.requestEntityFactory = requestEntityFactory;
         this.requiredLearningUrlFormat = requiredLearningUrlFormat;
         this.courseUrlFormat = courseUrlFormat;
+        this.requiredLearningUrlByDaysFormat = requiredLearningUrlByDaysFormat;
     }
 
     public List<Course> getRequiredCoursesByDepartmentCode(String departmentId) {
@@ -53,6 +59,15 @@ public class LearningCatalogueService {
             return results.getResults();
         }
         return emptyList();
+    }
+
+    public Map<String, List<Course>> getRequiredCoursesByDueDaysGroupedByOrg() {
+        RequestEntity requestEntity =
+            requestEntityFactory.createGetRequest(String.format(requiredLearningUrlByDaysFormat, DUE_DAYS));
+
+        ResponseEntity<Map<String, List<Course>>> responseEntity = restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Map<String, List<Course>>>(){});
+
+        return responseEntity.getBody();
     }
 
     public Course getCourse(String courseId) {

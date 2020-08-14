@@ -4,16 +4,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +28,7 @@ public class RegistryService {
     private OAuth2RestOperations restOperations;
     private String findByUidUrlFormat;
     private String getResourceByUidUrl;
+    private String getResourceByOrgCodeUrl;
     private URI getCurrentUrl;
 
     @Autowired
@@ -31,12 +36,14 @@ public class RegistryService {
                            RequestEntityFactory requestEntityFactory,
                            @Value("${registry.getCurrentUrl}") URI getCurrentUrl,
                            @Value("${registry.getResourceByUidUrl}") String getResourceByUidUrl,
-                           @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat) {
+                           @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat,
+                           @Value("${registry.getResourceByOrgCodeUrl}") String getResourceByOrgCodeUrl) {
         this.restOperations = restOperations;
         this.requestEntityFactory = requestEntityFactory;
         this.findByUidUrlFormat = findByUidUrlFormat;
         this.getCurrentUrl = getCurrentUrl;
         this.getResourceByUidUrl = getResourceByUidUrl;
+        this.getResourceByOrgCodeUrl = getResourceByOrgCodeUrl;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -74,5 +81,18 @@ public class RegistryService {
             LOGGER.debug(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
         }
         return Optional.empty();
+    }
+
+    public List<CivilServant> getCivilServantsByOrgCode(String code) {
+        LOGGER.debug("Getting profile details for civil servants with organisation code {}", code);
+        LOGGER.debug("URL {}", String.format(getResourceByUidUrl, code));
+        RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(getResourceByOrgCodeUrl, code));
+
+        try {
+            return restOperations.exchange(requestEntity, new ParameterizedTypeReference<List<CivilServant>>(){}).getBody();
+        } catch (HttpClientErrorException e) {
+            LOGGER.debug(String.format("Cannot find profile details for civil servant with organisation code %s", code), e);
+        }
+        return Collections.emptyList();
     }
 }
