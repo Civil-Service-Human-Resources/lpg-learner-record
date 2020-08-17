@@ -95,7 +95,7 @@ public class LearningJob {
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
 
-        LocalDateTime since = LocalDateTime.now().minusDays(10);
+        LocalDateTime since = LocalDateTime.now().minusDays(1);
         courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
 
