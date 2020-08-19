@@ -224,6 +224,7 @@ public class StatementStream {
         return catalogueCourse.getAudiences()
             .stream()
             .anyMatch(audience -> audience.getType().equals(Audience.Type.REQUIRED_LEARNING)
+                && civilServant.getOrganisationalUnit() != null
                 && audience.getDepartments().contains(civilServant.getOrganisationalUnit().getCode()));
     }
 
