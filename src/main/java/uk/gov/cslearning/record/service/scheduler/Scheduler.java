@@ -39,7 +39,7 @@ public class Scheduler {
     }
 
     @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 */3 * * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LockAssert.assertLocked();
 

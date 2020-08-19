@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -12,9 +13,11 @@ import java.util.Optional;
 
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.CourseNotificationJobHistory;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.CourseNotificationJobHistoryRepository;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CourseRefreshService;
@@ -50,6 +53,10 @@ public class LearningJob {
 
     private static final long[] NOTIFICATION_PERIODS = new long[]{1, 7, 30};
 
+    private static final long MINIMUM__DAY_PERIOD = 1;
+
+    private static final long MAXIMUM__DAY_PERIOD = 7;
+
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
 
@@ -72,6 +79,8 @@ public class LearningJob {
 
     private CourseRefreshService courseRefreshService;
 
+    private CourseNotificationJobHistoryRepository courseNotificationJobHistoryRepository;
+
     @Autowired
     public LearningJob(UserRecordService userRecordService,
             IdentityService identityService,
@@ -80,7 +89,8 @@ public class LearningJob {
             NotifyService notifyService,
             NotificationRepository notificationRepository,
             CourseRecordRepository courseRecordRepository,
-            CourseRefreshService courseRefreshService) {
+            CourseRefreshService courseRefreshService,
+            CourseNotificationJobHistoryRepository courseNotificationJobHistoryRepository) {
         this.userRecordService = userRecordService;
         this.identityService = identityService;
         this.registryService = registryService;
@@ -89,18 +99,30 @@ public class LearningJob {
         this.notificationRepository = notificationRepository;
         this.courseRecordRepository = courseRecordRepository;
         this.courseRefreshService = courseRefreshService;
+        this.courseNotificationJobHistoryRepository = courseNotificationJobHistoryRepository;
     }
 
     @Transactional
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord(), now);
 
-        LocalDateTime since = LocalDateTime.now().minusDays(1);
+        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.COMPLETED_COURSES_JOB.name(), now);
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
         courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
 
+        courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
         completedCourseRecords.forEach(courseRecord ->
-                registryService.getCivilServantByUid(courseRecord.getUserId()).ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
+                registryService.getCivilServantByUid(courseRecord.getUserId())
+                    .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
+
+        courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
@@ -209,5 +231,23 @@ public class LearningJob {
             Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
             notificationRepository.save(notification);
         }
+    }
+
+    private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory, LocalDateTime now) {
+        if (courseNotificationJobHistory.isPresent()) {
+            LocalDateTime startedAt = courseNotificationJobHistory.get().getStartedAt();
+            long days = calculateDayDifference(Duration.between(startedAt, now).toDays());
+            return LocalDateTime.now().minusDays(days);
+        } else {
+            return LocalDateTime.now().minusDays(1);
+        }
+    }
+
+    private long calculateDayDifference(long days) {
+        if (days == 0) {
+            return MINIMUM__DAY_PERIOD;
+        }
+
+        return days;
     }
 }
