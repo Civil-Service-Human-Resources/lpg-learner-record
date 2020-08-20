@@ -156,39 +156,38 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
-
-        Map<Long, List<Course>> incompleteCourses = new HashMap<>();
-        LocalDate now = LocalDate.now();
-
-        coursesGroupedByUserId.forEach((userId, notificationCourseModule) -> {
-            for (Course course : notificationCourseModule.getCourses()) {
-                Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, Lists.newArrayList(course.getId()));
-                    LocalDate mostRecentlyCompleted = null;
-
-                    for (CourseRecord courseRecord : courseRecords) {
-                        LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                        if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
-                            mostRecentlyCompleted = courseCompletionDate.toLocalDate();
-                        }
-                    }
-
-                    LocalDate nextRequiredBy = course.getNextRequiredBy(notificationCourseModule.getCivilServant(), mostRecentlyCompleted);
-                    LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
-
-                    if (nextRequiredBy != null) {
-                        checkAndAdd(course, notificationCourseModule.getCivilServant().getIdentity(), nextRequiredBy, now, incompleteCourses);
-                    }
-                }
-            for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
-                sendNotificationForPeriod(notificationCourseModule.getCivilServant().getIdentity(), entry.getKey(), entry.getValue());
-            }
-        });
+        coursesGroupedByUserId.forEach((userId, notificationCourseModule) -> processGroupedCoursesAndSendNotifications(userId, notificationCourseModule, LocalDate.now()));
 
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
         LOGGER.info("Sending notifications complete");
     }
 
+    private void processGroupedCoursesAndSendNotifications(String userId, NotificationCourseModule notificationCourseModule, LocalDate now) {
+        Map<Long, List<Course>> incompleteCourses = new HashMap<>();
+
+        for (Course course : notificationCourseModule.getCourses()) {
+            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, Lists.newArrayList(course.getId()));
+            LocalDate mostRecentlyCompleted = null;
+
+            for (CourseRecord courseRecord : courseRecords) {
+                LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
+                if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
+                    mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+                }
+            }
+
+            LocalDate nextRequiredBy = course.getNextRequiredBy(notificationCourseModule.getCivilServant(), mostRecentlyCompleted);
+            LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
+
+            if (nextRequiredBy != null) {
+                checkAndAdd(course, notificationCourseModule.getCivilServant().getIdentity(), nextRequiredBy, now, incompleteCourses);
+            }
+        }
+        for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
+            sendNotificationForPeriod(notificationCourseModule.getCivilServant().getIdentity(), entry.getKey(), entry.getValue());
+        }
+    }
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
         if (nextRequiredBy.isBefore(now)) {
