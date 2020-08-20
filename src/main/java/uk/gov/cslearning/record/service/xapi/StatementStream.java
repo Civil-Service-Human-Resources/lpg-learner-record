@@ -223,7 +223,9 @@ public class StatementStream {
     private boolean isCourseRequired(uk.gov.cslearning.record.service.catalogue.Course catalogueCourse, CivilServant civilServant) {
         return catalogueCourse.getAudiences()
             .stream()
-            .anyMatch(audience -> audience.getType().equals(Audience.Type.REQUIRED_LEARNING)
+            .anyMatch(audience -> audience.getType() != null
+                && civilServant.getOrganisationalUnit() != null
+                && audience.getType().equals(Audience.Type.REQUIRED_LEARNING)
                 && audience.getDepartments().contains(civilServant.getOrganisationalUnit().getCode()));
     }
 
