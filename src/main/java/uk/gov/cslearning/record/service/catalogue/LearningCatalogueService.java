@@ -61,8 +61,7 @@ public class LearningCatalogueService {
     }
 
     public Map<String, List<Course>> getRequiredCoursesByDueDaysGroupedByOrg(String dueDays) {
-        RequestEntity requestEntity =
-            requestEntityFactory.createGetRequest(String.format(requiredLearningUrlByDaysFormat, dueDays));
+        RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(requiredLearningUrlByDaysFormat, dueDays));
 
         ResponseEntity<Map<String, List<Course>>> responseEntity = restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Map<String, List<Course>>>(){});
 

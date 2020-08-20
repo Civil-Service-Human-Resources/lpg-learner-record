@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
@@ -39,6 +38,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 @Component
@@ -51,13 +51,13 @@ public class LearningJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearningJob.class);
 
-    private static final long[] NOTIFICATION_PERIODS = new long[]{1, 7, 30};
+    private static final List<Long> NOTIFICATION_PERIODS = ImmutableList.of(1L, 7L, 30L);
 
-    private static final String NOTIFICATION_PERIOD_PARAM = Stream.of(NOTIFICATION_PERIODS)
+    private static final String NOTIFICATION_PERIOD_PARAM = NOTIFICATION_PERIODS.stream()
         .map(String::valueOf)
         .collect(Collectors.joining(","));
 
-    private static final long MINIMUM__DAY_PERIOD = 1;
+    private static final long MINIMUM_DAY_PERIOD = 1;
 
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
@@ -293,7 +293,7 @@ public class LearningJob {
 
     private long calculateDayDifference(long days) {
         if (days == 0) {
-            return MINIMUM__DAY_PERIOD;
+            return MINIMUM_DAY_PERIOD;
         }
 
         return days;
