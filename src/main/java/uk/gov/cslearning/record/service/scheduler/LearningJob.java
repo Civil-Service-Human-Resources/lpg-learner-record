@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
@@ -42,7 +43,6 @@ import com.google.common.collect.Lists;
 
 @Component
 public class LearningJob {
-
     private static final String DAY_PERIOD = "1 day";
 
     private static final String WEEK_PERIOD = "1 week";
@@ -51,13 +51,13 @@ public class LearningJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearningJob.class);
 
-    private static final String COURSE_URI_FORMAT = "http://cslearning.gov.uk/courses/%s";
-
     private static final long[] NOTIFICATION_PERIODS = new long[]{1, 7, 30};
 
-    private static final long MINIMUM__DAY_PERIOD = 1;
+    private static final String NOTIFICATION_PERIOD_PARAM = Stream.of(NOTIFICATION_PERIODS)
+        .map(String::valueOf)
+        .collect(Collectors.joining(","));
 
-    private static final long MAXIMUM__DAY_PERIOD = 7;
+    private static final long MINIMUM__DAY_PERIOD = 1;
 
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
@@ -148,7 +148,13 @@ public class LearningJob {
 
     @Transactional
     public void sendReminderNotificationForIncompleteCourses() {
-        Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg();
+        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
+        Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
+        courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
 
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
@@ -177,6 +183,9 @@ public class LearningJob {
                 sendNotificationForPeriod(notificationCourseModule.getCivilServant().getIdentity(), entry.getKey(), entry.getValue());
             }
         });
+
+        courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
         LOGGER.info("Sending notifications complete");
     }
 

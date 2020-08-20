@@ -23,7 +23,6 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class LearningCatalogueService {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotifyService.class);
-    private static final String DUE_DAYS = "1,7,30";
 
     private final RestTemplate restTemplate;
 
@@ -61,9 +60,9 @@ public class LearningCatalogueService {
         return emptyList();
     }
 
-    public Map<String, List<Course>> getRequiredCoursesByDueDaysGroupedByOrg() {
+    public Map<String, List<Course>> getRequiredCoursesByDueDaysGroupedByOrg(String dueDays) {
         RequestEntity requestEntity =
-            requestEntityFactory.createGetRequest(String.format(requiredLearningUrlByDaysFormat, DUE_DAYS));
+            requestEntityFactory.createGetRequest(String.format(requiredLearningUrlByDaysFormat, dueDays));
 
         ResponseEntity<Map<String, List<Course>>> responseEntity = restTemplate.exchange(requestEntity, new ParameterizedTypeReference<Map<String, List<Course>>>(){});
 
