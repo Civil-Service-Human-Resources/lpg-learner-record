@@ -26,7 +26,7 @@ public class Scheduler {
     private LearnerService learnerService;
 
     @SchedulerLock(name = "incompletedCoursesJob", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 0 3 * * *")
+    @Scheduled(cron = "0 */15 * * * *")
     public void learningJob() throws Exception {
         LockAssert.assertLocked();
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
@@ -37,7 +37,7 @@ public class Scheduler {
     }
 
     @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void sendNotificationForCompletedLearning() throws Exception {
         LockAssert.assertLocked();
 
