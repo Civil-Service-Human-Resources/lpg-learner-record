@@ -104,7 +104,6 @@ public class LearningJob {
         this.courseNotificationJobHistoryRepository = courseNotificationJobHistoryRepository;
     }
 
-    @Transactional
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
         LocalDateTime now = LocalDateTime.now();
@@ -146,7 +145,6 @@ public class LearningJob {
         }
     }
 
-    @Transactional
     public void sendReminderNotificationForIncompleteCourses() {
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
@@ -211,7 +209,7 @@ public class LearningJob {
         for (Course c : courses) {
             requiredLearning
                     .append(c.getTitle())
-                    .append("\n");
+                    .append(System.lineSeparator());
         }
 
         String periodText;
