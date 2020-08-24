@@ -35,7 +35,7 @@ public class NotifyService {
             NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.debug("Reminder notify email sent: {}", response.getBody());
+            LOGGER.info("Reminder notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
         }
