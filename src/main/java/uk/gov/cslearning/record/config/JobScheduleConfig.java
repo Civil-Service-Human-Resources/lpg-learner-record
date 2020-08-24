@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "PT4H")
+@EnableSchedulerLock(defaultLockAtMostFor = "PT2H")
 public class JobScheduleConfig {
     @Bean
     public LockProvider lockProvider(DataSource dataSource) {
