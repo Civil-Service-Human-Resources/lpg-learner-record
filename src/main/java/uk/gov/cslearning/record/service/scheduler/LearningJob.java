@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import com.google.common.collect.ImmutableList;
@@ -155,18 +154,20 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
-        coursesGroupedByUserId.forEach((userId, notificationCourseModule) -> processGroupedCoursesAndSendNotifications(userId, notificationCourseModule, LocalDate.now()));
+        coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
+            identityService.getIdentityByUid(userId)
+                .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, notificationCourseModule, LocalDate.now())));
 
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
         LOGGER.info("Sending notifications complete");
     }
 
-    private void processGroupedCoursesAndSendNotifications(String userId, NotificationCourseModule notificationCourseModule, LocalDate now) {
+    private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
 
         for (Course course : notificationCourseModule.getCourses()) {
-            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(userId, Lists.newArrayList(course.getId()));
+            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
             LocalDate mostRecentlyCompleted = null;
 
             for (CourseRecord courseRecord : courseRecords) {
@@ -180,11 +181,11 @@ public class LearningJob {
             LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
 
             if (nextRequiredBy != null) {
-                checkAndAdd(course, notificationCourseModule.getCivilServant().getIdentity(), nextRequiredBy, now, incompleteCourses);
+                checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
             }
         }
         for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
-            sendNotificationForPeriod(notificationCourseModule.getCivilServant().getIdentity(), entry.getKey(), entry.getValue());
+            sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
         }
     }
 
