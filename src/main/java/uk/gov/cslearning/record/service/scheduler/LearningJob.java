@@ -150,6 +150,7 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
+        coursesGroupedByOrg.forEach((orgId, courses) -> LOGGER.info("Course size {} for orgId {}", courses.size(), orgId));
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
