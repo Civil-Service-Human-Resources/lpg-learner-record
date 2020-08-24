@@ -85,7 +85,7 @@ public class RegistryService {
 
     public List<CivilServant> getCivilServantsByOrgCode(String code) {
         LOGGER.debug("Getting profile details for civil servants with organisation code {}", code);
-        LOGGER.info("URL {}", String.format(getResourceByUidUrl, code));
+        LOGGER.info("URL {}", String.format(getResourceByOrgCodeUrl, code));
         RequestEntity requestEntity = requestEntityFactory.createGetRequest(String.format(getResourceByOrgCodeUrl, code));
 
         try {
