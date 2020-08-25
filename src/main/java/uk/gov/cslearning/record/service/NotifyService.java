@@ -32,6 +32,7 @@ public class NotifyService {
         personalisation.put(PERIOD_PERMISSION, period);
 
         try {
+            LOGGER.info(personalisation.toString());
             NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
