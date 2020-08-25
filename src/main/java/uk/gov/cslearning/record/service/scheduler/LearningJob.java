@@ -184,7 +184,6 @@ public class LearningJob {
             }
         }
 
-        LOGGER.info("Sending notifications for user: {}", identity.getUid());
         for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
             sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
         }
@@ -228,6 +227,7 @@ public class LearningJob {
                 break;
         }
 
+        LOGGER.info("Sending notification for user {} with content: {}", identity.getUsername(), requiredLearning.toString());
         notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {
