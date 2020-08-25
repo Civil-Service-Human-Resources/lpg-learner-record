@@ -57,14 +57,14 @@ public class RegistryService {
     }
 
     public Optional<CivilServant> getCivilServantByUid(String uid) {
-        LOGGER.debug("Getting profile details for civil servant with UID {}", uid);
+        LOGGER.info("Getting profile details for civil servant with UID {}", uid);
         LOGGER.debug("URL {}", String.format(findByUidUrlFormat, uid));
 
         try {
             CivilServant civilServant = restOperations.getForObject(String.format(findByUidUrlFormat, uid), CivilServant.class);
             return Optional.ofNullable(civilServant);
         } catch (HttpClientErrorException e) {
-            LOGGER.debug(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
+            LOGGER.info(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
         }
 
         return Optional.empty();

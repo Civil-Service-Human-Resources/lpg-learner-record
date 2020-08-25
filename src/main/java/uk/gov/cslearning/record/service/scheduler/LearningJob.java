@@ -152,7 +152,9 @@ public class LearningJob {
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
+        LOGGER.info("Grouping by user id");
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
+        LOGGER.info("Processing courses grouped by user id");
         coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
             identityService.getIdentityByUid(userId)
                 .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, notificationCourseModule, LocalDate.now())));
@@ -183,6 +185,8 @@ public class LearningJob {
                 checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
             }
         }
+
+        LOGGER.info("Sending notifications for user: {}", identity.getUid());
         for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
             sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
         }
@@ -243,7 +247,7 @@ public class LearningJob {
                 if (!coursesGroupedByUserId.containsKey(civilServant.getIdentity().getUid())) {
                     coursesGroupedByUserId.putIfAbsent(civilServant.getIdentity().getUid(), new NotificationCourseModule(civilServant, filterCompletedCourses(courses, civilServant.getIdentity())));
                 } else {
-                    List<Course> presentCourses = addIncompletedCoursesCoursesForUser(coursesGroupedByUserId, courses, civilServant);
+                    List<Course> presentCourses = addIncompletedCoursesForUser(coursesGroupedByUserId, courses, civilServant);
                     coursesGroupedByUserId.get(civilServant.getIdentity().getUid()).getCourses().addAll(presentCourses);
                 }
             });
@@ -264,7 +268,7 @@ public class LearningJob {
         return incompletedCourses;
     }
 
-    private List<Course> addIncompletedCoursesCoursesForUser(Map<String, NotificationCourseModule> coursesGroupedByUserId, List<Course> courses, CivilServant civilServant) {
+    private List<Course> addIncompletedCoursesForUser(Map<String, NotificationCourseModule> coursesGroupedByUserId, List<Course> courses, CivilServant civilServant) {
         List<Course> presentCourses = coursesGroupedByUserId.get(civilServant.getIdentity().getUid())
             .getCourses();
         List<String> presentCourseIds = presentCourses.stream()
