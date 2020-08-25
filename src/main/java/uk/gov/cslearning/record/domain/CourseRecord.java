@@ -38,7 +38,7 @@ public class CourseRecord {
     @JsonIgnore
     private boolean isRequired;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord", fetch = FetchType.EAGER)
     private Collection<ModuleRecord> moduleRecords;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
