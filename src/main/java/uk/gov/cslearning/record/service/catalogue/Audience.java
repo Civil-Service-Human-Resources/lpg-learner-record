@@ -1,12 +1,14 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.List;
+
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Audience {
@@ -116,23 +118,16 @@ public class Audience {
     }
 
     private LocalDate decrement(LocalDate dateTime, String frequency) {
-        return dateTime.minusYears(getYears(frequency));
+        Period period = Period.parse(frequency);
+        return dateTime
+            .minusYears(period.getYears())
+            .minusMonths(period.getMonths());
     }
 
     private LocalDate increment(LocalDate dateTime, String frequency) {
-        return dateTime.plusYears(getYears(frequency));
-    }
-
-    private long getYears(String frequency) {
-        switch (frequency) {
-            case "P1Y":
-                return 1;
-            case "P3Y":
-                return 3;
-            case "P5Y":
-                return 5;
-            default:
-                throw new RuntimeException("Unrecognised frequency " + frequency);
-        }
+        Period period = Period.parse(frequency);
+        return dateTime
+            .plusYears(period.getYears())
+            .plusMonths(period.getMonths());
     }
 }
