@@ -172,8 +172,7 @@ public class LearningJob {
             LocalDate mostRecentlyCompleted = null;
             for (CourseRecord courseRecord : courseRecords) {
                 LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
-                    LOGGER.info("Is courseCompletionDate null: {}", courseCompletionDate == null);
+                if (courseCompletionDate != null && (mostRecentlyCompleted == null) || (courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate()))) {
                     mostRecentlyCompleted = courseCompletionDate.toLocalDate();
                 }
             }
