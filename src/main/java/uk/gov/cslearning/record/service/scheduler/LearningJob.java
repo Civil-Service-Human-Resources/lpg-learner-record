@@ -169,20 +169,18 @@ public class LearningJob {
 
         for (Course course : notificationCourseModule.getCourses()) {
             Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-            if (!course.isComplete(courseRecords)) {
-                LocalDate mostRecentlyCompleted = null;
-                for (CourseRecord courseRecord : courseRecords) {
-                    LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                    if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
-                        mostRecentlyCompleted = courseCompletionDate.toLocalDate();
-                    }
+            LocalDate mostRecentlyCompleted = null;
+            for (CourseRecord courseRecord : courseRecords) {
+                LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
+                if (mostRecentlyCompleted == null || courseCompletionDate != null && mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate())) {
+                    mostRecentlyCompleted = courseCompletionDate.toLocalDate();
                 }
-                LocalDate nextRequiredBy = course.getNextRequiredBy(notificationCourseModule.getCivilServant(), mostRecentlyCompleted);
-                LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
+            }
+            LocalDate nextRequiredBy = course.getNextRequiredBy(notificationCourseModule.getCivilServant(), mostRecentlyCompleted);
+            LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
 
-                if (nextRequiredBy != null) {
-                    checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
-                }
+            if (nextRequiredBy != null) {
+                checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
             }
         }
 
