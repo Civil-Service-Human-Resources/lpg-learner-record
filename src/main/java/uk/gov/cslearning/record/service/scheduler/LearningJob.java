@@ -145,7 +145,6 @@ public class LearningJob {
     }
 
     public void sendReminderNotificationForIncompleteCourses() {
-        courseRefreshService.refreshCoursesForATimePeriod(LocalDateTime.now().minusDays(1));
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
@@ -246,13 +245,29 @@ public class LearningJob {
                 if (!coursesGroupedByUserId.containsKey(civilServant.getIdentity().getUid())) {
                     coursesGroupedByUserId.putIfAbsent(civilServant.getIdentity().getUid(), new NotificationCourseModule(civilServant, filterCompletedCourses(courses, civilServant.getIdentity())));
                 } else {
-                    List<Course> presentCourses = addIncompletedCoursesForUser(coursesGroupedByUserId, courses, civilServant);
-                    coursesGroupedByUserId.get(civilServant.getIdentity().getUid()).getCourses().addAll(presentCourses);
+                    List<Course> presentCourses = coursesGroupedByUserId.get(civilServant.getIdentity().getUid())
+                        .getCourses();
+                    addCourseIfDoesNotExist(courses, presentCourses, civilServant.getIdentity());
                 }
             });
         });
 
         return coursesGroupedByUserId;
+    }
+
+    private void addCourseIfDoesNotExist(List<Course> courses, List<Course> presentCourses, Identity identity) {
+        List<Course> filteredCompletedCourses = filterCompletedCourses(courses, identity);
+
+        List<String> presentCoursesIds = presentCourses.parallelStream()
+            .map(Course::getId)
+            .collect(Collectors.toList());
+
+        filteredCompletedCourses.forEach(filteredCompletedCourse -> {
+            if (!presentCoursesIds.contains(filteredCompletedCourse.getId())) {
+                presentCourses.add(filteredCompletedCourse);
+                presentCoursesIds.add(filteredCompletedCourse.getId());
+            }
+        });
     }
 
     private List<Course> filterCompletedCourses(List<Course> courses, Identity identity) {
@@ -265,21 +280,6 @@ public class LearningJob {
         });
 
         return incompletedCourses;
-    }
-
-    private List<Course> addIncompletedCoursesForUser(Map<String, NotificationCourseModule> coursesGroupedByUserId, List<Course> courses, CivilServant civilServant) {
-        List<Course> presentCourses = coursesGroupedByUserId.get(civilServant.getIdentity().getUid())
-            .getCourses();
-        List<String> presentCourseIds = presentCourses.stream()
-            .map(Course::getId)
-            .collect(Collectors.toList());
-        courses.forEach(course -> {
-            if (!presentCourseIds.contains(course.getId()) && !courseRecordRepository.findCompletedByCourseIdAndUserId(course.getId(), civilServant.getIdentity().getUid()).isPresent()) {
-                presentCourses.add(course);
-            }
-        });
-
-        return presentCourses;
     }
 
     private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory, LocalDateTime now) {
