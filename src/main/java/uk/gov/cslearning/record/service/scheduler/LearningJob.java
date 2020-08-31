@@ -145,6 +145,7 @@ public class LearningJob {
     }
 
     public void sendReminderNotificationForIncompleteCourses() {
+        courseRefreshService.refreshCoursesForATimePeriod(LocalDateTime.now().minusDays(1));
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
