@@ -67,7 +67,7 @@ catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
   courseUrlFormat: "${catalogue.serviceUrl}/courses/%s"
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
-  requiredLearningUrlByDaysFormat: "${catalogue.serviceUrl}/courses?mandatory=true&days=%s"
+  requiredLearningUrlByDaysFormat: "${catalogue.serviceUrl}/courses?mandatory=true&days=%s&size=1000000000"
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}
