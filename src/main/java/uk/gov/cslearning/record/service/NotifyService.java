@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.service.notify.NotificationClient;
@@ -9,6 +10,8 @@ import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
 import java.util.HashMap;
+
+import javax.annotation.PostConstruct;
 
 @Service
 public class NotifyService {
@@ -24,6 +27,13 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
+    private NotificationClient notificationClient;
+
+    @PostConstruct
+    public void initializeNotificationClient() {
+        notificationClient = new NotificationClient(govNotifyKey);
+    }
+
     public void notifyForIncompleteCourses(String email, String requiredLearning, String templateId, String period) {
         LOGGER.debug("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
         HashMap<String, String> personalisation = new HashMap<>();
@@ -33,8 +43,7 @@ public class NotifyService {
 
         try {
             LOGGER.info(personalisation.toString());
-            NotificationClient client = new NotificationClient(govNotifyKey);
-            SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
+            SendEmailResponse response = notificationClient.sendEmail(templateId, email, personalisation, "");
 
             LOGGER.info("Reminder notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
