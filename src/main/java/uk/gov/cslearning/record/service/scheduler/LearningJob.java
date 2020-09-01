@@ -155,9 +155,9 @@ public class LearningJob {
         LOGGER.info("Grouping by user id");
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
         LOGGER.info("Processing courses grouped by user id");
-        coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
-            identityService.getIdentityByUid(userId)
-                .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, notificationCourseModule, LocalDate.now())));
+        coursesGroupedByUserId.entrySet().parallelStream().forEach(entry ->
+            identityService.getIdentityByUid(entry.getKey())
+                .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, entry.getValue(), LocalDate.now())));
 
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
@@ -184,9 +184,8 @@ public class LearningJob {
             }
         }
 
-        for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
-            sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
-        }
+        incompleteCourses.entrySet().parallelStream().forEach(entry ->
+            sendNotificationForPeriod(identity, entry.getKey(), entry.getValue()));
     }
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
