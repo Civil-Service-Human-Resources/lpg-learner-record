@@ -113,6 +113,8 @@ public class LearningJob {
 
         courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
+        
+        LOGGER.info("Found {} completed course records", completedCourseRecords.size());
 
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
