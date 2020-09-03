@@ -60,7 +60,6 @@ public class NotifyService {
         personalisation.put(COURSE_TITLE_PERMISSION, courseTitle);
 
         try {
-            NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
             LOGGER.info("Complete notify email sent: {}", response.getBody());
