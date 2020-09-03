@@ -117,7 +117,7 @@ public class LearningJob {
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
-        completedCourseRecords.forEach(courseRecord ->
+        completedCourseRecords.parallelStream().forEach(courseRecord ->
                 registryService.getCivilServantByUid(courseRecord.getUserId())
                     .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
 
