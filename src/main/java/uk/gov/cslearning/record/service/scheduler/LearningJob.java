@@ -102,7 +102,6 @@ public class LearningJob {
         this.courseNotificationJobHistoryRepository = courseNotificationJobHistoryRepository;
     }
 
-    @Transactional
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
         LocalDateTime now = LocalDateTime.now();
@@ -145,8 +144,7 @@ public class LearningJob {
             LOGGER.info("User has already been sent notification");
         }
     }
-
-    @Transactional
+    
     public void sendReminderNotificationForIncompleteCourses() {
         Collection<Identity> identities = identityService.listAll();
 
