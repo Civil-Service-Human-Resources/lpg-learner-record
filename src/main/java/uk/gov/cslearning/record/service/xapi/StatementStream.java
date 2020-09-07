@@ -1,22 +1,9 @@
 package uk.gov.cslearning.record.service.xapi;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import gov.adlnet.xapi.model.Statement;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -30,9 +17,15 @@ import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.time.LocalDateTime;
+import java.util.*;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
+@Slf4j
 public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
@@ -52,14 +45,20 @@ public class StatementStream {
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id, Collection<CourseRecord> existingCourseRecords) {
         Map<String, List<Statement>> groups = new HashMap<>();
+
+        log.info("Mapping statement collection");
         Map<String, CourseRecord> records = existingCourseRecords.stream()
                 .collect(toMap(CourseRecord::getCourseId, c -> c));
+        log.info("Mapping done");
 
         Map<String, CourseRecord> updatedRecords = new HashMap<>();
 
         List<Statement> sortedStatements = new ArrayList<>(statements);
+        log.info("Sorting statements");
         sortedStatements.sort(Comparator.comparing(Statement::getTimestamp));
+        log.info("Statements sorted");
 
+        log.info("Grouping statements");
         for (Statement statement : sortedStatements) {
             String groupId = id.get(statement);
             if (!groups.containsKey(groupId)) {
@@ -74,13 +73,23 @@ public class StatementStream {
                 }
             }
         }
+        log.info("Statements grouped");
 
+        log.info("Processing statement groups");
         for (Map.Entry<String, List<Statement>> entry : groups.entrySet()) {
 
-            List<Statement> group = entry.getValue();
-            group.sort(Comparator.comparing(Statement::getTimestamp));
+            log.info("Processing group {}", entry.getKey());
 
+            List<Statement> group = entry.getValue();
+
+            log.info("Sorting group {}", entry.getKey());
+            group.sort(Comparator.comparing(Statement::getTimestamp));
+            log.info("Group {} sorted", entry.getKey());
+
+            log.info("Processing group {} statements", entry.getKey());
             for (Statement statement : group) {
+                log.info("Processing statement {} in group {}", statement.getId(), entry.getKey());
+                log.info("Data filling, statement {} in group {}", statement.getId(), entry.getKey());
                 Activity activity = Activity.getFor(statement);
 
                 if (activity != null) {
@@ -89,9 +98,15 @@ public class StatementStream {
                         LOGGER.info("Ignoring statement with no course ID {}", statement);
                         continue;
                     }
+                    log.info("Statement has course {}", courseId);
+
+                    log.info("Getting course record from existing data (Should be empty collection)");
                     CourseRecord courseRecord = records.get(courseId);
+                    log.info("Retrieved from existing data set (Should be empty and instantaneous)");
+                    log.info("Getting course {} info from catalogue", courseId);
                     uk.gov.cslearning.record.service.catalogue.Course catalogueCourse
                             = learningCatalogueService.getCachedCourse(courseId);
+                    log.info("Course {} retrieved from catalogue");
 
                     if (catalogueCourse == null) {
                         LOGGER.info("Ignoring statement with no catalogue course, courseId: {}", courseId);
@@ -99,6 +114,7 @@ public class StatementStream {
                     }
 
                     if (courseRecord == null) {
+                        log.info("Record not found in existing data, creating (This should always happen)");
                         String userId = group.get(0).getActor().getAccount().getName();
                         if (userId == null) {
                             LOGGER.info("Ignoring statement with no user ID {}", statement);
@@ -108,27 +124,45 @@ public class StatementStream {
                         courseRecord.setCourseTitle(catalogueCourse.getTitle());
                         courseRecord.setRequired(false);
 
+                        log.info("Getting user {} info for course from CSRS", userId);
                         Optional<CivilServant> civilServant = registryService.getCivilServantByUid(userId);
+                        log.info("User {} info retrieved", userId);
 
+                        log.info("Checking if course {} is mandatory for user {}", courseId, userId);
                         if (civilServant.isPresent() && isCourseRequired(catalogueCourse, civilServant.get())) {
+                            // TODO: Might be a bug here, if course is mandatory for user x but not user y, if user x is processed first user y will be processed after and set required to false, mandatory seems to be decided here while considering a specific user for everyone
+                            log.info("Course {} is mandatory for user {}", courseId, userId);
                             courseRecord.setRequired(true);
                         }
+                        //TODO: Might be a bug part 2, this rights the record back to the list of course with the mandatory flag set, this block is only entered if a course has not been seen before
+                        log.info("\"Cache\" course info");
                         records.put(courseId, courseRecord);
                     }
+
+                    log.info("Adding course record {} to updated set", courseId);
                     updatedRecords.put(courseId, courseRecord);
+                    log.info("Added {}", courseId);
+
+                    log.info("Data filling complete, statement {} in group {}", statement.getId(), entry.getKey());
+
+                    log.info("Action processing, statement {} in group {}", statement.getId(), entry.getKey());
 
                     if (activity instanceof Course) {
+                        log.info("Statement is a course, doing course updates");
                         replay(statement, courseRecord, null);
                         for (ModuleRecord moduleRecord : courseRecord.getModuleRecords()) {
                             replay(statement, courseRecord, moduleRecord);
                         }
+                        log.info("Completed statement course updates");
                     } else {
+                        log.info("Statement is a module, doing module updates");
                         String moduleId = activity.getModuleId();
                         if (moduleId == null) {
                             LOGGER.info("Ignoring statement with no module ID {}", statement);
                             continue;
                         }
 
+                        log.info("Getting existing module record");
                         ModuleRecord moduleRecord = courseRecord.getModuleRecord(moduleId);
                         Module catalogueModule = catalogueCourse.getModule(moduleId);
 
@@ -139,6 +173,7 @@ public class StatementStream {
                         }
 
                         if (moduleRecord == null) {
+                            log.info("No existing module record, creating");
                             moduleRecord = new ModuleRecord(moduleId);
                             moduleRecord.setCreatedAt(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
 
@@ -149,10 +184,12 @@ public class StatementStream {
                             moduleRecord.setDuration(catalogueModule.getDuration());
 
                             courseRecord.addModuleRecord(moduleRecord);
+                            log.info("Module record created");
                         }
 
                         String eventId = activity.getEventId();
                         if (eventId != null) {
+                            log.info("Module has an event, getting event info");
                             moduleRecord.setEventId(eventId);
 
                             Event catalogueEvent = catalogueModule.getEvent(eventId);
@@ -165,16 +202,20 @@ public class StatementStream {
                             if (!catalogueEvent.getDateRanges().isEmpty()) {
                                 moduleRecord.setEventDate(catalogueEvent.getDateRanges().get(0).getDate());
                             }
+                            log.info("Filled event info");
                         }
 
                         replay(statement, courseRecord, moduleRecord);
 
+                        log.info("Checking if updated infomation completes course");
                         if (checkComplete(courseRecord, catalogueCourse)) {
+                            log.info("Course is completed, updating");
                             courseRecord.setState(State.COMPLETED);
                         }
                     }
                 }
             }
+            log.info("Processed group {} statements", entry.getKey());
         }
         return updatedRecords.values();
     }
@@ -207,15 +248,19 @@ public class StatementStream {
     }
 
     private void replay(Statement statement, CourseRecord courseRecord, ModuleRecord moduleRecord) {
+        log.info("Action replay processing");
         Action action = Action.getFor(statement);
         if (action != null) {
+            log.info("Doing {} action", action);
             action.replay(courseRecord, moduleRecord);
         } else {
             LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
         }
+        log.info("Updating course timestamp");
         courseRecord.setLastUpdated(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
 
         if (moduleRecord != null) {
+            log.info("Updating module timestamp");
             moduleRecord.setUpdatedAt(courseRecord.getLastUpdated());
         }
     }

@@ -111,42 +111,61 @@ public class LearningJob {
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
         LocalDateTime now = LocalDateTime.now();
+        LOGGER.info("Getting last execution");
         LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord());
+        LOGGER.info("Last execution is {}", since);
 
+        LOGGER.info("Creating job history record");
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.COMPLETED_COURSES_JOB.name(), now);
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+        LOGGER.info("Initial job history record created");
 
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
-        
-        LOGGER.info("Found {} completed course records", completedCourseRecords.size());
+        LOGGER.info("Done, found {} completed course records", completedCourseRecords.size());
 
+        LOGGER.info("Updating job history data acquisition time");
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+        LOGGER.info("History updated");
 
+        LOGGER.info("Starting notification processing (Getting civil servant, checking notification history and sending if required");
         completedCourseRecords.parallelStream().forEach(courseRecord ->
                 registryService.getCivilServantByUid(courseRecord.getUserId())
                     .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
+        LOGGER.info("Finished notification processing");
 
+        LOGGER.info("Updating job history with complete time");
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+        LOGGER.info("Job history updated");
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
-        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
+        LOGGER.info("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
 
+        LOGGER.info("Finding historic notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(courseRecord.getUserId(), courseRecord.getCourseId(), NotificationType.COMPLETE);
+        LOGGER.info("Done (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
             .orElse(true);
 
         if (shouldSendNotification) {
+            LOGGER.info("Notification needs to be sent (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
+
+            LOGGER.info("Getting line manager email address (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
             String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
+            LOGGER.info("Retrieved lined manager email (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
 
+            LOGGER.info("Notifying (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
             notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
+            LOGGER.info("Notified (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
 
+            LOGGER.info("Updating notification log table (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
             Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
             notificationRepository.save(notification);
+            LOGGER.info("Notification log updated (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         } else {
-            LOGGER.info("User has already been sent notification");
+            LOGGER.info("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         }
     }
     
