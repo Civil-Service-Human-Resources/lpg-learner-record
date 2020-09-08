@@ -9,7 +9,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.transaction.TransactionStatus;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
@@ -53,7 +52,7 @@ public class CourseRefreshService {
             StatementStream stream = new StatementStream(learningCatalogueService, registryService);
 
             log.info("Replaying statements");
-            Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,  statement -> ((Activity) statement.getObject()).getId());
+            Collection<CourseRecord> updatedCourseRecords = stream.replay(statements, statement -> ((Activity) statement.getObject()).getId());
             log.info("Done replaying, saving to DB");
             transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                 @Override
