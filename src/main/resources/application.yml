@@ -38,6 +38,9 @@ logging:
             service:
               xapi:
                 StatementStream: ${XAPI_STATEMENT_STREAM_LOG_LEVEL:ERROR}
+            csrs:
+              service:
+                RegistryService: ${REGISTYR_SERVICE_LOG_LEVEL:ERROR}
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
