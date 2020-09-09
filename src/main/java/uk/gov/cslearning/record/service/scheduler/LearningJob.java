@@ -1,16 +1,12 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseNotificationJobHistory;
@@ -28,15 +24,10 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
-
-import com.google.common.collect.Lists;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.*;
 
 @Component
 public class LearningJob {
@@ -235,9 +226,7 @@ public class LearningJob {
 
     private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory, LocalDateTime now) {
         if (courseNotificationJobHistory.isPresent()) {
-            LocalDateTime startedAt = courseNotificationJobHistory.get().getStartedAt();
-            long days = calculateDayDifference(Duration.between(startedAt, now).toDays());
-            return LocalDateTime.now().minusDays(days);
+            return courseNotificationJobHistory.get().getDataAcquisition();
         } else {
             return LocalDateTime.now().minusDays(1);
         }
