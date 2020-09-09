@@ -31,6 +31,13 @@ logging:
   level:
     root: ${ROOT_LOGGING_LEVEL:INFO}
     com.zaxxer.hikari: ERROR
+    uk:
+      gov:
+        cslearning:
+          record:
+            service:
+              xapi:
+                StatementStream: ${XAPI_STATEMENT_STREAM_LOG_LEVEL:ERROR}
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
