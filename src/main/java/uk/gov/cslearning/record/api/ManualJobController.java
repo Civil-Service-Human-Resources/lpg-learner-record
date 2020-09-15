@@ -19,8 +19,13 @@ public class ManualJobController {
     }
 
     @GetMapping
-    public void startJob(@RequestParam(name = "job") String job) throws Exception {
+    public void startJob(@RequestParam(name = "job") String job) {
         switch (job) {
+            case "refresh":
+                log.info("Manual request for learner record refresh job");
+                scheduler.courseDataRefresh();
+                log.info("Learner record refresh started");
+                break;
             case "incomplete":
                 log.info("Manual request for incomplete learning job");
                 scheduler.learningJob();
