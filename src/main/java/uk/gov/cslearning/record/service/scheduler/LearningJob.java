@@ -128,7 +128,7 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
         LOGGER.info("History updated");
 
-        LOGGER.info("Starting notification processing (Getting civil servant, checking notification history and sending if required");
+        LOGGER.info("Starting notification processing (Getting civil servant, checking notification history and sending if required)");
         completedCourseRecords.parallelStream().forEach(courseRecord ->
                 registryService.getCivilServantByUid(courseRecord.getUserId())
                     .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
