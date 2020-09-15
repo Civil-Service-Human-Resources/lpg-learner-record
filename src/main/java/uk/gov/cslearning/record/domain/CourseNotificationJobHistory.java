@@ -38,6 +38,7 @@ public class CourseNotificationJobHistory {
     }
 
     public enum JobName {
+        LEARNER_RECORD_REFRESH,
         COMPLETED_COURSES_JOB,
         INCOMPLETED_COURSES_JOB
     }

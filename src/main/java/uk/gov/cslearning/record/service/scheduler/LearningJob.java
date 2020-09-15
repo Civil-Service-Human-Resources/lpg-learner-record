@@ -93,6 +93,18 @@ public class LearningJob {
         this.courseNotificationJobHistoryRepository = courseNotificationJobHistoryRepository;
     }
 
+    public void learnerRecordRefresh() {
+        LOGGER.info("Doing Learner Record Refresh");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord(), now);
+
+        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.LEARNER_RECORD_REFRESH.name(), now);
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
+        int refreshCount = courseRefreshService.refreshCoursesForATimePeriod(since);
+        LOGGER.info("Learner Record Refresh updated {} record(s)", refreshCount);
+    }
+
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
         LocalDateTime now = LocalDateTime.now();
@@ -101,7 +113,6 @@ public class LearningJob {
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.COMPLETED_COURSES_JOB.name(), now);
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
-        courseRefreshService.refreshCoursesForATimePeriod(since);
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
         
         LOGGER.info("Found {} completed course records", completedCourseRecords.size());
@@ -230,13 +241,5 @@ public class LearningJob {
         } else {
             return LocalDateTime.now().minusDays(1);
         }
-    }
-
-    private long calculateDayDifference(long days) {
-        if (days == 0) {
-            return MINIMUM__DAY_PERIOD;
-        }
-
-        return days;
     }
 }

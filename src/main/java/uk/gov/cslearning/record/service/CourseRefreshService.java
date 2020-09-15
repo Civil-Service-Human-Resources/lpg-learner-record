@@ -41,7 +41,7 @@ public class CourseRefreshService {
         this.xApiService = xApiService;
     }
 
-    public void refreshCoursesForATimePeriod(LocalDateTime since) {
+    public int refreshCoursesForATimePeriod(LocalDateTime since) {
         try {
             Collection<Statement> statements = xApiService.getStatements(null, null, since);
             StatementStream stream = new StatementStream(learningCatalogueService, registryService);
@@ -53,6 +53,7 @@ public class CourseRefreshService {
                     courseRecordRepository.saveAll(updatedCourseRecords);
                 }
             });
+            return updatedCourseRecords.size();
         } catch (IOException e) {
             throw new RuntimeException("Exception retrieving xAPI statements.", e);
         }
