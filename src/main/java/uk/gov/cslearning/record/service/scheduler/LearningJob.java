@@ -95,13 +95,16 @@ public class LearningJob {
 
     public void learnerRecordRefresh() {
         LOGGER.info("Doing Learner Record Refresh");
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord(), now);
-
-        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.LEARNER_RECORD_REFRESH.name(), now);
+        LocalDateTime startTime = LocalDateTime.now();
+        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.LEARNER_RECORD_REFRESH.name(), startTime);
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord(), startTime);
         int refreshCount = courseRefreshService.refreshCoursesForATimePeriod(since);
+
+        courseNotificationJobHistory.setDataAcquisition(startTime);
+        courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
         LOGGER.info("Learner Record Refresh updated {} record(s)", refreshCount);
     }
 
