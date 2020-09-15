@@ -99,7 +99,7 @@ public class LearningJob {
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.LEARNER_RECORD_REFRESH.name(), startTime);
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
-        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord(), startTime);
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastLearnerRecordRefreshRecord());
         int refreshCount = courseRefreshService.refreshCoursesForATimePeriod(since);
 
         courseNotificationJobHistory.setDataAcquisition(startTime);
@@ -111,7 +111,7 @@ public class LearningJob {
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord(), now);
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord());
 
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.COMPLETED_COURSES_JOB.name(), now);
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
@@ -238,7 +238,7 @@ public class LearningJob {
         }
     }
 
-    private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory, LocalDateTime now) {
+    private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory) {
         if (courseNotificationJobHistory.isPresent()) {
             return courseNotificationJobHistory.get().getDataAcquisition();
         } else {
