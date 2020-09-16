@@ -25,6 +25,9 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Query("SELECT cr FROM CourseRecord cr WHERE cr.lastUpdated >= ?1 AND cr.state = 'COMPLETED' AND cr.isRequired = true")
     List<CourseRecord> findCompletedByLastUpdated(LocalDateTime since);
 
+    @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.courseId = ?1 AND cr.identity.userId = ?2 AND cr.state = 'COMPLETED' AND cr.isRequired = true")
+    Optional<CourseRecord> findCompletedByCourseIdAndUserId(String courseId, String userId);
+
     @Query("SELECT COUNT(mr) FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId = ?1 and mr.state = 'REGISTERED'")
     Integer countRegisteredForEvent(@Param("eventId") String eventId);
 

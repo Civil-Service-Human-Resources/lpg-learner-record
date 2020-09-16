@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
