@@ -52,7 +52,7 @@ public class CourseRefreshService {
             StatementStream stream = new StatementStream(learningCatalogueService, registryService);
 
             log.info("Replaying statements");
-            Collection<CourseRecord> updatedCourseRecords = stream.replay(statements, statement -> ((Activity) statement.getObject()).getId());
+            Collection<CourseRecord> updatedCourseRecords = stream.mixedUserReplay(statements, statement -> ((Activity) statement.getObject()).getId());
             log.info("Done replaying, saving to DB");
             transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                 @Override

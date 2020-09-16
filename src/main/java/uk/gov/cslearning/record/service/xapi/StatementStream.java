@@ -39,6 +39,35 @@ public class StatementStream {
         this.registryService = registryService;
     }
 
+    public Collection<CourseRecord> mixedUserReplay(Collection<Statement> statements, GroupId id) {
+        Map<String, List<Statement>> userSplit = new HashMap<>();
+
+        for (Statement statement : statements) {
+            String userId = statement.getActor().getAccount().getName();
+
+            if (userSplit.containsKey(userId)) {
+                userSplit.get(userId).add(statement);
+            } else {
+                ArrayList<Statement> newUserStatements = new ArrayList();
+                newUserStatements.add(statement);
+                userSplit.put(userId, new ArrayList<>(newUserStatements));
+            }
+
+        }
+
+        Collection<CourseRecord> allRecords = new ArrayList();
+
+        for (String userId : userSplit.keySet()) {
+            log.info("Running course refresh for user {}", userId);
+            Collection<CourseRecord> userRecords = replay(userSplit.get(userId), id);
+            log.info("Course refresh complete for user {}, got {} records", userId, userRecords.size());
+            allRecords.addAll(userRecords);
+            log.info("Record count for all users is now {}", allRecords.size());
+        }
+
+        return allRecords;
+    }
+
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
         return replay(statements, id, Collections.emptySet());
     }
@@ -106,7 +135,7 @@ public class StatementStream {
                     log.info("Getting course {} info from catalogue", courseId);
                     uk.gov.cslearning.record.service.catalogue.Course catalogueCourse
                             = learningCatalogueService.getCachedCourse(courseId);
-                    log.info("Course {} retrieved from catalogue");
+                    log.info("Course {} retrieved from catalogue", courseId);
 
                     if (catalogueCourse == null) {
                         LOGGER.info("Ignoring statement with no catalogue course, courseId: {}", courseId);

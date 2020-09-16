@@ -36,6 +36,11 @@ public class ManualJobController {
                 scheduler.sendNotificationForCompletedLearning();
                 log.info("Complete learning job started");
                 break;
+            case "delete":
+                log.info("Manual request for delete job");
+                scheduler.deleteOldStatements();
+                log.info("Delete job started");
+                break;
             default:
                 log.info("Manual request for unknown job, nothing done");
                 break;

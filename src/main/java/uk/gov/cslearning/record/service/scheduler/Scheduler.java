@@ -32,8 +32,7 @@ public class Scheduler {
     @Async
     public void learningJob() {
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
-        //learningJob.sendReminderNotificationForIncompleteCourses();
-        LOGGER.info("Skipping sendReminderNotificationForIncompleteCourses at {}", dateFormat.format(new Date()));
+        learningJob.sendReminderNotificationForIncompleteCourses();
         LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
     }
 
@@ -44,6 +43,7 @@ public class Scheduler {
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }
 
+    @Async
     public void deleteOldStatements() {
         LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
         learnerService.deleteOldStatements();
