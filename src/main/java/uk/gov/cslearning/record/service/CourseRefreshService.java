@@ -18,7 +18,7 @@ import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -52,7 +52,39 @@ public class CourseRefreshService {
             StatementStream stream = new StatementStream(learningCatalogueService, registryService);
 
             log.info("Replaying statements");
-            Collection<CourseRecord> updatedCourseRecords = stream.mixedUserReplay(statements, statement -> ((Activity) statement.getObject()).getId());
+
+            Map<String, List<Statement>> userSplit = new HashMap<>();
+
+            log.info("Splitting {} records by user", statements.size());
+
+            for (Statement statement : statements) {
+                String userId = statement.getActor().getAccount().getName();
+                log.error("Splitting user {}", userId);
+                if (userSplit.containsKey(userId)) {
+                    userSplit.get(userId).add(statement);
+                } else {
+                    ArrayList<Statement> newUserStatements = new ArrayList();
+                    newUserStatements.add(statement);
+                    userSplit.put(userId, new ArrayList<>(newUserStatements));
+                }
+
+            }
+
+            log.info("Records split by user, total users {}", userSplit.keySet().size());
+
+            Collection<CourseRecord> updatedCourseRecords = new ArrayList();
+
+            for (String userId : userSplit.keySet()) {
+                log.info("Running course refresh for user {}, has {} statements", userId, userSplit.get(userId).size());
+                Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
+                Collection<CourseRecord> userRecords = stream.replay(userSplit.get(userId), statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
+                log.info("Course refresh complete for user {}, got {} records", userId, userRecords.size());
+                updatedCourseRecords.addAll(userRecords);
+                log.info("Record count for all users is now {}", updatedCourseRecords.size());
+            }
+
+            log.info("All users processed");
+
             log.info("Done replaying, saving to DB");
             transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                 @Override

@@ -39,41 +39,6 @@ public class StatementStream {
         this.registryService = registryService;
     }
 
-    public Collection<CourseRecord> mixedUserReplay(Collection<Statement> statements, GroupId id) {
-        Map<String, List<Statement>> userSplit = new HashMap<>();
-
-        log.error("Splitting {} records by user", statements.size());
-
-        for (Statement statement : statements) {
-            String userId = statement.getActor().getAccount().getName();
-            log.error("Splitting user {}", userId);
-            if (userSplit.containsKey(userId)) {
-                userSplit.get(userId).add(statement);
-            } else {
-                ArrayList<Statement> newUserStatements = new ArrayList();
-                newUserStatements.add(statement);
-                userSplit.put(userId, new ArrayList<>(newUserStatements));
-            }
-
-        }
-
-        log.error("Records split by user, total users {}", userSplit.keySet().size());
-
-        Collection<CourseRecord> allRecords = new ArrayList();
-
-        for (String userId : userSplit.keySet()) {
-            log.error("Running course refresh for user {}, has {} statements", userId, userSplit.get(userId).size());
-            Collection<CourseRecord> userRecords = replay(userSplit.get(userId), id);
-            log.error("Course refresh complete for user {}, got {} records", userId, userRecords.size());
-            allRecords.addAll(userRecords);
-            log.error("Record count for all users is now {}", allRecords.size());
-        }
-
-        log.error("All users processed");
-
-        return allRecords;
-    }
-
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
         return replay(statements, id, Collections.emptySet());
     }
