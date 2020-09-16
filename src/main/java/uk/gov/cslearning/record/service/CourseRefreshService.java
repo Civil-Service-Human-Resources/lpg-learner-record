@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
@@ -76,7 +77,7 @@ public class CourseRefreshService {
 
             for (String userId : userSplit.keySet()) {
                 log.info("Running course refresh for user {}, has {} statements", userId, userSplit.get(userId).size());
-                Collection<CourseRecord> existingCourseRecords = courseRecordRepository.findByUserId(userId);
+                Collection<CourseRecord> existingCourseRecords = transactionTemplate.execute(status -> courseRecordRepository.findByUserId(userId));
                 Collection<CourseRecord> userRecords = stream.replay(userSplit.get(userId), statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
                 log.info("Course refresh complete for user {}, got {} records", userId, userRecords.size());
                 updatedCourseRecords.addAll(userRecords);
