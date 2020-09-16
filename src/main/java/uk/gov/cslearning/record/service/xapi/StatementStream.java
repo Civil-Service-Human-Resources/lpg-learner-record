@@ -42,9 +42,11 @@ public class StatementStream {
     public Collection<CourseRecord> mixedUserReplay(Collection<Statement> statements, GroupId id) {
         Map<String, List<Statement>> userSplit = new HashMap<>();
 
+        log.error("Splitting {} records by user", statements.size());
+
         for (Statement statement : statements) {
             String userId = statement.getActor().getAccount().getName();
-
+            log.error("Splitting user {}", userId);
             if (userSplit.containsKey(userId)) {
                 userSplit.get(userId).add(statement);
             } else {
@@ -55,15 +57,19 @@ public class StatementStream {
 
         }
 
+        log.error("Records split by user, total users {}", userSplit.keySet().size());
+
         Collection<CourseRecord> allRecords = new ArrayList();
 
         for (String userId : userSplit.keySet()) {
-            log.info("Running course refresh for user {}", userId);
+            log.error("Running course refresh for user {}", userId);
             Collection<CourseRecord> userRecords = replay(userSplit.get(userId), id);
-            log.info("Course refresh complete for user {}, got {} records", userId, userRecords.size());
+            log.error("Course refresh complete for user {}, got {} records", userId, userRecords.size());
             allRecords.addAll(userRecords);
-            log.info("Record count for all users is now {}", allRecords.size());
+            log.error("Record count for all users is now {}", allRecords.size());
         }
+
+        log.error("All users processed");
 
         return allRecords;
     }
