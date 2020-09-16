@@ -62,7 +62,7 @@ public class StatementStream {
         Collection<CourseRecord> allRecords = new ArrayList();
 
         for (String userId : userSplit.keySet()) {
-            log.error("Running course refresh for user {}", userId);
+            log.error("Running course refresh for user {}, has {} statements", userId, userSplit.get(userId).size());
             Collection<CourseRecord> userRecords = replay(userSplit.get(userId), id);
             log.error("Course refresh complete for user {}, got {} records", userId, userRecords.size());
             allRecords.addAll(userRecords);
