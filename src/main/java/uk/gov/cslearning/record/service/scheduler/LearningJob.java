@@ -175,7 +175,9 @@ public class LearningJob {
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
+        LOGGER.info("Getting mandatory course");
         Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
+        LOGGER.info("Found {} mandatory course(s) over {} org(s)", coursesGroupedByOrg.entrySet().stream().mapToInt(element -> element.getValue().size()).reduce((result, element) -> result + element) , coursesGroupedByOrg.keySet().size());
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
@@ -268,7 +270,9 @@ public class LearningJob {
         Map<String, NotificationCourseModule> coursesGroupedByUserId = new HashMap<>();
 
         coursesGroupedByOrganisation.forEach((orgCode, courses) -> {
+            LOGGER.info("Getting civil servants for org {}", orgCode);
             List<CivilServant> civilServants = registryService.getCivilServantsByOrgCode(orgCode);
+            LOGGER.info("Got {} civil servants for org {}", civilServants.size(), orgCode);
             civilServants.forEach(civilServant -> {
                 if (!coursesGroupedByUserId.containsKey(civilServant.getIdentity().getUid())) {
                     coursesGroupedByUserId.putIfAbsent(civilServant.getIdentity().getUid(), new NotificationCourseModule(civilServant, filterCompletedCourses(courses, civilServant.getIdentity())));
