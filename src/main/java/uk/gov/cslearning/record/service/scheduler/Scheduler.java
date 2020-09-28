@@ -25,7 +25,7 @@ public class Scheduler {
     private LearnerService learnerService;
 
     @SchedulerLock(name = "learnerRecordRefresh", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "${lr-refresh-job-cron}")
     public void courseDataRefresh() {
         LockAssert.assertLocked();
         LOGGER.info("Learner Record Refresh at {}", dateFormat.format(new Date()));
@@ -34,7 +34,7 @@ public class Scheduler {
     }
 
     @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "${completed-job-cron}")
     public void sendNotificationForCompletedLearning() {
         LockAssert.assertLocked();
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
@@ -43,7 +43,7 @@ public class Scheduler {
     }
 
     @SchedulerLock(name = "incompletedCoursesJob", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "${incomplete-job-cron}")
     public void learningJob() {
         LockAssert.assertLocked();
         LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
