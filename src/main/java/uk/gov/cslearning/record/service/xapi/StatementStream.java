@@ -1,11 +1,28 @@
 package uk.gov.cslearning.record.service.xapi;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import gov.adlnet.xapi.model.Statement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.service.catalogue.Audience;
 import uk.gov.cslearning.record.service.catalogue.Event;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.catalogue.Module;
@@ -13,23 +30,20 @@ import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatementStream {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
 
     private LearningCatalogueService learningCatalogueService;
+    private RegistryService registryService;
 
-    public StatementStream(LearningCatalogueService learningCatalogueService) {
+    public StatementStream(LearningCatalogueService learningCatalogueService, RegistryService registryService) {
         checkArgument(learningCatalogueService != null);
         this.learningCatalogueService = learningCatalogueService;
+        this.registryService = registryService;
     }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
@@ -37,7 +51,6 @@ public class StatementStream {
     }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id, Collection<CourseRecord> existingCourseRecords) {
-
         Map<String, List<Statement>> groups = new HashMap<>();
         Map<String, CourseRecord> records = existingCourseRecords.stream()
                 .collect(toMap(CourseRecord::getCourseId, c -> c));
@@ -93,6 +106,13 @@ public class StatementStream {
                         }
                         courseRecord = new CourseRecord(courseId, userId);
                         courseRecord.setCourseTitle(catalogueCourse.getTitle());
+                        courseRecord.setRequired(false);
+
+                        Optional<CivilServant> civilServant = registryService.getCivilServantByUid(userId);
+
+                        if (civilServant.isPresent() && isCourseRequired(catalogueCourse, civilServant.get())) {
+                            courseRecord.setRequired(true);
+                        }
                         records.put(courseId, courseRecord);
                     }
                     updatedRecords.put(courseId, courseRecord);
@@ -198,6 +218,15 @@ public class StatementStream {
         if (moduleRecord != null) {
             moduleRecord.setUpdatedAt(courseRecord.getLastUpdated());
         }
+    }
+
+    private boolean isCourseRequired(uk.gov.cslearning.record.service.catalogue.Course catalogueCourse, CivilServant civilServant) {
+        return catalogueCourse.getAudiences()
+            .stream()
+            .anyMatch(audience -> audience.getType() != null
+                && civilServant.getOrganisationalUnit() != null
+                && audience.getType().equals(Audience.Type.REQUIRED_LEARNING)
+                && audience.getDepartments().contains(civilServant.getOrganisationalUnit().getCode()));
     }
 
     public interface GroupId {

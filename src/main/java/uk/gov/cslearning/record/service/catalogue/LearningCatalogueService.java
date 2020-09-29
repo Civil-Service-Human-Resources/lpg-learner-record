@@ -1,5 +1,13 @@
 package uk.gov.cslearning.record.service.catalogue;
 
+import static java.util.Collections.emptyList;
+
+import java.util.List;
+
+import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.RequestEntityException;
+import uk.gov.cslearning.record.service.RequestEntityFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,13 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.RequestEntityException;
-import uk.gov.cslearning.record.service.RequestEntityFactory;
-
-import java.util.List;
-
-import static java.util.Collections.emptyList;
 
 @Service
 public class LearningCatalogueService {
@@ -29,7 +30,6 @@ public class LearningCatalogueService {
     private final String courseUrlFormat;
 
     private final String requiredLearningUrlFormat;
-
 
     public LearningCatalogueService(RestTemplate restTemplate, RequestEntityFactory requestEntityFactory,
                                     @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,

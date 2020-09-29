@@ -6,14 +6,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.CourseNotificationJobHistory;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.CourseNotificationJobHistoryRepository;
+import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
+import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
@@ -41,6 +44,10 @@ public class LearningJob {
 
     private static final long[] NOTIFICATION_PERIODS = new long[]{1, 7, 30};
 
+    private static final long MINIMUM__DAY_PERIOD = 1;
+
+    private static final long MAXIMUM__DAY_PERIOD = 7;
+
     @Value("${govNotify.template.requiredLearningDue}")
     private String govNotifyRequiredLearningDueTemplateId;
 
@@ -59,67 +66,90 @@ public class LearningJob {
 
     private UserRecordService userRecordService;
 
+    private CourseRecordRepository courseRecordRepository;
+
+    private CourseRefreshService courseRefreshService;
+
+    private CourseNotificationJobHistoryRepository courseNotificationJobHistoryRepository;
+
     @Autowired
-    public LearningJob(UserRecordService userRecordService, IdentityService identityService, RegistryService registryService, LearningCatalogueService learningCatalogueService, NotifyService notifyService, NotificationRepository notificationRepository) {
+    public LearningJob(UserRecordService userRecordService,
+            IdentityService identityService,
+            RegistryService registryService,
+            LearningCatalogueService learningCatalogueService,
+            NotifyService notifyService,
+            NotificationRepository notificationRepository,
+            CourseRecordRepository courseRecordRepository,
+            CourseRefreshService courseRefreshService,
+            CourseNotificationJobHistoryRepository courseNotificationJobHistoryRepository) {
         this.userRecordService = userRecordService;
         this.identityService = identityService;
         this.registryService = registryService;
         this.learningCatalogueService = learningCatalogueService;
         this.notifyService = notifyService;
         this.notificationRepository = notificationRepository;
+        this.courseRecordRepository = courseRecordRepository;
+        this.courseRefreshService = courseRefreshService;
+        this.courseNotificationJobHistoryRepository = courseNotificationJobHistoryRepository;
     }
 
-    @Transactional
+    public void learnerRecordRefresh() {
+        LOGGER.info("Doing Learner Record Refresh");
+        LocalDateTime startTime = LocalDateTime.now();
+        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.LEARNER_RECORD_REFRESH.name(), startTime);
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastLearnerRecordRefreshRecord());
+        int refreshCount = courseRefreshService.refreshCoursesForATimePeriod(since);
+
+        courseNotificationJobHistory.setDataAcquisition(startTime);
+        courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+        LOGGER.info("Learner Record Refresh updated {} record(s)", refreshCount);
+    }
+
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord());
 
-        Collection<Identity> identities = identityService.listAll();
+        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.COMPLETED_COURSES_JOB.name(), now);
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
-        for (Identity identity : identities) {
-            LOGGER.debug("Got identity {}", identity);
-            registryService.getCivilServantByUid(identity.getUid()).ifPresent(civilServant -> {
-                if (civilServant.getLineManagerUid() == null) {
-                    LOGGER.debug("User {} has no line manager, skipping", identity);
-                } else {
-                    if (civilServant.getOrganisationalUnit() != null) {
-                        List<Course> courses = learningCatalogueService.getRequiredCoursesByDepartmentCode(civilServant.getOrganisationalUnit().getCode());
-                        LOGGER.debug("Found {} required courses", courses.size());
+        List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
+        
+        LOGGER.info("Found {} completed course records", completedCourseRecords.size());
 
-                        for (Course course : courses) {
-                            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-                            for (CourseRecord courseRecord : courseRecords) {
-                                LOGGER.debug("Course complete: {}", courseRecord.isComplete());
-                                if (courseRecord.isComplete()) {
-                                    checkAndNotifyLineManager(civilServant, identity, course, courseRecord.getCompletionDate());
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+        courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+
+        completedCourseRecords.parallelStream().forEach(courseRecord ->
+                registryService.getCivilServantByUid(courseRecord.getUserId())
+                    .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
+
+        courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
+        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
     }
 
-    void checkAndNotifyLineManager(CivilServant civilServant, Identity identity, Course course, LocalDateTime completedDate) {
-        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", identity, course);
+    void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
+        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
 
-        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(identity.getUid(), course.getId(), NotificationType.COMPLETE);
+        Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(courseRecord.getUserId(), courseRecord.getCourseId(), NotificationType.COMPLETE);
         boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
-                .orElse(true);
+            .orElse(true);
 
         if (shouldSendNotification) {
             String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
 
-            notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, course.getTitle());
+            notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
 
-            Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.COMPLETE);
+            Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
             notificationRepository.save(notification);
         } else {
             LOGGER.info("User has already been sent notification");
         }
     }
-
-    @Transactional
+    
     public void sendReminderNotificationForIncompleteCourses() {
         Collection<Identity> identities = identityService.listAll();
 
@@ -205,6 +235,14 @@ public class LearningJob {
         for (Course course : courses) {
             Notification notification = new Notification(course.getId(), identity.getUid(), NotificationType.REMINDER);
             notificationRepository.save(notification);
+        }
+    }
+
+    private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory) {
+        if (courseNotificationJobHistory.isPresent()) {
+            return courseNotificationJobHistory.get().getDataAcquisition();
+        } else {
+            return LocalDateTime.now().minusDays(1);
         }
     }
 }

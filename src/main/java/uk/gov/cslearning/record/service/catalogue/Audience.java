@@ -10,6 +10,12 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Audience {
+    public enum Type {
+        OPEN,
+        CLOSED_COURSE,
+        PRIVATE_COURSE,
+        REQUIRED_LEARNING
+    }
 
     private List<String> areasOfWork;
 
@@ -19,7 +25,7 @@ public class Audience {
 
     private String frequency;
 
-    private boolean mandatory;
+    private Type type;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate requiredBy;
@@ -56,20 +62,20 @@ public class Audience {
         this.frequency = frequency;
     }
 
-    public boolean isMandatory() {
-        return mandatory;
-    }
-
-    public void setMandatory(boolean mandatory) {
-        this.mandatory = mandatory;
-    }
-
     public LocalDate getRequiredBy() {
         return requiredBy;
     }
 
     public void setRequiredBy(LocalDate requiredBy) {
         this.requiredBy = requiredBy;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public int getRelevance(CivilServant civilServant) {
