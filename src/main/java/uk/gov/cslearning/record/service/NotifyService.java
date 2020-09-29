@@ -44,9 +44,9 @@ public class NotifyService {
         try {
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.info("Reminder notify email sent: {}", response.getBody());
+            LOGGER.debug("Reminder notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
-            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
+            LOGGER.error("Could not send email to GOV notify: {}", e.getLocalizedMessage());
         }
     }
 
@@ -62,7 +62,7 @@ public class NotifyService {
         try {
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.info("Complete notify email sent: {}", response.getBody());
+            LOGGER.debug("Complete notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
         }

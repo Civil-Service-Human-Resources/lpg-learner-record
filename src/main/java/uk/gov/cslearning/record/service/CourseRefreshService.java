@@ -1,15 +1,16 @@
 package uk.gov.cslearning.record.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.Statement;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
@@ -17,9 +18,12 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
 import uk.gov.cslearning.record.service.xapi.XApiService;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Component
 @Slf4j
@@ -48,15 +52,10 @@ public class CourseRefreshService {
         try {
             log.info("Getting xapi refresh statements since {}", since);
             Collection<Statement> statements = xApiService.getStatements(null, null, since);
-            log.info("Got statement, total {}", statements.size());
 
             StatementStream stream = new StatementStream(learningCatalogueService, registryService);
 
-            log.info("Replaying statements");
-
             Map<String, List<Statement>> userSplit = new HashMap<>();
-
-            log.info("Splitting {} records by user", statements.size());
 
             for (Statement statement : statements) {
                 String userId = statement.getActor().getAccount().getName();
@@ -68,25 +67,16 @@ public class CourseRefreshService {
                     newUserStatements.add(statement);
                     userSplit.put(userId, new ArrayList<>(newUserStatements));
                 }
-
             }
-
-            log.info("Records split by user, total users {}", userSplit.keySet().size());
 
             Collection<CourseRecord> updatedCourseRecords = new ArrayList();
 
             for (String userId : userSplit.keySet()) {
-                log.info("Running course refresh for user {}, has {} statements", userId, userSplit.get(userId).size());
                 Collection<CourseRecord> existingCourseRecords = transactionTemplate.execute(status -> courseRecordRepository.findByUserId(userId));
                 Collection<CourseRecord> userRecords = stream.replay(userSplit.get(userId), statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
-                log.info("Course refresh complete for user {}, got {} records", userId, userRecords.size());
                 updatedCourseRecords.addAll(userRecords);
-                log.info("Record count for all users is now {}", updatedCourseRecords.size());
             }
 
-            log.info("All users processed");
-
-            log.info("Done replaying, saving to DB");
             transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                 @Override
                 protected void doInTransactionWithoutResult(TransactionStatus status) {

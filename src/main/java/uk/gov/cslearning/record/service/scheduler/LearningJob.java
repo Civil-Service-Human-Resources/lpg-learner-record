@@ -1,13 +1,16 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseNotificationJobHistory;
@@ -26,11 +29,15 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 @Component
 public class LearningJob {
@@ -113,59 +120,35 @@ public class LearningJob {
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
         LOGGER.info("Sending notifications for complete learning.");
         LocalDateTime now = LocalDateTime.now();
-        LOGGER.info("Getting last execution");
         LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastCompletedCoursesJobRecord());
-        LOGGER.info("Last execution is {}", since);
 
-        LOGGER.info("Creating job history record");
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.COMPLETED_COURSES_JOB.name(), now);
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
-        LOGGER.info("Initial job history record created");
 
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
-        LOGGER.info("Done, found {} completed course records", completedCourseRecords.size());
 
-        LOGGER.info("Updating job history data acquisition time");
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
-        LOGGER.info("History updated");
 
-        LOGGER.info("Starting notification processing (Getting civil servant, checking notification history and sending if required)");
         completedCourseRecords.parallelStream().forEach(courseRecord ->
                 registryService.getCivilServantByUid(courseRecord.getUserId())
                     .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
-        LOGGER.info("Finished notification processing");
-
-        LOGGER.info("Updating job history with complete time");
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
-        LOGGER.info("Job history updated");
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
-        LOGGER.info("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
+        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
 
-        LOGGER.info("Finding historic notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(courseRecord.getUserId(), courseRecord.getCourseId(), NotificationType.COMPLETE);
-        LOGGER.info("Done (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
             .orElse(true);
 
         if (shouldSendNotification) {
-            LOGGER.info("Notification needs to be sent (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
-
-            LOGGER.info("Getting line manager email address (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
             String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
-            LOGGER.info("Retrieved lined manager email (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
-
-            LOGGER.info("Notifying (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
             notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
-            LOGGER.info("Notified (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
-
-            LOGGER.info("Updating notification log table (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
             Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
             notificationRepository.save(notification);
-            LOGGER.info("Notification log updated (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         } else {
             LOGGER.info("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         }
@@ -175,22 +158,17 @@ public class LearningJob {
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
-        LOGGER.info("Getting mandatory course");
         Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
-        LOGGER.info("Found {} mandatory course(s) over {} org(s)", coursesGroupedByOrg.entrySet().stream().mapToInt(element -> element.getValue().size()).reduce((result, element) -> result + element).orElse(0) , coursesGroupedByOrg.keySet().size());
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
-        LOGGER.info("Grouping by user id");
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
-        LOGGER.info("Processing courses grouped by user id");
         coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
             identityService.getIdentityByUid(userId)
                 .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, notificationCourseModule, LocalDate.now())));
 
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
-        LOGGER.info("Sending notifications complete");
     }
 
     private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
@@ -216,7 +194,6 @@ public class LearningJob {
         for (Map.Entry<Long, List<Course>> entry : incompleteCourses.entrySet()) {
             sendNotificationForPeriod(identity, entry.getKey(), entry.getValue());
         }
-        LOGGER.info("Sending notifications complete");
     }
 
     void checkAndAdd(Course course, Identity identity, LocalDate nextRequiredBy, LocalDate now, Map<Long, List<Course>> incompleteCourses) {
@@ -257,7 +234,7 @@ public class LearningJob {
                 break;
         }
 
-        LOGGER.info("Sending notification for user {} with content: {}", identity.getUsername(), requiredLearning.toString());
+        LOGGER.debug("Sending notification for user {} with content: {}", identity.getUsername(), requiredLearning.toString());
         notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {
@@ -270,9 +247,7 @@ public class LearningJob {
         Map<String, NotificationCourseModule> coursesGroupedByUserId = new HashMap<>();
 
         coursesGroupedByOrganisation.forEach((orgCode, courses) -> {
-            LOGGER.info("Getting civil servants for org {}", orgCode);
             List<CivilServant> civilServants = registryService.getCivilServantsByOrgCode(orgCode);
-            LOGGER.info("Got {} civil servants for org {}", civilServants.size(), orgCode);
             civilServants.forEach(civilServant -> {
                 if (!coursesGroupedByUserId.containsKey(civilServant.getIdentity().getUid())) {
                     coursesGroupedByUserId.putIfAbsent(civilServant.getIdentity().getUid(), new NotificationCourseModule(civilServant, filterCompletedCourses(courses, civilServant.getIdentity())));
@@ -320,13 +295,5 @@ public class LearningJob {
         } else {
             return LocalDateTime.now().minusDays(1);
         }
-    }
-
-    private long calculateDayDifference(long days) {
-        if (days == 0) {
-            return MINIMUM_DAY_PERIOD;
-        }
-
-        return days;
     }
 }

@@ -1,14 +1,17 @@
 package uk.gov.cslearning.record.service.scheduler;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import net.javacrumbs.shedlock.core.LockAssert;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import uk.gov.cslearning.record.service.LearnerService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.service.LearnerService;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component
 public class Scheduler {
@@ -22,28 +25,34 @@ public class Scheduler {
     @Autowired
     private LearnerService learnerService;
 
-    @Async
+    @SchedulerLock(name = "learnerRecordRefresh", lockAtMostFor = "PT4H")
+    @Scheduled(cron = "${notifications.lr-refresh-job-cron}")
     public void courseDataRefresh() {
+        LockAssert.assertLocked();
         LOGGER.info("Learner Record Refresh at {}", dateFormat.format(new Date()));
         learningJob.learnerRecordRefresh();
         LOGGER.info("Learner Record Refresh complete at {}", dateFormat.format(new Date()));
     }
 
-    @Async
-    public void learningJob() {
-        LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
-        learningJob.sendReminderNotificationForIncompleteCourses();
-        LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
-    }
-
-    @Async
+    @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
+    @Scheduled(cron = "${notifications.completed-job-cron}")
     public void sendNotificationForCompletedLearning() {
+        LockAssert.assertLocked();
         LOGGER.info("Executing sendLineManagerNotificationForCompletedLearning at {}", dateFormat.format(new Date()));
         learningJob.sendLineManagerNotificationForCompletedLearning();
         LOGGER.info("sendLineManagerNotificationForCompletedLearning complete at {}", dateFormat.format(new Date()));
     }
 
-    @Async
+    @SchedulerLock(name = "incompletedCoursesJob", lockAtMostFor = "PT4H")
+    @Scheduled(cron = "${notifications.incomplete-job-cron}")
+    public void learningJob() {
+        LockAssert.assertLocked();
+        LOGGER.info("Executing learningJob at {}", dateFormat.format(new Date()));
+        learningJob.sendReminderNotificationForIncompleteCourses();
+        LOGGER.info("learningJob complete at {}", dateFormat.format(new Date()));
+    }
+
+    @Scheduled(cron = "0 0 4 * * *")
     public void deleteOldStatements() {
         LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
         learnerService.deleteOldStatements();
