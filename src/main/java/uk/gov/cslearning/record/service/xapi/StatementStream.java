@@ -1,9 +1,23 @@
 package uk.gov.cslearning.record.service.xapi;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import gov.adlnet.xapi.model.Statement;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -17,13 +31,8 @@ import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
 
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class StatementStream {
@@ -248,19 +257,15 @@ public class StatementStream {
     }
 
     private void replay(Statement statement, CourseRecord courseRecord, ModuleRecord moduleRecord) {
-        log.info("Action replay processing");
         Action action = Action.getFor(statement);
         if (action != null) {
-            log.info("Doing {} action", action);
             action.replay(courseRecord, moduleRecord);
         } else {
             LOGGER.debug("Unrecognised statement {}", statement.getVerb().getId());
         }
-        log.info("Updating course timestamp");
         courseRecord.setLastUpdated(LocalDateTime.parse(statement.getTimestamp(), XApiService.DATE_FORMATTER));
 
         if (moduleRecord != null) {
-            log.info("Updating module timestamp");
             moduleRecord.setUpdatedAt(courseRecord.getLastUpdated());
         }
     }
