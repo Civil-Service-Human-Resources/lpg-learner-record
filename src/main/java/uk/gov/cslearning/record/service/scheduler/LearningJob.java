@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.domain.Grade;
+import uk.gov.cslearning.record.csrs.domain.Profession;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseNotificationJobHistory;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -24,6 +26,7 @@ import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.UserRecordService;
+import uk.gov.cslearning.record.service.catalogue.Audience;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
@@ -175,19 +178,21 @@ public class LearningJob {
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
 
         for (Course course : notificationCourseModule.getCourses()) {
-            Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
-            LocalDate mostRecentlyCompleted = null;
-            for (CourseRecord courseRecord : courseRecords) {
-                LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
-                if (courseCompletionDate != null && (mostRecentlyCompleted == null || mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate()))) {
-                    mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+            if (isCourseRequired(course, notificationCourseModule.getCivilServant())) {
+                Collection<CourseRecord> courseRecords = userRecordService.getUserRecord(identity.getUid(), Lists.newArrayList(course.getId()));
+                LocalDate mostRecentlyCompleted = null;
+                for (CourseRecord courseRecord : courseRecords) {
+                    LocalDateTime courseCompletionDate = courseRecord.getCompletionDate();
+                    if (courseCompletionDate != null && (mostRecentlyCompleted == null || mostRecentlyCompleted.isBefore(courseCompletionDate.toLocalDate()))) {
+                        mostRecentlyCompleted = courseCompletionDate.toLocalDate();
+                    }
                 }
-            }
-            LocalDate nextRequiredBy = course.getNextRequiredBy(notificationCourseModule.getCivilServant(), mostRecentlyCompleted);
-            LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
+                LocalDate nextRequiredBy = course.getNextRequiredBy(notificationCourseModule.getCivilServant(), mostRecentlyCompleted);
+                LOGGER.debug("Next required by for course {} is {}", course, nextRequiredBy);
 
-            if (nextRequiredBy != null) {
-                checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+                if (nextRequiredBy != null) {
+                    checkAndAdd(course, identity, nextRequiredBy, now, incompleteCourses);
+                }
             }
         }
 
@@ -287,6 +292,23 @@ public class LearningJob {
         });
 
         return incompletedCourses;
+    }
+
+    private boolean isCourseRequired(Course course, CivilServant civilServant) {
+        boolean hasMatchingGrade = false;
+        boolean hasMatchingProfession = false;
+        boolean hasMatchingAreasOfWork = false;
+        boolean hasMatchingInterests = false;
+        Collection<Audience> audiences = course.getAudiences();
+
+        for (Audience audience : audiences) {
+            hasMatchingGrade = RequiredCourseUtil.civilServantHasMatchingGrade(audience, civilServant);
+            hasMatchingProfession = RequiredCourseUtil.civilServantHasMatchingProfession(audience, civilServant);
+            hasMatchingAreasOfWork = RequiredCourseUtil.civilServantHasMatchingOtherAreasOfWork(audience, civilServant);
+            hasMatchingInterests = RequiredCourseUtil.civilServantHasMatchingInterests(audience, civilServant);
+        }
+
+        return hasMatchingGrade && hasMatchingProfession && hasMatchingAreasOfWork && hasMatchingInterests;
     }
 
     private LocalDateTime getSinceDate(Optional<CourseNotificationJobHistory> courseNotificationJobHistory) {

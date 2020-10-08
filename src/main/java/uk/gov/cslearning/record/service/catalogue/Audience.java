@@ -2,7 +2,9 @@ package uk.gov.cslearning.record.service.catalogue;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 
@@ -24,6 +26,8 @@ public class Audience {
     private List<String> departments;
 
     private List<String> grades;
+
+    private List<String> interests;
 
     private String frequency;
 
@@ -54,6 +58,14 @@ public class Audience {
 
     public void setGrades(List<String> grades) {
         this.grades = grades;
+    }
+
+    public List<String> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
     }
 
     public String getFrequency() {
