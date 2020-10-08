@@ -48,9 +48,9 @@ notifications:
   lr-refresh-job-cron: ${LR_REFRESH_JOB_CRON:0 0 0 * * *}
   completed-job-cron: ${COMPLETED_JOB_CRON:0 0 1 * * *}
   incomplete-job-cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
-  lr-refresh-job-enabled: true
-  completed-job-enabled: true
-  incomplete-job-cron-enabled: true
+  lr-refresh-job-enabled: ${LR_REFRESH_JOB_ENABLED:true}
+  completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
+  incompleted-job-enabled: ${INCOMPLETE_JOB_ENABLED:true}
 
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}

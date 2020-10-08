@@ -26,7 +26,7 @@ public class Scheduler {
     @Value("${notifications.completed-job-enabled}")
     private Boolean completedJobEnabled;
 
-    @Value("${notifications.incomplete-job-cron-enabled}")
+    @Value("${notifications.incompleted-job-enabled}")
     private Boolean incompletedJobEnabled;
 
     @Autowired
