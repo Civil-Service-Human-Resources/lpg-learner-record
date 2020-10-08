@@ -50,7 +50,7 @@ notifications:
   incomplete-job-cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
   lr-refresh-job-enabled: ${LR_REFRESH_JOB_ENABLED:true}
   completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
-  incompleted-job-enabled: ${INCOMPLETE_JOB_ENABLED:true}
+  incompleted-job-enabled: ${INCOMPLETED_JOB_ENABLED:true}
 
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
