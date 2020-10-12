@@ -1,17 +1,14 @@
 package uk.gov.cslearning.record.service;
 
-import java.util.HashMap;
-
-import javax.annotation.PostConstruct;
-
-import uk.gov.service.notify.NotificationClient;
-import uk.gov.service.notify.NotificationClientException;
-import uk.gov.service.notify.SendEmailResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.service.notify.NotificationClient;
+import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.SendEmailResponse;
+
+import java.util.HashMap;
 
 @Service
 public class NotifyService {
@@ -27,13 +24,6 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    private NotificationClient client;
-
-    @PostConstruct
-    public void initializeNotificationClient() {
-        client = new NotificationClient(govNotifyKey);
-    }
-
     public void notifyForIncompleteCourses(String email, String requiredLearning, String templateId, String period) {
         LOGGER.debug("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
         HashMap<String, String> personalisation = new HashMap<>();
@@ -42,11 +32,12 @@ public class NotifyService {
         personalisation.put(PERIOD_PERMISSION, period);
 
         try {
+            NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
             LOGGER.debug("Reminder notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
-            LOGGER.error("Could not send email to GOV notify: {}", e.getLocalizedMessage());
+            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
         }
     }
 
@@ -60,9 +51,10 @@ public class NotifyService {
         personalisation.put(COURSE_TITLE_PERMISSION, courseTitle);
 
         try {
+            NotificationClient client = new NotificationClient(govNotifyKey);
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.debug("Complete notify email sent: {}", response.getBody());
+            LOGGER.info("Complete notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
         }

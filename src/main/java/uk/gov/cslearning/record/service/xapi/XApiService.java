@@ -50,11 +50,10 @@ public class XApiService implements Serializable {
         StatementClient statementClient = new StatementClient(xApiProperties.getUrl(), xApiProperties.getUsername(),
                 xApiProperties.getPassword());
 
-        if (userId != null) {
-            Agent agent = new Agent(null, new Account(userId, HOMEPAGE));
-            statementClient = statementClient
+        Agent agent = new Agent(null, new Account(userId, HOMEPAGE));
+
+        statementClient = statementClient
                 .filterByActor(agent);
-        }
 
         if (activityId != null) {
             statementClient = statementClient
@@ -75,7 +74,6 @@ public class XApiService implements Serializable {
         }
         return statements;
     }
-
 
     private String stripPath(String url, String more) {
         int length = 1;

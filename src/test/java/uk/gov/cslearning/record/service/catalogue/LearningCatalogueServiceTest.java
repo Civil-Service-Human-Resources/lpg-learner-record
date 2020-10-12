@@ -20,10 +20,9 @@ public class LearningCatalogueServiceTest {
     private RequestEntityFactory requestEntityFactory = mock(RequestEntityFactory.class);
     private String courseUrlFormat = "course %s";
     private String requiredLearningUrlFormat = "department %s";
-    private String requiredLearningUrlByDaysFormat = "days= s";
 
     private LearningCatalogueService learningCatalogueService =
-            new LearningCatalogueService(restTemplate, requestEntityFactory, courseUrlFormat, requiredLearningUrlFormat, requiredLearningUrlByDaysFormat);
+            new LearningCatalogueService(restTemplate, requestEntityFactory, courseUrlFormat, requiredLearningUrlFormat);
 
 
     @Test

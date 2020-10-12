@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
@@ -33,14 +31,12 @@ public class UserRecordService {
     private CourseRecordRepository courseRecordRepository;
     private XApiService xApiService;
     private LearningCatalogueService learningCatalogueService;
-    private RegistryService registryService;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository,
                              XApiService xApiService,
                              LearningCatalogueService learningCatalogueService,
-                             CollectionsService collectionsService,
-                             RegistryService registryService) {
+                             CollectionsService collectionsService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(xApiService != null);
         checkArgument(learningCatalogueService != null);
@@ -48,7 +44,6 @@ public class UserRecordService {
         this.xApiService = xApiService;
         this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
-        this.registryService = registryService;
     }
 
     @Transactional
@@ -66,7 +61,7 @@ public class UserRecordService {
         try {
             Collection<Statement> statements = xApiService.getStatements(userId, null, since);
 
-            StatementStream stream = new StatementStream(learningCatalogueService, registryService);
+            StatementStream stream = new StatementStream(learningCatalogueService);
 
             Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,
                     statement -> ((Activity) statement.getObject()).getId(),

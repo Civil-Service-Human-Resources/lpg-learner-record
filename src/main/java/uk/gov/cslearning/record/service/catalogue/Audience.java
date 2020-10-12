@@ -1,23 +1,15 @@
 package uk.gov.cslearning.record.service.catalogue;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.List;
-
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Audience {
-    public enum Type {
-        OPEN,
-        CLOSED_COURSE,
-        PRIVATE_COURSE,
-        REQUIRED_LEARNING
-    }
 
     private List<String> areasOfWork;
 
@@ -27,7 +19,7 @@ public class Audience {
 
     private String frequency;
 
-    private Type type;
+    private boolean mandatory;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate requiredBy;
@@ -64,20 +56,20 @@ public class Audience {
         this.frequency = frequency;
     }
 
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
+
     public LocalDate getRequiredBy() {
         return requiredBy;
     }
 
     public void setRequiredBy(LocalDate requiredBy) {
         this.requiredBy = requiredBy;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 
     public int getRelevance(CivilServant civilServant) {
@@ -118,16 +110,23 @@ public class Audience {
     }
 
     private LocalDate decrement(LocalDate dateTime, String frequency) {
-        Period period = Period.parse(frequency);
-        return dateTime
-            .minusYears(period.getYears())
-            .minusMonths(period.getMonths());
+        return dateTime.minusYears(getYears(frequency));
     }
 
     private LocalDate increment(LocalDate dateTime, String frequency) {
-        Period period = Period.parse(frequency);
-        return dateTime
-            .plusYears(period.getYears())
-            .plusMonths(period.getMonths());
+        return dateTime.plusYears(getYears(frequency));
+    }
+
+    private long getYears(String frequency) {
+        switch (frequency) {
+            case "YEARLY":
+                return 1;
+            case "THREE_YEARLY":
+                return 3;
+            case "FIVE_YEARLY":
+                return 5;
+            default:
+                throw new RuntimeException("Unrecognised frequency " + frequency);
+        }
     }
 }
