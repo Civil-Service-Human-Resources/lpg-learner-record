@@ -31,10 +31,26 @@ logging:
   level:
     root: ${ROOT_LOGGING_LEVEL:INFO}
     com.zaxxer.hikari: ERROR
+    uk:
+      gov:
+        cslearning:
+          record:
+            service:
+              xapi:
+                StatementStream: ${XAPI_STATEMENT_STREAM_LOG_LEVEL:ERROR}
+            csrs:
+              service:
+                RegistryService: ${REGISTYR_SERVICE_LOG_LEVEL:ERROR}
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
   email: ${notifications.service}/notifications/email/
+  lr-refresh-job-cron: ${LR_REFRESH_JOB_CRON:0 0 0 * * *}
+  completed-job-cron: ${COMPLETED_JOB_CRON:0 0 1 * * *}
+  incomplete-job-cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
+  lr-refresh-job-enabled: ${LR_REFRESH_JOB_ENABLED:true}
+  completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
+  incompleted-job-enabled: ${INCOMPLETED_JOB_ENABLED:true}
 
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
@@ -61,11 +77,13 @@ registry:
   getCurrentUrl: "${registry.serviceUrl}/civilServants/me"
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
   getResourceByUidUrl: "${registry.serviceUrl}/civilServants/resource/%s"
+  getResourceByOrgCodeUrl: "${registry.serviceUrl}/civilServants/organisation/%s"
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
   courseUrlFormat: "${catalogue.serviceUrl}/courses/%s"
   requiredLearningUrlFormat: "${catalogue.serviceUrl}/courses?mandatory=true&department=%s"
+  requiredLearningUrlByDaysFormat: "${catalogue.serviceUrl}/courses?mandatory=true&days=%s&size=1000000000"
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}
