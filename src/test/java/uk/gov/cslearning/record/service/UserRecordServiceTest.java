@@ -67,7 +67,7 @@ public class UserRecordServiceTest {
     @Before
     public void setup() {
         userRecordService = new UserRecordService(courseRecordRepository, xApiService,
-                learningCatalogueService, collectionsService, registryService);
+                learningCatalogueService, collectionsService);
     }
 
     @Test

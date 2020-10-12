@@ -35,10 +35,7 @@ public class CourseRecord {
     @JsonIgnore
     private String department;
 
-    @JsonIgnore
-    private boolean isRequired;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord")
     private Collection<ModuleRecord> moduleRecords;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
@@ -52,14 +49,6 @@ public class CourseRecord {
         checkArgument(userId != null);
         this.identity = new CourseRecordIdentity(courseId, userId);
         this.moduleRecords = new HashSet<>();
-    }
-
-    public void setLastUpdated(LocalDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    public void setIdentity(CourseRecordIdentity identity) {
-        this.identity = identity;
     }
 
     public String getCourseTitle() {
@@ -76,6 +65,10 @@ public class CourseRecord {
 
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     @JsonProperty("courseId")
@@ -102,14 +95,6 @@ public class CourseRecord {
 
     public void setState(State state) {
         this.state = state;
-    }
-
-    public boolean isRequired() {
-        return isRequired;
-    }
-
-    public void setRequired(boolean isRequired) {
-        this.isRequired = isRequired;
     }
 
     @JsonProperty("modules")
