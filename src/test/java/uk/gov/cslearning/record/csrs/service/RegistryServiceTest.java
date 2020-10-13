@@ -19,6 +19,7 @@ public class RegistryServiceTest {
     private URI getCurrentUrl;
     private String findByUidUrlFormat = "%s";
     private String getResourceByUidUrl = "%s";
+    private String getResourceByOrgCodeUrl = "%s";
 
     private OAuth2RestOperations restOperations = mock(OAuth2RestOperations.class);
     private RequestEntityFactory requestEntityFactory = mock(RequestEntityFactory.class);
@@ -27,7 +28,7 @@ public class RegistryServiceTest {
     @Before
     public void setUp() throws Exception {
         getCurrentUrl = new URI("http://localhost");
-        registryService = new RegistryService(restOperations, requestEntityFactory, getCurrentUrl, getResourceByUidUrl, findByUidUrlFormat);
+        registryService = new RegistryService(restOperations, requestEntityFactory, getCurrentUrl, getResourceByUidUrl, findByUidUrlFormat, getResourceByOrgCodeUrl);
     }
 
     @Test

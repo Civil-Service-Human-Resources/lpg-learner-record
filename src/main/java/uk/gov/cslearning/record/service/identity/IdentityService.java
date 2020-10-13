@@ -80,4 +80,13 @@ public class IdentityService {
         }
         return Optional.of(identity);
     }
+
+    public Optional<Identity> getIdentityByUid(String uid) {
+        LOGGER.debug("Getting identity for uid: {}", uid);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
+            .queryParam("uid", uid);
+
+        return getIdentity(builder.toUriString());
+    }
 }

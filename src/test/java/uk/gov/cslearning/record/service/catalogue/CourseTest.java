@@ -41,7 +41,7 @@ public class CourseTest {
 
         Audience audience = new Audience();
         audience.setDepartments(departments);
-        audience.setMandatory(true);
+        audience.setType(Audience.Type.REQUIRED_LEARNING);
 
         Collection<Audience> audiences = new HashSet<Audience>();
         audiences.add(audience);
@@ -82,7 +82,7 @@ public class CourseTest {
 
         Audience audience = new Audience();
         audience.setDepartments(departments);
-        audience.setMandatory(true);
+        audience.setType(Audience.Type.REQUIRED_LEARNING);
 
         Collection<Audience> audiences = new HashSet<Audience>();
         audiences.add(audience);
