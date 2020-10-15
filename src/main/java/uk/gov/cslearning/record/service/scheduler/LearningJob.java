@@ -165,6 +165,8 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
+        LOGGER.info("{} users have incompleted courses", coursesGroupedByUserId.size());
+
         coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
             identityService.getIdentityByUid(userId)
                 .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, notificationCourseModule, LocalDate.now())));
