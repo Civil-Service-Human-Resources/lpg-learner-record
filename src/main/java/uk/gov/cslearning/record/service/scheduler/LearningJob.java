@@ -176,7 +176,7 @@ public class LearningJob {
     }
 
     private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
-        LOGGER.info("Processing for user: {}", identity.getUsername());
+        LOGGER.info("Processing incomplete courses for user: {}", identity.getUsername());
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
 
         for (Course course : notificationCourseModule.getCourses()) {
