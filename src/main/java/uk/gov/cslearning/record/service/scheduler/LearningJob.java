@@ -126,6 +126,7 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
+        LOGGER.info("Found {} completed records since {}", completedCourseRecords.size(), since.toString());
 
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
@@ -138,7 +139,7 @@ public class LearningJob {
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
-        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
+        LOGGER.info("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(courseRecord.getUserId(), courseRecord.getCourseId(), NotificationType.COMPLETE);
         boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
@@ -159,6 +160,7 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
+        LOGGER.info("Fetched {} incompleted records grouped by organisation", coursesGroupedByOrg.size());
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
@@ -172,6 +174,7 @@ public class LearningJob {
     }
 
     private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
+        LOGGER.info("Processing for user: {}", identity.getUsername());
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
 
         for (Course course : notificationCourseModule.getCourses()) {
@@ -234,7 +237,6 @@ public class LearningJob {
                 break;
         }
 
-        LOGGER.debug("Sending notification for user {} with content: {}", identity.getUsername(), requiredLearning.toString());
         notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {
