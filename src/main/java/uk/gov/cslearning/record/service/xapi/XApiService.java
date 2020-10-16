@@ -45,7 +45,7 @@ public class XApiService implements Serializable {
     }
 
     public Collection<Statement> getStatements(String userId, String activityId, LocalDateTime since) throws IOException {
-        LOGGER.debug("Getting xAPI statements for user {} and activity {} since {}", userId, activityId, since);
+        LOGGER.info("Getting xAPI statements for user {} and activity {} since {}", userId, activityId, since);
 
         StatementClient statementClient = new StatementClient(xApiProperties.getUrl(), xApiProperties.getUsername(),
                 xApiProperties.getPassword());
