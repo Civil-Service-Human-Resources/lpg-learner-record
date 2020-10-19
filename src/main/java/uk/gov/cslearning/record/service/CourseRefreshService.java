@@ -75,6 +75,9 @@ public class CourseRefreshService {
                 Collection<CourseRecord> existingCourseRecords = transactionTemplate.execute(status -> courseRecordRepository.findByUserId(userId));
                 Collection<CourseRecord> userRecords = stream.replay(userSplit.get(userId), statement -> ((Activity) statement.getObject()).getId(), existingCourseRecords);
                 updatedCourseRecords.addAll(userRecords);
+
+                log.info("Updated courses: ");
+                userRecords.forEach(courseRecord -> log.info("Course id: {} Course title: {} Course state: {}", courseRecord.getCourseId(), courseRecord.getCourseTitle(), courseRecord.getState()));
             }
 
             transactionTemplate.execute(new TransactionCallbackWithoutResult() {
