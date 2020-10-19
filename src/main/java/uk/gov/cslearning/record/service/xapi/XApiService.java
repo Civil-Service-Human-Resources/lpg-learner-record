@@ -43,8 +43,11 @@ public class XApiService implements Serializable {
         this.statementClientFactory = statementClientFactory;
         this.statementFactory = statementFactory;
     }
-
     public Collection<Statement> getStatements(String userId, String activityId, LocalDateTime since) throws IOException {
+        return getStatements(userId, activityId, null, since);
+    }
+
+    public Collection<Statement> getStatements(String userId, String activityId,  String verb, LocalDateTime since) throws IOException {
         LOGGER.debug("Getting xAPI statements for user {} and activity {} since {}", userId, activityId, since);
 
         StatementClient statementClient = new StatementClient(xApiProperties.getUrl(), xApiProperties.getUsername(),
@@ -61,6 +64,11 @@ public class XApiService implements Serializable {
                     .filterByActivity(activityId)
                     .includeRelatedActivities(true);
         }
+
+        if (verb != null) {
+            statementClient = statementClient.filterByVerb(verb);
+        }
+
         if (since != null) {
             statementClient = statementClient
                     .filterBySince(DATE_FORMATTER.format(since));
