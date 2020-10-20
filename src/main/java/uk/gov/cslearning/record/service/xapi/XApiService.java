@@ -78,10 +78,14 @@ public class XApiService implements Serializable {
         StatementResult result = statementClient.getStatements();
 
         List<Statement> statements = new ArrayList<>(result.getStatements());
+
         while (result.hasMore()) {
             result = statementClient.getStatements(stripPath(xApiProperties.getUrl(), result.getMore()));
             statements.addAll(result.getStatements());
         }
+
+        LOGGER.info("Refreshed and got {} statements", statements.size());
+
         return statements;
     }
 
