@@ -134,7 +134,7 @@ public class LearningJob {
 
         completedCourseRecords.parallelStream().forEach(courseRecord ->
                 registryService.getCivilServantByUid(courseRecord.getUserId())
-                    .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
+                    .ifPresent(civilServant -> processCivilServantForCompletedCourse(civilServant, courseRecord, since)));
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
     }
@@ -148,13 +148,9 @@ public class LearningJob {
 
         if (shouldSendNotification) {
             String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
-            if (StringUtils.isNotBlank(emailAddress)) {
-                notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
-                Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
-                notificationRepository.save(notification);
-            } else {
-                LOGGER.info("User {} has no line manager assigned. Notification skipped.", civilServant.getFullName());
-            }
+            notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
+            Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
+            notificationRepository.save(notification);
         } else {
             LOGGER.info("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         }
@@ -178,6 +174,14 @@ public class LearningJob {
 
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
+    }
+
+    private void processCivilServantForCompletedCourse(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime since) {
+        if (StringUtils.isNotBlank(civilServant.getLineManagerUid())) {
+            checkAndNotifyLineManager(civilServant, courseRecord, since);
+        } else {
+            LOGGER.info("User {} has no line manager assigned. Notification skipped.", civilServant.getFullName());
+        }
     }
 
     private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
