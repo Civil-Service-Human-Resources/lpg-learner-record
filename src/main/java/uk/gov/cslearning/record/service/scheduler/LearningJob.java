@@ -29,6 +29,7 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,9 +148,13 @@ public class LearningJob {
 
         if (shouldSendNotification) {
             String emailAddress = identityService.getEmailAddress(civilServant.getLineManagerUid());
-            notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
-            Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
-            notificationRepository.save(notification);
+            if (StringUtils.isNotBlank(emailAddress)) {
+                notifyService.notifyOnComplete(emailAddress, govNotifyCompletedLearningTemplateId, civilServant.getFullName(), emailAddress, courseRecord.getCourseTitle());
+                Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
+                notificationRepository.save(notification);
+            } else {
+                LOGGER.info("User {} has no line manager assigned. Notification skipped.", civilServant.getFullName());
+            }
         } else {
             LOGGER.info("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         }
