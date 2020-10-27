@@ -51,6 +51,7 @@ notifications:
   lr-refresh-job-enabled: ${LR_REFRESH_JOB_ENABLED:true}
   completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
   incompleted-job-enabled: ${INCOMPLETED_JOB_ENABLED:true}
+  lr-refresh-job-statement-buffer: ${LR_REFRESH_JOB_STATEMENT_BUFFER:200}
 
 xapi:
   username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
