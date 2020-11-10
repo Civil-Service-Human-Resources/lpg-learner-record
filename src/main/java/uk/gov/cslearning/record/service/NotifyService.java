@@ -35,7 +35,7 @@ public class NotifyService {
     }
 
     public void notifyForIncompleteCourses(String email, String requiredLearning, String templateId, String period) {
-        LOGGER.info("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
+        LOGGER.debug("Sending {} notification to {}, with required learning {}", period, email, requiredLearning);
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
         personalisation.put(REQUIRED_LEARNING_PERMISSION, requiredLearning);
@@ -44,14 +44,14 @@ public class NotifyService {
         try {
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.info("Reminder notify email sent: {}", response.getBody());
+            LOGGER.debug("Reminder notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: {}", e.getLocalizedMessage());
         }
     }
 
     public void notifyOnComplete(String email, String templateId, String learner, String manager, String courseTitle) {
-        LOGGER.info("Sending completion notification to {}, for course {}", email, courseTitle);
+        LOGGER.debug("Sending completion notification to {}, for course {}", email, courseTitle);
 
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(EMAIL_PERMISSION, email);
@@ -62,7 +62,7 @@ public class NotifyService {
         try {
             SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-            LOGGER.info("Complete notify email sent: {}", response.getBody());
+            LOGGER.debug("Complete notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
             LOGGER.error("Could not send email to GOV notify: {}", e.getLocalizedMessage());
         }

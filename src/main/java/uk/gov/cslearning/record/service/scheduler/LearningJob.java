@@ -127,7 +127,7 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
-        LOGGER.info("Found {} completed records since {}", completedCourseRecords.size(), since.toString());
+        LOGGER.debug("Found {} completed records since {}", completedCourseRecords.size(), since.toString());
 
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
@@ -140,7 +140,7 @@ public class LearningJob {
     }
 
     void checkAndNotifyLineManager(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime completedDate) {
-        LOGGER.info("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
+        LOGGER.debug("Notifying line manager of course completion for user {}, course id = {}", courseRecord.getUserId(), courseRecord.getCourseId());
 
         Optional<Notification> optionalNotification = notificationRepository.findFirstByIdentityUidAndCourseIdAndTypeOrderBySentDesc(courseRecord.getUserId(), courseRecord.getCourseId(), NotificationType.COMPLETE);
         boolean shouldSendNotification = optionalNotification.map(notification -> notification.sentBefore(completedDate))
@@ -152,7 +152,7 @@ public class LearningJob {
             Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
             notificationRepository.save(notification);
         } else {
-            LOGGER.info("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
+            LOGGER.debug("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         }
     }
 
@@ -161,12 +161,12 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
-        LOGGER.info("Fetched {} incompleted records grouped by organisation", coursesGroupedByOrg.size());
+        LOGGER.debug("Fetched {} incompleted records grouped by organisation", coursesGroupedByOrg.size());
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
-        LOGGER.info("{} users have incompleted courses", coursesGroupedByUserId.size());
+        LOGGER.debug("{} users have incompleted courses", coursesGroupedByUserId.size());
 
         coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
             identityService.getIdentityByUid(userId)
@@ -180,12 +180,12 @@ public class LearningJob {
         if (StringUtils.isNotBlank(civilServant.getLineManagerUid())) {
             checkAndNotifyLineManager(civilServant, courseRecord, since);
         } else {
-            LOGGER.info("User {} has no line manager assigned. Notification skipped.", civilServant.getFullName());
+            LOGGER.debug("User {} has no line manager assigned. Notification skipped.", civilServant.getFullName());
         }
     }
 
     private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
-        LOGGER.info("Processing incomplete courses for user: {}", identity.getUsername());
+        LOGGER.debug("Processing incomplete courses for user: {}", identity.getUsername());
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
 
         for (Course course : notificationCourseModule.getCourses()) {
