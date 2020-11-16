@@ -59,7 +59,7 @@ public class CourseRefreshService {
 
             for (Statement statement : statements) {
                 String userId = statement.getActor().getAccount().getName();
-                log.error("Splitting user {}", userId);
+                log.debug("Splitting user {}", userId);
                 if (userSplit.containsKey(userId)) {
                     userSplit.get(userId).add(statement);
                 } else {

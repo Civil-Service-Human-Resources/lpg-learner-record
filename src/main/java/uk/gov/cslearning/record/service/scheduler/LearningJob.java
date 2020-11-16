@@ -29,6 +29,7 @@ import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.identity.Identity;
 import uk.gov.cslearning.record.service.identity.IdentityService;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,13 +127,14 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         List<CourseRecord> completedCourseRecords = courseRecordRepository.findCompletedByLastUpdated(since);
+        LOGGER.debug("Found {} completed records since {}", completedCourseRecords.size(), since.toString());
 
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         completedCourseRecords.parallelStream().forEach(courseRecord ->
                 registryService.getCivilServantByUid(courseRecord.getUserId())
-                    .ifPresent(civilServant -> checkAndNotifyLineManager(civilServant, courseRecord, since)));
+                    .ifPresent(civilServant -> processCivilServantForCompletedCourse(civilServant, courseRecord, since)));
         courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
     }
@@ -150,7 +152,7 @@ public class LearningJob {
             Notification notification = new Notification(courseRecord.getCourseId(), courseRecord.getUserId(), NotificationType.COMPLETE);
             notificationRepository.save(notification);
         } else {
-            LOGGER.info("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
+            LOGGER.debug("User has already been sent notification (CSID{}:CRID{})", civilServant.getFullName(), courseRecord.getCourseId());
         }
     }
 
@@ -159,10 +161,13 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, List<Course>> coursesGroupedByOrg = learningCatalogueService.getRequiredCoursesByDueDaysGroupedByOrg(NOTIFICATION_PERIOD_PARAM);
+        LOGGER.debug("Fetched {} incompleted records grouped by organisation", coursesGroupedByOrg.size());
         courseNotificationJobHistory.setDataAcquisition(LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
 
         Map<String, NotificationCourseModule> coursesGroupedByUserId = groupCourseByUserId(coursesGroupedByOrg);
+        LOGGER.debug("{} users have incompleted courses", coursesGroupedByUserId.size());
+
         coursesGroupedByUserId.forEach((userId, notificationCourseModule) ->
             identityService.getIdentityByUid(userId)
                 .ifPresent(identity -> processGroupedCoursesAndSendNotifications(identity, notificationCourseModule, LocalDate.now())));
@@ -171,7 +176,16 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
     }
 
+    private void processCivilServantForCompletedCourse(CivilServant civilServant, CourseRecord courseRecord, LocalDateTime since) {
+        if (StringUtils.isNotBlank(civilServant.getLineManagerUid())) {
+            checkAndNotifyLineManager(civilServant, courseRecord, since);
+        } else {
+            LOGGER.debug("User {} has no line manager assigned. Notification skipped.", civilServant.getFullName());
+        }
+    }
+
     private void processGroupedCoursesAndSendNotifications(Identity identity, NotificationCourseModule notificationCourseModule, LocalDate now) {
+        LOGGER.debug("Processing incomplete courses for user: {}", identity.getUsername());
         Map<Long, List<Course>> incompleteCourses = new HashMap<>();
 
         for (Course course : notificationCourseModule.getCourses()) {
@@ -234,7 +248,6 @@ public class LearningJob {
                 break;
         }
 
-        LOGGER.debug("Sending notification for user {} with content: {}", identity.getUsername(), requiredLearning.toString());
         notifyService.notifyForIncompleteCourses(identity.getUsername(), requiredLearning.toString(), govNotifyRequiredLearningDueTemplateId, periodText);
 
         for (Course course : courses) {

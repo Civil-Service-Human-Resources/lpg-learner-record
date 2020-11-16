@@ -64,7 +64,7 @@ public class NotifyService {
 
             LOGGER.debug("Complete notify email sent: {}", response.getBody());
         } catch (NotificationClientException e) {
-            LOGGER.error("Could not send email to GOV notify: ", e.getLocalizedMessage());
+            LOGGER.error("Could not send email to GOV notify: {}", e.getLocalizedMessage());
         }
     }
 }
