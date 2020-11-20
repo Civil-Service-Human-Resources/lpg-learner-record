@@ -78,6 +78,7 @@ registry:
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
   getResourceByUidUrl: "${registry.serviceUrl}/civilServants/resource/%s"
   getResourceByOrgCodeUrl: "${registry.serviceUrl}/civilServants/organisation/%s"
+  getOrganisationalUnit: "${registry.serviceUrl}/organisationalUnits/parent/%s"
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}

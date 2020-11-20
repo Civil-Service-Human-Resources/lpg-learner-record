@@ -14,9 +14,11 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.domain.OrganisationalUnit;
 import uk.gov.cslearning.record.service.RequestEntityFactory;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,7 @@ public class RegistryService {
     private String findByUidUrlFormat;
     private String getResourceByUidUrl;
     private String getResourceByOrgCodeUrl;
+    private String getOrganisationalUnit;
     private URI getCurrentUrl;
 
     @Autowired
@@ -37,13 +40,15 @@ public class RegistryService {
                            @Value("${registry.getCurrentUrl}") URI getCurrentUrl,
                            @Value("${registry.getResourceByUidUrl}") String getResourceByUidUrl,
                            @Value("${registry.findByUidUrlFormat}") String findByUidUrlFormat,
-                           @Value("${registry.getResourceByOrgCodeUrl}") String getResourceByOrgCodeUrl) {
+                           @Value("${registry.getResourceByOrgCodeUrl}") String getResourceByOrgCodeUrl,
+                           @Value("${registry.getOrganisationalUnit}") String getOrganisationalUnit) {
         this.restOperations = restOperations;
         this.requestEntityFactory = requestEntityFactory;
         this.findByUidUrlFormat = findByUidUrlFormat;
         this.getCurrentUrl = getCurrentUrl;
         this.getResourceByUidUrl = getResourceByUidUrl;
         this.getResourceByOrgCodeUrl = getResourceByOrgCodeUrl;
+        this.getOrganisationalUnit = getOrganisationalUnit;
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -96,5 +101,25 @@ public class RegistryService {
             LOGGER.debug(String.format("Cannot find profile details for civil servant with organisation code %s", code), e);
         }
         return Collections.emptyList();
+    }
+
+    public List<OrganisationalUnit> getOrganisationalUnitByCode(String code) {
+        LOGGER.debug("Getting organisational unit with parent organisations");
+        String activationUrl = String.format(getOrganisationalUnit, code);
+
+        RequestEntity requestEntity = requestEntityFactory.createGetRequest(activationUrl);
+
+        ResponseEntity<List<OrganisationalUnit>> response = null;
+
+        try {
+            response = restOperations.exchange(requestEntity, new ParameterizedTypeReference<List<OrganisationalUnit>>() {});
+        } catch (HttpClientErrorException e) {
+            LOGGER.debug(String.format("Cannot find organisational unit and its parents with organisation code %s", code), e);
+        }
+
+        if (response.getBody() != null) {
+            return response.getBody();
+        }
+        return new ArrayList<>();
     }
 }
