@@ -38,16 +38,17 @@ import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class StatementStream {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
 
     private LearningCatalogueService learningCatalogueService;
     private RegistryService registryService;
+    private Map<String, List<String>> parentOrganisationsCache;
 
     public StatementStream(LearningCatalogueService learningCatalogueService, RegistryService registryService) {
         checkArgument(learningCatalogueService != null);
         this.learningCatalogueService = learningCatalogueService;
         this.registryService = registryService;
+        this.parentOrganisationsCache = new HashMap<>();
     }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
@@ -274,10 +275,7 @@ public class StatementStream {
 
     private boolean isCourseRequired(uk.gov.cslearning.record.service.catalogue.Course catalogueCourse, CivilServant civilServant) {
         if (civilServant.getOrganisationalUnit() != null) {
-            List<String> organisationalUnitCodes = registryService.getOrganisationalUnitByCode(civilServant.getOrganisationalUnit().getCode())
-                .stream()
-                .map(OrganisationalUnit::getCode)
-                .collect(toList());
+            List<String> organisationalUnitCodes = fetchOrganisationalUnits(civilServant.getOrganisationalUnit().getCode());
             return catalogueCourse.getAudiences()
                     .stream()
                     .anyMatch(audience -> audience.getType() != null &&
@@ -288,8 +286,21 @@ public class StatementStream {
         }
     }
 
-    public interface GroupId {
+    private List<String> fetchOrganisationalUnits(String code) {
+        if (parentOrganisationsCache.containsKey(code)) {
+            return parentOrganisationsCache.get(code);
+        } else {
+            List<String> organisationalUnitCodes = registryService.getOrganisationalUnitByCode(code)
+                .stream()
+                .map(OrganisationalUnit::getCode)
+                .collect(toList());
+            parentOrganisationsCache.put(code, organisationalUnitCodes);
 
+            return organisationalUnitCodes;
+        }
+    }
+
+    public interface GroupId {
         String get(Statement statement);
     }
 }
