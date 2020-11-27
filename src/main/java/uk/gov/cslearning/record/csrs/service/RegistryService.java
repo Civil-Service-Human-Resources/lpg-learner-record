@@ -85,7 +85,7 @@ public class RegistryService {
             CivilServant civilServant = restOperations.getForObject(String.format(getResourceByUidUrl, uid), CivilServant.class);
             return Optional.ofNullable(civilServant);
         } catch (HttpClientErrorException e) {
-            LOGGER.debug(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
+            LOGGER.error(String.format("Cannot find profile details for civil servant with UID %s", uid), e);
         }
         return Optional.empty();
     }
@@ -98,7 +98,7 @@ public class RegistryService {
         try {
             return restOperations.exchange(requestEntity, new ParameterizedTypeReference<List<CivilServant>>(){}).getBody();
         } catch (HttpClientErrorException e) {
-            LOGGER.debug(String.format("Cannot find profile details for civil servant with organisation code %s", code), e);
+            LOGGER.error(String.format("Cannot find profile details for civil servant with organisation code %s", code), e);
         }
         return Collections.emptyList();
     }
@@ -114,7 +114,7 @@ public class RegistryService {
         try {
             response = restOperations.exchange(requestEntity, new ParameterizedTypeReference<List<OrganisationalUnit>>() {});
         } catch (HttpClientErrorException e) {
-            LOGGER.debug(String.format("Cannot find organisational unit and its parents with organisation code %s", code), e);
+            LOGGER.error(String.format("Cannot find organisational unit and its parents with organisation code %s", code), e);
         }
 
         if (response.getBody() != null) {
