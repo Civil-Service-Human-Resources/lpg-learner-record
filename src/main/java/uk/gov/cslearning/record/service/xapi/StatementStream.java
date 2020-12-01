@@ -19,6 +19,7 @@ import java.util.Optional;
 import gov.adlnet.xapi.model.Statement;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.domain.OrganisationalUnit;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
@@ -31,21 +32,23 @@ import uk.gov.cslearning.record.service.xapi.action.Action;
 import uk.gov.cslearning.record.service.xapi.activity.Activity;
 import uk.gov.cslearning.record.service.xapi.activity.Course;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class StatementStream {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StatementStream.class);
 
     private LearningCatalogueService learningCatalogueService;
     private RegistryService registryService;
+    private Map<String, List<String>> parentOrganisationsCache;
 
     public StatementStream(LearningCatalogueService learningCatalogueService, RegistryService registryService) {
         checkArgument(learningCatalogueService != null);
         this.learningCatalogueService = learningCatalogueService;
         this.registryService = registryService;
+        this.parentOrganisationsCache = new HashMap<>();
     }
 
     public Collection<CourseRecord> replay(Collection<Statement> statements, GroupId id) {
@@ -271,16 +274,33 @@ public class StatementStream {
     }
 
     private boolean isCourseRequired(uk.gov.cslearning.record.service.catalogue.Course catalogueCourse, CivilServant civilServant) {
-        return catalogueCourse.getAudiences()
-            .stream()
-            .anyMatch(audience -> audience.getType() != null
-                && civilServant.getOrganisationalUnit() != null
-                && audience.getType().equals(Audience.Type.REQUIRED_LEARNING)
-                && audience.getDepartments().contains(civilServant.getOrganisationalUnit().getCode()));
+        if (civilServant.getOrganisationalUnit() != null) {
+            List<String> organisationalUnitCodes = fetchOrganisationalUnits(civilServant.getOrganisationalUnit().getCode());
+            return catalogueCourse.getAudiences()
+                    .stream()
+                    .anyMatch(audience -> audience.getType() != null &&
+                        audience.getType().equals(Audience.Type.REQUIRED_LEARNING) &&
+                        CollectionUtils.containsAny(audience.getDepartments(), organisationalUnitCodes));
+        } else {
+            return false;
+        }
+    }
+
+    private List<String> fetchOrganisationalUnits(String code) {
+        if (parentOrganisationsCache.containsKey(code)) {
+            return parentOrganisationsCache.get(code);
+        } else {
+            List<String> organisationalUnitCodes = registryService.getOrganisationalUnitByCode(code)
+                .stream()
+                .map(OrganisationalUnit::getCode)
+                .collect(toList());
+            parentOrganisationsCache.put(code, organisationalUnitCodes);
+
+            return organisationalUnitCodes;
+        }
     }
 
     public interface GroupId {
-
         String get(Statement statement);
     }
 }
