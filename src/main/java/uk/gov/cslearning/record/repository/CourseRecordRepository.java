@@ -18,7 +18,6 @@ import java.util.Optional;
 @Repository
 public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM CourseRecord r WHERE r.identity.userId = ?1")
     Collection<CourseRecord> findByUserId(String userId);
 
