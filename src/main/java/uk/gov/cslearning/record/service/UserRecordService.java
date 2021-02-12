@@ -51,7 +51,6 @@ public class UserRecordService {
         this.registryService = registryService;
     }
 
-    @Transactional
     public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
         LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 
