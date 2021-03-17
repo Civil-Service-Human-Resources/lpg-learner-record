@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reporting/module-records")
+@RequestMapping("/reporting")
 public class ModuleRecordController {
 
     private final ModuleRecordService moduleRecordService;
@@ -22,11 +22,20 @@ public class ModuleRecordController {
         this.moduleRecordService = moduleRecordService;
     }
 
-    @GetMapping(params = {"from", "to"})
+    @GetMapping(value = "/module-records", params = {"from", "to"})
     public ResponseEntity<List<ModuleRecordDto>> listForPeriod(
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         return ResponseEntity.ok(moduleRecordService.listRecordsForPeriod(from, to));
+    }
+
+    @GetMapping(value = "/module-records-for-learners", params = {"from", "to", "learnerIds"})
+    public ResponseEntity<List<ModuleRecordDto>> listModuleRecordsForPeriodAndLearnerIds(
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam List<String> learnerIds
+    ) {
+        return ResponseEntity.ok(moduleRecordService.listRecordsForPeriodAndLearnerIds(from, to, learnerIds));
     }
 }
