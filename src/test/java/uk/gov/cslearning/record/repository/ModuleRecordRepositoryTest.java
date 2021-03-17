@@ -70,7 +70,7 @@ public class ModuleRecordRepositoryTest {
         LocalDateTime queryStart = LocalDateTime.now().minusDays(2);
 
         ModuleRecord moduleRecord1 = new ModuleRecord("moduleRecord1");
-        moduleRecord1.setUpdatedAt(LocalDateTime.now().minusDays(1));
+        moduleRecord1.setUpdatedAt(queryStart);
         moduleRecord1.setCourseRecord(courseRecord1);
 
         ModuleRecord moduleRecord2 = new ModuleRecord("moduleRecord2");
@@ -85,7 +85,7 @@ public class ModuleRecordRepositoryTest {
         CourseRecord courseRecord2 = new CourseRecord("course-id-2", "user-id-2");
 
         ModuleRecord moduleRecord21 = new ModuleRecord("moduleRecord21");
-        moduleRecord21.setUpdatedAt(LocalDateTime.now().minusDays(1));
+        moduleRecord21.setUpdatedAt(queryStart);
         moduleRecord21.setCourseRecord(courseRecord2);
 
         ModuleRecord moduleRecord22 = new ModuleRecord("moduleRecord22");
@@ -103,8 +103,8 @@ public class ModuleRecordRepositoryTest {
 
         List<ModuleRecordDto> results = moduleRecordRepository.findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(queryStart, end, learnerIds);
 
-        assertEquals(2, results.size());
-        assertEquals(moduleRecord2.getModuleId(), results.get(0).getModuleId());
+        assertEquals(4, results.size());
+        assertEquals(moduleRecord1.getModuleId(), results.get(0).getModuleId());
     }
 
     @Test
