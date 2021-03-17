@@ -12,14 +12,14 @@ import java.util.List;
 
 @Repository
 public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long> {
-    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate) " +
+    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
             "FROM ModuleRecord mr " +
             "left join CourseRecord cr on cr.id = mr.courseRecord.id " +
             "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
             "AND mr.courseRecord IS NOT EMPTY")
     List<ModuleRecordDto> findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to);
 
-    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate) " +
+    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
             "FROM ModuleRecord mr " +
             "left join CourseRecord cr on cr.id = mr.courseRecord.id " +
             "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
