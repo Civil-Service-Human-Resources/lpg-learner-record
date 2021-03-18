@@ -125,11 +125,9 @@ public class ModuleRecordRepositoryTest {
         moduleRecordRepository.saveAll(moduleRecords);
 
         LocalDateTime end = LocalDateTime.now().minusDays(1).minusMinutes(1);
-
         List<ModuleRecordDto> results = moduleRecordRepository.findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(queryStart, end, learnerIds);
 
         assertEquals(5, results.size());
-
         for(int i = 0; i < results.size(); i++) {
             assertEquals(moduleRecords.get(i).getModuleId(), results.get(i).getModuleId());
             assertEquals(moduleRecords.get(i).getModuleTitle(), results.get(i).getModuleTitle());
