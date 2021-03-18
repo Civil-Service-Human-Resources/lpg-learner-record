@@ -66,45 +66,68 @@ public class ModuleRecordRepositoryTest {
         learnerIds.add("user-id-2");
 
         CourseRecord courseRecord1 = new CourseRecord("course-id-1", "user-id-1");
+        courseRecord1.setCourseTitle("courseRecord1Title");
 
         LocalDateTime queryStart = LocalDateTime.now().minusDays(2);
 
-        ModuleRecord moduleRecord1 = new ModuleRecord("moduleRecord1");
-        moduleRecord1.setUpdatedAt(queryStart);
-        moduleRecord1.setCourseRecord(courseRecord1);
+        ModuleRecord moduleRecord11 = new ModuleRecord("module-id-11");
+        moduleRecord11.setModuleTitle("moduleRecord11Title");
+        moduleRecord11.setModuleType("moduleRecord11Type");
+        moduleRecord11.setUpdatedAt(queryStart);
+        moduleRecord11.setCourseRecord(courseRecord1);
 
-        ModuleRecord moduleRecord2 = new ModuleRecord("moduleRecord2");
-        moduleRecord2.setUpdatedAt(queryStart);
-        moduleRecord2.setCourseRecord(courseRecord1);
-        moduleRecord2.setState(State.REGISTERED);
+        ModuleRecord moduleRecord12 = new ModuleRecord("module-id-12");
+        moduleRecord12.setModuleTitle("moduleRecord12Title");
+        moduleRecord12.setModuleType("moduleRecord12Type");
+        moduleRecord12.setUpdatedAt(queryStart);
+        moduleRecord12.setCourseRecord(courseRecord1);
+        moduleRecord12.setState(State.REGISTERED);
 
-        ModuleRecord moduleRecord3 = new ModuleRecord("moduleRecord3");
-        moduleRecord3.setUpdatedAt(LocalDateTime.now().minusDays(3));
-        moduleRecord3.setCourseRecord(courseRecord1);
+        ModuleRecord moduleRecord13 = new ModuleRecord("module-id-13");
+        moduleRecord13.setModuleTitle("moduleRecord13Title");
+        moduleRecord13.setModuleType("moduleRecord13Type");
+        moduleRecord13.setUpdatedAt(queryStart);
+        moduleRecord13.setCourseRecord(courseRecord1);
 
         CourseRecord courseRecord2 = new CourseRecord("course-id-2", "user-id-2");
+        courseRecord2.setCourseTitle("courseRecord2Title");
 
-        ModuleRecord moduleRecord21 = new ModuleRecord("moduleRecord21");
+        ModuleRecord moduleRecord21 = new ModuleRecord("module-id-21");
+        moduleRecord21.setModuleTitle("moduleRecord21Title");
+        moduleRecord21.setModuleType("moduleRecord21Type");
         moduleRecord21.setUpdatedAt(queryStart);
         moduleRecord21.setCourseRecord(courseRecord2);
 
-        ModuleRecord moduleRecord22 = new ModuleRecord("moduleRecord22");
+        ModuleRecord moduleRecord22 = new ModuleRecord("module-id-22");
+        moduleRecord22.setModuleTitle("moduleRecord22Title");
+        moduleRecord22.setModuleType("moduleRecord21Type");
         moduleRecord22.setUpdatedAt(queryStart);
         moduleRecord22.setCourseRecord(courseRecord2);
         moduleRecord22.setState(State.REGISTERED);
 
-        ModuleRecord moduleRecord23 = new ModuleRecord("moduleRecord23");
+        ModuleRecord moduleRecord23 = new ModuleRecord("module-id-23");
+        moduleRecord23.setModuleTitle("moduleRecord23Title");
+        moduleRecord23.setModuleType("moduleRecord23Type");
         moduleRecord23.setUpdatedAt(LocalDateTime.now().minusDays(3));
         moduleRecord23.setCourseRecord(courseRecord2);
 
-        moduleRecordRepository.saveAll(Arrays.asList(moduleRecord1, moduleRecord2, moduleRecord3, moduleRecord21, moduleRecord22, moduleRecord23));
+        List<ModuleRecord> moduleRecords = Arrays.asList(moduleRecord11, moduleRecord12, moduleRecord13, moduleRecord21, moduleRecord22, moduleRecord23);
+        moduleRecordRepository.saveAll(moduleRecords);
 
         LocalDateTime end = LocalDateTime.now().minusDays(1).minusMinutes(1);
 
         List<ModuleRecordDto> results = moduleRecordRepository.findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(queryStart, end, learnerIds);
 
-        assertEquals(4, results.size());
-        assertEquals(moduleRecord1.getModuleId(), results.get(0).getModuleId());
+        assertEquals(5, results.size());
+
+        for(int i = 0; i < results.size(); i++) {
+            assertEquals(moduleRecords.get(i).getModuleTitle(), results.get(i).getModuleTitle());
+            assertEquals(moduleRecords.get(i).getModuleType(), results.get(i).getModuleType());
+            assertEquals(moduleRecords.get(i).getCourseRecord().getCourseId(), results.get(i).getCourseId());
+            assertEquals(moduleRecords.get(i).getCourseRecord().getCourseTitle(), results.get(i).getCourseTitle());
+            assertEquals(moduleRecords.get(i).getCourseRecord().getUserId(), results.get(i).getLearner());
+            assertEquals(moduleRecords.get(i).getCourseRecord().getIdentity().getUserId(), results.get(i).getLearner());
+        }
     }
 
     @Test
