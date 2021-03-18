@@ -74,19 +74,24 @@ public class ModuleRecordRepositoryTest {
         moduleRecord11.setModuleTitle("moduleRecord11Title");
         moduleRecord11.setModuleType("moduleRecord11Type");
         moduleRecord11.setUpdatedAt(queryStart);
+        moduleRecord11.setCompletionDate(queryStart);
+        moduleRecord11.setState(State.COMPLETED);
         moduleRecord11.setCourseRecord(courseRecord1);
 
         ModuleRecord moduleRecord12 = new ModuleRecord("module-id-12");
         moduleRecord12.setModuleTitle("moduleRecord12Title");
         moduleRecord12.setModuleType("moduleRecord12Type");
         moduleRecord12.setUpdatedAt(queryStart);
-        moduleRecord12.setCourseRecord(courseRecord1);
+        moduleRecord12.setCompletionDate(queryStart);
         moduleRecord12.setState(State.REGISTERED);
+        moduleRecord12.setCourseRecord(courseRecord1);
 
         ModuleRecord moduleRecord13 = new ModuleRecord("module-id-13");
         moduleRecord13.setModuleTitle("moduleRecord13Title");
         moduleRecord13.setModuleType("moduleRecord13Type");
         moduleRecord13.setUpdatedAt(queryStart);
+        moduleRecord13.setCompletionDate(queryStart);
+        moduleRecord13.setState(State.IN_PROGRESS);
         moduleRecord13.setCourseRecord(courseRecord1);
 
         CourseRecord courseRecord2 = new CourseRecord("course-id-2", "user-id-2");
@@ -96,19 +101,24 @@ public class ModuleRecordRepositoryTest {
         moduleRecord21.setModuleTitle("moduleRecord21Title");
         moduleRecord21.setModuleType("moduleRecord21Type");
         moduleRecord21.setUpdatedAt(queryStart);
+        moduleRecord21.setCompletionDate(queryStart);
+        moduleRecord21.setState(State.APPROVED);
         moduleRecord21.setCourseRecord(courseRecord2);
 
         ModuleRecord moduleRecord22 = new ModuleRecord("module-id-22");
         moduleRecord22.setModuleTitle("moduleRecord22Title");
         moduleRecord22.setModuleType("moduleRecord21Type");
         moduleRecord22.setUpdatedAt(queryStart);
-        moduleRecord22.setCourseRecord(courseRecord2);
+        moduleRecord22.setCompletionDate(queryStart);
         moduleRecord22.setState(State.REGISTERED);
+        moduleRecord22.setCourseRecord(courseRecord2);
 
         ModuleRecord moduleRecord23 = new ModuleRecord("module-id-23");
         moduleRecord23.setModuleTitle("moduleRecord23Title");
         moduleRecord23.setModuleType("moduleRecord23Type");
         moduleRecord23.setUpdatedAt(LocalDateTime.now().minusDays(3));
+        moduleRecord23.setCompletionDate(queryStart);
+        moduleRecord23.setState(State.REGISTERED);
         moduleRecord23.setCourseRecord(courseRecord2);
 
         List<ModuleRecord> moduleRecords = Arrays.asList(moduleRecord11, moduleRecord12, moduleRecord13, moduleRecord21, moduleRecord22, moduleRecord23);
@@ -121,8 +131,12 @@ public class ModuleRecordRepositoryTest {
         assertEquals(5, results.size());
 
         for(int i = 0; i < results.size(); i++) {
+            assertEquals(moduleRecords.get(i).getModuleId(), results.get(i).getModuleId());
             assertEquals(moduleRecords.get(i).getModuleTitle(), results.get(i).getModuleTitle());
             assertEquals(moduleRecords.get(i).getModuleType(), results.get(i).getModuleType());
+            assertEquals(moduleRecords.get(i).getUpdatedAt(), results.get(i).getStateChangeDate());
+            assertEquals(moduleRecords.get(i).getCompletionDate(), results.get(i).getCompletedAt());
+            assertEquals(moduleRecords.get(i).getState().name(), results.get(i).getState());
             assertEquals(moduleRecords.get(i).getCourseRecord().getCourseId(), results.get(i).getCourseId());
             assertEquals(moduleRecords.get(i).getCourseRecord().getCourseTitle(), results.get(i).getCourseTitle());
             assertEquals(moduleRecords.get(i).getCourseRecord().getUserId(), results.get(i).getLearner());
