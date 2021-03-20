@@ -2,7 +2,6 @@ package uk.gov.cslearning.record.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
@@ -24,7 +23,6 @@ public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long
             "left join CourseRecord cr on cr.id = mr.courseRecord.id " +
             "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
             "AND mr.courseRecord.identity.userId in (?3) " +
-            "AND mr.courseRecord IS NOT EMPTY"
-            )
+            "AND mr.courseRecord IS NOT EMPTY")
     List<ModuleRecordDto> findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> learnerIds);
 }
