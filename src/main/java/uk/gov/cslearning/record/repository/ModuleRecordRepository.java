@@ -26,4 +26,14 @@ public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long
             "AND mr.courseRecord IS NOT EMPTY " +
             "ORDER BY mr.courseRecord.identity.userId")
     List<ModuleRecordDto> findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> learnerIds);
+
+    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
+            "FROM ModuleRecord mr " +
+            "left join CourseRecord cr on cr.id = mr.courseRecord.id " +
+            "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
+            "AND mr.courseRecord.identity.courseId in (?3) " +
+            "AND mr.courseRecord IS NOT EMPTY " +
+            "ORDER BY mr.courseRecord.identity.userId")
+    List<ModuleRecordDto> findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> courseIds);
+
 }
