@@ -38,4 +38,13 @@ public class ModuleRecordController {
     ) {
         return ResponseEntity.ok(moduleRecordService.listRecordsForPeriodAndLearnerIds(from, to, learnerIds));
     }
+
+    @GetMapping(value = "/module-records-for-course-ids", params = {"from", "to", "courseIds"})
+    public ResponseEntity<List<ModuleRecordDto>> listModuleRecordsForPeriodAndCourseIds(
+            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam List<String> courseIds
+    ) {
+        return ResponseEntity.ok(moduleRecordService.listRecordsForPeriodAndCourseIds(from, to, courseIds));
+    }
 }
