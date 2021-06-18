@@ -1,4 +1,8 @@
 spring:
+  datasource:
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -66,7 +70,7 @@ oauth:
   maxTotalConnections: 120
   defaultMaxConnectionsPerRoute: 60
   maxPerServiceUrl: 60
-  jwtKey: ${jwt_key}
+  jwtKey: ${jwt_key:dummy}
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
@@ -87,7 +91,7 @@ catalogue:
   requiredLearningUrlByDaysFormat: "${catalogue.serviceUrl}/courses?mandatory=true&days=%s&size=1000000000"
 
 govNotify:
-  key: ${GOV_NOTIFY_API_KEY:key}
+  key: ${GOV_NOTIFY_API_KEY:test-22877568-4bca-40f9-8f54-8bf7922583cf-e2f80f22-e3de-4007-9ce2-b50a2b5785b7}
   template:
     requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:template}
     completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:3f50f0eb-4c47-4e37-8a44-1628faa41924}
@@ -101,7 +105,7 @@ govNotify:
     bookingRequested: ${GOV_NOTIFY_BOOKING_REQUESTED:ae678ea1-ae7a-42f3-aa27-037336b346c4}
 
 lpg-ui:
-  serviceUrl: ${LPG_UI_URL:http://localhost:3001}
+  serviceUrl: ${LPG_UI_URL:http://local.learn.civilservice.gov.uk:3001}
   bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
 csl.homepage: "https://cslearning.gov.uk/"
