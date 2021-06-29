@@ -8,9 +8,6 @@ ADD build/libs/learner-record.jar /data/app.jar
 
 # Add AppInsights config and agent jar
 ADD lib/AI-Agent.xml /opt/appinsights/AI-Agent.xml
-ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/2.5.0/applicationinsights-agent-2.5.0.jar /opt/appinsights/applicationinsights-agent-2.5.0.jar
+ADD https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.0.3/applicationinsights-agent-3.0.3.jar /opt/appinsights/applicationinsights-agent-3.0.3.jar
 
-CMD java -javaagent:/opt/appinsights/applicationinsights-agent-2.5.0.jar -jar /data/app.jar
-
-ADD https://github.com/Civil-Service-Human-Resources/lpg-terraform-paas/releases/download/hammer-0.1/hammer /bin/hammer
-RUN chmod +x /bin/hammer
+CMD java -javaagent:/opt/appinsights/applicationinsights-agent-3.0.3.jar -jar /data/app.jar
