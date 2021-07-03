@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.xapi.StatementStream;
@@ -76,6 +77,9 @@ public class UserRecordService {
             for (CourseRecord courseRecord : updatedCourseRecords) {
                 if (!courseRecords.contains(courseRecord)) {
                     courseRecords.add(courseRecord);
+                }
+                if (courseRecord.getState() != null && courseRecord.getState().equals(State.COMPLETED)) {
+                    System.out.println("Record service: Course record set to complete. Title: " + courseRecord.getCourseTitle() + ", id: " + courseRecord.getCourseId());
                 }
             }
 
