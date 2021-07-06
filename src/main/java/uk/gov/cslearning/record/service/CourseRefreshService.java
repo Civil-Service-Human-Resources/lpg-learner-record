@@ -51,7 +51,7 @@ public class CourseRefreshService {
     public int refreshCoursesForATimePeriod(LocalDateTime since) {
         try {
             log.info("Getting xapi refresh statements since {}", since);
-            Collection<Statement> statements = xApiService.getStatements(null, null, since);
+            Collection<Statement> statements = xApiService.getStatements(null, null, "completed", since);
 
             StatementStream stream = new StatementStream(learningCatalogueService, registryService);
 
