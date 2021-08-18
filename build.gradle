@@ -2,7 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.0.0.RELEASE'
     id "org.sonarqube" version "2.6.2"
     id 'idea'
-
+    id 'net.ltgt.apt' version '0.21'
 }
 
 repositories {
@@ -26,6 +26,11 @@ bootJar {
     archiveName = 'learner-record.jar'
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
+
+// bootRun {
+//    systemProperties = System.properties
+//    jvmArgs project.findProperty('debug_jvm') ?: ''
+// }
 
 configurations {
     ajc
@@ -88,6 +93,9 @@ dependencies {
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE'
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.1.1.RELEASE'
 
+    compile group: "com.github.java-json-tools", name: "json-patch", version: "1.13"
+    compile 'org.mapstruct:mapstruct:1.4.2.Final'
+
     compile group: 'com.microsoft.azure', name: 'applicationinsights-web-auto', version: '2.5.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.5.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.5.0'
@@ -114,6 +122,7 @@ dependencies {
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
 
     compile 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'org.apache.commons:commons-collections4:4.4'
