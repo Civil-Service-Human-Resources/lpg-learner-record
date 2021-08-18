@@ -31,6 +31,9 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Query("SELECT cr FROM CourseRecord cr JOIN cr.moduleRecords mr where mr.eventId is not null")
     List<CourseRecord> listEventRecords();
 
+    @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId = ?1 AND cr.identity.courseId = ?2")
+    Optional<CourseRecord> getCourseRecord(String userId, String courseId);
+
     @Transactional
     @Modifying
     @Query("DELETE FROM CourseRecord r WHERE r.identity.userId = ?1")
