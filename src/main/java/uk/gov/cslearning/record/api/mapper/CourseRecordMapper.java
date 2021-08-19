@@ -5,7 +5,7 @@ import org.mapstruct.MappingTarget;
 import uk.gov.cslearning.record.api.input.CourseRecordInput;
 import uk.gov.cslearning.record.domain.CourseRecord;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CourseRecordMapper {
 
     CourseRecord asCourseRecord(CourseRecordInput input);

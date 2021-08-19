@@ -27,10 +27,9 @@ bootJar {
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
 
-// bootRun {
-//    systemProperties = System.properties
-//    jvmArgs project.findProperty('debug_jvm') ?: ''
-// }
+bootRun {
+   jvmArgs project.findProperty('debug_jvm') ?: ''
+}
 
 configurations {
     ajc
@@ -91,10 +90,12 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-configuration-processor'
     compile 'org.springframework.data:spring-data-jpa:2.0.5.RELEASE'
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE'
+
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.1.1.RELEASE'
 
     compile group: "com.github.java-json-tools", name: "json-patch", version: "1.13"
     compile 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-web-auto', version: '2.5.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.5.0'
