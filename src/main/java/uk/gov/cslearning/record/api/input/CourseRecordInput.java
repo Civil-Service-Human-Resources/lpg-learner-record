@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.api.input;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.cslearning.record.domain.State;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class CourseRecordInput {
 
     @Enumerated(EnumType.STRING)

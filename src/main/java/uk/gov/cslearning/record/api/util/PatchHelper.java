@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.api.utils;
+package uk.gov.cslearning.record.api.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -8,12 +8,15 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
+
 @Component
 @RequiredArgsConstructor
 public class PatchHelper {
 
-    private final PatchObjectMapper mapper;
+    private final ObjectMapper mapper;
 
+    @Valid
     public <T> T patch(JsonPatch patch, T targetBean, Class<T> targetClass) throws JsonPatchException {
         JsonNode target = mapper.valueToTree(targetBean);
         JsonNode patchedTarget = patch.apply(target);

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.api.input.CourseRecordInput;
 import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
-import uk.gov.cslearning.record.api.utils.PatchHelper;
+import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;

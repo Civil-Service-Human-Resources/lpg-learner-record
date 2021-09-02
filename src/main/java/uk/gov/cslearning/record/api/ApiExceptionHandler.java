@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.api;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import uk.gov.cslearning.record.dto.ErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
+import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import com.github.fge.jsonpatch.JsonPatchException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,11 +46,17 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({BookingNotFoundException.class, EventNotFoundException.class})
+    @ExceptionHandler({BookingNotFoundException.class, EventNotFoundException.class, CourseRecordNotFoundException.class})
     protected ResponseEntity handleNotFoundException(RuntimeException e) {
         LOGGER.error("Not Found: ", e);
 
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(JsonPatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity handleJsonPatchException(JsonPatchException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
