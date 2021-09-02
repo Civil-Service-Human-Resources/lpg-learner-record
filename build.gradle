@@ -27,9 +27,9 @@ bootJar {
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
 
-bootRun {
-   jvmArgs project.findProperty('debug_jvm') ?: ''
-}
+// bootRun {
+//     jvmArgs project.findProperty('debug_jvm') ?: ''
+// }
 
 configurations {
     ajc
@@ -95,7 +95,6 @@ dependencies {
 
     compile group: "com.github.java-json-tools", name: "json-patch", version: "1.13"
     compile 'org.mapstruct:mapstruct:1.4.2.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-web-auto', version: '2.5.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.5.0'
@@ -123,7 +122,6 @@ dependencies {
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
 
     compile 'org.projectlombok:lombok:1.18.4'
-    annotationProcessor 'org.projectlombok:lombok:1.18.8'
 
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'org.apache.commons:commons-collections4:4.4'

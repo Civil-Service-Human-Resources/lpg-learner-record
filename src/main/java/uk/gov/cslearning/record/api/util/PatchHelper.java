@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PatchHelper {
 
-    private final ObjectMapper mapper;
+    private final PatchObjectMapper mapper;
 
     public <T> T patch(JsonPatch patch, T targetBean, Class<T> targetClass) throws JsonPatchException {
         JsonNode target = mapper.valueToTree(targetBean);

@@ -29,7 +29,7 @@ public class CourseRecordService {
         try {
             patchedInput = patchHelper.patch(patch, updateParams, CourseRecordInput.class);
         } catch (JsonPatchException e) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Failed to apply patch");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, String.format("Failed to apply patch: %s", e.getMessage()));
         }
 
         courseRecordMapper.update(courseRecord, patchedInput);
