@@ -26,9 +26,6 @@ bootJar {
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
 
-bootRun {
-    jvmArgs project.findProperty('debug_jvm') ?: ''
-}
 
 configurations {
     ajc
