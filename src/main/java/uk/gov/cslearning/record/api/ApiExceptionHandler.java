@@ -1,6 +1,8 @@
 package uk.gov.cslearning.record.api;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.Patch;
+import com.microsoft.applicationinsights.core.dependencies.google.api.Http;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,12 +12,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.cslearning.record.api.output.error.GenericErrorResponse;
 import uk.gov.cslearning.record.dto.ErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import com.github.fge.jsonpatch.JsonPatchException;
+import uk.gov.cslearning.record.exception.PatchResourceException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,10 +57,11 @@ public class ApiExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler(JsonPatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    protected ResponseEntity handleJsonPatchException(JsonPatchException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    @ExceptionHandler(PatchResourceException.class)
+    protected ResponseEntity handleResourcePatchException(PatchResourceException e) {
+        GenericErrorResponse responseBody = new GenericErrorResponse(400, "", e);
+        return ResponseEntity.badRequest().body(responseBody);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

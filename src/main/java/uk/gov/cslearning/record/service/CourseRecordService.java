@@ -11,6 +11,7 @@ import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
 import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.PatchResourceException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 
 @Service
@@ -29,7 +30,7 @@ public class CourseRecordService {
         try {
             patchedInput = patchHelper.patch(patch, updateParams, CourseRecordInput.class);
         } catch (JsonPatchException e) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, String.format("Failed to apply patch: %s", e.getMessage()));
+            throw new PatchResourceException(e.getMessage());
         }
 
         courseRecordMapper.update(courseRecord, patchedInput);
