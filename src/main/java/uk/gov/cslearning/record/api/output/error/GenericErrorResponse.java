@@ -1,5 +1,8 @@
 package uk.gov.cslearning.record.api.output.error;
 
+import lombok.Data;
+
+@Data
 public class GenericErrorResponse {
 
     private int status;

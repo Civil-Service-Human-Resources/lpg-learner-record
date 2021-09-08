@@ -58,10 +58,11 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(PatchResourceException.class)
-    protected ResponseEntity handleResourcePatchException(PatchResourceException e) {
+    @ExceptionHandler({PatchResourceException.class})
+    protected ResponseEntity<GenericErrorResponse> handleResourcePatchException(RuntimeException e) {
+        LOGGER.error("Bad request: ", e);
         GenericErrorResponse responseBody = new GenericErrorResponse(400, "", e);
-        return ResponseEntity.badRequest().body(responseBody);
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

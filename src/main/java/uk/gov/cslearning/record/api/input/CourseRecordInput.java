@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.domain.Preference;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 @Getter
