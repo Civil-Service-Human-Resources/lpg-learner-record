@@ -76,7 +76,6 @@ public class CourseRecordControllerTest {
     @Test
     public void testInvalidContentType() throws Exception {
         String inputJson = "[{ \"op\": \"replace\", \"path\": \"/state\", \"value\": \"COMPLETED\" }\n]";
-        JsonPatch patchJson = generatePatch(inputJson);
         MockHttpServletRequestBuilder builtPatch = buildPatch(inputJson);
         builtPatch.contentType("application/json");
         mockMvc.perform(builtPatch)

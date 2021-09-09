@@ -9,8 +9,6 @@ import uk.gov.cslearning.record.validation.annotations.ValidEnum;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.validation.Valid;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
