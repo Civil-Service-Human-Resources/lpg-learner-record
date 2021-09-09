@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.domain.Preference;
+import uk.gov.cslearning.record.validation.annotations.ValidEnum;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -16,11 +17,13 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class CourseRecordInput {
 
+    @ValidEnum(enumClass = State.class)
     @Enumerated(EnumType.STRING)
-    private State state;
+    private String state;
 
+    @ValidEnum(enumClass = Preference.class)
     @Enumerated(EnumType.STRING)
-    private Preference preference;
+    private String preference;
 
     private boolean isRequired;
 }

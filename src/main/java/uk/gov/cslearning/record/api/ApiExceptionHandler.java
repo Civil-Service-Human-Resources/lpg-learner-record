@@ -59,9 +59,10 @@ public class ApiExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({PatchResourceException.class})
-    protected ResponseEntity<GenericErrorResponse> handleResourcePatchException(RuntimeException e) {
+    protected ResponseEntity<GenericErrorResponse> handleResourcePatchException(PatchResourceException e) {
         LOGGER.error("Bad request: ", e);
-        GenericErrorResponse responseBody = new GenericErrorResponse(400, "", e);
+
+        GenericErrorResponse responseBody = new GenericErrorResponse(400, "", e.getMessages());
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
