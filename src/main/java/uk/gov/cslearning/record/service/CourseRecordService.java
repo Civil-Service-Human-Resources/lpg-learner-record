@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.cslearning.record.api.input.CourseRecordInput;
 import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
@@ -14,12 +16,14 @@ import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.PatchResourceException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 
 @Service
 @RequiredArgsConstructor
 public class CourseRecordService {
 
     private final CourseRecordRepository courseRecordRepository;
+    private final ModuleRecordRepository moduleRecordRepository;
     private final CourseRecordMapper courseRecordMapper;
     private final PatchHelper patchHelper;
 
@@ -35,4 +39,8 @@ public class CourseRecordService {
         return courseRecord;
     }
 
+    public List<CourseRecord> fetchCourseRecords(String userId, String courseId) {
+        List<CourseRecord> records = courseRecordRepository.findByUserIdAndCourseId(userId, courseId);
+        return records;
+    }
 }
