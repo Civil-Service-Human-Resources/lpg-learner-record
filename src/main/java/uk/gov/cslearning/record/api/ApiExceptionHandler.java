@@ -15,11 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.gov.cslearning.record.api.output.error.GenericErrorResponse;
 import uk.gov.cslearning.record.dto.ErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
-import uk.gov.cslearning.record.exception.BookingNotFoundException;
-import uk.gov.cslearning.record.exception.EventNotFoundException;
-import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.*;
 import com.github.fge.jsonpatch.JsonPatchException;
-import uk.gov.cslearning.record.exception.PatchResourceException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +47,10 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({BookingNotFoundException.class, EventNotFoundException.class, CourseRecordNotFoundException.class})
+    @ExceptionHandler({BookingNotFoundException.class,
+            EventNotFoundException.class,
+            CourseRecordNotFoundException.class,
+            ModuleRecordNotFoundException.class})
     protected ResponseEntity handleNotFoundException(RuntimeException e) {
         LOGGER.error("Not Found: ", e);
 

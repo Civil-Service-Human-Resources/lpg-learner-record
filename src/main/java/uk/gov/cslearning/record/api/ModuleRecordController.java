@@ -1,19 +1,14 @@
 package uk.gov.cslearning.record.api;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.github.fge.jsonpatch.JsonPatch;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import uk.gov.cslearning.record.dto.ModuleRecordDto;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.service.ModuleRecordService;
 
-import java.time.LocalDate;
-import java.util.List;
-
 @RestController
-@RequestMapping("/reporting")
+@RequestMapping("/module_records")
 public class ModuleRecordController {
 
     private final ModuleRecordService moduleRecordService;
@@ -22,29 +17,10 @@ public class ModuleRecordController {
         this.moduleRecordService = moduleRecordService;
     }
 
-    @GetMapping(value = "/module-records", params = {"from", "to"})
-    public ResponseEntity<List<ModuleRecordDto>> listForPeriod(
-            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
-    ) {
-        return ResponseEntity.ok(moduleRecordService.listRecordsForPeriod(from, to));
-    }
-
-    @GetMapping(value = "/module-records-for-learners", params = {"from", "to", "learnerIds"})
-    public ResponseEntity<List<ModuleRecordDto>> listModuleRecordsForPeriodAndLearnerIds(
-            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @RequestParam List<String> learnerIds
-    ) {
-        return ResponseEntity.ok(moduleRecordService.listRecordsForPeriodAndLearnerIds(from, to, learnerIds));
-    }
-
-    @GetMapping(value = "/module-records-for-course-ids", params = {"from", "to", "courseIds"})
-    public ResponseEntity<List<ModuleRecordDto>> listModuleRecordsForPeriodAndCourseIds(
-            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @RequestParam List<String> courseIds
-    ) {
-        return ResponseEntity.ok(moduleRecordService.listRecordsForPeriodAndCourseIds(from, to, courseIds));
+    @PatchMapping(path = "/{moduleRecordId}", consumes = "application/json-patch+json")
+    public ResponseEntity<ModuleRecord> updateModuleRecord(@PathVariable("moduleRecordId") Long moduleRecordId,
+                                                           @RequestBody JsonPatch patchData) {
+        ModuleRecord updatedRecord = moduleRecordService.updateModuleRecord(moduleRecordId, patchData);
+        return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
     }
 }

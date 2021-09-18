@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.BeanDeserializer;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +19,7 @@ public class PatchHelperConfig {
         ObjectMapper patchObjectMapper = new ObjectMapper();
         SimpleModule validationModule = getValidationModule();
         patchObjectMapper.registerModule(validationModule);
+        patchObjectMapper.registerModule(new JavaTimeModule());
         return patchObjectMapper;
     }
 

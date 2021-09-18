@@ -1,21 +1,32 @@
 package uk.gov.cslearning.record.service;
 
+import com.github.fge.jsonpatch.JsonPatch;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.api.input.CourseRecordInput;
+import uk.gov.cslearning.record.api.input.ModuleRecordInput;
+import uk.gov.cslearning.record.api.mapper.ModuleRecordMapper;
+import uk.gov.cslearning.record.api.util.PatchHelper;
+import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
+import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ModuleRecordService {
 
     private final ModuleRecordRepository moduleRecordRepository;
-
-    public ModuleRecordService(ModuleRecordRepository moduleRecordRepository) {
-        this.moduleRecordRepository = moduleRecordRepository;
-    }
+    private final ModuleRecordMapper moduleRecordMapper;
+    private final PatchHelper patchHelper;
 
     @Transactional(readOnly = true)
     public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
@@ -31,5 +42,26 @@ public class ModuleRecordService {
     public List<ModuleRecordDto> listRecordsForPeriodAndCourseIds(LocalDate periodStart, LocalDate periodEnd, List<String> courseIds) {
         return moduleRecordRepository
                 .findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), courseIds);
+    }
+
+    public ModuleRecord updateModuleRecord(Long moduleRecordId, JsonPatch patch) {
+        ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
+        ModuleRecordInput existingRecordAsInput = moduleRecordMapper.asInput(moduleRecord);
+
+        ModuleRecordInput patchedInput =  patchHelper.patch(patch, existingRecordAsInput, ModuleRecordInput.class);
+        moduleRecordMapper.update(moduleRecord, patchedInput);
+
+        LocalDateTime updatedAt = LocalDateTime.now();
+        moduleRecord.setUpdatedAt(updatedAt);
+        if (hasModuleBeenCompleted(existingRecordAsInput, patchedInput)) {
+            moduleRecord.setCompletionDate(updatedAt);
+        }
+        moduleRecordRepository.save(moduleRecord);
+        return moduleRecord;
+    }
+
+    private boolean hasModuleBeenCompleted(ModuleRecordInput before, ModuleRecordInput after) {
+        return (State.COMPLETED.toString().equals(after.getState()) &&
+                !State.COMPLETED.toString().equals(before.getState()));
     }
 }
