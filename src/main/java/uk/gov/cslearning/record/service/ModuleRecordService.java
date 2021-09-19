@@ -5,14 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.api.input.CourseRecordInput;
-import uk.gov.cslearning.record.api.input.ModuleRecordInput;
+import uk.gov.cslearning.record.api.input.PATCH.PatchModuleRecordInput;
 import uk.gov.cslearning.record.api.mapper.ModuleRecordMapper;
 import uk.gov.cslearning.record.api.util.PatchHelper;
-import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
-import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 
@@ -46,9 +44,9 @@ public class ModuleRecordService {
 
     public ModuleRecord updateModuleRecord(Long moduleRecordId, JsonPatch patch) {
         ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
-        ModuleRecordInput existingRecordAsInput = moduleRecordMapper.asInput(moduleRecord);
+        PatchModuleRecordInput existingRecordAsInput = moduleRecordMapper.asInput(moduleRecord);
 
-        ModuleRecordInput patchedInput =  patchHelper.patch(patch, existingRecordAsInput, ModuleRecordInput.class);
+        PatchModuleRecordInput patchedInput =  patchHelper.patch(patch, existingRecordAsInput, PatchModuleRecordInput.class);
         moduleRecordMapper.update(moduleRecord, patchedInput);
 
         LocalDateTime updatedAt = LocalDateTime.now();
@@ -60,7 +58,7 @@ public class ModuleRecordService {
         return moduleRecord;
     }
 
-    private boolean hasModuleBeenCompleted(ModuleRecordInput before, ModuleRecordInput after) {
+    private boolean hasModuleBeenCompleted(PatchModuleRecordInput before, PatchModuleRecordInput after) {
         return (State.COMPLETED.toString().equals(after.getState()) &&
                 !State.COMPLETED.toString().equals(before.getState()));
     }

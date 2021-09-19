@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.api.input;
+package uk.gov.cslearning.record.api.input.PATCH;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class ModuleRecordInput {
+public class PatchModuleRecordInput {
 
     @ValidEnum(enumClass = State.class)
     @Enumerated(EnumType.STRING)
