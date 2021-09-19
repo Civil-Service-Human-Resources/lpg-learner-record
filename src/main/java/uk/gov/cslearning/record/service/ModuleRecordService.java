@@ -54,8 +54,7 @@ public class ModuleRecordService {
         if (hasModuleBeenCompleted(existingRecordAsInput, patchedInput)) {
             moduleRecord.setCompletionDate(updatedAt);
         }
-        moduleRecordRepository.save(moduleRecord);
-        return moduleRecord;
+        return moduleRecordRepository.save(moduleRecord);
     }
 
     private boolean hasModuleBeenCompleted(PatchModuleRecordInput before, PatchModuleRecordInput after) {
