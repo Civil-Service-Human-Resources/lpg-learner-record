@@ -23,4 +23,11 @@ public class ModuleRecordController {
         ModuleRecord updatedRecord = moduleRecordService.updateModuleRecord(moduleRecordId, patchData);
         return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<ModuleRecord> createModuleRecord(@RequestParam String courseId,
+                                                           @RequestParam String userId,
+                                                           @RequestBody PostModuleRecordInput newModule) {
+        
+    }
 }
