@@ -11,11 +11,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 public class PatchHelperConfig {
 
-    @Bean
-    public ObjectMapper patchMapper() {
+    public static ObjectMapper patchMapper() {
         ObjectMapper patchObjectMapper = new ObjectMapper();
         SimpleModule validationModule = getValidationModule();
         patchObjectMapper.registerModule(validationModule);
@@ -23,7 +21,7 @@ public class PatchHelperConfig {
         return patchObjectMapper;
     }
 
-    private SimpleModule getValidationModule() {
+    private static SimpleModule getValidationModule() {
         SimpleModule validationModule = new SimpleModule();
         validationModule.setDeserializerModifier(new BeanDeserializerModifier() {
             @Override
