@@ -10,18 +10,16 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 public class PatchHelperConfig {
 
-    @Bean
-    public ObjectMapper patchMapper() {
+    public static ObjectMapper patchMapper() {
         ObjectMapper patchObjectMapper = new ObjectMapper();
         SimpleModule validationModule = getValidationModule();
         patchObjectMapper.registerModule(validationModule);
         return patchObjectMapper;
     }
 
-    private SimpleModule getValidationModule() {
+    private static SimpleModule getValidationModule() {
         SimpleModule validationModule = new SimpleModule();
         validationModule.setDeserializerModifier(new BeanDeserializerModifier() {
             @Override

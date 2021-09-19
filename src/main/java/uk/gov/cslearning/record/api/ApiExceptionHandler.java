@@ -50,11 +50,13 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({BookingNotFoundException.class, EventNotFoundException.class, CourseRecordNotFoundException.class})
-    protected ResponseEntity handleNotFoundException(RuntimeException e) {
+    @ExceptionHandler({BookingNotFoundException.class,
+            EventNotFoundException.class,
+            CourseRecordNotFoundException.class})
+    protected ResponseEntity<GenericErrorResponse> handleNotFoundException(RuntimeException e) {
         LOGGER.error("Not Found: ", e);
-
-        return ResponseEntity.notFound().build();
+        GenericErrorResponse response = new GenericErrorResponse(404, "", Collections.singletonList(e.getMessage()));
+        return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.NOT_FOUND);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -69,7 +71,6 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorDto> handleConstraintViolationException(ConstraintViolationException e) {
         LOGGER.error("Bad Request: ", e);
-
         ErrorDto error = errorDtoFactory.create(HttpStatus.BAD_REQUEST, Collections.singletonList("Storage error"));
 
         return ResponseEntity.badRequest().body(error);

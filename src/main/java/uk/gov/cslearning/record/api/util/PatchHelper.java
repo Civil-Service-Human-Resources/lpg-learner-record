@@ -8,6 +8,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.cslearning.record.config.patchHelper.PatchHelperConfig;
 import uk.gov.cslearning.record.exception.PatchResourceException;
 
 import javax.validation.ConstraintViolationException;
@@ -15,12 +16,7 @@ import javax.validation.ConstraintViolationException;
 @Component
 public class PatchHelper {
 
-    private final ObjectMapper mapper;
-
-    @Autowired
-    public PatchHelper(ObjectMapper objectMapper) {
-        this.mapper = objectMapper;
-    }
+    private final ObjectMapper mapper = PatchHelperConfig.patchMapper();
 
     public <T> T patch(JsonPatch patch, T targetBean, Class<T> targetClass) {
 
