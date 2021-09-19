@@ -28,8 +28,7 @@ public class CourseRecordService {
         courseRecordMapper.update(courseRecord, patchedInput);
 
         courseRecord.setLastUpdated(LocalDateTime.now());
-        courseRecordRepository.save(courseRecord);
-        return courseRecord;
+        return courseRecordRepository.save(courseRecord);
     }
 
 }
