@@ -1,4 +1,4 @@
-package uk.gov.cslearning.record.api.input;
+package uk.gov.cslearning.record.api.input.PATCH;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import javax.persistence.Enumerated;
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class CourseRecordInput {
+public class PatchCourseRecordInput {
 
     @ValidEnum(enumClass = State.class)
     @Enumerated(EnumType.STRING)
