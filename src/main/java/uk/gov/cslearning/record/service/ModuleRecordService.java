@@ -13,6 +13,7 @@ import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.ResourceExists.ModuleRecordAlreadyExistsException;
 import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
@@ -65,12 +66,14 @@ public class ModuleRecordService {
 
         String userId = newModuleInput.getUserId();
         String courseId = newModuleInput.getCourseId();
+        String moduleId = newModuleInput.getModuleId();
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
+        moduleRecordRepository.findModuleRecordByModuleIdAndCourseRecordIdentityCourseIdAndCourseRecordIdentityUserId(moduleId, courseId, userId).ifPresent(mr -> {throw new ModuleRecordAlreadyExistsException(courseId, moduleId, userId);});
         ModuleRecord newModule = moduleRecordMapper.PostInputAsModule(newModuleInput);
         newModule.setCreatedAt(LocalDateTime.now());
         courseRecord.addModuleRecord(newModule);
-        courseRecordRepository.save(courseRecord);
-        return newModule;
+        CourseRecord updatedRecord = courseRecordRepository.save(courseRecord);
+        return updatedRecord.getModuleRecord(moduleId);
     }
 
     private boolean hasModuleBeenCompleted(PatchModuleRecordInput before, PatchModuleRecordInput after) {

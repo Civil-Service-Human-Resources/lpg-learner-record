@@ -1,8 +1,5 @@
 package uk.gov.cslearning.record.api;
 
-import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.Patch;
-import com.microsoft.applicationinsights.core.dependencies.google.api.Http;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +10,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import uk.gov.cslearning.record.api.output.error.GenericErrorResponse;
+import uk.gov.cslearning.record.api.output.error.GenericErrorResponseFactory;
 import uk.gov.cslearning.record.dto.ErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.*;
-import com.github.fge.jsonpatch.JsonPatchException;
+import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,9 +26,11 @@ public class ApiExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     private final ErrorDtoFactory errorDtoFactory;
+    private final GenericErrorResponseFactory genericErrorResponseFactory;
 
-    public ApiExceptionHandler(ErrorDtoFactory errorDtoFactory) {
+    public ApiExceptionHandler(ErrorDtoFactory errorDtoFactory, GenericErrorResponseFactory genericErrorResponseFactory) {
         this.errorDtoFactory = errorDtoFactory;
+        this.genericErrorResponseFactory = genericErrorResponseFactory;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -54,6 +53,13 @@ public class ApiExceptionHandler {
     protected ResponseEntity handleNotFoundException(RuntimeException e) {
         LOGGER.error("Not Found: ", e);
         GenericErrorResponse response = new GenericErrorResponse(404, "", Collections.singletonList(e.getMessage()));
+        return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ResourceExistsException.class})
+    protected ResponseEntity<GenericErrorResponse> handleResourceExistsException(ResourceExistsException e) {
+        GenericErrorResponse response = genericErrorResponseFactory.createResourceExistsException(e.getMessage());
         return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.NOT_FOUND);
     }
 
