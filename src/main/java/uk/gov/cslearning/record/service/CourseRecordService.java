@@ -7,10 +7,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import uk.gov.cslearning.record.api.input.PATCH.PatchCourseRecordInput;
+import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
 import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
+import uk.gov.cslearning.record.exception.ResourceExists.ModuleRecordAlreadyExistsException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 
@@ -37,5 +40,19 @@ public class CourseRecordService {
     public List<CourseRecord> fetchCourseRecords(String userId, String courseId) {
         List<CourseRecord> records = courseRecordRepository.findByUserIdAndCourseId(userId, courseId);
         return records;
+    }
+
+    public CourseRecord createCourseRecord(PostCourseRecordInput inputCourse) {
+        String userId = inputCourse.getUserId();
+        String courseId = inputCourse.getCourseId();
+        courseRecordRepository.getCourseRecord(userId, courseId).ifPresent(cr -> {throw new CourseRecordAlreadyExistsException(courseId, userId);});
+
+        CourseRecord newCourseRecord = courseRecordMapper.postInputAsCourseRecord(inputCourse);
+
+        return courseRecordRepository.save(newCourseRecord);
+    }
+
+    private void validateNewCourseRecord(PostCourseRecordInput newCourseRecord) {
+
     }
 }
