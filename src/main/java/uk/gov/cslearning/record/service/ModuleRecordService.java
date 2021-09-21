@@ -59,6 +59,9 @@ public class ModuleRecordService {
         if (hasModuleBeenCompleted(existingRecordAsInput, patchedInput)) {
             moduleRecord.setCompletionDate(updatedAt);
         }
+        CourseRecord cr = moduleRecord.getCourseRecord();
+        cr.setLastUpdated(updatedAt);
+        courseRecordRepository.save(cr);
         return moduleRecordRepository.save(moduleRecord);
     }
 

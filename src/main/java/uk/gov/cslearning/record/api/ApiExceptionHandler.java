@@ -60,7 +60,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler({ResourceExistsException.class})
     protected ResponseEntity<GenericErrorResponse> handleResourceExistsException(ResourceExistsException e) {
         GenericErrorResponse response = genericErrorResponseFactory.createResourceExistsException(e.getMessage());
-        return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
