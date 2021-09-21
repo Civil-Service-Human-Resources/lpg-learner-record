@@ -43,7 +43,7 @@ class TestPerson {
 public class PatchHelperTest {
 
     private final PatchHelperConfig phc = new PatchHelperConfig();
-    private final PatchHelper patchHelper = new PatchHelper(phc.patchMapper());
+    private final PatchHelper patchHelper = new PatchHelper();
 
     private final ObjectMapper mapper = new ObjectMapper();
 
