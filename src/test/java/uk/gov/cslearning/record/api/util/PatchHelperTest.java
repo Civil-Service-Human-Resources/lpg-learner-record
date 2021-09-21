@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestComponent;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.cslearning.record.config.patchHelper.PatchHelperConfig;
 import uk.gov.cslearning.record.exception.PatchResourceException;
@@ -40,9 +42,10 @@ class TestPerson {
  * class as well.
  */
 @RunWith(SpringRunner.class)
+@TestComponent
 public class PatchHelperTest {
 
-    private final PatchHelperConfig phc = new PatchHelperConfig();
+    @Autowired
     private final PatchHelper patchHelper = new PatchHelper();
 
     private final ObjectMapper mapper = new ObjectMapper();
