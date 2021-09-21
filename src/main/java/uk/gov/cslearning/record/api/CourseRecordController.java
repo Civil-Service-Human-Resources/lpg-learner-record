@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.output.CourseRecordOutput;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.service.CourseRecordService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -28,6 +30,12 @@ public class CourseRecordController {
                                                            @RequestBody JsonPatch patchData) {
         CourseRecord updatedRecord = courseRecordService.updateCourseRecord(userId, courseId, patchData);
         return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<CourseRecord> createCourseRecord(@Valid @RequestBody PostCourseRecordInput inputCourse) {
+        CourseRecord newRecord = courseRecordService.createCourseRecord(inputCourse);
+        return new ResponseEntity<>(newRecord, HttpStatus.CREATED);
     }
 
     @GetMapping

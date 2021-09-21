@@ -69,8 +69,7 @@ public class ModuleRecordService {
         String moduleId = newModuleInput.getModuleId();
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
         moduleRecordRepository.findModuleRecordByModuleIdAndCourseRecordIdentityCourseIdAndCourseRecordIdentityUserId(moduleId, courseId, userId).ifPresent(mr -> {throw new ModuleRecordAlreadyExistsException(courseId, moduleId, userId);});
-        ModuleRecord newModule = moduleRecordMapper.PostInputAsModule(newModuleInput);
-        newModule.setCreatedAt(LocalDateTime.now());
+        ModuleRecord newModule = moduleRecordMapper.postInputAsModule(newModuleInput);
         courseRecord.addModuleRecord(newModule);
         CourseRecord updatedRecord = courseRecordRepository.save(courseRecord);
         return updatedRecord.getModuleRecord(moduleId);
