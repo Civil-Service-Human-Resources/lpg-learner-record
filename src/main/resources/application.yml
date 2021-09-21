@@ -1,4 +1,8 @@
 spring:
+  datasource:
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     default-property-inclusion: non_null
     serialization:
