@@ -99,6 +99,10 @@ public class ModuleRecord {
         this.id = id;
     }
 
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
     public String getModuleId() {
         return moduleId;
     }
