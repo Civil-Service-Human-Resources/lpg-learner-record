@@ -105,7 +105,7 @@ govNotify:
     bookingRequested: ${GOV_NOTIFY_BOOKING_REQUESTED:ae678ea1-ae7a-42f3-aa27-037336b346c4}
 
 lpg-ui:
-  serviceUrl: ${LPG_UI_URL:http://local.learn.civilservice.gov.uk:3001}
+  serviceUrl: ${LPG_UI_URL:http://develop.learn.civilservice.gov.uk:3001}
   bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
 csl.homepage: "https://cslearning.gov.uk/"
