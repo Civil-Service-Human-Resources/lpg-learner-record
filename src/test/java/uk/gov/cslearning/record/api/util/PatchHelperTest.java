@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.cslearning.record.SpringTestConfiguration;
 import uk.gov.cslearning.record.config.patchHelper.PatchHelperConfig;
 import uk.gov.cslearning.record.exception.PatchResourceException;
 import uk.gov.cslearning.record.validation.annotations.ValidEnum;
@@ -43,6 +45,7 @@ class TestPerson {
  */
 @RunWith(SpringRunner.class)
 @TestComponent
+@Import(SpringTestConfiguration.class)
 public class PatchHelperTest {
 
     @Autowired
