@@ -16,7 +16,7 @@ public interface EventService {
     Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus);
 
     @Transactional(readOnly = true)
-    Optional<EventDto> findByUid(String eventUid);
+    EventDto findByUid(String eventUid, boolean getBookingCount);
 
     @Transactional
     EventDto create(EventDto eventDto);

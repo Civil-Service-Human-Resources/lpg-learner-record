@@ -30,10 +30,14 @@ public class EventController {
     }
 
     @GetMapping(path = "/event/{eventUid}")
-    public ResponseEntity<EventDto> find(@PathVariable String eventUid) {
-        return eventService.findByUid(eventUid)
-                .map(b -> new ResponseEntity<>(b, OK))
-                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    public ResponseEntity<EventDto> find(@PathVariable String eventUid,
+                                         @RequestParam(value = "getBookingCount", defaultValue = "false") boolean getBookingCount) {
+        EventDto event = eventService.findByUid(eventUid, getBookingCount);
+        if (event == null) {
+            return new ResponseEntity<>(NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(event, OK);
+        }
     }
 
     @PostMapping(path = "/event")

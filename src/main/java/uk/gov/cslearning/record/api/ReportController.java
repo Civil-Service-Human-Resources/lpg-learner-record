@@ -24,11 +24,11 @@ public class ReportController {
     }
 
     @GetMapping(value = "/reporting/bookings", params = {"from", "to"})
-    public ResponseEntity<List<BookingDto>> listBookings(
+    public ResponseEntity<Iterable<BookingDto>> listBookings(
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
-        List<BookingDto> bookings = bookingService.findAllForPeriod(from, to);
+        Iterable<BookingDto> bookings = bookingService.findAllForPeriod(from, to);
 
         return new ResponseEntity<>(bookings, OK);
     }

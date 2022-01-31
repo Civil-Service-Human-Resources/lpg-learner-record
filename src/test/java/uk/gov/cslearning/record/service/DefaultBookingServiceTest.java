@@ -318,25 +318,6 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldListAllBookings() {
-        Booking booking1 = new Booking();
-        Booking booking2 = new Booking();
-        Booking booking3 = new Booking();
-
-        BookingDto bookingDto1 = new BookingDto();
-        BookingDto bookingDto2 = new BookingDto();
-        BookingDto bookingDto3 = new BookingDto();
-
-        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto1);
-        when(bookingDtoFactory.create(booking2)).thenReturn(bookingDto2);
-        when(bookingDtoFactory.create(booking3)).thenReturn(bookingDto3);
-
-        when(bookingRepository.findAll()).thenReturn(Arrays.asList(booking1, booking2, booking3));
-
-        assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAll());
-    }
-
-    @Test
     public void shouldListAllBookingsForPeriod() {
         LocalDate from = LocalDate.parse("2018-01-01");
         LocalDate to = LocalDate.parse("2018-01-07");

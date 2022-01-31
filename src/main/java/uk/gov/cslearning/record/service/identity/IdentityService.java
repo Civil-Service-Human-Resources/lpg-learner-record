@@ -1,19 +1,26 @@
 package uk.gov.cslearning.record.service.identity;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collection;
-import java.util.Optional;
+import javax.ws.rs.client.Entity;
+import java.lang.reflect.ParameterizedType;
+import java.net.URI;
+import java.util.*;
 
 import static java.util.Collections.emptySet;
 
@@ -24,14 +31,20 @@ public class IdentityService {
 
     private OAuth2RestOperations restOperations;
 
+    private String UidMapUrl;
     private String listAllIdentitiesUrl;
     private String identityAPIUrl;
 
+    private final ParameterizedTypeReference<Map<String, Identity>> identityMapResponseType =
+            new ParameterizedTypeReference<Map<String, Identity>>() {};
+
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations,
+                           @Value("${identity.UidMapUrl}") String UidMapUrl,
                            @Value("${identity.listAllUrl}") String listAllIdentitiesUrl,
                            @Value("${identity.identityAPIUrl}") String identityAPIUrl) {
         this.restOperations = restOperations;
+        this.UidMapUrl = UidMapUrl;
         this.listAllIdentitiesUrl = listAllIdentitiesUrl;
         this.identityAPIUrl = identityAPIUrl;
     }
@@ -43,6 +56,25 @@ public class IdentityService {
             return Sets.newHashSet(identities);
         }
         return emptySet();
+    }
+
+    public Map<String, Identity> fetchByUids(List<String> uids) {
+        Map<String, Identity> identitiesMap = new HashMap<>();
+
+        List<List<String>> batchedUids = Lists.partition(uids, 20);
+
+        batchedUids.forEach(batch -> {
+            URI uri = UriComponentsBuilder.fromHttpUrl(UidMapUrl)
+                    .queryParam("uids", batch)
+                    .build().toUri();
+            Map<String, Identity> identitiesFromUids = restOperations.exchange(uri, HttpMethod.GET, null, identityMapResponseType).getBody();
+            if (identitiesFromUids != null) {
+                identitiesMap.putAll(identitiesFromUids);
+            }
+        });
+
+        return identitiesMap;
+
     }
 
     public String getEmailAddress(String uid) {

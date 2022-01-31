@@ -11,6 +11,7 @@ spring:
     add-mappings: false
   flyway:
     locations: classpath:db/migration/{vendor}
+    enabled: false
   jpa:
     hibernate:
       ddl-auto: none
@@ -75,6 +76,7 @@ oauth:
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
+  UidMapUrl: "${oauth.serviceUrl}/api/identities/map-for-uids"
 
 registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
