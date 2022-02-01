@@ -24,7 +24,7 @@ public class EventController {
     }
 
     @GetMapping(path = "/events-list")
-    public ResponseEntity<List<EventDto>> getEvents(@RequestParam(value = "eventUid") String[] eventUids,
+    public ResponseEntity<List<EventDto>> getEvents(@RequestParam(value = "uids") String[] eventUids,
                                                     @RequestParam(value = "getBookingCount", defaultValue = "false") boolean getBookingCount) {
         List<EventDto> events = eventService.getEvents(eventUids, getBookingCount);
         return new ResponseEntity<>(events, OK);
