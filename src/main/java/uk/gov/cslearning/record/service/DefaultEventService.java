@@ -61,6 +61,11 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
+    public EventDto findByUid(String uid) {
+        return findByUid(uid, false);
+    }
+
+    @Override
     public EventDto findByUid(String uid, boolean getBookingCount) {
         EventDto event = eventRepository.findByUid(uid)
                 .map(eventDtoFactory::create)

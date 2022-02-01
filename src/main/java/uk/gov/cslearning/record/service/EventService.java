@@ -18,6 +18,9 @@ public interface EventService {
     @Transactional(readOnly = true)
     EventDto findByUid(String eventUid, boolean getBookingCount);
 
+    @Transactional(readOnly = true)
+    EventDto findByUid(String uid);
+
     @Transactional
     EventDto create(EventDto eventDto);
 }
