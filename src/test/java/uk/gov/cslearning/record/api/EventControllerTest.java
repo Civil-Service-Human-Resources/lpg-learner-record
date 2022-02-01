@@ -63,7 +63,7 @@ public class EventControllerTest {
         event.setUid(eventUid);
         event.setUri(uri);
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.of(event));
+        when(eventService.findByUid(eventUid)).thenReturn(event);
 
         mockMvc.perform(
                 get("/event/" + eventUid).with(csrf())
@@ -128,7 +128,7 @@ public class EventControllerTest {
     public void shouldReturnNotFoundIfEventNotFoundOnGet() throws Exception {
         String eventUid = "event-id";
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.empty());
+        when(eventService.findByUid(eventUid)).thenReturn(null);
 
         mockMvc.perform(
                 get("/event/" + eventUid).with(csrf())
