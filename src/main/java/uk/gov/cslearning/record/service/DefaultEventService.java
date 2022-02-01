@@ -10,7 +10,9 @@ import uk.gov.cslearning.record.repository.EventRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultEventService implements EventService {
@@ -82,5 +84,17 @@ public class DefaultEventService implements EventService {
     @Override
     public EventDto create(EventDto eventDto) {
         return eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto)));
+    }
+
+    @Override
+    public List<EventDto> getEvents(String[] eventUids, boolean getBookingCount) {
+         return eventRepository.findByUidIn(eventUids).stream()
+                 .map(eventDtoFactory::create)
+                 .peek(eventDto -> {
+                     if (getBookingCount) {
+                         eventDto.setActiveBookingCount(getActiveBookingsCount(eventDto.getId()));
+                     }
+                 })
+                 .collect(Collectors.toList());
     }
 }

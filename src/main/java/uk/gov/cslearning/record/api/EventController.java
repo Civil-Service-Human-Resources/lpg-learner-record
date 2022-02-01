@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.service.EventService;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -20,6 +21,13 @@ public class EventController {
 
     public EventController(EventService eventService) {
         this.eventService = eventService;
+    }
+
+    @GetMapping(path = "/events")
+    public ResponseEntity<List<EventDto>> getEvents(@RequestParam(value = "eventUid") String[] eventUids,
+                                                    @RequestParam(value = "getBookingCount", defaultValue = "false") boolean getBookingCount) {
+        List<EventDto> events = eventService.getEvents(eventUids, getBookingCount);
+        return new ResponseEntity<>(events, OK);
     }
 
     @PatchMapping(path = "/event/{eventUid}")
