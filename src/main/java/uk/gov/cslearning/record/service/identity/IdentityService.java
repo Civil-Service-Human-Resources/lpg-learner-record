@@ -65,7 +65,7 @@ public class IdentityService {
 
         batchedUids.forEach(batch -> {
             URI uri = UriComponentsBuilder.fromHttpUrl(UidMapUrl)
-                    .queryParam("eventUid", batch)
+                    .queryParam("eventUid", batch.toArray())
                     .build().toUri();
             Map<String, Identity> identitiesFromUids = restOperations.exchange(uri, HttpMethod.GET, null, identityMapResponseType).getBody();
             if (identitiesFromUids != null) {

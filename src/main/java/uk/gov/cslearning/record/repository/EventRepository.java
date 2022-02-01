@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.repository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.Event;
@@ -15,7 +16,7 @@ public interface EventRepository extends CrudRepository<Event, Integer> {
 
     Integer countByBookings_StatusInAndIdEquals(Collection<BookingStatus> statuses, Integer id);
 
-    List<Event> findByUidIn(String[] uids);
+    List<Event> findByUidIn(List<String> uids);
 
 
 

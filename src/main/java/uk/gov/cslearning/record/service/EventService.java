@@ -26,5 +26,5 @@ public interface EventService {
     EventDto create(EventDto eventDto);
 
     @Transactional
-    List<EventDto> getEvents(String[] eventUids, boolean getBookingCount);
+    List<EventDto> getEvents(List<String> eventUids, boolean getBookingCount);
 }

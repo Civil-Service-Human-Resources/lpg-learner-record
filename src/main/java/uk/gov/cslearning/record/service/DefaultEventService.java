@@ -87,7 +87,7 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    public List<EventDto> getEvents(String[] eventUids, boolean getBookingCount) {
+    public List<EventDto> getEvents(List<String> eventUids, boolean getBookingCount) {
          return eventRepository.findByUidIn(eventUids).stream()
                  .map(eventDtoFactory::create)
                  .peek(eventDto -> {
