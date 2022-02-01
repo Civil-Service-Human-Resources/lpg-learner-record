@@ -34,7 +34,7 @@ public class EventIsActiveValidatorTest {
         EventDto event = new EventDto();
         event.setStatus(EventStatus.CANCELLED);
 
-        when(eventService.findByUid(eventUid)).thenReturn(event);
+        when(eventService.findByUid(eventUid, false)).thenReturn(event);
 
         assertFalse(validator.isValid(eventUri, mock(ConstraintValidatorContext.class)));
     }

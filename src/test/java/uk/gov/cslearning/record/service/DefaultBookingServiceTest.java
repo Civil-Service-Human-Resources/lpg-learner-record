@@ -138,7 +138,7 @@ public class DefaultBookingServiceTest {
         event.setBookings(bookings);
 
         when(eventRepository.findByUid(eventId)).thenReturn(Optional.of(event));
-        when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
+        when(bookingDtoFactory.createBulk(any())).thenReturn(bookingDtos);
 
         assertEquals(bookingDtos, bookingService.listByEventUid(eventId));
     }
@@ -333,14 +333,15 @@ public class DefaultBookingServiceTest {
         BookingDto bookingDto2 = new BookingDto();
         BookingDto bookingDto3 = new BookingDto();
 
-        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto1);
-        when(bookingDtoFactory.create(booking2)).thenReturn(bookingDto2);
-        when(bookingDtoFactory.create(booking3)).thenReturn(bookingDto3);
+        List<Booking> bookings = Arrays.asList(booking1, booking2, booking3);
+        List<BookingDto> bookingDtos = Arrays.asList(bookingDto1, bookingDto2, bookingDto3);
+
+        when(bookingDtoFactory.createBulk(bookings)).thenReturn(bookingDtos);
 
         when(bookingRepository.findAllByBookingTimeBetween(eq(start), eq(end)))
-                .thenReturn(Arrays.asList(booking1, booking2, booking3));
+                .thenReturn(bookings);
 
-        assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAllForPeriod(from, to));
+        assertEquals(bookingDtos, bookingService.findAllForPeriod(from, to));
     }
 
     @Test
