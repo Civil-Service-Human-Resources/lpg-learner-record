@@ -74,7 +74,7 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())))
                 .andExpect(jsonPath("$.uri", equalTo(uri.toString())));
 
-        verify(eventService).findByUid(eventUid);
+        verify(eventService).findByUid(eventUid, false);
     }
 
 
@@ -136,7 +136,7 @@ public class EventControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        verify(eventService).findByUid(eventUid);
+        verify(eventService).findByUid(eventUid, false);
     }
 
     @Test
