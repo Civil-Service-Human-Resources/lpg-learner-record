@@ -24,6 +24,8 @@ public class IdentityServiceTest {
 
     private static final String API_URL = "http://localhost/api/identities";
 
+    private static final String UID_MAP_URL = "http://localhost/api/identities/map-for-uids";
+
     private IdentityService identityService;
 
     @Mock
@@ -32,7 +34,7 @@ public class IdentityServiceTest {
     @Before
     public void setup() {
         initMocks(this);
-        identityService = new IdentityService(restOperations, LIST_ALL_URL, API_URL);
+        identityService = new IdentityService(restOperations, UID_MAP_URL, LIST_ALL_URL, API_URL);
     }
 
     @Test

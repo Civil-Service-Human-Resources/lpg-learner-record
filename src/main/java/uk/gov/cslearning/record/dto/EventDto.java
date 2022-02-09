@@ -13,4 +13,5 @@ public class EventDto {
     private URI uri;
     private EventStatus status;
     private CancellationReason cancellationReason;
+    private Integer activeBookingCount;
 }

@@ -63,7 +63,7 @@ public class EventControllerTest {
         event.setUid(eventUid);
         event.setUri(uri);
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.of(event));
+        when(eventService.findByUid(eventUid, false)).thenReturn(event);
 
         mockMvc.perform(
                 get("/event/" + eventUid).with(csrf())
@@ -74,7 +74,7 @@ public class EventControllerTest {
                 .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())))
                 .andExpect(jsonPath("$.uri", equalTo(uri.toString())));
 
-        verify(eventService).findByUid(eventUid);
+        verify(eventService).findByUid(eventUid, false);
     }
 
 
@@ -128,7 +128,7 @@ public class EventControllerTest {
     public void shouldReturnNotFoundIfEventNotFoundOnGet() throws Exception {
         String eventUid = "event-id";
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.empty());
+        when(eventService.findByUid(eventUid, false)).thenReturn(null);
 
         mockMvc.perform(
                 get("/event/" + eventUid).with(csrf())
@@ -136,7 +136,7 @@ public class EventControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        verify(eventService).findByUid(eventUid);
+        verify(eventService).findByUid(eventUid, false);
     }
 
     @Test

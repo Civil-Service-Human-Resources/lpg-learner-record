@@ -1,0 +1,35 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="lpg-learner-record" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+    <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="COSMOS_CONNECTION_STRING" value="mongodb://localhost:27017" />
+          <entry key="DATASOURCE" value="jdbc:mysql://localhost:3306/learner_record?user=root&amp;password=my-secret-pw&amp;useSSL=FALSE" />
+          <entry key="LEARNING_CATALOGUE_SERVICE_URL" value="http://localhost:9001" />
+          <entry key="OAUTH_SERVICE_URL" value="http://localhost:8080" />
+          <entry key="REGISTRY_SERVICE_URL" value="http://localhost:9002" />
+          <entry key="SPRING_PROFILES_ACTIVE" value="default" />
+          <entry key="XAPI_PASSWORD" value="1c0e1b6827606d7efed71e204939d048f94f842b" />
+          <entry key="XAPI_URL" value="http://localhost:8083/data/xAPI" />
+          <entry key="XAPI_USERNAME" value="66f2b4fc001e3da992d23b57d8a7457655bea078" />
+          <entry key="jwt_key" value="key" />
+        </map>
+      </option>
+      <option name="executionName" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="bootRun --stacktrace" />
+      <option name="taskDescriptions">
+        <list />
+      </option>
+      <option name="taskNames">
+        <list />
+      </option>
+      <option name="vmOptions" />
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+    <DebugAllEnabled>false</DebugAllEnabled>
+    <method v="2" />
+  </configuration>
+</component>
