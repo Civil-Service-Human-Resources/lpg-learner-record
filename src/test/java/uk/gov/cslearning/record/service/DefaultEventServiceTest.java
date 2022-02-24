@@ -85,19 +85,6 @@ public class DefaultEventServiceTest {
     }
 
     @Test
-    public void shouldFindEventByUid() {
-        String eventUid = "event-id";
-
-        Event event = new Event();
-        EventDto eventDto = new EventDto();
-
-        when(eventRepository.findByUid(eventUid)).thenReturn(Optional.of(event));
-        when(eventDtoFactory.create(event)).thenReturn(eventDto);
-
-        assertEquals(Optional.of(eventDto), eventService.findByUid(eventUid));
-    }
-
-    @Test
     public void shouldUpdateStatus() {
         String eventUid = "event-id";
 

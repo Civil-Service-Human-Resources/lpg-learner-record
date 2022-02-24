@@ -3,15 +3,16 @@ package uk.gov.cslearning.record.service;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.EventFactory;
-import uk.gov.cslearning.record.dto.CancellationReason;
-import uk.gov.cslearning.record.dto.EventDto;
-import uk.gov.cslearning.record.dto.EventStatus;
-import uk.gov.cslearning.record.dto.EventStatusDto;
+import uk.gov.cslearning.record.dto.*;
 import uk.gov.cslearning.record.dto.factory.EventDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.repository.EventRepository;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultEventService implements EventService {
@@ -54,17 +55,46 @@ public class DefaultEventService implements EventService {
         return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
     }
 
+    private Integer getActiveBookingsCount(Integer eventId) {
+        Collection<BookingStatus> queryStatuses = new ArrayList<>();
+        queryStatuses.add(BookingStatus.CONFIRMED);
+        queryStatuses.add(BookingStatus.REQUESTED);
+        return eventRepository.countByBookings_StatusInAndIdEquals(queryStatuses, eventId);
+    }
+
     @Override
-    public Optional<EventDto> findByUid(String uid) {
+    public EventDto findByUid(String uid) {
+        return findByUid(uid, false);
+    }
+
+    @Override
+    public EventDto findByUid(String uid, boolean getBookingCount) {
         EventDto event = eventRepository.findByUid(uid)
                 .map(eventDtoFactory::create)
                 .orElse(null);
 
-        return Optional.ofNullable(event);
+        if (event != null) {
+            if (getBookingCount) {
+                event.setActiveBookingCount(getActiveBookingsCount(event.getId()));
+            }
+        }
+        return event;
     }
 
     @Override
     public EventDto create(EventDto eventDto) {
         return eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto)));
+    }
+
+    @Override
+    public List<EventDto> getEvents(List<String> eventUids, boolean getBookingCount) {
+         return eventRepository.findByUidIn(eventUids).stream()
+                 .map(eventDtoFactory::create)
+                 .peek(eventDto -> {
+                     if (getBookingCount) {
+                         eventDto.setActiveBookingCount(getActiveBookingsCount(eventDto.getId()));
+                     }
+                 })
+                 .collect(Collectors.toList());
     }
 }

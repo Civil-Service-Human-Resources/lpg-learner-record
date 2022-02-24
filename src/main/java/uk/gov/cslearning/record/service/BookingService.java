@@ -22,9 +22,6 @@ public interface BookingService {
     Iterable<BookingDto> listByEventUid(String eventUid);
 
     @Transactional(readOnly = true)
-    Iterable<BookingDto> listByLearnerUid(String learnerUid);
-
-    @Transactional(readOnly = true)
     Optional<BookingDto> findByLearnerUidAndEventUid(String eventUid, String learnerUid);
 
     @Transactional
@@ -46,10 +43,7 @@ public interface BookingService {
     Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);
 
     @Transactional(readOnly = true)
-    List<BookingDto> findAll();
-
-    @Transactional(readOnly = true)
-    List<BookingDto> findAllForPeriod(LocalDate from, LocalDate to);
+    Iterable<BookingDto> findAllForPeriod(LocalDate from, LocalDate to);
 
     @Transactional
     void deleteAllByLearner(Learner learner);

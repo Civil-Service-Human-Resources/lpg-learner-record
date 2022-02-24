@@ -34,7 +34,7 @@ public class EventIsActiveValidatorTest {
         EventDto event = new EventDto();
         event.setStatus(EventStatus.CANCELLED);
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.of(event));
+        when(eventService.findByUid(eventUid, false)).thenReturn(event);
 
         assertFalse(validator.isValid(eventUri, mock(ConstraintValidatorContext.class)));
     }
@@ -46,7 +46,7 @@ public class EventIsActiveValidatorTest {
         EventDto event = new EventDto();
         event.setStatus(EventStatus.ACTIVE);
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.of(event));
+        when(eventService.findByUid(eventUid, false)).thenReturn(event);
 
         assertTrue(validator.isValid(eventUri, mock(ConstraintValidatorContext.class)));
     }
@@ -56,7 +56,7 @@ public class EventIsActiveValidatorTest {
         String eventUid = "event-uid";
         URI eventUri = URI.create("http://example.org/path/to/event/" + eventUid);
 
-        when(eventService.findByUid(eventUid)).thenReturn(Optional.empty());
+        when(eventService.findByUid(eventUid, false)).thenReturn(null);
 
         assertTrue(validator.isValid(eventUri, mock(ConstraintValidatorContext.class)));
     }
