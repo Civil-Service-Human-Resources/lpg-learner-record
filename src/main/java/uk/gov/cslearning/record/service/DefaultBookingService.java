@@ -21,10 +21,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,11 +73,8 @@ public class DefaultBookingService implements BookingService {
         Optional<Event> event = eventRepository.findByUid(eventUid);
 
         if (event.isPresent()) {
-            Iterable<BookingDto> bookings = event.get().getBookings().stream().map(
-                    bookingDtoFactory::create
-            ).collect(Collectors.toList());
-
-            return bookings;
+            List<Booking> bookings = event.get().getBookings();
+            return bookingDtoFactory.createBulk(bookings);
         }
         return new ArrayList<>();
     }
@@ -181,35 +175,17 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAll() {
-        return bookingRepository.findAll().stream()
-                .map(bookingDtoFactory::create)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BookingDto> findAllForPeriod(LocalDate from, LocalDate to) {
+    public Iterable<BookingDto> findAllForPeriod(LocalDate from, LocalDate to) {
         Instant periodStart = ZonedDateTime.of(from.atStartOfDay(), ZoneOffset.ofHours(0)).toInstant();
         Instant periodEnd = ZonedDateTime.of(to.plusDays(1).atStartOfDay(), ZoneOffset.ofHours(0)).toInstant();
-
-        return bookingRepository.findAllByBookingTimeBetween(periodStart, periodEnd).stream()
-                .map(bookingDtoFactory::create)
-                .collect(Collectors.toList());
+        List<Booking> bookings = bookingRepository.findAllByBookingTimeBetween(periodStart, periodEnd);
+        return bookingDtoFactory.createBulk(bookings);
     }
 
     private Optional<Booking> findActiveBookingByLearnerUidAndEventUid(String learnerUid, String eventUid) {
         List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
         return bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status);
-    }
-
-    @Override
-    public Iterable<BookingDto> listByLearnerUid(String learnerUid) {
-        return bookingRepository
-                .findAllByLearnerUid(learnerUid)
-                .stream()
-                .map(bookingDtoFactory::create)
-                .collect(Collectors.toList());
     }
 
     private BookingDto save(BookingDto bookingDto) {
