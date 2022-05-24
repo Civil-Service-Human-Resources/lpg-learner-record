@@ -9,6 +9,7 @@ import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.input.POST.PostModuleRecordInput;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.catalogue.Module;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,9 @@ public interface ModuleRecordMapper {
         ModuleRecord mr = new ModuleRecord();
         mr.setCreatedAt(now);
         mr.setUpdatedAt(now);
+        if (newModule.getState().equals(State.COMPLETED.toString())) {
+            mr.setCompletionDate(now);
+        }
         updateFromPost(mr, newModule);
         return mr;
     }

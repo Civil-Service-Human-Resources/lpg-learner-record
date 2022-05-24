@@ -51,6 +51,11 @@ public class UserRecordService {
         this.registryService = registryService;
     }
 
+    public Collection<CourseRecord> getUserRecord(String userId) {
+        LOGGER.debug("Retrieving user record for user {}", userId);
+        return courseRecordRepository.findByUserId(userId);
+    }
+
     public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
         LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 
@@ -87,7 +92,7 @@ public class UserRecordService {
 
             return courseRecords;
         } catch (IOException e) {
-            throw new RuntimeException("Exception retrieving xAPI statements.", e);
+            throw new RuntimeException("Exception retrieving xAPI statements. {}", e);
         }
     }
 

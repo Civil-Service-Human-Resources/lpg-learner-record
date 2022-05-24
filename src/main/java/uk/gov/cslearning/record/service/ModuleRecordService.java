@@ -56,7 +56,7 @@ public class ModuleRecordService {
 
         LocalDateTime updatedAt = LocalDateTime.now();
         moduleRecord.setUpdatedAt(updatedAt);
-        if (hasModuleBeenCompleted(existingRecordAsInput, patchedInput)) {
+        if (patchedInput.getState().equals(State.COMPLETED.toString())) {
             moduleRecord.setCompletionDate(updatedAt);
         }
         CourseRecord cr = moduleRecord.getCourseRecord();
@@ -78,8 +78,4 @@ public class ModuleRecordService {
         return updatedRecord.getModuleRecord(moduleId);
     }
 
-    private boolean hasModuleBeenCompleted(PatchModuleRecordInput before, PatchModuleRecordInput after) {
-        return (State.COMPLETED.toString().equals(after.getState()) &&
-                !State.COMPLETED.toString().equals(before.getState()));
-    }
 }

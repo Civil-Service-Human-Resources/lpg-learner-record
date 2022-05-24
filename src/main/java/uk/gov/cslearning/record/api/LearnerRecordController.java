@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -24,11 +25,14 @@ public class LearnerRecordController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordController.class);
     private UserRecordService userRecordService;
+    private boolean learningLockerEnabled;
 
     @Autowired
-    public LearnerRecordController(UserRecordService userRecordService) {
+    public LearnerRecordController(UserRecordService userRecordService,
+                                   @Value("${xapi.enabled}") boolean learningLockerEnabled) {
         checkArgument(userRecordService != null);
         this.userRecordService = userRecordService;
+        this.learningLockerEnabled = learningLockerEnabled;
     }
 
     @GetMapping(path = "/{userId}")
@@ -37,7 +41,15 @@ public class LearnerRecordController {
                                               @RequestParam(name = "includeState", required = false) List<State> includeStates,
                                               @RequestParam(name = "ignoreState", required = false) List<State> ignoreStates) {
         LOGGER.debug("Getting user record for {}", userId);
-        Collection<CourseRecord> records = userRecordService.getUserRecord(userId, activityIds);
+        Collection<CourseRecord> records = new ArrayList<>();
+        LOGGER.info("Learning locker enabled: {}", learningLockerEnabled);
+        if (learningLockerEnabled) {
+            LOGGER.info("Getting records from learning locker.");
+            records = userRecordService.getUserRecord(userId, activityIds);
+        } else {
+            LOGGER.info("Getting records from learner record DB");
+            records = userRecordService.getUserRecord(userId);
+        }
 
         if (includeStates != null && !includeStates.isEmpty()) {
             records = records.stream()
