@@ -25,14 +25,14 @@ public class LearnerRecordController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordController.class);
     private UserRecordService userRecordService;
+
+    @Value("${xapi.enabled}")
     private boolean learningLockerEnabled;
 
     @Autowired
-    public LearnerRecordController(UserRecordService userRecordService,
-                                   @Value("${xapi.enabled}") boolean learningLockerEnabled) {
+    public LearnerRecordController(UserRecordService userRecordService) {
         checkArgument(userRecordService != null);
         this.userRecordService = userRecordService;
-        this.learningLockerEnabled = learningLockerEnabled;
     }
 
     @GetMapping(path = "/{userId}")

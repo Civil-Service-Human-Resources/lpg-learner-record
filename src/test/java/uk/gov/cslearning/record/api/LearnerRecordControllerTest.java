@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -33,6 +34,7 @@ public class LearnerRecordControllerTest {
     public void setup() {
         initMocks(this);
         mockMvc = standaloneSetup(controller).build();
+        ReflectionTestUtils.setField(controller, "learningLockerEnabled", true);
     }
 
     @Test
