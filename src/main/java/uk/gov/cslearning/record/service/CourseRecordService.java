@@ -22,7 +22,6 @@ import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 public class CourseRecordService {
 
     private final CourseRecordRepository courseRecordRepository;
-    private final ModuleRecordRepository moduleRecordRepository;
     private final CourseRecordMapper courseRecordMapper;
     private final PatchHelper patchHelper;
 
@@ -38,8 +37,7 @@ public class CourseRecordService {
     }
 
     public List<CourseRecord> fetchCourseRecords(String userId, String courseId) {
-        List<CourseRecord> records = courseRecordRepository.findByUserIdAndCourseId(userId, courseId);
-        return records;
+        return courseRecordRepository.findByUserIdAndCourseId(userId, courseId);
     }
 
     public CourseRecord createCourseRecord(PostCourseRecordInput inputCourse) {
@@ -52,7 +50,4 @@ public class CourseRecordService {
         return courseRecordRepository.save(newCourseRecord);
     }
 
-    private void validateNewCourseRecord(PostCourseRecordInput newCourseRecord) {
-
-    }
 }

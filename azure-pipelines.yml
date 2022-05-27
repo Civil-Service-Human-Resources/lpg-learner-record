@@ -1,0 +1,44 @@
+trigger:
+  branches:
+    include:
+      - master
+      - idt-develop
+      - idt-feature-LC-*
+      - idt-release-v*
+      - idt-hotfix-v*
+  tags:
+    include:
+      - '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: Gradle@3
+    inputs:
+      gradleWrapperFile: 'build.gradle'
+      jdkVersionOption: '1.8'
+      javaHomeOption: 'JDKVersion'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: false
+      testResultsFiles: 'build/test-results/**/TEST-*.xml'
+      tasks: 'build'
+    displayName: 'Install Gradle and Java 8'
+
+  - script: |
+      echo starting build
+      ./gradlew clean
+      ./gradlew build
+    displayName: 'Build with Gradle'
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'CSL azure container registry'
+      ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags') }}:
+        repository: 'lpg-learner-record/prod'
+      ${{ else }}:
+        repository: 'lpg-learner-record/test'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: '$(Build.SourceBranchName)'
+

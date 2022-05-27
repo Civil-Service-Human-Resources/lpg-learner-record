@@ -41,8 +41,7 @@ public class LearnerRecordController {
                                               @RequestParam(name = "includeState", required = false) List<State> includeStates,
                                               @RequestParam(name = "ignoreState", required = false) List<State> ignoreStates) {
         LOGGER.debug("Getting user record for {}", userId);
-        Collection<CourseRecord> records = new ArrayList<>();
-        LOGGER.info("Learning locker enabled: {}", learningLockerEnabled);
+        Collection<CourseRecord> records;
         if (learningLockerEnabled) {
             LOGGER.info("Getting records from learning locker.");
             records = userRecordService.getUserRecord(userId, activityIds);
