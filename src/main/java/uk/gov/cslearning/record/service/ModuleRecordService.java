@@ -56,7 +56,7 @@ public class ModuleRecordService {
 
         LocalDateTime updatedAt = LocalDateTime.now();
 
-        if (!moduleRecord.getUpdatedAt().isBefore(patchedInput.getUpdatedAt())) {
+        if (patch.toString().contains("updatedAt")) {
             updatedAt = patchedInput.getUpdatedAt();
         }
 
