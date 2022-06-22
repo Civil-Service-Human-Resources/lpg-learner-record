@@ -51,10 +51,15 @@ public class ModuleRecordService {
         ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
         PatchModuleRecordInput existingRecordAsInput = moduleRecordMapper.asInput(moduleRecord);
 
-        PatchModuleRecordInput patchedInput =  patchHelper.patch(patch, existingRecordAsInput, PatchModuleRecordInput.class);
+        PatchModuleRecordInput patchedInput = patchHelper.patch(patch, existingRecordAsInput, PatchModuleRecordInput.class);
         moduleRecordMapper.update(moduleRecord, patchedInput);
 
         LocalDateTime updatedAt = LocalDateTime.now();
+
+        if (!moduleRecord.getUpdatedAt().isBefore(patchedInput.getUpdatedAt())) {
+            updatedAt = patchedInput.getUpdatedAt();
+        }
+
         moduleRecord.setUpdatedAt(updatedAt);
         if (patchedInput.getState().equals(State.COMPLETED.toString())) {
             moduleRecord.setCompletionDate(updatedAt);
