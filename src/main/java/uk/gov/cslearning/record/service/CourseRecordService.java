@@ -31,8 +31,6 @@ public class CourseRecordService {
 
         PatchCourseRecordInput patchedInput =  patchHelper.patch(patch, updateParams, PatchCourseRecordInput.class);
         courseRecordMapper.update(courseRecord, patchedInput);
-
-        courseRecord.setLastUpdated(LocalDateTime.now());
         return courseRecordRepository.save(courseRecord);
     }
 

@@ -53,19 +53,8 @@ public class ModuleRecordService {
 
         PatchModuleRecordInput patchedInput = patchHelper.patch(patch, existingRecordAsInput, PatchModuleRecordInput.class);
         moduleRecordMapper.update(moduleRecord, patchedInput);
-
-        LocalDateTime updatedAt = LocalDateTime.now();
-
-        if (patch.toString().contains("updatedAt")) {
-            updatedAt = patchedInput.getUpdatedAt();
-        }
-
-        moduleRecord.setUpdatedAt(updatedAt);
-        if (patchedInput.getState().equals(State.COMPLETED.toString())) {
-            moduleRecord.setCompletionDate(updatedAt);
-        }
         CourseRecord cr = moduleRecord.getCourseRecord();
-        cr.setLastUpdated(updatedAt);
+        cr.setLastUpdated(moduleRecord.getUpdatedAt());
         courseRecordRepository.save(cr);
         return moduleRecordRepository.save(moduleRecord);
     }
