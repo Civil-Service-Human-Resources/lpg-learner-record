@@ -37,8 +37,6 @@ public class PostCourseRecordInput {
 
     private Boolean isRequired = false;
 
-    @Size(min=1, message = "At least 1 module record is required to create a new course record")
     @Valid
-    @NotNull(message = "moduleRecords is required")
     private List<PostModuleRecordInput> moduleRecords;
 }

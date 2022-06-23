@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.validation.annotations.ValidEnum;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,9 +16,17 @@ public class ModuleRecordMatchesCourseRecordValidator implements ConstraintValid
 
     @Override
     public boolean isValid(PostCourseRecordInput value, ConstraintValidatorContext context) {
-        PostModuleRecordInput moduleRecord = value.getModuleRecords().get(0);
+        boolean valid = true;
+        List<PostModuleRecordInput> modules = value.getModuleRecords();
+        if (modules.size() > 0) {
+            List<PostModuleRecordInput> validRecords = modules.stream().filter(m -> doesUserIdAndCourseIdMatch(m, value)).collect(Collectors.toList());
+            valid = (validRecords.size() == modules.size());
+        }
+        return valid;
+    }
 
-        return moduleRecord.getCourseId().equals(value.getCourseId()) && moduleRecord.getUserId().equals((value.getUserId()));
+    private boolean doesUserIdAndCourseIdMatch(PostModuleRecordInput moduleRecord, PostCourseRecordInput courseRecord) {
+        return moduleRecord.getCourseId().equals(courseRecord.getCourseId()) && moduleRecord.getUserId().equals((courseRecord.getUserId()));
     }
 
 }
