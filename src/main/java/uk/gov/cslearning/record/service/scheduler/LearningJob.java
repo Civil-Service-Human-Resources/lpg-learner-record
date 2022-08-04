@@ -21,7 +21,6 @@ import uk.gov.cslearning.record.dto.NotificationCourseModule;
 import uk.gov.cslearning.record.repository.CourseNotificationJobHistoryRepository;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
-import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.UserRecordService;
 import uk.gov.cslearning.record.service.catalogue.Course;
@@ -78,7 +77,6 @@ public class LearningJob {
 
     private CourseRecordRepository courseRecordRepository;
 
-    private CourseRefreshService courseRefreshService;
 
     private CourseNotificationJobHistoryRepository courseNotificationJobHistoryRepository;
 
@@ -90,7 +88,6 @@ public class LearningJob {
             NotifyService notifyService,
             NotificationRepository notificationRepository,
             CourseRecordRepository courseRecordRepository,
-            CourseRefreshService courseRefreshService,
             CourseNotificationJobHistoryRepository courseNotificationJobHistoryRepository) {
         this.userRecordService = userRecordService;
         this.identityService = identityService;
@@ -99,23 +96,7 @@ public class LearningJob {
         this.notifyService = notifyService;
         this.notificationRepository = notificationRepository;
         this.courseRecordRepository = courseRecordRepository;
-        this.courseRefreshService = courseRefreshService;
         this.courseNotificationJobHistoryRepository = courseNotificationJobHistoryRepository;
-    }
-
-    public void learnerRecordRefresh() {
-        LOGGER.info("Doing Learner Record Refresh");
-        LocalDateTime startTime = LocalDateTime.now();
-        CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.LEARNER_RECORD_REFRESH.name(), startTime);
-        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
-
-        LocalDateTime since = getSinceDate(courseNotificationJobHistoryRepository.findLastLearnerRecordRefreshRecord());
-        int refreshCount = courseRefreshService.refreshCoursesForATimePeriod(since);
-
-        courseNotificationJobHistory.setDataAcquisition(startTime);
-        courseNotificationJobHistory.setCompletedAt(LocalDateTime.now());
-        courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
-        LOGGER.info("Learner Record Refresh updated {} record(s)", refreshCount);
     }
 
     public void sendLineManagerNotificationForCompletedLearning() throws HttpClientErrorException {
