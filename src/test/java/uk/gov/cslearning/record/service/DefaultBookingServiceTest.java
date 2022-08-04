@@ -45,9 +45,6 @@ public class DefaultBookingServiceTest {
     private BookingRepository bookingRepository;
 
     @Mock
-    private XApiService xApiService;
-
-    @Mock
     private EventRepository eventRepository;
 
     @Mock
@@ -186,7 +183,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 
-        verify(xApiService).approve(bookingDto);
         verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
 
     }
@@ -219,7 +215,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
 
-        verify(xApiService).approve(bookingDto);
         verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
     }
 
@@ -252,7 +247,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
 
@@ -271,7 +265,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
 
@@ -301,7 +294,6 @@ public class DefaultBookingServiceTest {
 
         verify(messageService).createCancelEventMessage(booking1, "cancellation reason");
         verify(notificationService).send(messageDto);
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking2);
     }
 
