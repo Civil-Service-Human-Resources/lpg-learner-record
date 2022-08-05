@@ -56,6 +56,16 @@ public class UserRecordService {
         return courseRecordRepository.findByUserId(userId);
     }
 
+    public Collection<CourseRecord> getUserRecordWithActivities(String userId, List<String> activityIds) {
+        Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
+        if (activityIds != null && !activityIds.isEmpty()) {
+            return courseRecords.stream()
+                    .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
+                    .collect(Collectors.toSet());
+        }
+        return courseRecords;
+    }
+
     public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
         LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 

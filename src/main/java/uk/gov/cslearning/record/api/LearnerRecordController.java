@@ -47,7 +47,7 @@ public class LearnerRecordController {
             records = userRecordService.getUserRecord(userId, activityIds);
         } else {
             LOGGER.info("Getting records from learner record DB");
-            records = userRecordService.getUserRecord(userId);
+            records = userRecordService.getUserRecordWithActivities(userId, activityIds);
         }
 
         if (includeStates != null && !includeStates.isEmpty()) {
