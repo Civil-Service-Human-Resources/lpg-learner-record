@@ -1,5 +1,7 @@
 package uk.gov.cslearning.record.api.input.POST;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +13,7 @@ import javax.persistence.Enumerated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 public class PostModuleRecordInput {
@@ -41,4 +44,7 @@ public class PostModuleRecordInput {
     @ValidEnum(enumClass = State.class)
     @Enumerated(EnumType.STRING)
     private String state;
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private LocalDate eventDate;
 }
