@@ -47,4 +47,6 @@ public class PostModuleRecordInput {
 
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate eventDate;
+
+    private String eventId;
 }
