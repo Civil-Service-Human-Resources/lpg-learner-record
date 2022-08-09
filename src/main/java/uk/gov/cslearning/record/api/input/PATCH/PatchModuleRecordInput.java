@@ -37,12 +37,19 @@ public class PatchModuleRecordInput {
 
     private boolean rated;
 
+    //TODO: This field is never used
     private String paymentMethod;
 
+    //TODO: This field is never used
     private String paymentDetails;
 
     @ValidEnum(enumClass = BookingStatus.class)
     @Enumerated(EnumType.STRING)
     private String bookingStatus;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime eventDate;
+
+    private String eventId;
 
 }
