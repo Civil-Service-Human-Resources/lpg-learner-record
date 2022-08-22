@@ -26,9 +26,6 @@ public class LearnerRecordController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LearnerRecordController.class);
     private UserRecordService userRecordService;
 
-    @Value("${xapi.enabled}")
-    private boolean learningLockerEnabled;
-
     @Autowired
     public LearnerRecordController(UserRecordService userRecordService) {
         checkArgument(userRecordService != null);
@@ -42,13 +39,7 @@ public class LearnerRecordController {
                                               @RequestParam(name = "ignoreState", required = false) List<State> ignoreStates) {
         LOGGER.debug("Getting user record for {}", userId);
         Collection<CourseRecord> records;
-        if (learningLockerEnabled) {
-            LOGGER.info("Getting records from learning locker.");
-            records = userRecordService.getUserRecord(userId, activityIds);
-        } else {
-            LOGGER.info("Getting records from learner record DB");
-            records = userRecordService.getUserRecordWithActivities(userId, activityIds);
-        }
+        records = userRecordService.getUserRecordWithActivities(userId, activityIds);
 
         if (includeStates != null && !includeStates.isEmpty()) {
             records = records.stream()
