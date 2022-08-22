@@ -39,7 +39,7 @@ public class LearnerRecordController {
                                               @RequestParam(name = "ignoreState", required = false) List<State> ignoreStates) {
         LOGGER.debug("Getting user record for {}", userId);
         Collection<CourseRecord> records;
-        records = userRecordService.getUserRecordWithActivities(userId, activityIds);
+        records = userRecordService.getUserRecord(userId, activityIds);
 
         if (includeStates != null && !includeStates.isEmpty()) {
             records = records.stream()

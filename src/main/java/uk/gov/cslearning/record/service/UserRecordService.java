@@ -25,45 +25,20 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class UserRecordService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
-    private final CollectionsService collectionsService;
     private CourseRecordRepository courseRecordRepository;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository,
-                             LearningCatalogueService learningCatalogueService,
-                             CollectionsService collectionsService,
-                             RegistryService registryService) {
+                             LearningCatalogueService learningCatalogueService) {
         checkArgument(courseRecordRepository != null);
         checkArgument(learningCatalogueService != null);
         this.courseRecordRepository = courseRecordRepository;
-        this.collectionsService = collectionsService;
-    }
-
-    public Collection<CourseRecord> getUserRecord(String userId) {
-        LOGGER.debug("Retrieving user record for user {}", userId);
-        return courseRecordRepository.findByUserId(userId);
-    }
-
-    public Collection<CourseRecord> getUserRecordWithActivities(String userId, List<String> activityIds) {
-        Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
-        if (activityIds != null && !activityIds.isEmpty()) {
-            return courseRecords.stream()
-                    .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
-                    .collect(Collectors.toSet());
-        }
-        return courseRecords;
     }
 
     public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
         LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
 
         Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
-
-        LocalDateTime since = courseRecords.stream()
-                .map(CourseRecord::getLastUpdated)
-                .filter(Objects::nonNull)
-                .reduce((a, b) -> a.isAfter(b) ? a : b)
-                .orElse(null);
 
         if (activityIds != null && !activityIds.isEmpty()) {
             return courseRecords.stream()
@@ -76,13 +51,11 @@ public class UserRecordService {
 
     @Transactional
     public void deleteUserRecords(String uid) {
-        collectionsService.deleteAllByLearnerUid(uid);
         courseRecordRepository.deleteAllByUid(uid);
     }
 
     @Transactional
-    public void deleteOldRecords(DateTime dateTime, LocalDateTime localDateTime) {
-        collectionsService.deleteAllByAge(dateTime);
+    public void deleteOldRecords(LocalDateTime localDateTime) {
         courseRecordRepository.deleteAllByLastUpdatedBefore(localDateTime);
     }
 }
