@@ -109,7 +109,6 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.google.guava:guava:23.5-jre'
-    compile 'gov.adlnet:jxapi:2.0.1'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'org.codehaus.janino:janino:3.0.8'
     compile 'org.reflections:reflections:0.9.11'

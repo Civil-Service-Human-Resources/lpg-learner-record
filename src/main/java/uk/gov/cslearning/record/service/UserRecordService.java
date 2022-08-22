@@ -1,7 +1,5 @@
 package uk.gov.cslearning.record.service;
 
-import gov.adlnet.xapi.model.Activity;
-import gov.adlnet.xapi.model.Statement;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +27,6 @@ public class UserRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
     private final CollectionsService collectionsService;
     private CourseRecordRepository courseRecordRepository;
-    private LearningCatalogueService learningCatalogueService;
-    private RegistryService registryService;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository,
@@ -40,9 +36,7 @@ public class UserRecordService {
         checkArgument(courseRecordRepository != null);
         checkArgument(learningCatalogueService != null);
         this.courseRecordRepository = courseRecordRepository;
-        this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
-        this.registryService = registryService;
     }
 
     public Collection<CourseRecord> getUserRecord(String userId) {
