@@ -13,8 +13,6 @@ import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
-import uk.gov.cslearning.record.service.xapi.StatementStream;
-import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -31,21 +29,17 @@ public class UserRecordService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
     private final CollectionsService collectionsService;
     private CourseRecordRepository courseRecordRepository;
-    private XApiService xApiService;
     private LearningCatalogueService learningCatalogueService;
     private RegistryService registryService;
 
     @Autowired
     public UserRecordService(CourseRecordRepository courseRecordRepository,
-                             XApiService xApiService,
                              LearningCatalogueService learningCatalogueService,
                              CollectionsService collectionsService,
                              RegistryService registryService) {
         checkArgument(courseRecordRepository != null);
-        checkArgument(xApiService != null);
         checkArgument(learningCatalogueService != null);
         this.courseRecordRepository = courseRecordRepository;
-        this.xApiService = xApiService;
         this.learningCatalogueService = learningCatalogueService;
         this.collectionsService = collectionsService;
         this.registryService = registryService;
@@ -77,33 +71,13 @@ public class UserRecordService {
                 .reduce((a, b) -> a.isAfter(b) ? a : b)
                 .orElse(null);
 
-        try {
-            Collection<Statement> statements = xApiService.getStatements(userId, null, since);
-
-            StatementStream stream = new StatementStream(learningCatalogueService, registryService);
-
-            Collection<CourseRecord> updatedCourseRecords = stream.replay(statements,
-                    statement -> ((Activity) statement.getObject()).getId(),
-                    courseRecords);
-
-            courseRecordRepository.saveAll(updatedCourseRecords);
-
-            for (CourseRecord courseRecord : updatedCourseRecords) {
-                if (!courseRecords.contains(courseRecord)) {
-                    courseRecords.add(courseRecord);
-                }
-            }
-
-            if (activityIds != null && !activityIds.isEmpty()) {
-                return courseRecords.stream()
-                        .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
-                        .collect(Collectors.toSet());
-            }
-
-            return courseRecords;
-        } catch (IOException e) {
-            throw new RuntimeException("Exception retrieving xAPI statements. {}", e);
+        if (activityIds != null && !activityIds.isEmpty()) {
+            return courseRecords.stream()
+                    .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
+                    .collect(Collectors.toSet());
         }
+
+        return courseRecords;
     }
 
     @Transactional

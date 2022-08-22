@@ -19,7 +19,6 @@ import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.booking.BookingNotificationService;
-import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
 import java.time.LocalDate;
