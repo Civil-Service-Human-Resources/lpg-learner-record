@@ -34,7 +34,6 @@ public class LearnerRecordControllerTest {
     public void setup() {
         initMocks(this);
         mockMvc = standaloneSetup(controller).build();
-        ReflectionTestUtils.setField(controller, "learningLockerEnabled", true);
     }
 
     @Test
