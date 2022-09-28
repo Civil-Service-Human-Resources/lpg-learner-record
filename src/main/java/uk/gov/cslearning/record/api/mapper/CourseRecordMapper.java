@@ -27,7 +27,7 @@ public abstract class CourseRecordMapper {
     public abstract void update(@MappingTarget CourseRecord courseRecord, PatchCourseRecordInput input);
 
     @Mapping(target = "moduleRecords", ignore = true)
-    public abstract void udpateFromPost(@MappingTarget CourseRecord courseRecord, PostCourseRecordInput input);
+    public abstract void updateFromPost(@MappingTarget CourseRecord courseRecord, PostCourseRecordInput input);
 
     public CourseRecord postInputAsCourseRecord(PostCourseRecordInput inputCourse) {
         LocalDateTime now = LocalDateTime.now();
@@ -39,7 +39,7 @@ public abstract class CourseRecordMapper {
             convertedModuleRecord.setUpdatedAt(now);
             cr.addModuleRecord(convertedModuleRecord);
         });
-        udpateFromPost(cr, inputCourse);
+        updateFromPost(cr, inputCourse);
         return cr;
     }
 
