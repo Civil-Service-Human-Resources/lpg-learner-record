@@ -55,7 +55,7 @@ public class UserRecordService {
     }
 
     @Transactional
-    public void deleteOldRecords(LocalDateTime localDateTime) {
+    public void deleteRecordsLastUpdatedBefore(LocalDateTime localDateTime) {
         courseRecordRepository.deleteAllByLastUpdatedBefore(localDateTime);
     }
 }

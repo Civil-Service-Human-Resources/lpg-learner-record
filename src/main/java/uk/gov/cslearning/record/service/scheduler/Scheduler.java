@@ -56,8 +56,8 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 4 * * *")
     public void deleteOldStatements() {
-        LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
+        LOGGER.info("Executing deleteRecordsLastUpdatedBefore at {}", dateFormat.format(new Date()));
         learnerService.deleteOldStatements();
-        LOGGER.info("deleteOldRecords complete at {}", dateFormat.format(new Date()));
+        LOGGER.info("deleteRecordsLastUpdatedBefore complete at {}", dateFormat.format(new Date()));
     }
 }

@@ -52,7 +52,7 @@ public class UserRecordServiceTest {
         Instant instant = DateTimeFormatter.ISO_DATE_TIME.parse(dateTime.toString(), Instant::from);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
-        userRecordService.deleteOldRecords(localDateTime);
+        userRecordService.deleteRecordsLastUpdatedBefore(localDateTime);
 
     }
 
