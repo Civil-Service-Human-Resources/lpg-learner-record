@@ -120,14 +120,10 @@ dependencies {
     compile 'org.projectlombok:lombok:1.18.4'
     annotationProcessor 'org.projectlombok:lombok:1.18.4'
 
-    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'org.apache.commons:commons-collections4:4.4'
     compile 'javax.interceptor:javax.interceptor-api:3.1'
 
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
-
     compile group: 'org.hashids', name: 'hashids', version: '1.0.3'
-
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
