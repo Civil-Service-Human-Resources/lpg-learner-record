@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.0.0.RELEASE'
     id "org.sonarqube" version "2.6.2"
     id 'idea'
+    id "io.franzbecker.gradle-lombok" version "5.0.0"
+    id 'net.ltgt.apt' version '0.21'
 }
 
 repositories {
@@ -77,6 +79,8 @@ dependencies {
     compile 'javax.activation:activation:1.1'
     compile 'org.aspectj:aspectjrt:1.9.1'
     compile 'org.aspectj:aspectjweaver:1.9.1'
+    compile 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.4'
 
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jersey'
@@ -116,9 +120,6 @@ dependencies {
     compile 'uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE'
 
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
-
-    compile 'org.projectlombok:lombok:1.18.4'
-    annotationProcessor 'org.projectlombok:lombok:1.18.4'
 
     compile 'org.apache.commons:commons-collections4:4.4'
     compile 'javax.interceptor:javax.interceptor-api:3.1'

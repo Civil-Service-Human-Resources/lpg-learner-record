@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.cslearning.record.api.input.PATCH.PatchModuleRecordInput;
 import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.input.POST.PostModuleRecordInput;
@@ -12,19 +13,25 @@ import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.service.catalogue.Module;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ModuleRecordMapper {
+public abstract class ModuleRecordMapper {
 
-    PatchModuleRecordInput asInput(ModuleRecord moduleRecord);
+    private Clock clock;
 
-    ModuleRecord postInputAsModuleBasic(PostModuleRecordInput newModule);
+    @Autowired
+    public final void setClock(Clock clock) {
+        this.clock = clock;
+    }
 
-    void updateFromPost(@MappingTarget ModuleRecord moduleRecord, PostModuleRecordInput input);
+    public abstract PatchModuleRecordInput asInput(ModuleRecord moduleRecord);
 
-    default ModuleRecord postInputAsModule(PostModuleRecordInput newModule) {
-        LocalDateTime now = LocalDateTime.now();
+    public abstract void updateFromPost(@MappingTarget ModuleRecord moduleRecord, PostModuleRecordInput input);
+
+    public ModuleRecord postInputAsModule(PostModuleRecordInput newModule) {
+        LocalDateTime now = LocalDateTime.now(clock);
         ModuleRecord mr = new ModuleRecord();
         mr.setCreatedAt(now);
         mr.setUpdatedAt(now);
@@ -35,5 +42,5 @@ public interface ModuleRecordMapper {
         return mr;
     }
 
-    void update(@MappingTarget ModuleRecord moduleRecord, PatchModuleRecordInput input);
+    public abstract void update(@MappingTarget ModuleRecord moduleRecord, PatchModuleRecordInput input);
 }

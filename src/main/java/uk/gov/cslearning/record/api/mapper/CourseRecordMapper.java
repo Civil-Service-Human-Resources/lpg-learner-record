@@ -12,6 +12,7 @@ import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 
 import javax.inject.Inject;
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring",
@@ -19,18 +20,29 @@ import java.time.LocalDateTime;
         uses = ModuleRecordMapper.class)
 public abstract class CourseRecordMapper {
 
-    @Autowired
     private ModuleRecordMapper moduleRecordMapper;
+    private Clock clock;
+
+    @Autowired
+    public final void setModuleRecordMapper(ModuleRecordMapper moduleRecordMapper) {
+        this.moduleRecordMapper = moduleRecordMapper;
+    }
+
+    @Autowired
+    public final void setClock(Clock clock) {
+        this.clock = clock;
+    }
 
     public abstract PatchCourseRecordInput asInput(CourseRecord courseRecord);
 
     public abstract void update(@MappingTarget CourseRecord courseRecord, PatchCourseRecordInput input);
 
+    @Mapping(target = "required", source = "isRequired")
     @Mapping(target = "moduleRecords", ignore = true)
     public abstract void updateFromPost(@MappingTarget CourseRecord courseRecord, PostCourseRecordInput input);
 
     public CourseRecord postInputAsCourseRecord(PostCourseRecordInput inputCourse) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(clock);
         CourseRecord cr = new CourseRecord(inputCourse.getCourseId(), inputCourse.getUserId());
         cr.setLastUpdated(now);
         inputCourse.getModuleRecords().forEach(mr -> {
