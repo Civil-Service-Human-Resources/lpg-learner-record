@@ -22,14 +22,8 @@ steps:
       jdkArchitectureOption: 'x64'
       publishJUnitResults: false
       testResultsFiles: 'build/test-results/**/TEST-*.xml'
-      tasks: 'build'
-    displayName: 'Install Gradle and Java 8'
-
-  - script: |
-      echo starting build
-      ./gradlew clean
-      ./gradlew build
-    displayName: 'Build with Gradle'
+      tasks: 'clean build'
+    displayName: 'Install Gradle and Java 8 and build'
 
   - task: Docker@2
     inputs:
