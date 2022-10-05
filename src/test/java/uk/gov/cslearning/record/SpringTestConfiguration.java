@@ -10,6 +10,8 @@ import uk.gov.cslearning.record.api.output.error.GenericErrorResponseFactory;
 import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 
+import java.time.Clock;
+
 @TestConfiguration
 public class SpringTestConfiguration {
 
@@ -34,6 +36,10 @@ public class SpringTestConfiguration {
 
     @Bean
     public ModuleRecordMapper moduleRecordMapper() { return new ModuleRecordMapperImpl();
+    }
+
+    @Bean
+    public Clock clock() {return Clock.systemDefaultZone();
     }
 
 }
