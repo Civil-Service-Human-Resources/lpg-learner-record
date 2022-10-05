@@ -16,7 +16,7 @@ pool:
 steps:
   - task: Gradle@3
     inputs:
-      gradleWrapperFile: 'build.gradle'
+      gradleWrapperFile: 'gradlew'
       jdkVersionOption: '1.8'
       javaHomeOption: 'JDKVersion'
       jdkArchitectureOption: 'x64'
