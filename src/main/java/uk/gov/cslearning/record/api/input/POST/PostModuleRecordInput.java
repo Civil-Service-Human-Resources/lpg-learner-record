@@ -38,7 +38,6 @@ public class PostModuleRecordInput {
     @NotBlank(message = "moduleType is required")
     private String moduleType;
 
-    @NotNull(message = "duration is required")
     private Long duration;
 
     @ValidEnum(enumClass = State.class)
