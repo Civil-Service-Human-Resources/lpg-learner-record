@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.domain.CourseRecord;
@@ -37,7 +38,8 @@ public class LearnerRecordController {
                                               @RequestParam(name = "includeState", required = false) List<State> includeStates,
                                               @RequestParam(name = "ignoreState", required = false) List<State> ignoreStates) {
         LOGGER.debug("Getting user record for {}", userId);
-        Collection<CourseRecord> records = userRecordService.getUserRecord(userId, activityIds);
+        Collection<CourseRecord> records;
+        records = userRecordService.getUserRecord(userId, activityIds);
 
         if (includeStates != null && !includeStates.isEmpty()) {
             records = records.stream()

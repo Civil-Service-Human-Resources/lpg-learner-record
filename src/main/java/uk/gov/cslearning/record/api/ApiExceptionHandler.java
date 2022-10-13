@@ -9,12 +9,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import uk.gov.cslearning.record.api.output.error.GenericErrorResponse;
+import uk.gov.cslearning.record.api.output.error.GenericErrorResponseFactory;
 import uk.gov.cslearning.record.dto.ErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
-import uk.gov.cslearning.record.exception.BookingNotFoundException;
-import uk.gov.cslearning.record.exception.EventNotFoundException;
+import uk.gov.cslearning.record.exception.*;
+import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,9 +26,11 @@ public class ApiExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     private final ErrorDtoFactory errorDtoFactory;
+    private final GenericErrorResponseFactory genericErrorResponseFactory;
 
-    public ApiExceptionHandler(ErrorDtoFactory errorDtoFactory) {
+    public ApiExceptionHandler(ErrorDtoFactory errorDtoFactory, GenericErrorResponseFactory genericErrorResponseFactory) {
         this.errorDtoFactory = errorDtoFactory;
+        this.genericErrorResponseFactory = genericErrorResponseFactory;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -43,17 +46,35 @@ public class ApiExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({BookingNotFoundException.class, EventNotFoundException.class})
+    @ExceptionHandler({BookingNotFoundException.class,
+            EventNotFoundException.class,
+            CourseRecordNotFoundException.class,
+            ModuleRecordNotFoundException.class})
     protected ResponseEntity handleNotFoundException(RuntimeException e) {
         LOGGER.error("Not Found: ", e);
+        GenericErrorResponse response = new GenericErrorResponse(404, "", Collections.singletonList(e.getMessage()));
+        return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.NOT_FOUND);
+    }
 
-        return ResponseEntity.notFound().build();
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ResourceExistsException.class})
+    protected ResponseEntity<GenericErrorResponse> handleResourceExistsException(ResourceExistsException e) {
+        GenericErrorResponse response = genericErrorResponseFactory.createResourceExistsException(e.getMessage());
+        return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({PatchResourceException.class})
+    protected ResponseEntity<GenericErrorResponse> handleResourcePatchException(PatchResourceException e) {
+        LOGGER.error("Bad request: ", e);
+
+        GenericErrorResponse responseBody = new GenericErrorResponse(400, "", e.getMessages());
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ErrorDto> handleConstraintViolationException(ConstraintViolationException e) {
         LOGGER.error("Bad Request: ", e);
-
         ErrorDto error = errorDtoFactory.create(HttpStatus.BAD_REQUEST, Collections.singletonList("Storage error"));
 
         return ResponseEntity.badRequest().body(error);

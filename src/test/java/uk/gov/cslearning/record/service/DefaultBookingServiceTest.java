@@ -19,7 +19,6 @@ import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.booking.BookingNotificationService;
-import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -43,9 +42,6 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private BookingRepository bookingRepository;
-
-    @Mock
-    private XApiService xApiService;
 
     @Mock
     private EventRepository eventRepository;
@@ -186,7 +182,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 
-        verify(xApiService).approve(bookingDto);
         verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
 
     }
@@ -219,7 +214,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
 
-        verify(xApiService).approve(bookingDto);
         verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
     }
 
@@ -252,7 +246,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
 
@@ -271,7 +264,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
 
@@ -301,7 +293,6 @@ public class DefaultBookingServiceTest {
 
         verify(messageService).createCancelEventMessage(booking1, "cancellation reason");
         verify(notificationService).send(messageDto);
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking2);
     }
 

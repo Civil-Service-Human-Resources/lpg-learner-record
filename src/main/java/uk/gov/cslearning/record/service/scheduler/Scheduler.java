@@ -20,9 +20,6 @@ public class Scheduler {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Value("${notifications.lr-refresh-job-enabled}")
-    private Boolean refreshJobEnabled;
-
     @Value("${notifications.completed-job-enabled}")
     private Boolean completedJobEnabled;
 
@@ -34,17 +31,6 @@ public class Scheduler {
 
     @Autowired
     private LearnerService learnerService;
-
-    @SchedulerLock(name = "learnerRecordRefresh", lockAtMostFor = "PT4H")
-    @Scheduled(cron = "${notifications.lr-refresh-job-cron}")
-    public void courseDataRefresh() {
-        LockAssert.assertLocked();
-        if (refreshJobEnabled) {
-            LOGGER.info("Learner Record Refresh at {}", dateFormat.format(new Date()));
-            learningJob.learnerRecordRefresh();
-            LOGGER.info("Learner Record Refresh complete at {}", dateFormat.format(new Date()));
-        }
-    }
 
     @SchedulerLock(name = "completedCoursesJob", lockAtMostFor = "PT4H")
     @Scheduled(cron = "${notifications.completed-job-cron}")
@@ -70,8 +56,8 @@ public class Scheduler {
 
     @Scheduled(cron = "0 0 4 * * *")
     public void deleteOldStatements() {
-        LOGGER.info("Executing deleteOldRecords at {}", dateFormat.format(new Date()));
+        LOGGER.info("Executing deleteRecordsLastUpdatedBefore at {}", dateFormat.format(new Date()));
         learnerService.deleteOldStatements();
-        LOGGER.info("deleteOldRecords complete at {}", dateFormat.format(new Date()));
+        LOGGER.info("deleteRecordsLastUpdatedBefore complete at {}", dateFormat.format(new Date()));
     }
 }

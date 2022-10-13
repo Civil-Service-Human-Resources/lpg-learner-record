@@ -1,4 +1,4 @@
-FROM gradle:4.3-jdk8 as debug
+FROM gradle:4.6-jdk8 as debug
 
 WORKDIR /workspace/app
 
@@ -16,7 +16,7 @@ RUN gradle wrapper assemble \
 
 CMD java -jar /workspace/app/build/libs/learner-record.jar
 
-FROM openjdk:8-jre-alpine as production
+FROM amazoncorretto:8-alpine as production
 
 ARG JAR_DIR=/workspace/app/build/libs
 
