@@ -1,6 +1,5 @@
 package uk.gov.cslearning.record;
 
-import gov.adlnet.xapi.client.StatementClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,12 +21,4 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
-    public StatementClient statementClient(
-            @Value("${xapi.url}") String url,
-            @Value("${xapi.username}") String username,
-            @Value("${xapi.password}") String password
-    ) throws MalformedURLException {
-        return new StatementClient(url, username, password);
-    }
 }

@@ -5,13 +5,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.cslearning.record.SpringTestConfiguration;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.dto.InviteDto;
-import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.service.identity.Identity;
@@ -30,7 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({InviteController.class, ErrorDtoFactory.class})
+@WebMvcTest({InviteController.class})
+@Import(SpringTestConfiguration.class)
 @WithMockUser(username = "user")
 public class InviteControllerTest {
 
