@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ModuleRecordDto {
+    private String uid;
     private String moduleId;
     private String state;
     private String learner;
@@ -20,9 +21,10 @@ public class ModuleRecordDto {
     public ModuleRecordDto() {
     }
 
-    public ModuleRecordDto(String moduleId, State state, String learner,
+    public ModuleRecordDto(String uid, String moduleId, State state, String learner,
                            LocalDateTime stateChangeDate, LocalDateTime completedAt,
                            String moduleTitle, String moduleType, String courseId, String courseTitle) {
+        this.uid = uid;
         this.moduleId = moduleId;
         this.state = String.valueOf(state);
         this.learner = learner;
