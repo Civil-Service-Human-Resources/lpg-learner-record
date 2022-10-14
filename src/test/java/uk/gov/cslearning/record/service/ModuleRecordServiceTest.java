@@ -52,6 +52,7 @@ public class ModuleRecordServiceTest {
 
     private PostModuleRecordInput getModuleRecordInput() {
         PostModuleRecordInput recordInput = new PostModuleRecordInput();
+        recordInput.setUid("uid123");
         recordInput.setCost(BigDecimal.ONE);
         recordInput.setState("IN_PROGRESS");
         recordInput.setModuleId("moduleID");
@@ -179,6 +180,7 @@ public class ModuleRecordServiceTest {
         Assert.assertEquals(State.IN_PROGRESS, createdRecord.getState());
         Assert.assertEquals("2022-01-01T00:00", createdRecord.getCreatedAt().toString() );
         Assert.assertEquals("2022-01-01T00:00", createdRecord.getUpdatedAt().toString() );
+        Assert.assertEquals("uid123", createdRecord.getUid());
         Assert.assertTrue(createdRecord.getOptional());
         Assert.assertEquals("courseID", createdRecord.getCourseRecord().getCourseId());
         Assert.assertEquals("testTitle", createdRecord.getCourseRecord().getCourseTitle());
