@@ -18,7 +18,6 @@ import java.time.LocalDate;
 @Data
 public class PostModuleRecordInput {
 
-    @NotBlank(message = "uid is required")
     private String uid;
 
     @NotBlank(message = "userId is required")
