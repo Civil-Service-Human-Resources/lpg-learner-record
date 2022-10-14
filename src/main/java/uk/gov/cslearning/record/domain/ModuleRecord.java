@@ -23,6 +23,9 @@ public class ModuleRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50, unique = true)
+    private String uid;
+
     @Column(nullable = false)
     private String moduleId;
 
@@ -97,6 +100,14 @@ public class ModuleRecord {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public void setModuleId(String moduleId) {

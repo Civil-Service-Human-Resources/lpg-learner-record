@@ -1,2 +1,1 @@
-ALTER TABLE module_record
-    ADD uid CHAR(36);
+ALTER TABLE `module_record` ADD COLUMN uid VARCHAR(50) AFTER id;

@@ -61,6 +61,7 @@ public class ModuleRecordService {
 
     public ModuleRecord createModuleRecord(PostModuleRecordInput newModuleInput) {
 
+        String uid = newModuleInput.getUid();
         String userId = newModuleInput.getUserId();
         String courseId = newModuleInput.getCourseId();
         String moduleId = newModuleInput.getModuleId();
