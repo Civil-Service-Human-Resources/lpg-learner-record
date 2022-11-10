@@ -58,6 +58,6 @@ public class DefaultLearnerService implements LearnerService {
 
         bookingService.deleteAllByAge(instant);
         notificationService.deleteAllByAge(localDateTime);
-        userRecordService.deleteOldRecords(dateTime, localDateTime);
+        userRecordService.deleteRecordsLastUpdatedBefore(localDateTime);
     }
 }

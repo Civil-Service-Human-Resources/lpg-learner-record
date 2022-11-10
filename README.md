@@ -49,7 +49,6 @@ For a complete list of test dependencies check the `build.gradle` file. The main
 #### Data Stores
 
 - MySQL <version> for CRUD actions on learner record, booking and event data
-- MongoDB <version> (CosmosDB) for accessing Learning Locker-created experience statements
 
 #### Data migrations
 
@@ -78,7 +77,6 @@ Deployment is controlled via the Terraform scripts in the main PaaS repository, 
 Significant configuration properties are highlighted here. For the full configuration file see `src/main/resources/application.yml`
 
 - `spring.datasource` connection settings for learner record's own MySQL database
-- `spring.data.mongodb` the connection settings for accessing the Learning Locker Mongo database (currently Azure CosmosDB in Mongo compatibility mode in production)
 - `notifications` notification service and path
 - `xapi` connection settings for Learning Locker xAPI
 - `oauth` connection settings for the identity-service used to create bearer tokens

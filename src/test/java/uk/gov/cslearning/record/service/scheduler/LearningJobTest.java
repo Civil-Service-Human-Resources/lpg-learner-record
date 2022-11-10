@@ -24,7 +24,6 @@ import uk.gov.cslearning.record.domain.Notification;
 import uk.gov.cslearning.record.domain.NotificationType;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
-import uk.gov.cslearning.record.service.CourseRefreshService;
 import uk.gov.cslearning.record.service.NotifyService;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.identity.Identity;
@@ -74,9 +73,6 @@ public class LearningJobTest {
 
     @Mock
     private CourseRecordRepository courseRecordRepository;
-
-    @Mock
-    private CourseRefreshService courseRefreshService;
 
     private List<Course> incompleteCoursesDay;
     private List<Course> incompleteCoursesWeek;
