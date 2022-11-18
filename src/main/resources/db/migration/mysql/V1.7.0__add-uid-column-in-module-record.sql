@@ -1,0 +1,1 @@
+ALTER TABLE `module_record` ADD COLUMN uid VARCHAR(50) AFTER id;
