@@ -10,12 +10,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.cslearning.record.SpringTestConfiguration;
 import uk.gov.cslearning.record.dto.*;
-import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.EventService;
 
@@ -37,7 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({BookingController.class, ErrorDtoFactory.class})
+@WebMvcTest({BookingController.class})
+@Import(SpringTestConfiguration.class)
 @WithMockUser(username = "user")
 public class BookingControllerTest {
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
@@ -223,7 +225,7 @@ public class BookingControllerTest {
         EventDto eventDto = new EventDto();
         eventDto.setStatus(EventStatus.ACTIVE);
 
-        when(eventService.findByUid("event-id")).thenReturn(Optional.of(eventDto));
+        when(eventService.findByUid("event-id")).thenReturn(eventDto);
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())
@@ -378,7 +380,7 @@ public class BookingControllerTest {
         EventDto eventDto = new EventDto();
         eventDto.setStatus(EventStatus.CANCELLED);
 
-        when(eventService.findByUid("event-id")).thenReturn(Optional.of(eventDto));
+        when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
 
         mockMvc.perform(
                 post("/event/blah/booking/").with(csrf())

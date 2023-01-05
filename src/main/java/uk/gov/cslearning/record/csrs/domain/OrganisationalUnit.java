@@ -1,9 +1,9 @@
 package uk.gov.cslearning.record.csrs.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

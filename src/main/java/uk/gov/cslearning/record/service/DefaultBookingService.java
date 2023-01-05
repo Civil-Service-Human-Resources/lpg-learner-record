@@ -15,17 +15,12 @@ import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.booking.BookingNotificationService;
-import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class DefaultBookingService implements BookingService {
@@ -34,17 +29,15 @@ public class DefaultBookingService implements BookingService {
     private final BookingDtoFactory bookingDtoFactory;
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
-    private final XApiService xApiService;
     private final NotificationService notificationService;
     private final MessageService messageService;
     private final BookingNotificationService bookingNotificationService;
 
-    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, XApiService xApiService, NotificationService notificationService, MessageService messageService, BookingNotificationService bookingNotificationService) {
+    public DefaultBookingService(BookingFactory bookingFactory, BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository, EventRepository eventRepository, NotificationService notificationService, MessageService messageService, BookingNotificationService bookingNotificationService) {
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
-        this.xApiService = xApiService;
         this.notificationService = notificationService;
         this.messageService = messageService;
         this.bookingNotificationService = bookingNotificationService;
@@ -76,11 +69,8 @@ public class DefaultBookingService implements BookingService {
         Optional<Event> event = eventRepository.findByUid(eventUid);
 
         if (event.isPresent()) {
-            Iterable<BookingDto> bookings = event.get().getBookings().stream().map(
-                    bookingDtoFactory::create
-            ).collect(Collectors.toList());
-
-            return bookings;
+            List<Booking> bookings = event.get().getBookings();
+            return bookingDtoFactory.createBulk(bookings);
         }
         return new ArrayList<>();
     }
@@ -107,12 +97,6 @@ public class DefaultBookingService implements BookingService {
      */
     @Override
     public BookingDto register(BookingDto bookingDto) {
-        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
-            xApiService.approve(bookingDto);
-        } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            xApiService.register(bookingDto);
-        }
-
         BookingDto savedBookingDto = save(bookingDto);
 
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
@@ -156,10 +140,6 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto unregister(BookingDto bookingDto) {
-        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)
-                || bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            xApiService.unregister(bookingDto);
-        }
 
         bookingDto.setStatus(BookingStatus.CANCELLED);
         bookingDto.setCancellationTime(Instant.now());
@@ -181,35 +161,17 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAll() {
-        return bookingRepository.findAll().stream()
-                .map(bookingDtoFactory::create)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BookingDto> findAllForPeriod(LocalDate from, LocalDate to) {
+    public Iterable<BookingDto> findAllForPeriod(LocalDate from, LocalDate to) {
         Instant periodStart = ZonedDateTime.of(from.atStartOfDay(), ZoneOffset.ofHours(0)).toInstant();
         Instant periodEnd = ZonedDateTime.of(to.plusDays(1).atStartOfDay(), ZoneOffset.ofHours(0)).toInstant();
-
-        return bookingRepository.findAllByBookingTimeBetween(periodStart, periodEnd).stream()
-                .map(bookingDtoFactory::create)
-                .collect(Collectors.toList());
+        List<Booking> bookings = bookingRepository.findAllByBookingTimeBetween(periodStart, periodEnd);
+        return bookingDtoFactory.createBulk(bookings);
     }
 
     private Optional<Booking> findActiveBookingByLearnerUidAndEventUid(String learnerUid, String eventUid) {
         List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
         return bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status);
-    }
-
-    @Override
-    public Iterable<BookingDto> listByLearnerUid(String learnerUid) {
-        return bookingRepository
-                .findAllByLearnerUid(learnerUid)
-                .stream()
-                .map(bookingDtoFactory::create)
-                .collect(Collectors.toList());
     }
 
     private BookingDto save(BookingDto bookingDto) {

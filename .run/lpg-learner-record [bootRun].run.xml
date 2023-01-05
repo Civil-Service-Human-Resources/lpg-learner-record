@@ -1,19 +1,27 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="lpg-learner-record [bootRun]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
+  <configuration default="false" name="lpg-learner-record" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
     <ExternalSystemSettings>
+      <option name="env">
+        <map>
+          <entry key="DATASOURCE" value="jdbc:mysql://localhost:3306/learner_record?user=root&amp;password=my-secret-pw&amp;useSSL=FALSE" />
+          <entry key="LEARNING_CATALOGUE_SERVICE_URL" value="http://localhost:9001" />
+          <entry key="OAUTH_SERVICE_URL" value="http://localhost:8080" />
+          <entry key="REGISTRY_SERVICE_URL" value="http://localhost:9002" />
+          <entry key="SPRING_PROFILES_ACTIVE" value="default" />
+          <entry key="jwt_key" value="key" />
+        </map>
+      </option>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="--stacktrace" />
+      <option name="scriptParameters" value="bootRun --stacktrace" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
-        <list>
-          <option value="bootRun" />
-        </list>
+        <list />
       </option>
-      <option name="vmOptions" value="" />
+      <option name="vmOptions" />
     </ExternalSystemSettings>
     <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>

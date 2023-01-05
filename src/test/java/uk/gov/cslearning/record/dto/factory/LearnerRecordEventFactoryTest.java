@@ -41,6 +41,7 @@ public class LearnerRecordEventFactoryTest {
         String courseId = "course-id";
         String userId = "user-id";
         String email = "user@example.org";
+        String uid = "uid";
         String moduleId = "module-id";
         long moduleRecordId = 837239;
         String courseName = "course-name";
@@ -61,6 +62,7 @@ public class LearnerRecordEventFactoryTest {
 
         ModuleRecord moduleRecord = new ModuleRecord(moduleId);
         moduleRecord.setId(moduleRecordId);
+        moduleRecord.setUid(uid);
         moduleRecord.setEventId(eventId);
         moduleRecord.setModuleTitle(moduleName);
         moduleRecord.setCost(cost);

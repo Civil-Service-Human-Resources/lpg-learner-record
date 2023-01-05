@@ -19,7 +19,6 @@ import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.service.booking.BookingNotificationService;
-import uk.gov.cslearning.record.service.xapi.XApiService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -43,9 +42,6 @@ public class DefaultBookingServiceTest {
 
     @Mock
     private BookingRepository bookingRepository;
-
-    @Mock
-    private XApiService xApiService;
 
     @Mock
     private EventRepository eventRepository;
@@ -138,7 +134,7 @@ public class DefaultBookingServiceTest {
         event.setBookings(bookings);
 
         when(eventRepository.findByUid(eventId)).thenReturn(Optional.of(event));
-        when(bookingDtoFactory.create(any())).thenReturn(bookingDto1).thenReturn(bookingDto2);
+        when(bookingDtoFactory.createBulk(any())).thenReturn(bookingDtos);
 
         assertEquals(bookingDtos, bookingService.listByEventUid(eventId));
     }
@@ -186,7 +182,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
 
-        verify(xApiService).approve(bookingDto);
         verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
 
     }
@@ -219,7 +214,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
 
-        verify(xApiService).approve(bookingDto);
         verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
     }
 
@@ -252,7 +246,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
 
@@ -271,7 +264,6 @@ public class DefaultBookingServiceTest {
 
         assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
 
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking);
     }
 
@@ -301,7 +293,6 @@ public class DefaultBookingServiceTest {
 
         verify(messageService).createCancelEventMessage(booking1, "cancellation reason");
         verify(notificationService).send(messageDto);
-        verify(xApiService).unregister(bookingDto);
         verify(bookingRepository).saveBooking(booking2);
     }
 
@@ -315,25 +306,6 @@ public class DefaultBookingServiceTest {
         when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status)).thenReturn(Optional.of(booking));
 
         assertEquals(Optional.of(booking), bookingService.findActiveBookingByEmailAndEvent(learnerEmail, eventUid));
-    }
-
-    @Test
-    public void shouldListAllBookings() {
-        Booking booking1 = new Booking();
-        Booking booking2 = new Booking();
-        Booking booking3 = new Booking();
-
-        BookingDto bookingDto1 = new BookingDto();
-        BookingDto bookingDto2 = new BookingDto();
-        BookingDto bookingDto3 = new BookingDto();
-
-        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto1);
-        when(bookingDtoFactory.create(booking2)).thenReturn(bookingDto2);
-        when(bookingDtoFactory.create(booking3)).thenReturn(bookingDto3);
-
-        when(bookingRepository.findAll()).thenReturn(Arrays.asList(booking1, booking2, booking3));
-
-        assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAll());
     }
 
     @Test
@@ -352,14 +324,15 @@ public class DefaultBookingServiceTest {
         BookingDto bookingDto2 = new BookingDto();
         BookingDto bookingDto3 = new BookingDto();
 
-        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto1);
-        when(bookingDtoFactory.create(booking2)).thenReturn(bookingDto2);
-        when(bookingDtoFactory.create(booking3)).thenReturn(bookingDto3);
+        List<Booking> bookings = Arrays.asList(booking1, booking2, booking3);
+        List<BookingDto> bookingDtos = Arrays.asList(bookingDto1, bookingDto2, bookingDto3);
+
+        when(bookingDtoFactory.createBulk(bookings)).thenReturn(bookingDtos);
 
         when(bookingRepository.findAllByBookingTimeBetween(eq(start), eq(end)))
-                .thenReturn(Arrays.asList(booking1, booking2, booking3));
+                .thenReturn(bookings);
 
-        assertEquals(Arrays.asList(bookingDto1, bookingDto2, bookingDto3), bookingService.findAllForPeriod(from, to));
+        assertEquals(bookingDtos, bookingService.findAllForPeriod(from, to));
     }
 
     @Test

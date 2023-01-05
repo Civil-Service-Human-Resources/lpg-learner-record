@@ -2,7 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.0.0.RELEASE'
     id "org.sonarqube" version "2.6.2"
     id 'idea'
-
+    id "io.franzbecker.gradle-lombok" version "5.0.0"
+    id 'net.ltgt.apt' version '0.21'
 }
 
 repositories {
@@ -26,6 +27,7 @@ bootJar {
     archiveName = 'learner-record.jar'
     mainClassName = 'uk.gov.cslearning.record.Application'
 }
+
 
 configurations {
     ajc
@@ -77,6 +79,8 @@ dependencies {
     compile 'javax.activation:activation:1.1'
     compile 'org.aspectj:aspectjrt:1.9.1'
     compile 'org.aspectj:aspectjweaver:1.9.1'
+    compile 'org.projectlombok:lombok:1.18.4'
+    annotationProcessor 'org.projectlombok:lombok:1.18.4'
 
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jersey'
@@ -86,7 +90,12 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-configuration-processor'
     compile 'org.springframework.data:spring-data-jpa:2.0.5.RELEASE'
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.3.RELEASE'
+
     compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.1.1.RELEASE'
+
+    compile group: "com.github.java-json-tools", name: "json-patch", version: "1.13"
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-web-auto', version: '2.5.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.5.0'
@@ -104,7 +113,6 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.google.guava:guava:23.5-jre'
-    compile 'gov.adlnet:jxapi:2.0.1'
     compile 'org.apache.commons:commons-lang3:3.7'
     compile 'org.codehaus.janino:janino:3.0.8'
     compile 'org.reflections:reflections:0.9.11'
@@ -113,16 +121,10 @@ dependencies {
 
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
 
-    compile 'org.projectlombok:lombok:1.18.4'
-
-    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'org.apache.commons:commons-collections4:4.4'
     compile 'javax.interceptor:javax.interceptor-api:3.1'
 
-    compile("org.springframework.boot:spring-boot-starter-data-mongodb")
-
     compile group: 'org.hashids', name: 'hashids', version: '1.0.3'
-
 
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
@@ -137,5 +139,5 @@ dependencies {
 compileJava.dependsOn(processResources)
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
+    gradleVersion = '4.6'
 }

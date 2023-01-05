@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.validation.validators;
 
 import org.springframework.stereotype.Component;
+import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.service.EventService;
 import uk.gov.cslearning.record.validation.annotations.EventIsActive;
@@ -28,9 +29,11 @@ public class EventIsActiveValidator implements ConstraintValidator<EventIsActive
        }
 
        String eventUid = Paths.get(eventUri.getPath()).getFileName().toString();
+       EventDto event = eventService.findByUid(eventUid, false);
+       if (event != null) {
+           return event.getStatus().equals(EventStatus.ACTIVE);
+       }
+       return true;
 
-       return eventService.findByUid(eventUid)
-              .map(eventDto -> eventDto.getStatus().equals(EventStatus.ACTIVE))
-              .orElse(true);
    }
 }

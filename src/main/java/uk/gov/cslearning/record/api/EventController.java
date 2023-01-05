@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.service.EventService;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -22,6 +23,13 @@ public class EventController {
         this.eventService = eventService;
     }
 
+    @GetMapping(path = "/events-list")
+    public ResponseEntity<List<EventDto>> getEvents(@RequestParam(value = "uids") List<String> eventUids,
+                                                    @RequestParam(value = "getBookingCount", defaultValue = "false") boolean getBookingCount) {
+        List<EventDto> events = eventService.getEvents(eventUids, getBookingCount);
+        return new ResponseEntity<>(events, OK);
+    }
+
     @PatchMapping(path = "/event/{eventUid}")
     public ResponseEntity cancelEvent(@PathVariable String eventUid, @RequestBody EventStatusDto eventStatus) {
         return eventService.updateStatus(eventUid, eventStatus).
@@ -30,10 +38,14 @@ public class EventController {
     }
 
     @GetMapping(path = "/event/{eventUid}")
-    public ResponseEntity<EventDto> find(@PathVariable String eventUid) {
-        return eventService.findByUid(eventUid)
-                .map(b -> new ResponseEntity<>(b, OK))
-                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+    public ResponseEntity<EventDto> find(@PathVariable String eventUid,
+                                         @RequestParam(value = "getBookingCount", defaultValue = "false") boolean getBookingCount) {
+        EventDto event = eventService.findByUid(eventUid, getBookingCount);
+        if (event == null) {
+            return new ResponseEntity<>(NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(event, OK);
+        }
     }
 
     @PostMapping(path = "/event")

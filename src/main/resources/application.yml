@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=my-secret-pw&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
@@ -18,14 +18,6 @@ spring:
     cache-names: courseId
     caffeine:
       spec: maximumSize=500, expireAfterAccess=1h
-  data:
-    mongodb:
-      uri: ${COSMOS_CONNECTION_STRING:mongodb://localhost:27017}
-      database: ${DATABASE:learninglocker}
-      socketTimeoutInMilliseconds: ${SOCKET_TIMEOUT_IN_MILLISECONDS:60000}
-      connectionTimeoutInMilliseconds: ${CONNECTION_TIMEOUT_IN_MILLISECONDS:30000}
-      maxConnectionIdleTimeInMilliseconds: ${MAX_CONNECTION_IDLE_TIME_IN_MILLISECONDS:30000}
-
 server:
   port: 9000
 
@@ -39,9 +31,6 @@ logging:
       gov:
         cslearning:
           record:
-            service:
-              xapi:
-                StatementStream: ${XAPI_STATEMENT_STREAM_LOG_LEVEL:ERROR}
             csrs:
               service:
                 RegistryService: ${REGISTYR_SERVICE_LOG_LEVEL:ERROR}
@@ -49,17 +38,10 @@ logging:
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
   email: ${notifications.service}/notifications/email/
-  lr-refresh-job-cron: ${LR_REFRESH_JOB_CRON:0 0 0 * * *}
   completed-job-cron: ${COMPLETED_JOB_CRON:0 0 1 * * *}
   incomplete-job-cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
-  lr-refresh-job-enabled: ${LR_REFRESH_JOB_ENABLED:true}
   completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
   incompleted-job-enabled: ${INCOMPLETED_JOB_ENABLED:true}
-
-xapi:
-  username: ${XAPI_USERNAME:66f2b4fc001e3da992d23b57d8a7457655bea078}
-  password: ${XAPI_PASSWORD:1c0e1b6827606d7efed71e204939d048f94f842b}
-  url: ${XAPI_URL:http://localhost:8083/data/xAPI}
 
 oauth:
   serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
@@ -75,6 +57,7 @@ oauth:
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
+  UidMapUrl: "${oauth.serviceUrl}/api/identities/map-for-uids"
 
 registry:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
@@ -118,7 +101,7 @@ retention:
 spring:
   profiles: production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=my-secret-pw&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
