@@ -25,27 +25,27 @@ public class ModuleRecordController {
     @PatchMapping(path = "/{moduleRecordId}", consumes = "application/json-patch+json")
     public ResponseEntity<ModuleRecord> updateModuleRecord(@PathVariable("moduleRecordId") Long moduleRecordId,
                                                            @RequestBody JsonPatch patchData) {
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.received moduleRecordId: " + moduleRecordId);
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.received patchData: " + patchData);
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.received moduleRecordId: {} ", moduleRecordId);
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.received patchData: {} ", patchData);
         ModuleRecord updatedRecord = moduleRecordService.updateModuleRecord(moduleRecordId, patchData);
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord: " + updatedRecord);
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getId: " + updatedRecord.getId());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getModuleId: " + updatedRecord.getModuleId());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getCreatedAt: " + updatedRecord.getCreatedAt());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getUpdatedA: " + updatedRecord.getUpdatedAt());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getCompletionDate: " + updatedRecord.getCompletionDate());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getState: " + updatedRecord.getState());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getResult: " + updatedRecord.getResult());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getScore: " + updatedRecord.getScore());
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getModuleTitle: " + updatedRecord.getModuleTitle());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord: {} ", updatedRecord);
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getId: {} ", updatedRecord.getId());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getModuleId: {} ", updatedRecord.getModuleId());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getCreatedAt: {} ", updatedRecord.getCreatedAt());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getUpdatedA: {} ", updatedRecord.getUpdatedAt());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getCompletionDate: {} ", updatedRecord.getCompletionDate());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getState: {} ", updatedRecord.getState());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getResult: {} ", updatedRecord.getResult());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getScore: {} ", updatedRecord.getScore());
+        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord.getModuleTitle: {} ", updatedRecord.getModuleTitle());
         return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ModuleRecord> createModuleRecord(@Valid @RequestBody PostModuleRecordInput newModule) {
-        log.debug("LC-1627: ModuleRecordController.createModuleRecord.received newModule: " + newModule);
+        log.debug("LC-1627: ModuleRecordController.createModuleRecord.received newModule: {} ", newModule);
         ModuleRecord createdModule = moduleRecordService.createModuleRecord(newModule);
-        log.debug("LC-1627: ModuleRecordController.createModuleRecord.returning createdModule: " + createdModule);
+        log.debug("LC-1627: ModuleRecordController.createModuleRecord.returning createdModule: {} ", createdModule);
         return new ResponseEntity<>(createdModule, HttpStatus.CREATED);
     }
 }
