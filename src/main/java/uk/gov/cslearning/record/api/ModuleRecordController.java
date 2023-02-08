@@ -25,17 +25,17 @@ public class ModuleRecordController {
     @PatchMapping(path = "/{moduleRecordId}", consumes = "application/json-patch+json")
     public ResponseEntity<ModuleRecord> updateModuleRecord(@PathVariable("moduleRecordId") Long moduleRecordId,
                                                            @RequestBody JsonPatch patchData) {
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.received moduleRecordId: {} ", moduleRecordId);
+        log.info("LC-1627: ModuleRecordController.updateModuleRecord.received moduleRecordId: {} ", moduleRecordId);
         ModuleRecord updatedRecord = moduleRecordService.updateModuleRecord(moduleRecordId, patchData);
-        log.debug("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord: {} ", updatedRecord);
+        log.info("LC-1627: ModuleRecordController.updateModuleRecord.returning updatedRecord: {} ", updatedRecord);
         return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ModuleRecord> createModuleRecord(@Valid @RequestBody PostModuleRecordInput newModule) {
-        log.debug("LC-1627: ModuleRecordController.createModuleRecord.received newModule: {} ", newModule);
+        log.info("LC-1627: ModuleRecordController.createModuleRecord.received newModule: {} ", newModule);
         ModuleRecord createdModule = moduleRecordService.createModuleRecord(newModule);
-        log.debug("LC-1627: ModuleRecordController.createModuleRecord.returning createdModule: {} ", createdModule);
+        log.info("LC-1627: ModuleRecordController.createModuleRecord.returning createdModule: {} ", createdModule);
         return new ResponseEntity<>(createdModule, HttpStatus.CREATED);
     }
 }
