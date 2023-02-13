@@ -10,6 +10,10 @@ trigger:
     include:
       - '*'
 
+variables:
+  - name: acr_repo
+    value: lpg-learner-record
+
 pool:
   vmImage: ubuntu-latest
 
@@ -27,11 +31,11 @@ steps:
 
   - task: Docker@2
     inputs:
-      containerRegistry: 'lpgregistry ACR'
       ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags') }}:
-        repository: 'lpg-learner-record/prod'
+        containerRegistry: 'csl production ACR'
       ${{ else }}:
-        repository: 'lpg-learner-record/test'
+        containerRegistry: 'csl staging ACR'
+      repository: '${{ variables.acr_repo }}'
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
       tags: '$(Build.SourceBranchName)'
