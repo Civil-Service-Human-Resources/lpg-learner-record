@@ -10,6 +10,15 @@ trigger:
     include:
       - '*'
 
+variables:
+  - name: acr_repo_suffix
+    ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags') }}:
+      value: 'prod'
+    ${{ else }}:
+      value: 'test'
+
+name: '$(SourceBranchName)-$(Rev:r)'
+
 pool:
   vmImage: ubuntu-latest
 
@@ -28,10 +37,7 @@ steps:
   - task: Docker@2
     inputs:
       containerRegistry: 'lpgregistry ACR'
-      ${{ if startsWith(variables['Build.SourceBranch'], 'refs/tags') }}:
-        repository: 'lpg-learner-record/prod'
-      ${{ else }}:
-        repository: 'lpg-learner-record/test'
+      repository: 'lpg-learner-record/${{ variables.acr_repo_suffix }}'
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
       tags: '$(Build.SourceBranchName)'
