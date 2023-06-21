@@ -46,4 +46,6 @@ public class PatchModuleRecordInput {
 
     private String eventId;
 
+    private String uid;
+
 }

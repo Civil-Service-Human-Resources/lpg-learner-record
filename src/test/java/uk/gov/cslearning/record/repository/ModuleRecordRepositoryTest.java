@@ -154,4 +154,11 @@ public class ModuleRecordRepositoryTest {
 
         assertEquals(courseRecord, moduleRecordRepository.findById(id).get().getCourseRecord());
     }
+
+    @Test
+    public void shouldBeAbleToSetAndGetModuleRecordUid(){
+        ModuleRecord moduleRecord = new ModuleRecord("moduleRecord1");
+        moduleRecord.setUid("uid123");
+        assertEquals(moduleRecord.getUid(), "uid123");
+    }
 }
