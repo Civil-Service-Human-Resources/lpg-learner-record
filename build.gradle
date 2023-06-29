@@ -104,7 +104,7 @@ dependencies {
     compile 'com.h2database:h2:1.4.199'
     compile 'org.hibernate:hibernate-core:5.2.16.Final'
     compile 'org.hibernate:hibernate-entitymanager:5.2.16.Final'
-    compile 'mysql:mysql-connector-java:8.0.8-dmr'
+    compile 'com.mysql:mysql-connector-j:8.0.33'
 
     compile group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '4.12.0'
     compile group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '4.12.0'
