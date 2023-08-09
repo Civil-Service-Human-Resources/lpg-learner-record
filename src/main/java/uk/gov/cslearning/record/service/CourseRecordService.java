@@ -2,20 +2,20 @@ package uk.gov.cslearning.record.service;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import uk.gov.cslearning.record.api.input.PATCH.PatchCourseRecordInput;
 import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
 import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.CourseRecordIdentity;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
-import uk.gov.cslearning.record.exception.ResourceExists.ModuleRecordAlreadyExistsException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.repository.ModuleRecordRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +30,17 @@ public class CourseRecordService {
         PatchCourseRecordInput updateParams = courseRecordMapper.asInput(courseRecord);
 
         PatchCourseRecordInput patchedInput =  patchHelper.patch(patch, updateParams, PatchCourseRecordInput.class);
+        patchedInput.setLastUpdated(LocalDateTime.now());
         courseRecordMapper.update(courseRecord, patchedInput);
         return courseRecordRepository.save(courseRecord);
     }
 
-    public List<CourseRecord> fetchCourseRecords(String userId, String courseId) {
-        return courseRecordRepository.findByUserIdAndCourseId(userId, courseId);
+    public List<CourseRecord> fetchCourseRecords(String userId, List<String> courseIds) {
+        if (CollectionUtils.isEmpty(courseIds)) {
+            return courseRecordRepository.findByUserId(userId);
+        } else {
+            return courseRecordRepository.findByUserIdAndCourseIdIn(userId, courseIds);
+        }
     }
 
     public CourseRecord createCourseRecord(PostCourseRecordInput inputCourse) {
