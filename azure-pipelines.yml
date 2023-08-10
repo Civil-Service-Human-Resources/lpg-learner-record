@@ -38,6 +38,10 @@ steps:
       testResultsFormat: 'JUnit'
       testResultsFiles: '**/TEST-*.xml'
     displayName: 'Publish test results'
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'JaCoCo'
+      summaryFileLocation: 'JacocoReport'
   - task: Docker@2
     inputs:
       containerRegistry: 'lpgregistry ACR'
