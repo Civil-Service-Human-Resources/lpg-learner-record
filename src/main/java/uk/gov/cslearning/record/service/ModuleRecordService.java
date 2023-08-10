@@ -18,6 +18,7 @@ import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,6 +31,7 @@ public class ModuleRecordService {
     private final ModuleRecordMapper moduleRecordMapper;
     private final PatchHelper patchHelper;
     private final CourseRecordRepository courseRecordRepository;
+    private final Clock clock;
 
     @Transactional(readOnly = true)
     public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
@@ -53,6 +55,7 @@ public class ModuleRecordService {
 
         PatchModuleRecordInput patchedInput = patchHelper.patch(patch, existingRecordAsInput, PatchModuleRecordInput.class);
         moduleRecordMapper.update(moduleRecord, patchedInput);
+        moduleRecord.setUpdatedAt(LocalDateTime.now(clock));
         CourseRecord cr = moduleRecord.getCourseRecord();
         cr.setLastUpdated(moduleRecord.getUpdatedAt());
         courseRecordRepository.save(cr);
@@ -61,7 +64,6 @@ public class ModuleRecordService {
 
     public ModuleRecord createModuleRecord(PostModuleRecordInput newModuleInput) {
 
-        String uid = newModuleInput.getUid();
         String userId = newModuleInput.getUserId();
         String courseId = newModuleInput.getCourseId();
         String moduleId = newModuleInput.getModuleId();

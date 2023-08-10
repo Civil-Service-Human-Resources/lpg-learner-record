@@ -70,6 +70,10 @@ compileTestJava {
     }
 }
 
+test {
+    systemProperty 'spring.profiles.active', 'test'
+}
+
 dependencies {
 
     ajc 'org.aspectj:aspectjtools:1.9.1'

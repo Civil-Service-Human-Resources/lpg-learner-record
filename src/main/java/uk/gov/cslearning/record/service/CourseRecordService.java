@@ -14,6 +14,7 @@ import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,13 +25,14 @@ public class CourseRecordService {
     private final CourseRecordRepository courseRecordRepository;
     private final CourseRecordMapper courseRecordMapper;
     private final PatchHelper patchHelper;
+    private final Clock clock;
 
     public CourseRecord updateCourseRecord(String userId, String courseId, JsonPatch patch) {
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
         PatchCourseRecordInput updateParams = courseRecordMapper.asInput(courseRecord);
 
         PatchCourseRecordInput patchedInput =  patchHelper.patch(patch, updateParams, PatchCourseRecordInput.class);
-        patchedInput.setLastUpdated(LocalDateTime.now());
+        patchedInput.setLastUpdated(LocalDateTime.now(clock));
         courseRecordMapper.update(courseRecord, patchedInput);
         return courseRecordRepository.save(courseRecord);
     }

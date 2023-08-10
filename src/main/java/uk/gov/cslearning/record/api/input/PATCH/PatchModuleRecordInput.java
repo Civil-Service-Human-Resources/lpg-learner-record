@@ -30,9 +30,6 @@ public class PatchModuleRecordInput {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime completionDate;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime updatedAt;
-
     private String score;
 
     private boolean rated;
