@@ -22,12 +22,7 @@ public class PatchCourseRecordInput {
     @Enumerated(EnumType.STRING)
     private String state;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime lastUpdated;
-
     @ValidEnum(enumClass = Preference.class)
     @Enumerated(EnumType.STRING)
     private String preference;
-
-    private boolean isRequired;
 }
