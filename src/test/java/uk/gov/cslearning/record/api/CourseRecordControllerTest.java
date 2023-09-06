@@ -99,10 +99,10 @@ public class CourseRecordControllerTest {
         mockMvc.perform(get("/course_records")
                         .param("courseIds", "testCourse1,testCourse3")
                         .param("userId", "user2"))
-                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse3"))
+                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
                 .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
-                .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse1"))
+                .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse3"))
                 .andExpect(jsonPath("$.courseRecords[1].userId").value("user2"))
                 .andExpect(jsonPath("$.courseRecords[1].state").value("IN_PROGRESS"));
     }
