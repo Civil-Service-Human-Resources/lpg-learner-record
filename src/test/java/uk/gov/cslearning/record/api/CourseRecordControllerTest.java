@@ -97,14 +97,7 @@ public class CourseRecordControllerTest {
     @Test
     public void testGetCourseRecords() throws Exception {
         mockMvc.perform(get("/course_records")
-                .param("courseId", "testCourse1")
-                .param("userId", "user1"))
-                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
-                .andExpect(jsonPath("$.courseRecords[0].userId").value("user1"))
-                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"));
-
-        mockMvc.perform(get("/course_records")
-                        .param("courseId", "testCourse1,testCourse3")
+                        .param("courseIds", "testCourse1,testCourse3")
                         .param("userId", "user2"))
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse3"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
@@ -112,6 +105,17 @@ public class CourseRecordControllerTest {
                 .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[1].userId").value("user2"))
                 .andExpect(jsonPath("$.courseRecords[1].state").value("IN_PROGRESS"));
+    }
+
+    @Test
+    public void testGetCourseRecord() throws Exception {
+        mockMvc.perform(get("/course_records")
+                        .param("courseIds", "testCourse1")
+                        .param("userId", "user1"))
+                .andExpect(jsonPath("$.courseRecords.length()").value(1))
+                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
+                .andExpect(jsonPath("$.courseRecords[0].userId").value("user1"))
+                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"));
     }
 
     @Test
