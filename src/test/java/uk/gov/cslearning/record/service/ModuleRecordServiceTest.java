@@ -95,14 +95,13 @@ public class ModuleRecordServiceTest {
 
         service.updateModuleRecord(1000L, patch);
 
-        verify(moduleRecordRepository).save(moduleRecordArgumentCaptor.capture());
+        verify(moduleRecordRepository).saveAndFlush(moduleRecordArgumentCaptor.capture());
 
         ModuleRecord updatedRecord = moduleRecordArgumentCaptor.getValue();
 
         Assert.assertEquals(State.REGISTERED, updatedRecord.getState());
         Assert.assertEquals(BookingStatus.REQUESTED, updatedRecord.getBookingStatus());
         Assert.assertEquals("eventID", updatedRecord.getEventId());
-        assertTime(updatedRecord.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
         assertDate(updatedRecord.getEventDate(), 2, 2, 2023);
     }
 
@@ -121,12 +120,11 @@ public class ModuleRecordServiceTest {
 
         service.updateModuleRecord(1000L, patch);
 
-        verify(moduleRecordRepository).save(moduleRecordArgumentCaptor.capture());
+        verify(moduleRecordRepository).saveAndFlush(moduleRecordArgumentCaptor.capture());
 
         ModuleRecord updatedRecord = moduleRecordArgumentCaptor.getValue();
 
         Assert.assertEquals(State.COMPLETED, updatedRecord.getState());
-        assertTime(updatedRecord.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
         assertTime(updatedRecord.getCompletionDate(), 2, 2, 2023, 10, 0, 0);
     }
 

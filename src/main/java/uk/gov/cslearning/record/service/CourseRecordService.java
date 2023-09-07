@@ -10,13 +10,9 @@ import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
 import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.CourseRecordIdentity;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
-import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,15 +23,13 @@ public class CourseRecordService {
     private final CourseRecordRepository courseRecordRepository;
     private final CourseRecordMapper courseRecordMapper;
     private final PatchHelper patchHelper;
-    private final Clock clock;
 
     public CourseRecord updateCourseRecord(String userId, String courseId, JsonPatch patch) {
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
         PatchCourseRecordInput updateParams = courseRecordMapper.asInput(courseRecord);
 
-        PatchCourseRecordInput patchedInput =  patchHelper.patch(patch, updateParams, PatchCourseRecordInput.class);
+        PatchCourseRecordInput patchedInput = patchHelper.patch(patch, updateParams, PatchCourseRecordInput.class);
         courseRecordMapper.update(courseRecord, patchedInput);
-        courseRecord.setLastUpdated(LocalDateTime.now(clock));
         return courseRecordRepository.save(courseRecord);
     }
 
@@ -50,12 +44,7 @@ public class CourseRecordService {
     }
 
     public CourseRecord createCourseRecord(PostCourseRecordInput inputCourse) {
-        String userId = inputCourse.getUserId();
-        String courseId = inputCourse.getCourseId();
-        courseRecordRepository.getCourseRecord(userId, courseId).ifPresent(cr -> {throw new CourseRecordAlreadyExistsException(courseId, userId);});
-
         CourseRecord newCourseRecord = courseRecordMapper.postInputAsCourseRecord(inputCourse);
-
         return courseRecordRepository.save(newCourseRecord);
     }
 

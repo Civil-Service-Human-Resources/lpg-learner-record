@@ -23,14 +23,16 @@ import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.service.CourseRecordService;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.cslearning.record.TestUtils.assertTime;
 
 
 @DataJpaTest
@@ -76,22 +78,22 @@ public class CourseRecordControllerTest {
                         .with(csrf())
                         .contentType("application/json")
                         .content(jsonInput))
-                        .andExpect(status().isCreated());
+                .andExpect(status().isCreated());
 
         CourseRecord result = courseRecordRepository.findByUserId("createCourseUserID").get(0);
-        assert(result.isRequired());
-        assert(result.getCourseTitle()).equals("Test title");
-        assert(result.getCourseId()).equals("createCourseID");
-        assertTime(result.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+        assert (result.isRequired());
+        assert (result.getCourseTitle()).equals("Test title");
+        assert (result.getCourseId()).equals("createCourseID");
+        assertNotNull(result.getLastUpdated());
 
         ModuleRecord mrResult = result.getModuleRecord("createModuleID");
-        assert(mrResult.getDuration()).equals(100L);
-        assert(mrResult.getModuleTitle()).equals("Test module title");
-        assert(mrResult.getModuleType()).equals("elearning");
-        assert(mrResult.getState()).equals(State.IN_PROGRESS);
-        assertTime(mrResult.getCreatedAt(), 1, 1, 2023, 10, 0, 0);
-        assertTime(mrResult.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
-        assert(!mrResult.getOptional());
+        assert (mrResult.getDuration()).equals(100L);
+        assert (mrResult.getModuleTitle()).equals("Test module title");
+        assert (mrResult.getModuleType()).equals("elearning");
+        assert (mrResult.getState()).equals(State.IN_PROGRESS);
+        assertNotNull(mrResult.getCreatedAt());
+        assertNotNull(mrResult.getUpdatedAt());
+        assert (!mrResult.getOptional());
     }
 
     @Test
@@ -123,14 +125,14 @@ public class CourseRecordControllerTest {
         CourseRecord sampleRecord = new CourseRecord("courseID", "userID");
         sampleRecord.setState(State.IN_PROGRESS);
         courseRecordRepository.save(sampleRecord);
+        LocalDateTime datetime = sampleRecord.getLastUpdated();
         String inputJson = "[{ \"op\": \"replace\", \"path\": \"/state\", \"value\": \"COMPLETED\" }\n]";
         MockHttpServletRequestBuilder builtPatch = TestUtils.buildCourseRecordPatch("courseID", "userID", inputJson);
         mockMvc.perform(builtPatch)
                 .andExpect(status().isOk());
-
         CourseRecord result = courseRecordRepository.findByUserId("userID").get(0);
-        assert(result.getState()).equals(State.COMPLETED);
-        assertTime(result.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+        assert (result.getState()).equals(State.COMPLETED);
+        assertNotEquals(datetime, result.getLastUpdated());
     }
 
     @Test

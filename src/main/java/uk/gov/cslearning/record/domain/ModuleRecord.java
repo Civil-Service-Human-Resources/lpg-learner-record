@@ -11,6 +11,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -77,6 +78,20 @@ public class ModuleRecord {
             @JoinColumn(name = "user_id", referencedColumnName = "userId")
     })
     private CourseRecord courseRecord;
+
+    @PreUpdate
+    @JsonIgnore
+    public void onUpdate() {
+        updatedAt = LocalDateTime.now(Clock.systemDefaultZone());
+        courseRecord.setLastUpdated(updatedAt);
+    }
+
+    @PrePersist
+    public void onInsert() {
+        createdAt = LocalDateTime.now(Clock.systemDefaultZone());
+        courseRecord.setLastUpdated(updatedAt);
+        updatedAt = createdAt;
+    }
 
     public ModuleRecord() {
     }

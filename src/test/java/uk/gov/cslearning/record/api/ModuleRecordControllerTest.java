@@ -15,24 +15,20 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import uk.gov.cslearning.record.Application;
 import uk.gov.cslearning.record.SpringTestConfiguration;
 import uk.gov.cslearning.record.TestUtils;
-import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.input.POST.PostModuleRecordInput;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
-import uk.gov.cslearning.record.service.CourseRecordService;
 import uk.gov.cslearning.record.service.ModuleRecordService;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.cslearning.record.TestUtils.assertTime;
 
@@ -72,11 +68,13 @@ public class ModuleRecordControllerTest {
 
         String jsonInput = mapper.writeValueAsString(mr);
 
+        LocalDateTime crUpdated = courseRecordRepository.getCourseRecord("user1", "testCourse1").get().getLastUpdated();
+
         mockMvc.perform(post("/module_records")
                         .with(csrf())
                         .contentType("application/json")
                         .content(jsonInput))
-                        .andExpect(status().isCreated());
+                .andExpect(status().isCreated());
 
         ModuleRecord result = moduleRecordRepository.findAll()
                 .stream()
@@ -87,24 +85,30 @@ public class ModuleRecordControllerTest {
         assertEquals("Test module title", result.getModuleTitle());
         assertEquals("elearning", result.getModuleType());
         assertEquals(State.IN_PROGRESS, result.getState());
-        assertTime(result.getCreatedAt(), 1, 1, 2023, 10, 0, 0);
-        assertTime(result.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
+        assertNotNull(result.getCreatedAt());
+        assertNotNull(result.getUpdatedAt());
         assertFalse(result.getOptional());
+
+        CourseRecord resultCr = courseRecordRepository.getCourseRecord("user1", "testCourse1").get();
+        assertNotEquals(crUpdated, resultCr.getLastUpdated());
     }
 
     @Test
     public void testPatchModuleRecord() throws Exception {
         String inputJson = "[{ \"op\": \"replace\", \"path\": \"/state\", \"value\": \"COMPLETED\" }, { \"op\": \"replace\", \"path\": \"/completionDate\", \"value\": \"2023-02-02T10:00:00.000Z\" }\n]";
         MockHttpServletRequestBuilder builtPatch = TestUtils.buildModuleRecordPatch("1001", inputJson);
+        LocalDateTime mrUpdated = moduleRecordRepository.findById(1001L).get().getUpdatedAt();
+        LocalDateTime crUpdated = courseRecordRepository.findByUserIdAndCourseIdIn("user1", Collections.singletonList("testCourse1")).get(0).getLastUpdated();
         mockMvc.perform(builtPatch)
                 .andExpect(status().isOk());
 
         ModuleRecord result = moduleRecordRepository.findById(1001L).get();
-        assert(result.getState()).equals(State.COMPLETED);
-        assertTime(result.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
+        assert (result.getState()).equals(State.COMPLETED);
+        assertNotEquals(mrUpdated, result.getUpdatedAt());
         assertTime(result.getCompletionDate(), 2, 2, 2023, 10, 0, 0);
 
-        CourseRecord courseRecord = courseRecordRepository.findByUserIdAndCourseIdIn("user1",Collections.singletonList("testCourse1")).get(0);
+        CourseRecord courseRecord = courseRecordRepository.findByUserIdAndCourseIdIn("user1", Collections.singletonList("testCourse1")).get(0);
+        assertNotEquals(crUpdated, courseRecord.getLastUpdated());
     }
 
 }
