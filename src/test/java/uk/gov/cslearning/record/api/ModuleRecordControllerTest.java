@@ -35,23 +35,19 @@ import static uk.gov.cslearning.record.TestUtils.assertTime;
 
 @DataJpaTest
 @WithMockUser(username = "user")
-@SpringBootTest(classes = {ModuleRecordController.class, ModuleRecordService.class, SpringTestConfiguration.class, Application.class})
+@SpringBootTest(classes = {ModuleRecordController.class, ModuleRecordService.class, SpringTestConfiguration.class, Application.class, ApiExceptionHandler.class})
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
 @EnableWebMvc
 public class ModuleRecordControllerTest {
 
+    private final static ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ModuleRecordRepository moduleRecordRepository;
-
     @Autowired
     private CourseRecordRepository courseRecordRepository;
-
-
-    private final static ObjectMapper mapper = new ObjectMapper();
 
     @Test
     public void testCreateModuleRecord() throws Exception {
@@ -91,6 +87,27 @@ public class ModuleRecordControllerTest {
 
         CourseRecord resultCr = courseRecordRepository.getCourseRecord("user1", "testCourse1").get();
         assertNotEquals(crUpdated, resultCr.getLastUpdated());
+    }
+
+    @Test()
+    public void testCreateExistingModuleRecord() throws Exception {
+
+        PostModuleRecordInput mr = new PostModuleRecordInput();
+        mr.setCourseId("testCourse1");
+        mr.setUserId("user1");
+        mr.setModuleId("testModule1");
+        mr.setDuration(100L);
+        mr.setState("IN_PROGRESS");
+        mr.setModuleTitle("Test module title");
+        mr.setModuleType("elearning");
+        mr.setOptional(false);
+
+        String jsonInput = mapper.writeValueAsString(mr);
+        mockMvc.perform(post("/module_records")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(jsonInput))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

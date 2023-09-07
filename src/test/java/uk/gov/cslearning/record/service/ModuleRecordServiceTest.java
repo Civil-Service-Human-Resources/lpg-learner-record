@@ -73,8 +73,7 @@ public class ModuleRecordServiceTest {
                 moduleRecordRepository,
                 moduleRecordMapper,
                 new PatchHelper(),
-                courseRecordRepository,
-                clock
+                courseRecordRepository
         );
     }
 

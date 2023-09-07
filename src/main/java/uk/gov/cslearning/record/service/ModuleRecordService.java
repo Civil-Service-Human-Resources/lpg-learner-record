@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.api.input.PATCH.PatchModuleRecordInput;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ModuleRecordService {
 
     private final ModuleRecordRepository moduleRecordRepository;
@@ -53,7 +55,6 @@ public class ModuleRecordService {
     }
 
     public ModuleRecord createModuleRecord(PostModuleRecordInput newModuleInput) {
-
         String userId = newModuleInput.getUserId();
         String courseId = newModuleInput.getCourseId();
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
@@ -61,6 +62,7 @@ public class ModuleRecordService {
         courseRecord.addModuleRecord(newModule);
         courseRecordRepository.saveAndFlush(courseRecord);
         return newModule;
+
     }
 
 }
