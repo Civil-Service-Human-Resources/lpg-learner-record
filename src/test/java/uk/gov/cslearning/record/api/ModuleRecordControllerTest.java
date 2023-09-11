@@ -83,6 +83,7 @@ public class ModuleRecordControllerTest {
         assertEquals(State.IN_PROGRESS, result.getState());
         assertNotNull(result.getCreatedAt());
         assertNotNull(result.getUpdatedAt());
+        assertNotNull(result.getId());
         assertFalse(result.getOptional());
 
         CourseRecord resultCr = courseRecordRepository.getCourseRecord("user1", "testCourse1").get();

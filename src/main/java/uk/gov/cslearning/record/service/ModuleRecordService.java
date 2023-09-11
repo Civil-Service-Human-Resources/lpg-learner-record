@@ -60,9 +60,8 @@ public class ModuleRecordService {
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
         ModuleRecord newModule = moduleRecordMapper.postInputAsModule(newModuleInput);
         courseRecord.addModuleRecord(newModule);
-        courseRecordRepository.saveAndFlush(courseRecord);
-        return newModule;
-
+        courseRecord = courseRecordRepository.saveAndFlush(courseRecord);
+        return courseRecord.getModuleRecord(newModule.getModuleId());
     }
 
 }
