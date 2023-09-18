@@ -1,11 +1,13 @@
 package uk.gov.cslearning.record.api;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.api.input.POST.PostModuleRecordInput;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.exception.ResourceExists.ModuleRecordAlreadyExistsException;
 import uk.gov.cslearning.record.service.ModuleRecordService;
 
 import javax.validation.Valid;
@@ -29,7 +31,12 @@ public class ModuleRecordController {
 
     @PostMapping
     public ResponseEntity<ModuleRecord> createModuleRecord(@Valid @RequestBody PostModuleRecordInput newModule) {
-        ModuleRecord createdModule = moduleRecordService.createModuleRecord(newModule);
-        return new ResponseEntity<>(createdModule, HttpStatus.CREATED);
+        try {
+            ModuleRecord createdModule = moduleRecordService.createModuleRecord(newModule);
+            return new ResponseEntity<>(createdModule, HttpStatus.CREATED);
+        } catch (
+                DataIntegrityViolationException e) {
+            throw new ModuleRecordAlreadyExistsException(newModule.getCourseId(), newModule.getModuleId(), newModule.getUserId());
+        }
     }
 }

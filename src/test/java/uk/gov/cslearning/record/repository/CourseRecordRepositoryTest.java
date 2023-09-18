@@ -25,10 +25,8 @@ public class CourseRecordRepositoryTest {
 
     @Test
     public void shouldSaveCourseRecord() {
-
         CourseRecord courseRecord = new CourseRecord("courseId", "userId");
         courseRecordRepository.save(courseRecord);
-
         assertThat(courseRecord.getIdentity(), notNullValue());
     }
 

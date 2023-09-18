@@ -91,8 +91,6 @@ lpg-ui:
   serviceUrl: ${LPG_UI_URL:http://develop.learn.civilservice.gov.uk:3001}
   bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
-csl.homepage: "https://cslearning.gov.uk/"
-
 retention:
   timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}
 
@@ -108,3 +106,20 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+---
+
+spring:
+  profiles: test
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+  main:
+    web-application-type: none
+  flyway:
+    locations: classpath:db/migration/h2

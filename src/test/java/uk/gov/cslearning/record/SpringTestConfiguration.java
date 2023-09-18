@@ -11,6 +11,8 @@ import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 
 import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 
 @TestConfiguration
 public class SpringTestConfiguration {
@@ -39,7 +41,7 @@ public class SpringTestConfiguration {
     }
 
     @Bean
-    public Clock clock() {return Clock.systemDefaultZone();
+    public Clock clock() {return Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London"));
     }
 
 }
