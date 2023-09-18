@@ -1,35 +1,37 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="lpg-learner-record [bootRun]" type="GradleRunConfiguration" factoryName="Gradle">
-    <ExternalSystemSettings>
-      <option name="env">
-        <map>
-          <entry key="CLIENT_ID" value="ea331052-c56c-11ec-9d64-0242ac120021" />
-          <entry key="DATASOURCE" value="jdbc:mysql://localhost:3306/learner_record?user=root&amp;password=my-secret-pw&amp;useSSL=FALSE" />
-          <entry key="LEARNING_CATALOGUE_SERVICE_URL" value="http://localhost:9001" />
-          <entry key="OAUTH_SERVICE_URL" value="https://identity.integration.learn.civilservice.gov.uk" />
-          <entry key="REGISTRY_SERVICE_URL" value="http://localhost:9002" />
-          <entry key="SPRING_PROFILES_ACTIVE" value="default" />
-          <entry key="jwt_key" value="bJwXRAslLzOtPywnCqBbQujKBKki44LB" />
-        </map>
-      </option>
-      <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
-      <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="--stacktrace" />
-      <option name="taskDescriptions">
-        <list />
-      </option>
-      <option name="taskNames">
-        <list>
-          <option value="bootRun" />
-        </list>
-      </option>
-      <option name="vmOptions" />
-    </ExternalSystemSettings>
-    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-    <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-    <DebugAllEnabled>false</DebugAllEnabled>
-    <ForceTestExec>false</ForceTestExec>
-    <method v="2" />
-  </configuration>
+    <configuration default="false" name="lpg-learner-record [bootRun]" type="GradleRunConfiguration"
+                   factoryName="Gradle">
+        <ExternalSystemSettings>
+            <option name="env">
+                <map>
+                    <entry key="CLIENT_ID" value="ea331052-c56c-11ec-9d64-0242ac120021"/>
+                    <entry key="DATASOURCE"
+                           value="jdbc:mysql://localhost:3306/learner_record?user=root&amp;password=my-secret-pw&amp;useSSL=FALSE"/>
+                    <entry key="LEARNING_CATALOGUE_SERVICE_URL" value="http://localhost:9001"/>
+                    <entry key="OAUTH_SERVICE_URL" value="http://localhost:8080"/>
+                    <entry key="REGISTRY_SERVICE_URL" value="http://localhost:9002"/>
+                    <entry key="SPRING_PROFILES_ACTIVE" value="default"/>
+                    <entry key="jwt_key" value="key"/>
+                </map>
+            </option>
+            <option name="executionName"/>
+            <option name="externalProjectPath" value="$PROJECT_DIR$"/>
+            <option name="externalSystemIdString" value="GRADLE"/>
+            <option name="scriptParameters" value="--stacktrace"/>
+            <option name="taskDescriptions">
+                <list/>
+            </option>
+            <option name="taskNames">
+                <list>
+                    <option value="bootRun"/>
+                </list>
+            </option>
+            <option name="vmOptions"/>
+        </ExternalSystemSettings>
+        <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+        <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+        <DebugAllEnabled>false</DebugAllEnabled>
+        <ForceTestExec>false</ForceTestExec>
+        <method v="2"/>
+    </configuration>
 </component>
