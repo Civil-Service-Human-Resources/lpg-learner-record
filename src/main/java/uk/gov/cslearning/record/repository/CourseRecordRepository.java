@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +16,7 @@ import java.util.Optional;
 public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long> {
 
     @Query("SELECT r FROM CourseRecord r WHERE r.identity.userId = ?1")
-    Collection<CourseRecord> findByUserId(String userId);
+    List<CourseRecord> findByUserId(String userId);
 
     @Query("SELECT cr FROM CourseRecord cr WHERE cr.lastUpdated >= ?1 AND cr.state = 'COMPLETED' AND cr.isRequired = true")
     List<CourseRecord> findCompletedByLastUpdated(LocalDateTime since);
@@ -34,8 +33,8 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId = ?1 AND cr.identity.courseId = ?2")
     Optional<CourseRecord> getCourseRecord(String userId, String courseId);
 
-    @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId = ?1 AND (cr.identity.courseId = ?2 OR ?2 is NULL)")
-    List<CourseRecord> findByUserIdAndCourseId(String userId, String courseId);
+    @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId = ?1 AND cr.identity.courseId in (?2)")
+    List<CourseRecord> findByUserIdAndCourseIdIn(String userId, List<String> courseId);
 
     @Transactional
     @Modifying

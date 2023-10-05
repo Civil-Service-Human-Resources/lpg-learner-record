@@ -33,7 +33,17 @@ steps:
       testResultsFiles: 'build/test-results/**/TEST-*.xml'
       tasks: 'clean build'
     displayName: 'Install Gradle and Java 8 and build'
-
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/TEST-*.xml'
+    displayName: 'Publish test results'
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: 'JaCoCo'
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test/jacocoTestReport.xml'
+      pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java/'
+    displayName: 'Publish coverage results'
   - task: Docker@2
     inputs:
       containerRegistry: 'lpgregistry ACR'

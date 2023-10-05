@@ -4,6 +4,15 @@ plugins {
     id 'idea'
     id "io.franzbecker.gradle-lombok" version "5.0.0"
     id 'net.ltgt.apt' version '0.21'
+    id 'jacoco'
+    id 'java'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
 }
 
 repositories {
@@ -68,6 +77,11 @@ compileTestJava {
                 project.sourceSets.test.output.classesDir.absolutePath,
                 project.sourceSets.test.runtimeClasspath.asPath
     }
+}
+
+test {
+    systemProperty 'spring.profiles.active', 'test'
+    finalizedBy jacocoTestReport
 }
 
 dependencies {

@@ -28,14 +28,12 @@ public class PatchModuleRecordInput {
     private String result;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime completionDate;
-
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime updatedAt;
 
-    private String score;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime completionDate;
 
-    private boolean rated;
+    private String score;
 
     @ValidEnum(enumClass = BookingStatus.class)
     @Enumerated(EnumType.STRING)

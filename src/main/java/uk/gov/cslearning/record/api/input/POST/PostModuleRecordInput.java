@@ -44,6 +44,7 @@ public class PostModuleRecordInput {
 
     @ValidEnum(enumClass = State.class)
     @Enumerated(EnumType.STRING)
+    @NotNull
     private String state;
 
     @JsonSerialize(using = LocalDateSerializer.class)

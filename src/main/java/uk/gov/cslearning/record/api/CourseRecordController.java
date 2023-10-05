@@ -34,15 +34,16 @@ public class CourseRecordController {
 
     @PostMapping
     public ResponseEntity<CourseRecord> createCourseRecord(@Valid @RequestBody PostCourseRecordInput inputCourse) {
+        log.debug("Creating course record");
         CourseRecord newRecord = courseRecordService.createCourseRecord(inputCourse);
         return new ResponseEntity<>(newRecord, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<CourseRecordOutput> fetchCourseRecords(@RequestParam String userId,
-                                                                 @RequestParam(required = false) String courseId) {
+                                                                 @RequestParam(required = false) List<String> courseIds) {
 
-        List<CourseRecord> courseRecords = courseRecordService.fetchCourseRecords(userId, courseId);
+        List<CourseRecord> courseRecords = courseRecordService.fetchCourseRecords(userId, courseIds);
         CourseRecordOutput responseObject = new CourseRecordOutput(courseRecords);
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
