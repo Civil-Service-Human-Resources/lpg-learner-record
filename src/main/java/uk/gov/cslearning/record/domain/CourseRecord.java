@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,6 +44,18 @@ public class CourseRecord {
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
+
+    @PreUpdate
+    @JsonIgnore
+    public void onUpdate() {
+        lastUpdated = LocalDateTime.now(Clock.systemDefaultZone());
+    }
+
+    @PrePersist
+    @JsonIgnore
+    public void onPersist() {
+        lastUpdated = LocalDateTime.now(Clock.systemDefaultZone());
+    }
 
     public CourseRecord() {
     }
