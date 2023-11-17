@@ -136,7 +136,7 @@ public class MessageService {
         String cost = getCostOfEvent(course, event.getId()).toString();
 
         map.put("email address", civilServant.getLineManagerEmailAddress());
-        map.put("learnerName", bookingDto.getLearner());
+        map.put("learnerName", bookingDto.getLearnerName());
         map.put("learnerEmail", bookingDto.getLearnerEmail());
 
         map.put("recipientName", civilServant.getLineManagerEmailAddress());

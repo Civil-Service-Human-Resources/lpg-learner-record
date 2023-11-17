@@ -24,6 +24,9 @@ public class BookingDto {
     @NotNull(message = "{booking.learnerEmail.required}")
     private String learnerEmail;
 
+    @NotNull(message = "{booking.learnerName.required}")
+    private String learnerName;
+
     @NotNull(message = "{booking.event.required}")
     @EventIsActive(message = "{booking.event.active}")
     private URI event;
