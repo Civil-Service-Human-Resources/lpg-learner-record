@@ -23,6 +23,7 @@ public class BookingNotificationService {
     }
 
     public void sendRequestedNotifications(BookingDto bookingDto) {
+        System.out.println(bookingDto.toString());
         String learnerUid = bookingDto.getLearner();
 
         CivilServant civilServant = registryService.getCivilServantResourceByUid(learnerUid).orElseThrow(() -> new CivilServantNotFoundException(learnerUid));
