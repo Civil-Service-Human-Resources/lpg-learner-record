@@ -102,7 +102,6 @@ public class DefaultBookingService implements BookingService {
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED) || bookingDto.getStatus().equals(BookingStatus.CANCELLED)) {
             bookingNotificationService.sendConfirmedNotifications(savedBookingDto);
         } else if (bookingDto.getStatus().equals(BookingStatus.REQUESTED)) {
-            System.out.println("Booking requested");
             bookingNotificationService.sendRequestedNotifications(savedBookingDto);
         }
 
