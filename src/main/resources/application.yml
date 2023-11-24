@@ -82,7 +82,7 @@ govNotify:
     cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:cc525c34-1a31-4fa1-ab19-862fd223caab}
     cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:26e0e8ae-7617-40f7-be37-ca63b8a0d257}
     bookingConfirmed: ${GOV_NOTIFY_BOOKING_CONFIRMED:8efb52bd-9ada-402e-8fab-84a751bf4a71}
-    bookingConfirmedLineManager: ${GOV_NOTIFY_BOOKING_CONFIRMED_LINE_MANAGER:5e3a76c5-5178-4c8c-9bcd-87886dc0efef}
+    bookingConfirmedLineManager: ${GOV_NOTIFY_BOOKING_CONFIRMED_LINE_MANAGER:b7fd56d1-d629-4431-812d-c462afe3536c}
     bookingRequestLineManager: ${GOV_NOTIFY_BOOKING_REQUEST_LINE_MANAGER:d6c2fdd5-e66d-46ef-b3cc-65397366b390}
     bookingCancelledLineManager: ${GOV_NOTIFY_BOOKING_CANCELLED_LINE_MANAGER:c00fac77-8448-41c9-b15c-23361ccef419}
     bookingRequested: ${GOV_NOTIFY_BOOKING_REQUESTED:ae678ea1-ae7a-42f3-aa27-037336b346c4}
