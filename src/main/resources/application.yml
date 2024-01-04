@@ -33,7 +33,7 @@ logging:
           record:
             csrs:
               service:
-                RegistryService: ${REGISTYR_SERVICE_LOG_LEVEL:ERROR}
+                RegistryService: ${REGISTRY_SERVICE_LOG_LEVEL:ERROR}
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
@@ -47,8 +47,10 @@ oauth:
   serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
   clientSecret: ${CLIENT_SECRET:test}
-  checkTokenUrl: "${oauth.serviceUrl}/oauth/check_token"
-  tokenUrl: "${oauth.serviceUrl}/oauth/token"
+  checkTokenEndpoint: ${OAUTH_CHECK_TOKEN_ENDPOINT:/oauth/check_token}
+  checkTokenUrl: "${oauth.serviceUrl}${oauth.checkTokenEndpoint}"
+  tokenEndpoint: ${OAUTH_TOKEN_ENDPOINT:/oauth/token}
+  tokenUrl: "${oauth.serviceUrl}${oauth.tokenEndpoint}"
   maxTotalConnections: 120
   defaultMaxConnectionsPerRoute: 60
   maxPerServiceUrl: 60
