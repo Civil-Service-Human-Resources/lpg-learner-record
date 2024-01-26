@@ -101,7 +101,11 @@ retention:
 spring:
   profiles: production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=my-secret-pw&useSSL=false}
+    host: ${DATASOURCE_HOST:localhost}
+    database: ${DATASOURCE_DATABASE:learner_record}
+    username: ${DATASOURCE_USERNAME:root}
+    password: ${DATASOURCE_PASSWORD:password}
+    url: ${DATASOURCE:jdbc:mysql://${spring.datasource.host}:3306/${spring.datasource.database}?user=${spring.datasource.username}&password=${spring.datasource.password}&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
