@@ -97,11 +97,14 @@ retention:
   timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}
 
 ---
-
+database:
+  host: ${DATABASE_HOST:jdbc:mysql://mysql:3306}
+  name: ${DATABASE_NAME:learner_record}
+  use-ssl: ${DATABASE_USESSL:false}
 spring:
   profiles: production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=my-secret-pw&useSSL=false}
+    url: ${DATASOURCE_URL:${database.host}/${database.name}?useSSL=${database.use-ssl}&requireSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
