@@ -101,6 +101,7 @@ database:
   host: ${DATABASE_HOST:jdbc:mysql://mysql:3306}
   name: ${DATABASE_NAME:learner_record}
   use-ssl: ${DATABASE_USESSL:false}
+  
 spring:
   profiles: production
   datasource:
