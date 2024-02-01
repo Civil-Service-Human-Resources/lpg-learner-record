@@ -100,14 +100,14 @@ retention:
 database:
   host: ${DATABASE_HOST:jdbc:mysql://mysql:3306}
   name: ${DATABASE_NAME:learner_record}
-  username: ${DATASOURCE_USERNAME:username}
-  password: ${DATASOURCE_PASSWORD:my-secret-pw}
   use-ssl: ${DATABASE_USESSL:false}
 
 spring:
   profiles: production
   datasource:
     url: ${DATASOURCE_URL:${database.host}/${database.name}?useSSL=${database.use-ssl}&requireSSL=false}
+    username: ${DATASOURCE_USERNAME:username}
+    password: ${DATASOURCE_PASSWORD:my-secret-pw}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
