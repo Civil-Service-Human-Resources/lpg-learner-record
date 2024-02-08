@@ -136,7 +136,8 @@ public class MessageService {
         String cost = getCostOfEvent(course, event.getId()).toString();
 
         map.put("email address", civilServant.getLineManagerEmailAddress());
-        map.put("learnerName", bookingDto.getLearnerEmail()); // we can use email
+        map.put("learnerName", civilServant.getFullName());
+        map.put("learnerEmail", bookingDto.getLearnerEmail());
 
         map.put("recipient", civilServant.getLineManagerEmailAddress());
         map.put("courseTitle", course.getTitle());
