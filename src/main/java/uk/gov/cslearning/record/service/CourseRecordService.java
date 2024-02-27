@@ -1,18 +1,17 @@
 package uk.gov.cslearning.record.service;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.api.input.PATCH.PatchCourseRecordInput;
-import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
-import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
-import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.util.IUtilService;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,16 +20,35 @@ import java.util.List;
 public class CourseRecordService {
 
     private final CourseRecordRepository courseRecordRepository;
-    private final CourseRecordMapper courseRecordMapper;
-    private final PatchHelper patchHelper;
+    private final ModuleRecordService moduleRecordService;
+    private final IUtilService utilService;
 
-    public CourseRecord updateCourseRecord(String userId, String courseId, JsonPatch patch) {
+    public CourseRecord updateCourseRecord(CourseRecord input) {
+        String userId = input.getUserId();
+        String courseId = input.getCourseId();
+        log.debug(String.format("Updating course record for course %s and user %s", courseId, userId));
         CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
-        PatchCourseRecordInput updateParams = courseRecordMapper.asInput(courseRecord);
-
-        PatchCourseRecordInput patchedInput = patchHelper.patch(patch, updateParams, PatchCourseRecordInput.class);
-        courseRecordMapper.update(courseRecord, patchedInput);
-        return courseRecordRepository.save(courseRecord);
+        LocalDateTime updated = utilService.getNowDateTime();
+        input.setLastUpdated(updated);
+        courseRecord.update(input);
+        List<ModuleRecord> updatedModules = new ArrayList<>();
+        for (ModuleRecord mr : input.getModuleRecords()) {
+            log.debug(String.format("Processing module %s for user %s", mr.getModuleId(), userId));
+            Long moduleRecordId = mr.getId();
+            if (moduleRecordId == null) {
+                log.debug("No module record ID found; creating module");
+                mr = moduleRecordService.createModuleRecord(mr, updated);
+                courseRecord.addModuleRecord(mr);
+            } else {
+                log.debug(String.format("Module record ID %s found; updating module", moduleRecordId));
+                mr = moduleRecordService.updateModuleRecord(moduleRecordId, mr, updated);
+            }
+            updatedModules.add(mr);
+        }
+        log.debug("Saving course record");
+        courseRecordRepository.saveAndFlush(courseRecord);
+        input.setModuleRecords(updatedModules);
+        return input;
     }
 
     public List<CourseRecord> fetchCourseRecords(String userId, List<String> courseIds) {
@@ -43,9 +61,14 @@ public class CourseRecordService {
         }
     }
 
-    public CourseRecord createCourseRecord(PostCourseRecordInput inputCourse) {
-        CourseRecord newCourseRecord = courseRecordMapper.postInputAsCourseRecord(inputCourse);
-        return courseRecordRepository.save(newCourseRecord);
+    public CourseRecord createCourseRecord(CourseRecord courseRecord) {
+        LocalDateTime updated = utilService.getNowDateTime();
+        courseRecord.setLastUpdated(updated);
+        courseRecord.getModuleRecords().forEach(mr -> {
+            mr = moduleRecordService.createModuleRecord(mr, updated);
+            mr.setCourseRecord(courseRecord);
+        });
+        return courseRecordRepository.save(courseRecord);
     }
 
 }

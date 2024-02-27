@@ -2,15 +2,18 @@ package uk.gov.cslearning.record.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Embeddable
 public class CourseRecordIdentity implements Serializable {
 
     @Column(nullable = false)
+    @NotBlank(message = "courseId is required")
     private String courseId;
 
     @Column(nullable = false)
+    @NotBlank(message = "userId is required")
     private String userId;
 
     public CourseRecordIdentity() {
@@ -38,21 +41,4 @@ public class CourseRecordIdentity implements Serializable {
         this.userId = userId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CourseRecordIdentity that = (CourseRecordIdentity) o;
-
-        if (!courseId.equals(that.courseId)) return false;
-        return userId.equals(that.userId);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = courseId.hashCode();
-        result = 31 * result + userId.hashCode();
-        return result;
-    }
 }

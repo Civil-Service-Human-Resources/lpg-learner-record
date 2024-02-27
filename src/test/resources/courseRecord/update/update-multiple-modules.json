@@ -1,0 +1,23 @@
+{
+  "courseId": "testCourseId",
+  "userId": "testUserId",
+  "courseTitle": "title",
+  "state": "APPROVED",
+  "modules": [
+    {
+      "moduleTitle": "newModuleRecord",
+      "moduleId": "newModuleRecord",
+      "optional": false,
+      "state": "APPROVED",
+      "moduleType": "elearning"
+    },
+    {
+      "id": "%s",
+      "moduleTitle": "testModuleId1",
+      "moduleId": "testModuleId1",
+      "optional": false,
+      "state": "IN_PROGRESS",
+      "moduleType": "elearning"
+    }
+  ]
+}

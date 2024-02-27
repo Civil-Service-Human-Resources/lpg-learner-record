@@ -1,0 +1,12 @@
+{
+  "courseId": "testCourse1",
+  "userId": "user2",
+  "courseTitle": "title",
+  "modules": [
+    {
+      "moduleTitle": "Module",
+      "moduleType": "link",
+      "optional": false
+    }
+  ]
+}

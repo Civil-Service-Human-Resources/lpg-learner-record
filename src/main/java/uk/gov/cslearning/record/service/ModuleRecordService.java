@@ -1,23 +1,19 @@
 package uk.gov.cslearning.record.service;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cslearning.record.api.input.PATCH.PatchModuleRecordInput;
-import uk.gov.cslearning.record.api.input.POST.PostModuleRecordInput;
-import uk.gov.cslearning.record.api.mapper.ModuleRecordMapper;
-import uk.gov.cslearning.record.api.util.PatchHelper;
-import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
-import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
-import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
+import uk.gov.cslearning.record.util.IUtilService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,9 +22,30 @@ import java.util.List;
 public class ModuleRecordService {
 
     private final ModuleRecordRepository moduleRecordRepository;
-    private final ModuleRecordMapper moduleRecordMapper;
-    private final PatchHelper patchHelper;
-    private final CourseRecordRepository courseRecordRepository;
+    private final IUtilService utilService;
+
+    public ModuleRecord createModuleRecord(ModuleRecord input, LocalDateTime createdTimestamp) {
+        input.setCreatedAt(createdTimestamp);
+        input.setUid(utilService.generateUUID());
+        input.setUpdatedAt(createdTimestamp);
+        if (input.getState().equals(State.COMPLETED)) {
+            input.setCompletionDate(createdTimestamp);
+        }
+        return input;
+    }
+
+    public ModuleRecord updateModuleRecord(Long moduleRecordId, ModuleRecord newRecord, LocalDateTime updated) {
+        ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
+        newRecord.setUpdatedAt(updated);
+        if (newRecord.getState().equals(State.COMPLETED)) {
+            newRecord.setCompletionDate(updated);
+        }
+        if (StringUtils.isBlank(newRecord.getUid())) {
+            newRecord.setUid(utilService.generateUUID());
+        }
+        moduleRecord.update(newRecord);
+        return moduleRecordRepository.saveAndFlush(moduleRecord);
+    }
 
     @Transactional(readOnly = true)
     public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
@@ -44,24 +61,6 @@ public class ModuleRecordService {
     public List<ModuleRecordDto> listRecordsForPeriodAndCourseIds(LocalDate periodStart, LocalDate periodEnd, List<String> courseIds) {
         return moduleRecordRepository
                 .findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), courseIds);
-    }
-
-    public ModuleRecord updateModuleRecord(Long moduleRecordId, JsonPatch patch) {
-        ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
-        PatchModuleRecordInput existingRecordAsInput = moduleRecordMapper.asInput(moduleRecord);
-        PatchModuleRecordInput patchedInput = patchHelper.patch(patch, existingRecordAsInput, PatchModuleRecordInput.class);
-        moduleRecordMapper.update(moduleRecord, patchedInput);
-        return moduleRecordRepository.saveAndFlush(moduleRecord);
-    }
-
-    public ModuleRecord createModuleRecord(PostModuleRecordInput newModuleInput) {
-        String userId = newModuleInput.getUserId();
-        String courseId = newModuleInput.getCourseId();
-        CourseRecord courseRecord = courseRecordRepository.getCourseRecord(userId, courseId).orElseThrow(() -> new CourseRecordNotFoundException(userId, courseId));
-        ModuleRecord newModule = moduleRecordMapper.postInputAsModule(newModuleInput);
-        courseRecord.addModuleRecord(newModule);
-        courseRecord = courseRecordRepository.saveAndFlush(courseRecord);
-        return courseRecord.getModuleRecord(newModule.getModuleId());
     }
 
 }
