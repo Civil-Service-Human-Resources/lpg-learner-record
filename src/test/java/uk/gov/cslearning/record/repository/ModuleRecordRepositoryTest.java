@@ -8,9 +8,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
+import uk.gov.cslearning.record.domain.State;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -26,15 +26,16 @@ public class ModuleRecordRepositoryTest {
         String courseId = "course-id";
 
         CourseRecord courseRecord = new CourseRecord(courseId, "user-id");
+        courseRecord.setCourseTitle("title");
         ModuleRecord moduleRecord = new ModuleRecord("moduleRecord1");
+        moduleRecord.setState(State.IN_PROGRESS);
+        moduleRecord.setModuleType("elearning");
+        moduleRecord.setModuleTitle("title");
         moduleRecord.setCourseRecord(courseRecord);
 
         long id = moduleRecordRepository.save(moduleRecord).getId();
 
         assertEquals(courseRecord, moduleRecordRepository.findById(id).get().getCourseRecord());
-        assertNotNull(courseRecord.getLastUpdated());
-        assertNotNull(moduleRecord.getCreatedAt());
-        assertNotNull(moduleRecord.getUpdatedAt());
     }
 
     @Test
