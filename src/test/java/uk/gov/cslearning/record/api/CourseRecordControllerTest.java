@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -168,6 +169,7 @@ public class CourseRecordControllerTest extends TestDataService {
                 .andExpect(jsonPath("modules[0].state").value("APPROVED"))
                 .andExpect(jsonPath("modules[0].updatedAt", Matchers.contains(2023, 1, 1, 10, 0)))
                 .andExpect(jsonPath("modules[0].createdAt", Matchers.contains(2023, 1, 1, 10, 0)))
+                .andExpect(jsonPath("modules[0].id", Matchers.any(Integer.class)))
                 .andExpect(jsonPath("modules[1].moduleId").value("testModuleId1"))
                 .andExpect(jsonPath("modules[1].state").value("IN_PROGRESS"))
                 .andExpect(jsonPath("modules[1].updatedAt", Matchers.contains(2023, 1, 1, 10, 0)))
@@ -188,6 +190,47 @@ public class CourseRecordControllerTest extends TestDataService {
         ModuleRecord mrResult2 = result.getModuleRecord("testModuleId1");
         assert (mrResult2.getState()).equals(State.IN_PROGRESS);
         assertTime(mrResult2.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
+    }
+
+    /**
+     * Should:
+     * - Update the course record state to APPROVED
+     * - Update the module record state to APPROVED
+     * - Create a new module record with state IN_PROGRESS
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateCourseRecordAndCreateModuleRecord() throws Exception {
+        CourseRecord cr = generateCourseRecord(1);
+        cr.getModuleRecords().forEach(moduleRecordRepository::saveAndFlush);
+        String json = new String(Files.readAllBytes(Paths.get("src/test/resources/courseRecord/update/create-one-module.json")));
+
+        mockMvc.perform(put("/course_records")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(jsonPath("modules.length()").value(1))
+                .andExpect(jsonPath("modules[0].moduleId").value("newModuleRecord"))
+                .andExpect(jsonPath("modules[0].state").value("COMPLETED"))
+                .andExpect(jsonPath("modules[0].updatedAt", Matchers.contains(2023, 1, 1, 10, 0)))
+                .andExpect(jsonPath("modules[0].createdAt", Matchers.contains(2023, 1, 1, 10, 0)))
+                .andExpect(jsonPath("modules[0].completionDate", Matchers.contains(2023, 1, 1, 10, 0)))
+                .andExpect(jsonPath("modules[0].id", Matchers.any(Integer.class)))
+                .andExpect(jsonPath("lastUpdated", Matchers.contains(2023, 1, 1, 10, 0)))
+                .andExpect(status().isOk());
+
+        CourseRecord result = courseRecordRepository.findByUserId("testUserId").get(0);
+        assert (result.getState().equals(State.COMPLETED));
+        assertTime(result.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+
+        assertEquals(2, result.getModuleRecords().size());
+
+        ModuleRecord mrResult = result.getModuleRecord("newModuleRecord");
+        assert (mrResult.getState()).equals(State.COMPLETED);
+        assertTime(mrResult.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
+        assertTime(mrResult.getCreatedAt(), 1, 1, 2023, 10, 0, 0);
+        assertTime(mrResult.getCompletionDate(), 1, 1, 2023, 10, 0, 0);
     }
 
     @Test
@@ -212,6 +255,23 @@ public class CourseRecordControllerTest extends TestDataService {
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user1"))
                 .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"));
+    }
+
+    @Test
+    public void testGetCourseRecordWithModules() throws Exception {
+        CourseRecord cr = generateCourseRecord(2);
+        cr.setState(State.IN_PROGRESS);
+        cr.getModuleRecords().forEach(moduleRecordRepository::saveAndFlush);
+        mockMvc.perform(get("/course_records")
+                        .param("courseIds", cr.getCourseId())
+                        .param("userId", cr.getUserId()))
+                .andExpect(jsonPath("$.courseRecords.length()").value(1))
+                .andExpect(jsonPath("$.courseRecords[0].courseId").value(cr.getCourseId()))
+                .andExpect(jsonPath("$.courseRecords[0].userId").value(cr.getUserId()))
+                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.courseRecords[0].modules.length()").value(2))
+                .andExpect(jsonPath("$.courseRecords[0].modules[0].id", Matchers.any(Integer.class)))
+                .andExpect(jsonPath("$.courseRecords[0].modules[1].id", Matchers.any(Integer.class)));
     }
 
 }

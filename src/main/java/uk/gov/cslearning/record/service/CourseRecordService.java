@@ -37,7 +37,7 @@ public class CourseRecordService {
             Long moduleRecordId = mr.getId();
             if (moduleRecordId == null) {
                 log.debug("No module record ID found; creating module");
-                mr = moduleRecordService.createModuleRecord(mr, updated);
+                mr = moduleRecordService.createModuleRecord(mr, courseRecord, updated);
                 courseRecord.addModuleRecord(mr);
             } else {
                 log.debug(String.format("Module record ID %s found; updating module", moduleRecordId));
@@ -64,10 +64,7 @@ public class CourseRecordService {
     public CourseRecord createCourseRecord(CourseRecord courseRecord) {
         LocalDateTime updated = utilService.getNowDateTime();
         courseRecord.setLastUpdated(updated);
-        courseRecord.getModuleRecords().forEach(mr -> {
-            mr = moduleRecordService.createModuleRecord(mr, updated);
-            mr.setCourseRecord(courseRecord);
-        });
+        courseRecord.getModuleRecords().forEach(mr -> moduleRecordService.createModuleRecord(mr, courseRecord, updated));
         return courseRecordRepository.save(courseRecord);
     }
 
