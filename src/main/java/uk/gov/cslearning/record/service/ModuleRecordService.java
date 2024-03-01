@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
-import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
 import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
@@ -29,20 +28,13 @@ public class ModuleRecordService {
         input.setCreatedAt(createdTimestamp);
         input.setUid(utilService.generateUUID());
         input.setUpdatedAt(createdTimestamp);
-        if (input.getState().equals(State.COMPLETED)) {
-            input.setCompletionDate(createdTimestamp);
-        }
         input.setCourseRecord(parentRecord);
         return moduleRecordRepository.saveAndFlush(input);
-//        return input;
     }
 
     public ModuleRecord updateModuleRecord(Long moduleRecordId, ModuleRecord newRecord, LocalDateTime updated) {
         ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
         newRecord.setUpdatedAt(updated);
-        if (newRecord.getState().equals(State.COMPLETED)) {
-            newRecord.setCompletionDate(updated);
-        }
         if (StringUtils.isBlank(newRecord.getUid())) {
             newRecord.setUid(utilService.generateUUID());
         }

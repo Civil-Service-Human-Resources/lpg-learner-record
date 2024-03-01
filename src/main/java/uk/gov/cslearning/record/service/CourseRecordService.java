@@ -7,11 +7,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.util.IUtilService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -62,6 +64,9 @@ public class CourseRecordService {
     }
 
     public CourseRecord createCourseRecord(CourseRecord courseRecord) {
+        if (courseRecordRepository.findByUserIdAndCourseIdIn(courseRecord.getUserId(), Collections.singletonList(courseRecord.getCourseId())).size() > 0) {
+            throw new CourseRecordAlreadyExistsException(courseRecord.getCourseId(), courseRecord.getUserId());
+        }
         LocalDateTime updated = utilService.getNowDateTime();
         courseRecord.setLastUpdated(updated);
         courseRecord.getModuleRecords().forEach(mr -> moduleRecordService.createModuleRecord(mr, courseRecord, updated));

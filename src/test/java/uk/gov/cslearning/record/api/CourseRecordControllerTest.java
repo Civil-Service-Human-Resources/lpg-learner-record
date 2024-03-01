@@ -42,7 +42,7 @@ import static uk.gov.cslearning.record.TestUtils.assertTime;
 @DataJpaTest
 @WithMockUser(username = "user")
 @SpringBootTest(classes = {CourseRecordController.class, CourseRecordService.class, ModuleRecordService.class,
-        SpringTestConfiguration.class, Application.class})
+        SpringTestConfiguration.class, Application.class, ApiExceptionHandler.class})
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
 @EnableWebMvc
@@ -215,7 +215,7 @@ public class CourseRecordControllerTest extends TestDataService {
                 .andExpect(jsonPath("modules[0].state").value("COMPLETED"))
                 .andExpect(jsonPath("modules[0].updatedAt", Matchers.contains(2023, 1, 1, 10, 0)))
                 .andExpect(jsonPath("modules[0].createdAt", Matchers.contains(2023, 1, 1, 10, 0)))
-                .andExpect(jsonPath("modules[0].completionDate", Matchers.contains(2023, 1, 1, 10, 0)))
+                .andExpect(jsonPath("modules[0].completionDate", Matchers.contains(2024, 1, 10, 10, 0)))
                 .andExpect(jsonPath("modules[0].id", Matchers.any(Integer.class)))
                 .andExpect(jsonPath("lastUpdated", Matchers.contains(2023, 1, 1, 10, 0)))
                 .andExpect(status().isOk());
@@ -230,7 +230,7 @@ public class CourseRecordControllerTest extends TestDataService {
         assert (mrResult.getState()).equals(State.COMPLETED);
         assertTime(mrResult.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
         assertTime(mrResult.getCreatedAt(), 1, 1, 2023, 10, 0, 0);
-        assertTime(mrResult.getCompletionDate(), 1, 1, 2023, 10, 0, 0);
+        assertTime(mrResult.getCompletionDate(), 10, 1, 2024, 10, 0, 0);
     }
 
     @Test

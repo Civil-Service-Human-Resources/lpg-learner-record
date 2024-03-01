@@ -3,7 +3,6 @@
   "userId": "testUserId",
   "courseTitle": "title",
   "state": "COMPLETED",
-  "lastUpdated": "2024-01-10T10:00:00.00",
   "modules": [
     {
       "id": null,
@@ -12,6 +11,7 @@
       "moduleId": "newModuleRecord",
       "optional": false,
       "state": "COMPLETED",
+      "completionDate": "2024-01-10T10:00:00.00",
       "moduleType": "elearning"
     }
   ]
