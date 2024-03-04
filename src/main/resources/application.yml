@@ -33,7 +33,7 @@ logging:
           record:
             csrs:
               service:
-                RegistryService: ${REGISTYR_SERVICE_LOG_LEVEL:ERROR}
+                RegistryService: ${REGISTRY_SERVICE_LOG_LEVEL:ERROR}
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
@@ -47,8 +47,10 @@ oauth:
   serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
   clientSecret: ${CLIENT_SECRET:test}
-  checkTokenUrl: "${oauth.serviceUrl}/oauth/check_token"
-  tokenUrl: "${oauth.serviceUrl}/oauth/token"
+  checkTokenEndpoint: ${OAUTH_CHECK_TOKEN_ENDPOINT:/oauth/check_token}
+  checkTokenUrl: "${oauth.serviceUrl}${oauth.checkTokenEndpoint}"
+  tokenEndpoint: ${OAUTH_TOKEN_ENDPOINT:/oauth/token}
+  tokenUrl: "${oauth.serviceUrl}${oauth.tokenEndpoint}"
   maxTotalConnections: 120
   defaultMaxConnectionsPerRoute: 60
   maxPerServiceUrl: 60
@@ -95,11 +97,17 @@ retention:
   timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}
 
 ---
+database:
+  host: ${DATABASE_HOST:jdbc:mysql://localhost:3306}
+  name: ${DATABASE_NAME:learner_record}
+  use-ssl: ${DATABASE_USESSL:false}
 
 spring:
   profiles: production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=my-secret-pw&useSSL=false}
+    url: ${DATASOURCE_URL:${database.host}/${database.name}?useSSL=${database.use-ssl}&requireSSL=false}
+    username: ${DATASOURCE_USERNAME:username}
+    password: ${DATASOURCE_PASSWORD:my-secret-pw}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
