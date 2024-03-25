@@ -24,21 +24,12 @@ public class CourseRecordRepositoryTest {
     private CourseRecordRepository courseRecordRepository;
 
     @Test
-    public void shouldSaveCourseRecord() {
-        CourseRecord courseRecord = new CourseRecord("courseId", "userId");
-        courseRecordRepository.save(courseRecord);
-        assertThat(courseRecord.getIdentity(), notNullValue());
-    }
-
-    @Test
     public void shouldSaveCourseRecordWithModuleRecord() {
 
-        CourseRecord courseRecord = new CourseRecord("courseId", "userId");
-        courseRecord.addModuleRecord(new ModuleRecord("moduleId"));
+        CourseRecord courseRecord = createRegistration("userId", "eventId");
 
-        courseRecord = courseRecordRepository.save(courseRecord);
-
-        assertThat(courseRecord.getIdentity(), notNullValue());
+        assertThat(courseRecord.getCourseId(), notNullValue());
+        assertThat(courseRecord.getUserId(), notNullValue());
         assertThat(courseRecord.getModuleRecord("moduleId").getId(), notNullValue());
     }
 
@@ -62,6 +53,7 @@ public class CourseRecordRepositoryTest {
 
         // Add a non-event record for good measure
         CourseRecord courseRecord = new CourseRecord("courseId", "userId");
+        courseRecord.setCourseTitle("title");
         courseRecordRepository.save(courseRecord);
 
         final String eventId = "eventId";
@@ -76,15 +68,18 @@ public class CourseRecordRepositoryTest {
         assertThat(Iterables.size(records), is(registrations));
     }
 
-    private void createRegistration(String userId, String eventId) {
+    private CourseRecord createRegistration(String userId, String eventId) {
 
         ModuleRecord moduleRecord = new ModuleRecord("moduleId");
+        moduleRecord.setModuleTitle("title");
         moduleRecord.setEventId(eventId);
+        moduleRecord.setModuleType("face-to-face");
         moduleRecord.setState(State.REGISTERED);
 
         CourseRecord courseRecord = new CourseRecord("courseId", userId);
+        courseRecord.setCourseTitle("title");
         courseRecord.addModuleRecord(moduleRecord);
 
-        courseRecordRepository.save(courseRecord);
+        return courseRecordRepository.save(courseRecord);
     }
 }

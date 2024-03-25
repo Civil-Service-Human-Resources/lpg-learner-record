@@ -2,16 +2,14 @@ package uk.gov.cslearning.record;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import uk.gov.cslearning.record.api.mapper.CourseRecordMapper;
-import uk.gov.cslearning.record.api.mapper.CourseRecordMapperImpl;
-import uk.gov.cslearning.record.api.mapper.ModuleRecordMapper;
-import uk.gov.cslearning.record.api.mapper.ModuleRecordMapperImpl;
+import org.springframework.context.annotation.Primary;
 import uk.gov.cslearning.record.api.output.error.GenericErrorResponseFactory;
-import uk.gov.cslearning.record.api.util.PatchHelper;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
+import uk.gov.cslearning.record.util.IUtilService;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @TestConfiguration
@@ -28,20 +26,24 @@ public class SpringTestConfiguration {
     }
 
     @Bean
-    public PatchHelper patchHelper() {
-        return new PatchHelper();
+    public IUtilService stringUtilService() {
+        return new IUtilService() {
+            @Override
+            public String generateUUID() {
+                return "UUID";
+            }
+
+            @Override
+            public LocalDateTime getNowDateTime() {
+                return LocalDateTime.now(clock());
+            }
+        };
     }
 
     @Bean
-    public CourseRecordMapper courseRecordMapper() { return new CourseRecordMapperImpl();
-    }
-
-    @Bean
-    public ModuleRecordMapper moduleRecordMapper() { return new ModuleRecordMapperImpl();
-    }
-
-    @Bean
-    public Clock clock() {return Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London"));
+    @Primary
+    public Clock clock() {
+        return Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London"));
     }
 
 }

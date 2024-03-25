@@ -1,8 +1,14 @@
+database:
+  host: ${DATABASE_HOST:jdbc:mysql://localhost:3306}
+  name: ${DATABASE_NAME:learner_record}
+  use-ssl: ${DATABASE_USESSL:false}
 spring:
-#  datasource:
-#      url: ${DATASOURCE:jdbc:mysql://localhost:3306/learner_record?user=root&password=password&useSSL=false}
-#      platform: mysql
-#      driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    url: ${DATASOURCE_URL:${database.host}/${database.name}?useSSL=${database.use-ssl}&requireSSL=false}
+    username: ${DATASOURCE_USERNAME:root}
+    password: ${DATASOURCE_PASSWORD:my-secret-pw}
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -12,8 +18,10 @@ spring:
   flyway:
     locations: classpath:db/migration/{vendor}
   jpa:
-    hibernate:
-      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        enable_lazy_load_no_trans: true
   cache:
     cache-names: courseId
     caffeine:
@@ -95,25 +103,6 @@ lpg-ui:
 
 retention:
   timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}
-
----
-database:
-  host: ${DATABASE_HOST:jdbc:mysql://localhost:3306}
-  name: ${DATABASE_NAME:learner_record}
-  use-ssl: ${DATABASE_USESSL:false}
-
-spring:
-  profiles: production
-  datasource:
-    url: ${DATASOURCE_URL:${database.host}/${database.name}?useSSL=${database.use-ssl}&requireSSL=false}
-    username: ${DATASOURCE_USERNAME:username}
-    password: ${DATASOURCE_PASSWORD:my-secret-pw}
-    platform: mysql
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 
 ---
 

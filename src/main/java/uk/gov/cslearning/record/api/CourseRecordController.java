@@ -1,11 +1,9 @@
 package uk.gov.cslearning.record.api;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.cslearning.record.api.input.POST.PostCourseRecordInput;
 import uk.gov.cslearning.record.api.output.CourseRecordOutput;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.service.CourseRecordService;
@@ -24,16 +22,8 @@ public class CourseRecordController {
         this.courseRecordService = courseRecordService;
     }
 
-    @PatchMapping(consumes = "application/json-patch+json")
-    public ResponseEntity<CourseRecord> updateCourseRecord(@RequestParam String userId,
-                                                           @RequestParam String courseId,
-                                                           @RequestBody JsonPatch patchData) {
-        CourseRecord updatedRecord = courseRecordService.updateCourseRecord(userId, courseId, patchData);
-        return new ResponseEntity<>(updatedRecord, HttpStatus.OK);
-    }
-
     @PostMapping
-    public ResponseEntity<CourseRecord> createCourseRecord(@Valid @RequestBody PostCourseRecordInput inputCourse) {
+    public ResponseEntity<CourseRecord> createCourseRecord(@Valid @RequestBody CourseRecord inputCourse) {
         log.debug("Creating course record");
         CourseRecord newRecord = courseRecordService.createCourseRecord(inputCourse);
         return new ResponseEntity<>(newRecord, HttpStatus.CREATED);
@@ -46,5 +36,11 @@ public class CourseRecordController {
         List<CourseRecord> courseRecords = courseRecordService.fetchCourseRecords(userId, courseIds);
         CourseRecordOutput responseObject = new CourseRecordOutput(courseRecords);
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
+    }
+
+    @PutMapping
+    @ResponseBody
+    public CourseRecord updateCourseRecord(@Valid @RequestBody CourseRecord courseRecord) {
+        return courseRecordService.updateCourseRecord(courseRecord);
     }
 }

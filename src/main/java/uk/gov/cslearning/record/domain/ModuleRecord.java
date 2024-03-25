@@ -10,8 +10,9 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -28,10 +29,13 @@ public class ModuleRecord {
     private String uid;
 
     @Column(nullable = false)
+    @NotBlank(message = "moduleId is required")
     private String moduleId;
 
+    @NotBlank(message = "ModuleTitle is required")
     private String moduleTitle;
 
+    @NotBlank(message = "moduleType is required")
     private String moduleType;
 
     private Long duration;
@@ -41,11 +45,13 @@ public class ModuleRecord {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate eventDate;
 
+    @NotNull(message = "optional is required")
     private Boolean optional = Boolean.FALSE;
 
     private BigDecimal cost;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private State state;
 
     @Enumerated(EnumType.STRING)
@@ -79,26 +85,21 @@ public class ModuleRecord {
     })
     private CourseRecord courseRecord;
 
-    @PreUpdate
-    @JsonIgnore
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now(Clock.systemDefaultZone());
-        courseRecord.setLastUpdated(updatedAt);
-    }
-
-    @PrePersist
-    public void onInsert() {
-        createdAt = LocalDateTime.now(Clock.systemDefaultZone());
-        courseRecord.setLastUpdated(updatedAt);
-        updatedAt = createdAt;
-    }
-
     public ModuleRecord() {
     }
 
     public ModuleRecord(String moduleId) {
         checkArgument(moduleId != null);
         this.moduleId = moduleId;
+    }
+
+    @JsonIgnore
+    public void update(ModuleRecord mr) {
+        this.setState(mr.getState());
+        this.setEventDate(mr.getEventDate());
+        this.setEventId(mr.getEventId());
+        this.setUpdatedAt(mr.getUpdatedAt());
+        this.setCompletionDate(mr.getCompletionDate());
     }
 
     public CourseRecord getCourseRecord() {
@@ -125,12 +126,12 @@ public class ModuleRecord {
         this.uid = uid;
     }
 
-    public void setModuleId(String moduleId) {
-        this.moduleId = moduleId;
-    }
-
     public String getModuleId() {
         return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
     }
 
     public String getEventId() {
@@ -290,4 +291,5 @@ public class ModuleRecord {
                 .append(eventId)
                 .toHashCode();
     }
+
 }
