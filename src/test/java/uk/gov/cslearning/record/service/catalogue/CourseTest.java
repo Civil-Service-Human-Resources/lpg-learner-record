@@ -64,7 +64,10 @@ public class CourseTest {
         civilServant.setOrganisationalUnit(organisationalUnit);
 
         CourseRecord courseRecord = new CourseRecord(courseId, userId);
+        courseRecord.setCourseTitle("title");
         ModuleRecord moduleRecord = new ModuleRecord(moduleId);
+        moduleRecord.setModuleType("elearning");
+        moduleRecord.setModuleTitle("title");
         moduleRecord.setState(State.COMPLETED);
         courseRecord.addModuleRecord(moduleRecord);
 
@@ -105,7 +108,10 @@ public class CourseTest {
         civilServant.setOrganisationalUnit(organisationalUnit);
 
         CourseRecord courseRecord = new CourseRecord(courseId, userId);
+        courseRecord.setCourseTitle("title");
         ModuleRecord moduleRecord = new ModuleRecord(moduleId);
+        moduleRecord.setModuleType("elearning");
+        moduleRecord.setModuleTitle("title");
         moduleRecord.setState(State.IN_PROGRESS);
         courseRecord.addModuleRecord(moduleRecord);
 

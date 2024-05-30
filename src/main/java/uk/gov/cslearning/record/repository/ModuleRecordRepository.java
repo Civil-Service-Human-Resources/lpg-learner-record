@@ -8,7 +8,6 @@ import uk.gov.cslearning.record.dto.ModuleRecordDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long> {
@@ -36,6 +35,4 @@ public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long
             "AND mr.courseRecord IS NOT EMPTY " +
             "ORDER BY mr.courseRecord.identity.userId")
     List<ModuleRecordDto> findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> courseIds);
-
-    Optional<ModuleRecord> findModuleRecordByModuleIdAndCourseRecordIdentityCourseIdAndCourseRecordIdentityUserId(String moduleId, String courseId, String userId);
 }

@@ -13,7 +13,10 @@ import uk.gov.cslearning.record.api.output.error.GenericErrorResponse;
 import uk.gov.cslearning.record.api.output.error.GenericErrorResponseFactory;
 import uk.gov.cslearning.record.dto.ErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
-import uk.gov.cslearning.record.exception.*;
+import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
+import uk.gov.cslearning.record.exception.EventNotFoundException;
+import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
 
 import java.util.Collections;
@@ -61,15 +64,6 @@ public class ApiExceptionHandler {
     protected ResponseEntity<GenericErrorResponse> handleResourceExistsException(ResourceExistsException e) {
         GenericErrorResponse response = genericErrorResponseFactory.createResourceExistsException(e.getMessage());
         return new ResponseEntity<GenericErrorResponse>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({PatchResourceException.class})
-    protected ResponseEntity<GenericErrorResponse> handleResourcePatchException(PatchResourceException e) {
-        LOGGER.error("Bad request: ", e);
-
-        GenericErrorResponse responseBody = new GenericErrorResponse(400, "", e.getMessages());
-        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

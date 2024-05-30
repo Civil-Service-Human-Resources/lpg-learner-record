@@ -1,34 +1,38 @@
 package uk.gov.cslearning.record.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
-import java.time.Clock;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
-import static java.util.Collections.unmodifiableCollection;
 
 @Entity
 public class CourseRecord {
 
     @JsonIgnore
     @EmbeddedId
+    @Valid
     private CourseRecordIdentity identity;
 
+    @NotBlank(message = "courseTitle is required")
     private String courseTitle;
 
     @Enumerated(EnumType.STRING)
     private State state;
 
-    private String preference;
+    @Enumerated(EnumType.STRING)
+    private Preference preference;
 
     @JsonIgnore
     private String profession;
@@ -40,39 +44,19 @@ public class CourseRecord {
     private boolean isRequired;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseRecord", fetch = FetchType.EAGER)
-    private Collection<ModuleRecord> moduleRecords;
+    @Valid
+    private Collection<ModuleRecord> moduleRecords = new HashSet<>();
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdated;
 
-    @PreUpdate
-    @JsonIgnore
-    public void onUpdate() {
-        lastUpdated = LocalDateTime.now(Clock.systemDefaultZone());
-    }
-
-    @PrePersist
-    @JsonIgnore
-    public void onPersist() {
-        lastUpdated = LocalDateTime.now(Clock.systemDefaultZone());
-    }
-
     public CourseRecord() {
     }
 
-    public CourseRecord(String courseId, String userId) {
-        checkArgument(courseId != null);
-        checkArgument(userId != null);
+    @JsonCreator
+    public CourseRecord(@NotBlank(message = "courseId is required") @JsonProperty("courseId") String courseId,
+                        @NotBlank(message = "userId is required") @JsonProperty("userId") String userId) {
         this.identity = new CourseRecordIdentity(courseId, userId);
-        this.moduleRecords = new HashSet<>();
-    }
-
-    public void setLastUpdated(LocalDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
-    public void setIdentity(CourseRecordIdentity identity) {
-        this.identity = identity;
     }
 
     public String getCourseTitle() {
@@ -87,8 +71,16 @@ public class CourseRecord {
         return identity;
     }
 
+    public void setIdentity(CourseRecordIdentity identity) {
+        this.identity = identity;
+    }
+
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
+    }
+
+    public void setLastUpdated(LocalDateTime lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     @JsonProperty("courseId")
@@ -101,11 +93,11 @@ public class CourseRecord {
         return identity.getUserId();
     }
 
-    public String getPreference() {
+    public Preference getPreference() {
         return preference;
     }
 
-    public void setPreference(String preference) {
+    public void setPreference(Preference preference) {
         this.preference = preference;
     }
 
@@ -127,12 +119,19 @@ public class CourseRecord {
 
     @JsonProperty("modules")
     public Collection<ModuleRecord> getModuleRecords() {
-        return unmodifiableCollection(moduleRecords);
+        return moduleRecords;
+    }
+
+    public void setModuleRecords(List<ModuleRecord> updatedModules) {
+        this.moduleRecords = updatedModules;
     }
 
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
         moduleRecord.setCourseRecord(this);
+        if (moduleRecords == null) {
+            moduleRecords = new ArrayList<>();
+        }
         moduleRecords.add(moduleRecord);
     }
 
@@ -171,27 +170,9 @@ public class CourseRecord {
         return false;
     }
 
-    public boolean isComplete() {
-        return this.state == State.COMPLETED;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        CourseRecord that = (CourseRecord) o;
-
-        return new EqualsBuilder()
-                .append(identity, that.identity)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(identity)
-                .toHashCode();
+    public void update(CourseRecord input) {
+        this.state = input.getState();
+        this.preference = input.getPreference();
+        this.lastUpdated = input.getLastUpdated();
     }
 }
