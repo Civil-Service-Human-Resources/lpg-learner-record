@@ -35,8 +35,8 @@ public class ModuleRecordService {
     public ModuleRecord updateModuleRecord(Long moduleRecordId, ModuleRecord newRecord, LocalDateTime updated) {
         ModuleRecord moduleRecord = moduleRecordRepository.findById(moduleRecordId).orElseThrow(() -> new ModuleRecordNotFoundException(moduleRecordId));
         newRecord.setUpdatedAt(updated);
-        if (StringUtils.isBlank(newRecord.getUid())) {
-            newRecord.setUid(utilService.generateUUID());
+        if (StringUtils.isBlank(moduleRecord.getUid())) {
+            moduleRecord.setUid(utilService.generateUUID());
         }
         moduleRecord.update(newRecord);
         return moduleRecordRepository.saveAndFlush(moduleRecord);
