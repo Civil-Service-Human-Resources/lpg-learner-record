@@ -131,12 +131,13 @@ dependencies {
     compile 'org.codehaus.janino:janino:3.0.8'
     compile 'org.reflections:reflections:0.9.11'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.5'
-    compile 'uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE'
+    compile 'uk.gov.service.notify:notifications-java-client:3.9.2-RELEASE'
 
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
 
     compile 'org.apache.commons:commons-collections4:4.4'
-    compile 'javax.interceptor:javax.interceptor-api:3.1'
+    implementation group: 'jakarta.interceptor', name: 'jakarta.interceptor-api', version: '2.2.0'
+
 
     compile group: 'org.hashids', name: 'hashids', version: '1.0.3'
 
