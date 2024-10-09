@@ -45,7 +45,7 @@ logging:
 
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
-  email: ${notifications.service}/notifications/email/
+  email: ${notifications.service}/notifications/email
   completed-job-cron: ${COMPLETED_JOB_CRON:0 0 1 * * *}
   incomplete-job-cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
   completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
