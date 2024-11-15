@@ -1,35 +1,5 @@
 package uk.gov.cslearning.record.service.scheduler;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
-import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.CourseRecordIdentity;
-import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.NotificationType;
-import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.repository.NotificationRepository;
-import uk.gov.cslearning.record.service.NotifyService;
-import uk.gov.cslearning.record.service.catalogue.Course;
-import uk.gov.cslearning.record.service.identity.Identity;
-import uk.gov.cslearning.record.service.identity.IdentityService;
-import uk.gov.service.notify.NotificationClientException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +10,28 @@ import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
+import uk.gov.cslearning.record.domain.Notification;
+import uk.gov.cslearning.record.domain.NotificationType;
+import uk.gov.cslearning.record.repository.CourseRecordRepository;
+import uk.gov.cslearning.record.repository.NotificationRepository;
+import uk.gov.cslearning.record.service.NotifyService;
+import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.identity.Identity;
+import uk.gov.cslearning.record.service.identity.IdentityService;
+import uk.gov.service.notify.NotificationClientException;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -51,7 +43,6 @@ public class LearningJobTest {
     private static final String COURSE_TITLE_2 = "Title 2";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final String EMAIL = "test@example.com";
-    private static final String MANAGER_EMAIL = "test@example.com";
     private static final String MONTH_PERIOD = "1 month";
     private static final String IDENTITY_UID = "identity123";
 
@@ -195,45 +186,6 @@ public class LearningJobTest {
         assertThat(requiredLearningCaptor.getValue(), equalTo(expectedRequiredLearning));
 
         assertThat(periodCaptor.getValue(), equalTo(MONTH_PERIOD));
-    }
-
-
-    @Test
-    public void testArgumentsOfLearningNotificationsForCompletedCourses() throws NotificationClientException {
-        Identity identity = new Identity();
-        identity.setUid("uid");
-
-        CourseRecord courseRecord = new CourseRecord();
-        courseRecord.setIdentity(new CourseRecordIdentity("1", identity.getUid()));
-        courseRecord.setCourseTitle(COURSE_TITLE_1);
-
-        CivilServant civilServant = new CivilServant();
-        civilServant.setFullName("test user");
-        civilServant.setLineManagerUid("managerUid");
-        civilServant.setLineManagerEmailAddress(MANAGER_EMAIL);
-
-        CivilServant managerCivilServant = new CivilServant();
-        managerCivilServant.setFullName("manager");
-
-        when(registryService.getCivilServantByUid("managerUid"))
-                .thenReturn(Optional.of(managerCivilServant));
-
-        LocalDateTime now = LocalDateTime.now();
-        when(identityService.getEmailAddress("managerUid")).thenReturn("test@example.com");
-        learningJob.checkAndNotifyLineManager(civilServant, courseRecord, now);
-
-        ArgumentCaptor<String> emailCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> courseCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> templateIdCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> learnerCaptor = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> managerCaptor = ArgumentCaptor.forClass(String.class);
-
-        verify(notifyService).notifyOnComplete(emailCaptor.capture(), templateIdCaptor.capture(), learnerCaptor.capture(), managerCaptor.capture(), courseCaptor.capture());
-
-        assertThat(emailCaptor.getValue(), equalTo(MANAGER_EMAIL));
-        assertThat(courseCaptor.getValue(), equalTo(COURSE_TITLE_1));
-        assertThat(learnerCaptor.getValue(), equalTo("test user"));
-        assertThat(managerCaptor.getValue(), equalTo("test@example.com"));
     }
 
     @Test
