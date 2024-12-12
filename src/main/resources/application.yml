@@ -46,9 +46,7 @@ logging:
 notifications:
   service: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
   email: ${notifications.service}/notifications/email
-  completed-job-cron: ${COMPLETED_JOB_CRON:0 0 1 * * *}
   incomplete-job-cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
-  completed-job-enabled: ${COMPLETED_JOB_ENABLED:true}
   incompleted-job-enabled: ${INCOMPLETED_JOB_ENABLED:true}
 
 oauth:
@@ -75,7 +73,6 @@ registry:
   findByUidUrlFormat: "${registry.serviceUrl}/civilServants/search/findByIdentity?uid=%s&projection=allCivilServantDetails"
   getResourceByUidUrl: "${registry.serviceUrl}/civilServants/resource/%s"
   getResourceByOrgCodeUrl: "${registry.serviceUrl}/civilServants/organisation/%s"
-  getOrganisationalUnit: "${registry.serviceUrl}/organisationalUnits/parent/%s"
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
@@ -87,7 +84,6 @@ govNotify:
   key: ${GOV_NOTIFY_API_KEY:test-22877568-4bca-40f9-8f54-8bf7922583cf-e2f80f22-e3de-4007-9ce2-b50a2b5785b7}
   template:
     requiredLearningDue: ${GOV_NOTIFY_REQUIRED_LEARNING_DUE_TEMPLATE_ID:ead2c71c-4dea-497f-80de-30d3d3645016}
-    completedLearning: ${GOV_NOTIFY_LEARNING_COMPLETED_TEMPLATE_ID:3f50f0eb-4c47-4e37-8a44-1628faa41924}
     inviteLearner: ${GOV_NOTIFY_INVITE_LEARNER_TEMPLATE_ID:cf623c5b-b9e9-4899-b419-4f851e581056}
     cancelBooking: ${GOV_NOTIFY_CANCEL_BOOKING_TEMPLATE_ID:cc525c34-1a31-4fa1-ab19-862fd223caab}
     cancelEvent: ${GOV_NOTIFY_CANCEL_EVENT_TEMPLATE_ID:26e0e8ae-7617-40f7-be37-ca63b8a0d257}
