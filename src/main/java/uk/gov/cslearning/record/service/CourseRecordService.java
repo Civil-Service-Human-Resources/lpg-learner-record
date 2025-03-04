@@ -3,6 +3,8 @@ package uk.gov.cslearning.record.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import uk.gov.cslearning.record.api.FetchCourseRecordParams;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.CourseRecords;
 import uk.gov.cslearning.record.domain.ModuleRecord;
@@ -53,18 +55,17 @@ public class CourseRecordService {
         return input;
     }
 
-    public List<CourseRecord> fetchCourseRecords(String userId, List<String> courseIds) {
-        if (courseIds.isEmpty()) {
-            log.info(String.format("Fetching all course records for user '%s'", userId));
-            return courseRecordRepository.findByUserId(userId);
+    public List<CourseRecord> fetchCourseRecords(FetchCourseRecordParams fetchCourseRecordParams) {
+        if (CollectionUtils.isEmpty(fetchCourseRecordParams.getCourseIds())) {
+            log.info(String.format("Fetching all course records for user '%s'", fetchCourseRecordParams.getUserId()));
+            return courseRecordRepository.findByUserId(fetchCourseRecordParams.getUserId());
         } else {
-            log.info(String.format("Fetching all course records for user '%s' and course IDs '%s'", userId, courseIds));
-            return courseRecordRepository.findByUserIdAndCourseIdIn(userId, courseIds);
+            log.info(String.format("Fetching all course records for user '%s' and course IDs '%s'", fetchCourseRecordParams.getUserId(), fetchCourseRecordParams.getCourseIds()));
+            return courseRecordRepository.findByUserIdAndCourseIdIn(fetchCourseRecordParams.getUserId(), fetchCourseRecordParams.getCourseIds());
         }
     }
 
     public CourseRecords getCourseRecords(String userId, List<String> courseIds) {
-//        List<CourseRecord> crs = courseRecordRepository.findAll();
         List<CourseRecord> crs = courseRecordRepository.findByUserIdAndCourseIdIn(userId, courseIds);
         return CourseRecords.create(userId, crs);
     }

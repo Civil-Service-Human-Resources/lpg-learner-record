@@ -30,10 +30,8 @@ public class CourseRecordController {
     }
 
     @GetMapping
-    public ResponseEntity<CourseRecordOutput> fetchCourseRecords(@RequestParam String userId,
-                                                                 @RequestParam(required = false) List<String> courseIds) {
-
-        List<CourseRecord> courseRecords = courseRecordService.fetchCourseRecords(userId, courseIds);
+    public ResponseEntity<CourseRecordOutput> fetchCourseRecords(@Valid FetchCourseRecordParams fetchCourseRecordParams) {
+        List<CourseRecord> courseRecords = courseRecordService.fetchCourseRecords(fetchCourseRecordParams);
         CourseRecordOutput responseObject = new CourseRecordOutput(courseRecords);
         return new ResponseEntity<>(responseObject, HttpStatus.OK);
     }
