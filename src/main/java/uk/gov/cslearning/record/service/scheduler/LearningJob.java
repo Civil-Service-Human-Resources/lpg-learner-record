@@ -69,9 +69,6 @@ public class LearningJob {
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
         LearningJobCourseDataMap requiredLearningData = getRequiredLearningJobMap();
         log.info("Fetching civil servants for course data");
-//        Map<String, List<CourseRecords>> civilServants = requiredLearningData.getOrgCodes().stream().collect(Collectors.toMap(
-//                Function.identity(), orgCode -> groupCourseRecordsByUserId(orgCode, requiredLearningData.getCourseIds().stream().toList())
-//        ));
         List<String> courseIds = requiredLearningData.getCourseIds().stream().toList();
         Map<String, List<CourseRecords>> civilServants = new HashMap<>();
         for (String orgCode : requiredLearningData.getOrgCodes()) {
