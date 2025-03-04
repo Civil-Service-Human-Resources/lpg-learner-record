@@ -1,34 +1,35 @@
 package uk.gov.cslearning.record.notifications.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import uk.gov.cslearning.record.client.notification.INotificationClient;
+import uk.gov.cslearning.record.config.NotificationTemplates;
+import uk.gov.cslearning.record.notifications.dto.IMessageParams;
 import uk.gov.cslearning.record.notifications.dto.MessageDto;
-import uk.gov.cslearning.record.service.RequestEntityFactory;
+import uk.gov.cslearning.record.util.IUtilService;
+
+import java.util.List;
 
 @Service
 public class NotificationService {
 
-    private final RestTemplate restTemplate;
+    private final IUtilService stringUtils;
+    private final INotificationClient notificationClient;
+    private final NotificationTemplates notificationTemplates;
 
-    private final RequestEntityFactory requestEntityFactory;
-
-    private final String emailNotificationUrl;
-
-    public NotificationService(RestTemplate restTemplate, RequestEntityFactory requestEntityFactory,
-                               @Value("${notifications.email}") String emailNotificationUrl) {
-        this.restTemplate = restTemplate;
-        this.requestEntityFactory = requestEntityFactory;
-        this.emailNotificationUrl = emailNotificationUrl;
+    public NotificationService(IUtilService stringUtils, INotificationClient notificationClient,
+                               NotificationTemplates notificationTemplates) {
+        this.stringUtils = stringUtils;
+        this.notificationClient = notificationClient;
+        this.notificationTemplates = notificationTemplates;
     }
 
-    public boolean send(MessageDto message) {
-        RequestEntity requestEntity = requestEntityFactory.createPostRequest(emailNotificationUrl, message);
+    public void send(IMessageParams message) {
+        String templateName = notificationTemplates.getTemplate(message.getTemplate());
+        MessageDto messageDto = new MessageDto(message.getRecipient(), message.getPersonalisation(), stringUtils.generateUUID());
+        notificationClient.sendEmail(templateName, messageDto);
+    }
 
-        ResponseEntity<Void> response = restTemplate.exchange(requestEntity, Void.class);
-
-        return response.getStatusCode().is2xxSuccessful();
+    public void send(List<IMessageParams> messages) {
+        messages.forEach(this::send);
     }
 }

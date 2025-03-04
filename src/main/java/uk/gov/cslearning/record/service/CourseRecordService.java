@@ -2,9 +2,9 @@ package uk.gov.cslearning.record.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.CourseRecords;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
@@ -54,13 +54,23 @@ public class CourseRecordService {
     }
 
     public List<CourseRecord> fetchCourseRecords(String userId, List<String> courseIds) {
-        if (CollectionUtils.isEmpty(courseIds)) {
+        if (courseIds.isEmpty()) {
             log.info(String.format("Fetching all course records for user '%s'", userId));
             return courseRecordRepository.findByUserId(userId);
         } else {
             log.info(String.format("Fetching all course records for user '%s' and course IDs '%s'", userId, courseIds));
             return courseRecordRepository.findByUserIdAndCourseIdIn(userId, courseIds);
         }
+    }
+
+    public CourseRecords getCourseRecords(String userId, List<String> courseIds) {
+//        List<CourseRecord> crs = courseRecordRepository.findAll();
+        List<CourseRecord> crs = courseRecordRepository.findByUserIdAndCourseIdIn(userId, courseIds);
+        return CourseRecords.create(userId, crs);
+    }
+
+    public List<CourseRecords> getCourseRecords(List<String> userIds, List<String> courseIds) {
+        return userIds.stream().map(uid -> getCourseRecords(uid, courseIds)).toList();
     }
 
     public CourseRecord createCourseRecord(CourseRecord courseRecord) {

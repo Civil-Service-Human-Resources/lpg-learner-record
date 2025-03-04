@@ -1,32 +1,18 @@
 package uk.gov.cslearning.record;
 
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import uk.gov.cslearning.record.api.output.error.GenericErrorResponseFactory;
-import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.util.IUtilService;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 
-@TestConfiguration
+@Configuration
 public class SpringTestConfiguration {
 
     @Bean
-    public ErrorDtoFactory errorDtoFactory() {
-        return new ErrorDtoFactory();
-    }
-
-    @Bean
-    public GenericErrorResponseFactory genericErrorResponseFactory() {
-        return new GenericErrorResponseFactory();
-    }
-
-    @Bean
-    public IUtilService stringUtilService() {
+    @Primary
+    public IUtilService testUtilService() {
         return new IUtilService() {
             @Override
             public String generateUUID() {
@@ -34,8 +20,18 @@ public class SpringTestConfiguration {
             }
 
             @Override
+            public String generateSaltedString(int hashLength) {
+                return "Rand1";
+            }
+
+            @Override
             public LocalDateTime getNowDateTime() {
                 return LocalDateTime.now(clock());
+            }
+
+            @Override
+            public Instant getNowInstant() {
+                return getNowDateTime().toInstant(ZoneOffset.UTC);
             }
         };
     }

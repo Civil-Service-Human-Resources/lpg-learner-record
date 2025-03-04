@@ -1,15 +1,14 @@
 package uk.gov.cslearning.record.service;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.domain.Invite;
-import uk.gov.cslearning.record.domain.factory.InviteFactory;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
 import uk.gov.cslearning.record.repository.InviteRepository;
@@ -18,16 +17,16 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
 
-@RunWith(MockitoJUnitRunner.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
+@ExtendWith(SpringExtension.class)
 public class DefaultInviteServiceTest {
     @Mock
     private InviteRepository inviteRepository;
 
     @Mock
     private InviteDtoFactory inviteDtoFactory;
-
-    @Mock
-    private InviteFactory inviteFactory;
 
     @Mock
     private EventService eventService;
@@ -49,7 +48,7 @@ public class DefaultInviteServiceTest {
         Mockito.when(inviteRepository.findAllByEventUid(eventId)).thenReturn(invites);
         Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
 
-        Assert.assertEquals(inviteDto, ((ArrayList) inviteService.findByEventId(eventId)).get(0));
+        assertEquals(inviteDto, inviteService.findByEventId(eventId).stream().findFirst().get());
     }
 
     @Test
@@ -61,7 +60,7 @@ public class DefaultInviteServiceTest {
         Mockito.when(inviteRepository.findById(id)).thenReturn(Optional.of(new Invite()));
         Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
 
-        Assert.assertEquals(inviteService.findInvite(id), Optional.of(inviteDto));
+        assertEquals(Optional.of(inviteDto), inviteService.findInvite(id));
 
         Mockito.verify(inviteRepository).findById(id);
         Mockito.verify(inviteDtoFactory).create(invite);
@@ -73,7 +72,7 @@ public class DefaultInviteServiceTest {
 
         Mockito.when(inviteRepository.findById(id)).thenReturn(Optional.empty());
 
-        Assert.assertEquals(inviteService.findInvite(id), Optional.empty());
+        assertEquals(Optional.empty(), inviteService.findInvite(id));
 
         Mockito.verify(inviteRepository).findById(id);
     }

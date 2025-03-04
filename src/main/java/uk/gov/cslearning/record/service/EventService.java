@@ -6,7 +6,6 @@ import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface EventService {
 
@@ -14,13 +13,10 @@ public interface EventService {
     Event getEvent(String eventUid, String path);
 
     @Transactional
-    Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus);
+    EventDto updateStatus(String eventUid, EventStatusDto eventStatus);
 
     @Transactional(readOnly = true)
     EventDto findByUid(String eventUid, boolean getBookingCount);
-
-    @Transactional(readOnly = true)
-    EventDto findByUid(String uid);
 
     @Transactional
     EventDto create(EventDto eventDto);

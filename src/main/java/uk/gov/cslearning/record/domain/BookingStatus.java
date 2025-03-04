@@ -9,7 +9,7 @@ import java.util.Arrays;
 public enum BookingStatus {
     REQUESTED("Requested"), CONFIRMED("Confirmed"), CANCELLED("Cancelled");
 
-    private String value;
+    private final String value;
 
     BookingStatus(String value) {
         this.value = value;

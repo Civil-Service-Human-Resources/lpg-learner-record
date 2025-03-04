@@ -1,0 +1,303 @@
+{
+  "CO": [
+    {
+      "id": "courseId1",
+      "title": "Course 1",
+      "modules": [
+        {
+          "id": "moduleId1",
+          "type": "link",
+          "title": "module1",
+          "description": "module1",
+          "optional": true,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId2",
+          "type": "link",
+          "title": "module2",
+          "description": "module2",
+          "optional": false,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId3",
+          "type": "link",
+          "title": "module3",
+          "description": "module3",
+          "optional": false,
+          "moduleType": "link"
+        }
+      ],
+      "audiences": [
+        {
+          "id": "due-in-5-days",
+          "name": "Due in 5 days",
+          "departments": [
+            "CO",
+            "HMRC"
+          ],
+          "requiredBy": "2022-01-06T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        },
+        {
+          "id": "due-in-1-day",
+          "name": "Due in 1 day",
+          "departments": [
+            "DWP"
+          ],
+          "requiredBy": "2023-01-02T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "status": "Published"
+    },
+    {
+      "id": "courseId3",
+      "title": "Course 3",
+      "shortDescription": "Course 3",
+      "description": "Course 3",
+      "modules": [
+        {
+          "id": "moduleId1",
+          "type": "link",
+          "title": "module1",
+          "description": "module1",
+          "optional": false,
+          "moduleType": "link"
+        }
+      ],
+      "audiences": [
+        {
+          "id": "due-in-5-days",
+          "name": "Due in 5 days",
+          "departments": [
+            "CO"
+          ],
+          "requiredBy": "2022-01-06T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "status": "Published"
+    }
+  ],
+  "DWP": [
+    {
+      "id": "courseId1",
+      "title": "Course 1",
+      "shortDescription": "Course 1",
+      "description": "Course 1",
+      "modules": [
+        {
+          "id": "moduleId1",
+          "type": "link",
+          "title": "module1",
+          "description": "module1",
+          "optional": true,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId2",
+          "type": "link",
+          "title": "module2",
+          "description": "module2",
+          "optional": false,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId3",
+          "type": "link",
+          "title": "module3",
+          "description": "module3",
+          "optional": false,
+          "moduleType": "link"
+        }
+      ],
+      "audiences": [
+        {
+          "id": "due-in-5-days",
+          "name": "Due in 5 days",
+          "departments": [
+            "CO",
+            "HMRC"
+          ],
+          "requiredBy": "2022-01-06T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        },
+        {
+          "id": "due-in-1-day",
+          "name": "Due in 1 day",
+          "departments": [
+            "DWP"
+          ],
+          "requiredBy": "2023-01-02T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "status": "Published"
+    },
+    {
+      "id": "courseId2",
+      "title": "Course 2",
+      "shortDescription": "Course 2",
+      "description": "Course 2",
+      "modules": [
+        {
+          "id": "moduleId1",
+          "type": "link",
+          "title": "module1",
+          "description": "module1",
+          "optional": false,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId2",
+          "type": "link",
+          "title": "module2",
+          "description": "module2",
+          "optional": false,
+          "moduleType": "link"
+        }
+      ],
+      "audiences": [
+        {
+          "id": "due-in-5-days",
+          "name": "Due in 5 days",
+          "departments": [
+            "DWP"
+          ],
+          "requiredBy": "2023-01-06T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        },
+        {
+          "id": "due-in-1-day",
+          "name": "Due in 1 day",
+          "departments": [
+            "HMRC"
+          ],
+          "requiredBy": "2023-01-02T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "status": "Published"
+    }
+  ],
+  "HMRC": [
+    {
+      "id": "courseId1",
+      "title": "Course 1",
+      "shortDescription": "Course 1",
+      "description": "Course 1",
+      "modules": [
+        {
+          "id": "moduleId1",
+          "type": "link",
+          "title": "module1",
+          "description": "module1",
+          "optional": true,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId2",
+          "type": "link",
+          "title": "module2",
+          "description": "module2",
+          "optional": false,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId3",
+          "type": "link",
+          "title": "module3",
+          "description": "module3",
+          "optional": false,
+          "moduleType": "link"
+        }
+      ],
+      "audiences": [
+        {
+          "id": "due-in-5-days",
+          "name": "Due in 5 days",
+          "departments": [
+            "CO",
+            "HMRC"
+          ],
+          "requiredBy": "2023-01-06T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        },
+        {
+          "id": "due-in-1-day",
+          "name": "Due in 1 day",
+          "departments": [
+            "DWP"
+          ],
+          "requiredBy": "2024-01-02T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "status": "Published"
+    },
+    {
+      "id": "courseId2",
+      "title": "Course 2",
+      "shortDescription": "Course 2",
+      "description": "Course 2",
+      "modules": [
+        {
+          "id": "moduleId1",
+          "type": "link",
+          "title": "module1",
+          "description": "module1",
+          "optional": false,
+          "moduleType": "link"
+        },
+        {
+          "id": "moduleId2",
+          "type": "link",
+          "title": "module2",
+          "description": "module2",
+          "optional": false,
+          "moduleType": "link"
+        }
+      ],
+      "audiences": [
+        {
+          "id": "due-in-5-days",
+          "name": "Due in 5 days",
+          "departments": [
+            "DWP"
+          ],
+          "requiredBy": "2022-01-06T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        },
+        {
+          "id": "due-in-1-day",
+          "name": "Due in 1 day",
+          "departments": [
+            "HMRC"
+          ],
+          "requiredBy": "2023-01-02T00:00:00Z",
+          "frequency": "P1Y",
+          "type": "REQUIRED_LEARNING"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "status": "Published"
+    }
+  ]
+}

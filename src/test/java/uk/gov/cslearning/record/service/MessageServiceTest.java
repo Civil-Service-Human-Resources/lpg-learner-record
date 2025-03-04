@@ -1,119 +1,156 @@
 package uk.gov.cslearning.record.service;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.cslearning.record.config.LpgUiConfig;
+import uk.gov.cslearning.record.config.NotificationTemplates;
+import uk.gov.cslearning.record.csrs.domain.CivilServant;
+import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.Learner;
-import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
+import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.InviteDto;
-import uk.gov.cslearning.record.notifications.dto.MessageDto;
-import uk.gov.cslearning.record.notifications.dto.factory.MessageDtoFactory;
+import uk.gov.cslearning.record.notifications.dto.IMessageParams;
+import uk.gov.cslearning.record.notifications.dto.NotificationTemplate;
+import uk.gov.cslearning.record.service.catalogue.Module;
 import uk.gov.cslearning.record.service.catalogue.*;
+import uk.gov.cslearning.record.util.IUtilService;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class MessageServiceTest {
-    private final LearningCatalogueService learningCatalogueService = mock(LearningCatalogueService.class);
+    private static final Course course = new Course("id", "title", List.of(), List.of());
 
-    private final MessageDtoFactory messageDtoFactory = mock(MessageDtoFactory.class);
+    static {
+        Venue venue = new Venue();
+        venue.setLocation("London");
 
-    private final String bookingUrlFormat = "test/format/%s/%s";
-    private final String learningCatalogueBaseUrl = "http://host";
+        DateRange dateRange = new DateRange();
+        dateRange.setDate(LocalDate.of(2025, 2, 26));
+        ArrayList<DateRange> dateRanges = new ArrayList<>();
+        dateRanges.add(dateRange);
 
-    private final String inviteMessageTemplateId = "inviteTemplateId";
-    private final String unregisterMessageTemplateId = "unregisterTemplateId";
-    private final String cancelEventMessageTemplateId = "cancelEventTemplateId";
-    private final String bookingConfirmedMessageTemplateID = "bookingConfirmedTemplateId";
-    private final String bookingConfirmedMessageLineManagerTemplateId = "bookingConfirmedMessageLineManagerTemplateId";
-    private final String bookingCancelledMessageLineManagerTemplateId = "bookingCancelledMessageLineManagerTemplateId";
-    private final String bookingRequestMessageLineManagerTemplateId = "bookingRequestMessageLineManagerTemplateId";
-    private final String bookingRequestedMessageTemplateId = "bookingRequestedTemplateId";
+        Event event = new Event();
+        event.setId("eventId");
+        event.setDateRanges(dateRanges);
+        event.setVenue(venue);
 
-    private final MessageService messageService = new MessageService(learningCatalogueService, messageDtoFactory, bookingUrlFormat, learningCatalogueBaseUrl, inviteMessageTemplateId, unregisterMessageTemplateId,
-            cancelEventMessageTemplateId, bookingConfirmedMessageTemplateID, bookingConfirmedMessageLineManagerTemplateId, bookingCancelledMessageLineManagerTemplateId, bookingRequestMessageLineManagerTemplateId, bookingRequestedMessageTemplateId);
+        Module module = new Module();
+        module.setCost(BigDecimal.valueOf(10L));
+        module.setId("moduleId");
+        module.setEvents(List.of(event));
+        course.setModules(List.of(module));
+    }
+
+    @Mock
+    private LearningCatalogueService learningCatalogueService;
+    @Mock
+    private NotificationTemplates notificationTemplates;
+    @Mock
+    private RegistryService registryService;
+    @Mock
+    private LpgUiConfig lpgUiConfig;
+
+    @Mock
+    private IUtilService utilService;
+
+    @InjectMocks
+    private MessageService messageService;
+
+    @BeforeEach
+    public void before() {
+        when(utilService.generateUUID()).thenReturn("UID");
+        when(notificationTemplates.getTemplate(any())).thenReturn("Template");
+        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
+        when(lpgUiConfig.getBookingUrl(any(), any())).thenReturn("bookingUrl");
+    }
+
+    private void validateIMessageParams(IMessageParams params, String expectedRecipient,
+                                        Map<String, String> expectedPersonalisation, NotificationTemplate expectedTemplate) {
+        assertEquals(expectedRecipient, params.getRecipient());
+        assertEquals(expectedTemplate, params.getTemplate());
+        assertEquals(expectedPersonalisation, params.getPersonalisation());
+    }
 
     @Test
     public void shouldCreateInviteMessage() throws URISyntaxException {
         InviteDto inviteDto = new InviteDto();
-        inviteDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
+        inviteDto.setEvent(new URI("http://host/course/courseId/module/moduleId/event/eventId"));
         inviteDto.setLearnerEmail("test@domain.com");
 
-        Course course = new Course();
-        course.setTitle("title");
-
-        Venue venue = new Venue();
-        venue.setLocation("London");
-
-        DateRange dateRange = new DateRange();
-        dateRange.setDate(LocalDate.now());
-        ArrayList<DateRange> dateRanges = new ArrayList<>();
-        dateRanges.add(dateRange);
-
-        Event event = new Event();
-        event.setDateRanges(dateRanges);
-        event.setVenue(venue);
-
-        MessageDto messageDto = new MessageDto();
-
-        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
-        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
-
-        assertEquals(messageService.createInviteMessage(inviteDto), messageDto);
-
+        IMessageParams messageDto = messageService.createInviteMessage(inviteDto);
+        validateIMessageParams(messageDto, "test@domain.com", Map.of(
+                "learnerName", "test@domain.com",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "inviteLink", "bookingUrl"
+        ), NotificationTemplate.INVITE_LEARNER);
         verify(learningCatalogueService).getCourse("courseId");
-        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
-        verify(messageDtoFactory).create(any(), any(), any());
     }
 
     @Test
     public void shouldCreateUnregisterMessage() throws URISyntaxException {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
-        bookingDto.setLearnerEmail("test@domain.com");
-        bookingDto.setLearner("learnerId");
+        Learner learner = new Learner("learnerId", "test@domain.com");
+        Booking booking = new Booking();
+        uk.gov.cslearning.record.domain.Event event = new uk.gov.cslearning.record.domain.Event();
+        event.setPath("host/course/courseId/module/moduleId/event/eventId");
+        booking.setEvent(event);
+        booking.setLearner(learner);
+        booking.setCancellationReason(BookingCancellationReason.PAYMENT);
+        booking.setBookingReference("reference");
 
-        Course course = new Course();
-        course.setTitle("title");
+        CivilServant civilServant = new CivilServant();
+        civilServant.setLineManagerEmailAddress("lmEmail@domain.com");
+        civilServant.setFullName("Learner");
+        when(registryService.getCivilServantResourceByUid(any())).thenReturn(Optional.of(civilServant));
 
-        Venue venue = new Venue();
-        venue.setLocation("London");
-
-        DateRange dateRange = new DateRange();
-        dateRange.setDate(LocalDate.now());
-        ArrayList<DateRange> dateRanges = new ArrayList<>();
-        dateRanges.add(dateRange);
-
-        Event event = new Event();
-        event.setDateRanges(dateRanges);
-        event.setVenue(venue);
-
-        MessageDto messageDto = new MessageDto();
-
-        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
-        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
-
-        assertEquals(messageService.createUnregisterMessage(bookingDto, ""), messageDto);
-
-        verify(learningCatalogueService).getCourse("courseId");
-        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
-        verify(messageDtoFactory).create(any(), any(), any());
+        List<IMessageParams> messageDtos = messageService.createCancelBookingMessages(booking);
+        IMessageParams learnerMessage = messageDtos.get(0);
+        validateIMessageParams(learnerMessage, "test@domain.com", Map.of(
+                "courseTitle", "title",
+                "learnerName", "test@domain.com",
+                "cancellationReason", "the booking has not been paid",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "bookingReference", "reference"
+        ), NotificationTemplate.CANCEL_BOOKING);
+        IMessageParams lmMessage = messageDtos.get(1);
+        validateIMessageParams(lmMessage, "lmEmail@domain.com", Map.of(
+                "recipient", "lmEmail@domain.com",
+                "learnerName", "Learner",
+                "learnerEmail", "test@domain.com",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "cost", "10",
+                "bookingReference", "reference"
+        ), NotificationTemplate.BOOKING_CANCELLED_LINE_MANAGER);
     }
 
     @Test
-    public void shouldCreateCancelEventMessage() throws URISyntaxException {
+    public void shouldCreateCancelEventMessags() {
         uk.gov.cslearning.record.domain.Event recordEvent = new uk.gov.cslearning.record.domain.Event();
-        recordEvent.setPath("/course/courseId/module/moduleId/event/eventId");
+        recordEvent.setPath("/courses/courseId/modules/moduleId/events/eventId");
 
         Learner learner = new Learner();
         learner.setLearnerEmail("test@domain.com");
@@ -121,106 +158,117 @@ public class MessageServiceTest {
 
         Booking booking = new Booking();
         booking.setLearner(learner);
-        booking.setEvent(recordEvent);
+        booking.setBookingReference("reference");
+        recordEvent.addBooking(booking);
 
-        String cancellationReason = "cancellation reason";
+        Learner learner2 = new Learner();
+        learner2.setLearnerEmail("test2@domain.com");
+        learner2.setUid("learner2Id");
 
-        Course course = new Course();
-        course.setTitle("title");
+        Booking booking2 = new Booking();
+        booking2.setLearner(learner2);
+        booking2.setBookingReference("reference");
+        recordEvent.addBooking(booking2);
 
-        Venue venue = new Venue();
-        venue.setLocation("London");
+        List<IMessageParams> messageDtos = messageService.createBulkCancelEventMessages(recordEvent, CancellationReason.UNAVAILABLE);
+        IMessageParams learnerMessage = messageDtos.get(0);
+        validateIMessageParams(learnerMessage, "test@domain.com", Map.of(
+                "learnerName", "test@domain.com",
+                "cancellationReason", "the event is no longer available",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "bookingReference", "reference"
+        ), NotificationTemplate.CANCEL_EVENT);
+        IMessageParams lmMessage = messageDtos.get(1);
+        validateIMessageParams(lmMessage, "test2@domain.com", Map.of(
+                "learnerName", "test2@domain.com",
+                "cancellationReason", "the event is no longer available",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "bookingReference", "reference"
+        ), NotificationTemplate.CANCEL_EVENT);
 
-        DateRange dateRange = new DateRange();
-        dateRange.setDate(LocalDate.now());
-        ArrayList<DateRange> dateRanges = new ArrayList<>();
-        dateRanges.add(dateRange);
-
-        Event event = new Event();
-        event.setDateRanges(dateRanges);
-        event.setVenue(venue);
-
-        MessageDto messageDto = new MessageDto();
-
-        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        when(learningCatalogueService.getEventByUrl("http://host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
-        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
-
-        assertEquals(messageService.createCancelEventMessage(booking, cancellationReason), messageDto);
-
-        verify(learningCatalogueService).getCourse("courseId");
-        verify(learningCatalogueService).getEventByUrl("http://host/course/courseId/module/moduleId/event/eventId");
-        verify(messageDtoFactory).create(any(), any(), any());
     }
 
     @Test
-    public void shouldCreateBookingConfirmedMessage() throws URISyntaxException {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
-        bookingDto.setLearnerEmail("test@domain.com");
-        bookingDto.setLearner("learnerId");
+    public void shouldCreateBookingCreatedMessages() throws URISyntaxException {
+        Learner learner = new Learner("learnerId", "test@domain.com");
+        Booking booking = new Booking();
+        uk.gov.cslearning.record.domain.Event event = new uk.gov.cslearning.record.domain.Event();
+        event.setPath("host/course/courseId/module/moduleId/event/eventId");
+        booking.setEvent(event);
+        booking.setLearner(learner);
+        booking.setBookingReference("reference");
+        booking.setAccessibilityOptions("Accessibility option");
 
-        Course course = new Course();
-        course.setTitle("title");
+        CivilServant cs = new CivilServant();
+        cs.setLineManagerEmailAddress("lmEmail@domain.com");
+        cs.setFullName("Learner");
+        when(registryService.getCivilServantResourceByUid("learnerId")).thenReturn(Optional.of(cs));
 
-        Venue venue = new Venue();
-        venue.setLocation("London");
+        List<IMessageParams> messageDtos = messageService.createRegisteredMessages(booking);
 
-        DateRange dateRange = new DateRange();
-        dateRange.setDate(LocalDate.now());
-        ArrayList<DateRange> dateRanges = new ArrayList<>();
-        dateRanges.add(dateRange);
-
-        Event event = new Event();
-        event.setDateRanges(dateRanges);
-        event.setVenue(venue);
-
-        MessageDto messageDto = new MessageDto();
-
-        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
-        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
-
-        assertEquals(messageService.createBookedMessage(bookingDto), messageDto);
-
-        verify(learningCatalogueService).getCourse("courseId");
-        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
-        verify(messageDtoFactory).create(any(), any(), any());
+        IMessageParams learnerMessage = messageDtos.get(0);
+        validateIMessageParams(learnerMessage, "test@domain.com", Map.of(
+                "learnerName", "test@domain.com",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "accessibility", "Accessibility option",
+                "bookingReference", "reference"
+        ), NotificationTemplate.BOOKING_REQUESTED);
+        IMessageParams lmMessage = messageDtos.get(1);
+        validateIMessageParams(lmMessage, "lmEmail@domain.com", Map.of(
+                "recipient", "lmEmail@domain.com",
+                "learnerName", "Learner",
+                "learnerEmail", "test@domain.com",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "cost", "10",
+                "bookingReference", "reference"
+        ), NotificationTemplate.BOOKING_REQUEST_LINE_MANAGER);
     }
 
     @Test
-    public void shouldCreateBookingRequestedMessage() throws URISyntaxException {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setEvent(new URI("host/course/courseId/module/moduleId/event/eventId"));
-        bookingDto.setLearnerEmail("test@domain.com");
-        bookingDto.setLearner("learnerId");
-        bookingDto.setAccessibilityOptions("Braille");
+    public void shouldCreateBookingConfirmedMessages() throws URISyntaxException {
+        Learner learner = new Learner("learnerId", "test@domain.com");
+        Booking booking = new Booking();
+        uk.gov.cslearning.record.domain.Event event = new uk.gov.cslearning.record.domain.Event();
+        event.setPath("host/course/courseId/module/moduleId/event/eventId");
+        booking.setEvent(event);
+        booking.setLearner(learner);
+        booking.setAccessibilityOptions("Braille");
+        booking.setBookingReference("reference");
 
-        Course course = new Course();
-        course.setTitle("title");
+        CivilServant cs = new CivilServant();
+        cs.setLineManagerEmailAddress("lmEmail@domain.com");
+        cs.setFullName("Learner");
+        when(registryService.getCivilServantResourceByUid("learnerId")).thenReturn(Optional.of(cs));
 
-        Venue venue = new Venue();
-        venue.setLocation("London");
+        List<IMessageParams> messageDtos = messageService.createBookedMessages(booking);
 
-        DateRange dateRange = new DateRange();
-        dateRange.setDate(LocalDate.now());
-        ArrayList<DateRange> dateRanges = new ArrayList<>();
-        dateRanges.add(dateRange);
-
-        Event event = new Event();
-        event.setDateRanges(dateRanges);
-        event.setVenue(venue);
-
-        MessageDto messageDto = new MessageDto();
-
-        when(learningCatalogueService.getCourse("courseId")).thenReturn(course);
-        when(learningCatalogueService.getEventByUrl("host/course/courseId/module/moduleId/event/eventId")).thenReturn(event);
-        when(messageDtoFactory.create(any(), any(), any())).thenReturn(messageDto);
-
-        assertEquals(messageService.createRegisteredMessage(bookingDto), messageDto);
-
-        verify(learningCatalogueService).getCourse("courseId");
-        verify(learningCatalogueService).getEventByUrl("host/course/courseId/module/moduleId/event/eventId");
-        verify(messageDtoFactory).create(any(), any(), any());
+        IMessageParams learnerMessage = messageDtos.get(0);
+        validateIMessageParams(learnerMessage, "test@domain.com", Map.of(
+                "learnerName", "test@domain.com",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "accessibility", "Braille",
+                "bookingReference", "reference"
+        ), NotificationTemplate.BOOKING_CONFIRMED);
+        IMessageParams lmMessage = messageDtos.get(1);
+        validateIMessageParams(lmMessage, "lmEmail@domain.com", Map.of(
+                "recipient", "lmEmail@domain.com",
+                "learnerName", "Learner",
+                "learnerEmail", "test@domain.com",
+                "courseTitle", "title",
+                "courseDate", "26 Feb 2025",
+                "courseLocation", "London",
+                "cost", "10",
+                "bookingReference", "reference"
+        ), NotificationTemplate.BOOKING_CONFIRMED_LINE_MANAGER);
     }
 }

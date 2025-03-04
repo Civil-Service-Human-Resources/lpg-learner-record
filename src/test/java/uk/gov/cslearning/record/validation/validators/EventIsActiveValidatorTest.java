@@ -1,24 +1,23 @@
 package uk.gov.cslearning.record.validation.validators;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import jakarta.validation.ConstraintValidatorContext;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.service.EventService;
 
-import javax.validation.ConstraintValidatorContext;
 import java.net.URI;
-import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class EventIsActiveValidatorTest {
 
     @Mock

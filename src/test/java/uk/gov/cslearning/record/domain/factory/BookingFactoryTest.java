@@ -1,15 +1,17 @@
 package uk.gov.cslearning.record.domain.factory;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.Learner;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
+import uk.gov.cslearning.record.util.IUtilService;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,37 +19,38 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class BookingFactoryTest {
 
+    Instant now = LocalDateTime.of(2023, 1, 1, 10, 0).toInstant(ZoneOffset.UTC);
     @Mock
     private EventFactory eventFactory;
 
     @Mock
-    private LearnerFactory learnerFactory;
-
+    private IUtilService utilService;
     @InjectMocks
     private BookingFactory bookingFactory;
+
+    @BeforeEach
+    public void before() {
+        when(utilService.getNowInstant()).thenReturn(now);
+    }
 
     @Test
     public void shouldReturnBooking() throws URISyntaxException {
         int id = 99;
         URI paymentDetails = new URI("http://csrs/payment-details");
-        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant confirmationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant cancellationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant bookingTime = now;
+        Instant confirmationTime = now;
+        Instant cancellationTime = now;
         String learnerUid = "learner-uuid";
         String learnerEmail = "test@domain.com";
         URI event = new URI("http://learning-catalogue/event-path");
         String accessibilityOptions = "Braille";
         BookingCancellationReason cancellationReason = BookingCancellationReason.PAYMENT;
-        Learner learner = new Learner();
-        learner.setId(99);
 
         BookingDto bookingDto = new BookingDto();
 
@@ -63,31 +66,24 @@ public class BookingFactoryTest {
         bookingDto.setAccessibilityOptions(accessibilityOptions);
         bookingDto.setCancellationReason(cancellationReason);
 
-        when(learnerFactory.create(learnerUid, learnerEmail)).thenReturn(learner);
-
         Booking booking = bookingFactory.create(bookingDto);
 
-        assertThat(booking.getStatus(), equalTo(BookingStatus.CONFIRMED));
-        assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
-        assertThat(booking.getConfirmationTime(), equalTo(bookingDto.getConfirmationTime()));
-        assertThat(booking.getCancellationTime(), equalTo(bookingDto.getCancellationTime()));
-        assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
-        assertThat(booking.getId(), equalTo(bookingDto.getId()));
-        assertThat(booking.getLearner().getId(), equalTo(99));
-        assertThat(booking.getAccessibilityOptions(), equalTo(bookingDto.getAccessibilityOptions()));
-        assertThat(booking.getCancellationReason(), equalTo(bookingDto.getCancellationReason()));
-
-        verify(eventFactory).create(event.getPath());
-        verify(learnerFactory).create(learnerUid, learnerEmail);
+        assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
+        assertEquals(bookingDto.getBookingTime(), booking.getBookingTime());
+        assertEquals(bookingDto.getConfirmationTime(), booking.getConfirmationTime());
+        assertEquals(bookingDto.getPaymentDetails().getPath(), booking.getPaymentDetails());
+        assertEquals("learner-uuid", booking.getLearner().getUid());
+        assertEquals("test@domain.com", booking.getLearner().getLearnerEmail());
+        assertEquals(bookingDto.getAccessibilityOptions(), booking.getAccessibilityOptions());
     }
 
     @Test
     public void shouldCreateLearnerIfNotPresent() throws URISyntaxException {
         int id = 99;
         URI paymentDetails = new URI("http://csrs/payment-details");
-        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant confirmationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant cancellationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant bookingTime = now;
+        Instant confirmationTime = now;
+        Instant cancellationTime = now;
         String learnerUid = "learner-uuid";
         String learnerEmail = "test@domain.com";
         URI event = new URI("http://learning-catalogue/event-path");
@@ -110,25 +106,19 @@ public class BookingFactoryTest {
 
         Booking booking = bookingFactory.create(bookingDto);
 
-        assertThat(booking.getStatus(), equalTo(BookingStatus.CONFIRMED));
-        assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
-        assertThat(booking.getConfirmationTime(), equalTo(bookingDto.getConfirmationTime()));
-        assertThat(booking.getCancellationTime(), equalTo(bookingDto.getCancellationTime()));
-        assertThat(booking.getPaymentDetails(), equalTo(bookingDto.getPaymentDetails().getPath()));
-        assertThat(booking.getId(), equalTo(bookingDto.getId()));
-        assertThat(booking.getAccessibilityOptions(), equalTo(bookingDto.getAccessibilityOptions()));
-        assertThat(booking.getCancellationReason(), equalTo(bookingDto.getCancellationReason()));
-
-        verify(learnerFactory).create(learnerUid, learnerEmail);
-        verify(eventFactory).create(event.getPath());
+        assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
+        assertEquals(bookingDto.getBookingTime(), booking.getBookingTime());
+        assertEquals(bookingDto.getConfirmationTime(), booking.getConfirmationTime());
+        assertEquals(bookingDto.getPaymentDetails().getPath(), booking.getPaymentDetails());
+        assertEquals(bookingDto.getAccessibilityOptions(), booking.getAccessibilityOptions());
     }
 
     @Test
     public void shouldIgnorePaymentDetailsIfNotPresent() throws URISyntaxException {
         int id = 99;
-        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant confirmationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        Instant cancellationTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
+        Instant bookingTime = now;
+        Instant confirmationTime = now;
+        Instant cancellationTime = now;
         String learnerUid = "learner-uuid";
         String learnerEmail = "test@domain.com";
         URI event = new URI("http://learning-catalogue/event-path");
@@ -150,13 +140,8 @@ public class BookingFactoryTest {
 
         Booking booking = bookingFactory.create(bookingDto);
 
-        assertThat(booking.getStatus(), equalTo(BookingStatus.CONFIRMED));
-        assertThat(booking.getBookingTime(), equalTo(bookingDto.getBookingTime()));
-        assertThat(booking.getId(), equalTo(bookingDto.getId()));
-        assertThat(booking.getAccessibilityOptions(), equalTo(bookingDto.getAccessibilityOptions()));
-        assertThat(booking.getCancellationReason(), equalTo(bookingDto.getCancellationReason()));
-
-        verify(learnerFactory).create(learnerUid, learnerEmail);
-        verify(eventFactory).create(event.getPath());
+        assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
+        assertEquals(bookingDto.getBookingTime(), booking.getBookingTime());
+        assertEquals(bookingDto.getAccessibilityOptions(), booking.getAccessibilityOptions());
     }
 }

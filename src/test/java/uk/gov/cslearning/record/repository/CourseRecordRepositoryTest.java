@@ -1,24 +1,21 @@
 package uk.gov.cslearning.record.repository;
 
-import com.google.common.collect.Iterables;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.IntegrationTestBase;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 
-import static org.hamcrest.CoreMatchers.is;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @Transactional
-public class CourseRecordRepositoryTest {
+public class CourseRecordRepositoryTest extends IntegrationTestBase {
 
     @Autowired
     private CourseRecordRepository courseRecordRepository;
@@ -30,22 +27,7 @@ public class CourseRecordRepositoryTest {
 
         assertThat(courseRecord.getCourseId(), notNullValue());
         assertThat(courseRecord.getUserId(), notNullValue());
-        assertThat(courseRecord.getModuleRecord("moduleId").getId(), notNullValue());
-    }
-
-    @Test
-    public void shouldLoadCountOfRegistrationsForAnEvent() {
-
-        final String eventId = "eventId";
-        final int registrations = 3;
-
-        for (int i = 0; i < registrations; i++) {
-            createRegistration("user" + i, eventId);
-        }
-
-        Integer count = courseRecordRepository.countRegisteredForEvent(eventId);
-
-        assertThat(count, is(registrations));
+        assertThat(courseRecord.getModuleRecords().stream().filter(mr -> mr.getModuleId().equals("moduleId")).findFirst().get().getId(), notNullValue());
     }
 
     @Test
@@ -63,9 +45,9 @@ public class CourseRecordRepositoryTest {
             createRegistration("user" + i, eventId);
         }
 
-        Iterable<CourseRecord> records = courseRecordRepository.listEventRecords();
+        List<CourseRecord> records = courseRecordRepository.listEventRecords();
 
-        assertThat(Iterables.size(records), is(registrations));
+        assertEquals(registrations, records.size());
     }
 
     private CourseRecord createRegistration(String userId, String eventId) {

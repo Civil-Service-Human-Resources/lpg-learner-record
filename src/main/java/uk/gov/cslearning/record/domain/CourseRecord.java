@@ -5,19 +5,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
 @Entity
+@Getter
+@Setter
 public class CourseRecord {
 
     @JsonIgnore
@@ -59,30 +61,6 @@ public class CourseRecord {
         this.identity = new CourseRecordIdentity(courseId, userId);
     }
 
-    public String getCourseTitle() {
-        return courseTitle;
-    }
-
-    public void setCourseTitle(String courseTitle) {
-        this.courseTitle = courseTitle;
-    }
-
-    public CourseRecordIdentity getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(CourseRecordIdentity identity) {
-        this.identity = identity;
-    }
-
-    public LocalDateTime getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(LocalDateTime lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
     @JsonProperty("courseId")
     public String getCourseId() {
         return identity.getCourseId();
@@ -93,20 +71,9 @@ public class CourseRecord {
         return identity.getUserId();
     }
 
-    public Preference getPreference() {
-        return preference;
-    }
-
-    public void setPreference(Preference preference) {
-        this.preference = preference;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
+    @JsonProperty("modules")
+    public Collection<ModuleRecord> getModuleRecords() {
+        return moduleRecords;
     }
 
     public boolean isRequired() {
@@ -115,15 +82,6 @@ public class CourseRecord {
 
     public void setRequired(boolean isRequired) {
         this.isRequired = isRequired;
-    }
-
-    @JsonProperty("modules")
-    public Collection<ModuleRecord> getModuleRecords() {
-        return moduleRecords;
-    }
-
-    public void setModuleRecords(List<ModuleRecord> updatedModules) {
-        this.moduleRecords = updatedModules;
     }
 
     public void addModuleRecord(ModuleRecord moduleRecord) {
@@ -135,39 +93,17 @@ public class CourseRecord {
         moduleRecords.add(moduleRecord);
     }
 
-    public ModuleRecord getModuleRecord(String moduleId) {
-        return this.moduleRecords.stream()
-                .filter(moduleRecord -> moduleId.equals(moduleRecord.getModuleId()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    public LocalDateTime getCompletionDate() {
-        LocalDateTime mostRecentCompletionDate = null;
-        for (ModuleRecord moduleRecord : moduleRecords) {
-            if (mostRecentCompletionDate == null ||
-                    moduleRecord.getCompletionDate() != null
-                            && mostRecentCompletionDate.isBefore(moduleRecord.getCompletionDate())) {
-                mostRecentCompletionDate = moduleRecord.getCompletionDate();
+    @JsonIgnore
+    public LocalDateTime getEarliestCompletionDateForModules(List<String> moduleIds) {
+        Map<String, ModuleRecord> map = this.moduleRecords.stream().collect(Collectors.toMap(ModuleRecord::getModuleId, mr -> mr));
+        return moduleIds.stream().map(moduleId -> {
+            ModuleRecord mr = map.get(moduleId);
+            if (mr == null || mr.getCompletionDate() == null) {
+                return LocalDateTime.MIN;
+            } else {
+                return mr.getCompletionDate();
             }
-        }
-        return mostRecentCompletionDate;
-    }
-
-    public boolean matchesActivityId(String activityId) {
-        if (activityId.endsWith(getCourseId())) {
-            return true;
-        }
-        for (ModuleRecord moduleRecord : moduleRecords) {
-            if (activityId.endsWith(moduleRecord.getModuleId())) {
-                return true;
-            }
-            String eventId = moduleRecord.getEventId();
-            if (eventId != null && activityId.endsWith(eventId)) {
-                return true;
-            }
-        }
-        return false;
+        }).min(LocalDateTime::compareTo).orElse(LocalDateTime.MIN);
     }
 
     public void update(CourseRecord input) {

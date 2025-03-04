@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.dto.factory;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
@@ -8,7 +9,7 @@ import uk.gov.cslearning.record.dto.ModuleRecordDto;
 
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ModuleRecordDtoFactoryTest {
 

@@ -1,7 +1,6 @@
 package uk.gov.cslearning.record.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,8 +11,8 @@ import uk.gov.cslearning.record.service.LearnerService;
 
 @RestController
 @RequestMapping("/learner")
+@Slf4j
 public class LearnerController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(LearnerController.class);
 
     private final LearnerService learnerService;
 
@@ -24,11 +23,11 @@ public class LearnerController {
     @DeleteMapping("/{uid}")
     @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE')")
     public ResponseEntity deleteLearner(@PathVariable String uid) {
-        LOGGER.info("Deleting learner with uid {}", uid);
+        log.info("Deleting learner with uid {}", uid);
 
         learnerService.deleteLearnerByUid(uid);
 
-        LOGGER.info("Learner deleted with uid {}", uid);
+        log.info("Learner deleted with uid {}", uid);
 
         return ResponseEntity.noContent().build();
     }

@@ -1,27 +1,23 @@
 package uk.gov.cslearning.record.repository;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.cslearning.record.domain.Learner;
 
-import javax.transaction.Transactional;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.IntegrationTestBase;
+import uk.gov.cslearning.record.domain.Learner;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @Transactional
-public class LearnerRepositoryTest {
+public class LearnerRepositoryTest extends IntegrationTestBase {
 
     @Autowired
     private LearnerRepository learnerRepository;
 
     @Test
-    public void shouldSaveLearner(){
+    public void shouldSaveLearner() {
         Learner learner = new Learner();
         learner.setUid("test-uuid");
         learner.setLearnerEmail("test@domain.com");

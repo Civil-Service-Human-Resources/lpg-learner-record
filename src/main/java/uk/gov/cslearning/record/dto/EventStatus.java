@@ -7,7 +7,7 @@ import uk.gov.cslearning.record.exception.UnknownStatusException;
 import java.util.Arrays;
 
 public enum EventStatus {
-    ACTIVE("Active"),CANCELLED("Cancelled");
+    ACTIVE("Active"), CANCELLED("Cancelled");
 
     private final String value;
 
@@ -18,7 +18,7 @@ public enum EventStatus {
     @JsonCreator
     public static EventStatus forValue(String value) {
         return Arrays.stream(EventStatus.values())
-                .filter(v -> v.value.equalsIgnoreCase(value))
+                .filter(v -> v.getValue().equalsIgnoreCase(value) || v.toString().equalsIgnoreCase(value))
                 .findAny()
                 .orElseThrow(() -> new UnknownStatusException(value));
     }

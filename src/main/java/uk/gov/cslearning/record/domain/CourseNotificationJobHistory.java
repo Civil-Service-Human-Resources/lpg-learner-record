@@ -1,17 +1,15 @@
 package uk.gov.cslearning.record.domain;
 
-import java.time.LocalDateTime;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -38,8 +36,6 @@ public class CourseNotificationJobHistory {
     }
 
     public enum JobName {
-        LEARNER_RECORD_REFRESH,
-        COMPLETED_COURSES_JOB,
         INCOMPLETED_COURSES_JOB
     }
 }
