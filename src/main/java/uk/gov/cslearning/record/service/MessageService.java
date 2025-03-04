@@ -37,7 +37,7 @@ public class MessageService {
         for (String title : requiredLearningTitles) {
             requiredLearningStr
                     .append(title)
-                    .append(System.lineSeparator());
+                    .append("\n");
         }
         return new RequiredLearningDueMessageParams(email, period, requiredLearningStr.toString());
     }

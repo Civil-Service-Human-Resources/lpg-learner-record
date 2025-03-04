@@ -291,14 +291,14 @@ public class LearningJobTest extends IntegrationTestBase {
                             }
                         }
                         """);
-        mockIncompleteLearningEmail("hmrcCivilServant1@hmrc.gov.uk", "Course 1\\r\\n", "5 days");
-        mockIncompleteLearningEmail("hmrcCivilServant1@hmrc.gov.uk", "Course 2\\r\\n", "1 day");
+        mockIncompleteLearningEmail("hmrcCivilServant1@hmrc.gov.uk", "Course 1\\n", "5 days");
+        mockIncompleteLearningEmail("hmrcCivilServant1@hmrc.gov.uk", "Course 2\\n", "1 day");
 
-        mockIncompleteLearningEmail("dwpCivilServant2@dwp.gov.uk", "Course 1\\r\\n", "1 day");
-        mockIncompleteLearningEmail("dwpCivilServant2@dwp.gov.uk", "Course 2\\r\\n", "5 days");
+        mockIncompleteLearningEmail("dwpCivilServant2@dwp.gov.uk", "Course 1\\n", "1 day");
+        mockIncompleteLearningEmail("dwpCivilServant2@dwp.gov.uk", "Course 2\\n", "5 days");
 
-        mockIncompleteLearningEmail("coCivilServant2@cabinetoffice.gov.uk", "Course 3\\r\\nCourse 1\\r\\n", "5 days");
-        mockIncompleteLearningEmail("coCivilServant1@cabinetoffice.gov.uk", "Course 3\\r\\n", "5 days");
+        mockIncompleteLearningEmail("coCivilServant2@cabinetoffice.gov.uk", "Course 3\\nCourse 1\\n", "5 days");
+        mockIncompleteLearningEmail("coCivilServant1@cabinetoffice.gov.uk", "Course 3\\n", "5 days");
 
         learningJob.sendReminderNotificationForIncompleteCourses();
         List<Notification> notifications = new ArrayList<>((Collection<Notification>) notificationRepository.findAll());
