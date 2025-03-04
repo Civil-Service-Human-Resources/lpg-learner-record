@@ -108,6 +108,7 @@ public class EventTest extends IntegrationTestBase {
                 .andExpect(jsonPath("uid").value("eventId"))
                 .andExpect(jsonPath("uri").value("http://localhost:9000/learning_catalogue/courses/courseId/modules/moduleId/events/eventId"))
                 .andExpect(jsonPath("status").value("Active"));
+        assertEquals("/courses/courseId/modules/moduleId/events/eventId", eventRepository.findByUid("eventId").get().getPath());
     }
 
     @Test

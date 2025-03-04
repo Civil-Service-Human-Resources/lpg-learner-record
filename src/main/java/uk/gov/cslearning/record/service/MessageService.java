@@ -65,7 +65,7 @@ public class MessageService {
     public List<IMessageParams> createBulkCancelEventMessages(uk.gov.cslearning.record.domain.Event event, CancellationReason cancellationReason) {
         CourseMessageDetails courseMessageDetails = getCourseMessageDetails(event.getEventIds());
         List<IMessageParams> params = new ArrayList<>();
-        event.getBookings().forEach(b -> params.add(new CancelEventMessageParams(b.getLearner().getLearnerEmail(), courseMessageDetails, cancellationReason.getValue(), b.getBookingReference())));
+        event.getActiveBookings().forEach(b -> params.add(new CancelEventMessageParams(b.getLearner().getLearnerEmail(), courseMessageDetails, cancellationReason.getValue(), b.getBookingReference())));
         return params;
     }
 

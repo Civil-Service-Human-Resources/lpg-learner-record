@@ -39,6 +39,11 @@ public class Event {
     private CancellationReason cancellationReason;
 
     @JsonIgnore
+    public List<Booking> getActiveBookings() {
+        return this.bookings.stream().filter(b -> !b.getStatus().equals(BookingStatus.CANCELLED)).toList();
+    }
+
+    @JsonIgnore
     public EventIds getEventIds() {
         String[] parts = this.path.split("/");
         return new EventIds(parts[2], parts[4], parts[6]);

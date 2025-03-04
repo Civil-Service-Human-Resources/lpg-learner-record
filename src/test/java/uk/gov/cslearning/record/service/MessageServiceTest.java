@@ -12,6 +12,7 @@ import uk.gov.cslearning.record.config.NotificationTemplates;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.CancellationReason;
@@ -158,6 +159,7 @@ public class MessageServiceTest {
 
         Booking booking = new Booking();
         booking.setLearner(learner);
+        booking.setStatus(BookingStatus.CONFIRMED);
         booking.setBookingReference("reference");
         recordEvent.addBooking(booking);
 
@@ -167,8 +169,19 @@ public class MessageServiceTest {
 
         Booking booking2 = new Booking();
         booking2.setLearner(learner2);
+        booking2.setStatus(BookingStatus.REQUESTED);
         booking2.setBookingReference("reference");
         recordEvent.addBooking(booking2);
+
+        Learner learner3 = new Learner();
+        learner3.setLearnerEmail("test2@domain.com");
+        learner3.setUid("learner3Id");
+
+        Booking booking3 = new Booking();
+        booking3.setLearner(learner3);
+        booking3.setStatus(BookingStatus.CANCELLED);
+        booking3.setBookingReference("reference");
+        recordEvent.addBooking(booking3);
 
         List<IMessageParams> messageDtos = messageService.createBulkCancelEventMessages(recordEvent, CancellationReason.UNAVAILABLE);
         IMessageParams learnerMessage = messageDtos.get(0);
