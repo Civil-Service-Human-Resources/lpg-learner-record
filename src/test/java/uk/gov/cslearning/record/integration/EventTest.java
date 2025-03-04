@@ -111,7 +111,7 @@ public class EventTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testInviteLearnerToEvent() throws Exception {
+    public void testInviteLearnerToEventAndBook() throws Exception {
         Learner learner = testDataService.generateLearner();
         Event event = generateEvent();
         stubService.getIdentityServiceStubService().getIdentityWithEmail(learner.getLearnerEmail(),
@@ -151,6 +151,69 @@ public class EventTest extends IntegrationTestBase {
                 .andExpect(jsonPath("event").value("http://localhost:9000/learning_catalogue/courses/courseId/modules/moduleId/events/" + event.getUid()))
                 .andExpect(jsonPath("learnerEmail").value(learner.getLearnerEmail()));
         assertEquals(learner.getLearnerEmail(), inviteRepository.findAllByEventUid(event.getUid()).stream().toList().get(0).getLearnerEmail());
+
+        // accept booking
+        JSONObject civilServant = new JSONObject();
+        civilServant.put("fullName", "Learner Name");
+        civilServant.put("lineManagerEmailAddress", "lineManager@email.com");
+        stubService.getCsrsStubService().getCivilServant(learner.getUid(), civilServant.toString());
+        stubService.getNotificationServiceStubService().sendEmail("BOOKING_REQUESTED",
+                String.format("""
+                        {
+                            "recipient": "%1$s",
+                            "personalisation": {
+                                "learnerName": "%1$s",
+                                "courseTitle": "Course 1",
+                                "courseDate": "10 Mar 2025",
+                                "courseLocation": "London",
+                                "accessibility": "Braille",
+                                "bookingReference": "Rand1"
+                            },
+                            "reference": "UUID"
+                        }
+                        """, learner.getLearnerEmail()));
+        stubService.getNotificationServiceStubService().sendEmail("BOOKING_REQUEST_LINE_MANAGER",
+                String.format("""
+                        {
+                            "recipient": "lineManager@email.com",
+                            "personalisation": {
+                                "recipient": "lineManager@email.com",
+                                "learnerName": "Learner Name",
+                                "learnerEmail": "%s",
+                                "courseTitle": "Course 1",
+                                "courseDate": "10 Mar 2025",
+                                "courseLocation": "London",
+                                "cost": "10.0",
+                                "bookingReference": "Rand1"
+                            },
+                            "reference": "UUID"
+                        }
+                        """, learner.getLearnerEmail()));
+        String bookJson = String.format("""
+                {
+                    "learner": "%s",
+                    "learnerEmail": "%s",
+                    "learnerName": "Learner",
+                    "event": "http://localhost:9001%s",
+                    "status": "REQUESTED",
+                    "accessibilityOptions": "Braille"
+                }
+                """, learner.getUid(), learner.getLearnerEmail(), event.getPath());
+        mockMvc.perform(post("/event/" + event.getUid() + "/booking/")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(bookJson))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").value(Matchers.any(Integer.class)))
+                .andExpect(jsonPath("learner").value(learner.getUid()))
+                .andExpect(jsonPath("learnerEmail").value(learner.getLearnerEmail()))
+                .andExpect(jsonPath("event").value("http://localhost:9000/learning_catalogue/courses/courseId/modules/moduleId/events/" + event.getUid()))
+                .andExpect(jsonPath("status").value("Requested"))
+                .andExpect(jsonPath("bookingTime").value("2023-01-01T10:00:00Z"))
+                .andExpect(jsonPath("bookingReference").value("Rand1"))
+                .andExpect(jsonPath("accessibilityOptions").value("Braille"))
+                .andExpect(jsonPath("eventUid").value(event.getUid()))
+                .andExpect(jsonPath("eventPath").value("/learning_catalogue/courses/courseId/modules/moduleId/events/" + event.getUid()));
     }
 
     @Test

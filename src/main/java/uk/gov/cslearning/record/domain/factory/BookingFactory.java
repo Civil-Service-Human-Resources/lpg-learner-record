@@ -5,6 +5,7 @@ import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
+import uk.gov.cslearning.record.repository.LearnerRepository;
 import uk.gov.cslearning.record.util.IUtilService;
 
 import java.time.Instant;
@@ -13,12 +14,16 @@ import java.time.Instant;
 public class BookingFactory {
 
     private final IUtilService utilService;
+    private final LearnerRepository learnerRepository;
 
-    public BookingFactory(IUtilService utilService) {
+    public BookingFactory(IUtilService utilService, LearnerRepository learnerRepository) {
         this.utilService = utilService;
+        this.learnerRepository = learnerRepository;
     }
-
+    
     public Booking create(BookingDto bookingDto) {
+        Learner learner = learnerRepository.findByUid(bookingDto.getLearner())
+                .orElse(new Learner(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
         Instant creationTime = utilService.getNowInstant();
         Booking booking = new Booking();
 
@@ -30,7 +35,7 @@ public class BookingFactory {
         if (null != bookingDto.getPaymentDetails()) {
             booking.setPaymentDetails(bookingDto.getPaymentDetails().getPath());
         }
-        booking.setLearner(new Learner(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
+        booking.setLearner(learner);
         booking.setPoNumber(bookingDto.getPoNumber());
         booking.setAccessibilityOptions(bookingDto.getAccessibilityOptions());
         booking.setBookingReference(utilService.generateSaltedString(5));
