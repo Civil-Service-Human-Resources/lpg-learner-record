@@ -10,15 +10,19 @@ public class BookingStatusConverter implements AttributeConverter<BookingStatus,
 
     @Override
     public String convertToDatabaseColumn(BookingStatus bookingStatus) {
-        return bookingStatus.name();
+        return bookingStatus != null ? bookingStatus.name() : null;
     }
 
     @Override
     public BookingStatus convertToEntityAttribute(String value) {
-        if (NumberUtils.isCreatable(value)) {
-            return BookingStatus.values()[Integer.parseInt(value)];
-        } else {
-            return BookingStatus.valueOf(value);
+        BookingStatus status = null;
+        if (value != null) {
+            if (NumberUtils.isCreatable(value)) {
+                status = BookingStatus.values()[Integer.parseInt(value)];
+            } else {
+                status = BookingStatus.valueOf(value);
+            }
         }
+        return status;
     }
 }
