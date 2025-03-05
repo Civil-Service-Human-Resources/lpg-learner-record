@@ -33,7 +33,7 @@ public class SecurityConfig {
     @Order(1)
     public SecurityFilterChain permittedChain(HttpSecurity httpSecurity) throws Exception {
         log.info("Building base filter chain");
-        return httpSecurity.securityMatcher(actuatorBasePath + "/**")
+        return httpSecurity.securityMatcher("/error", actuatorBasePath + "/**")
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
