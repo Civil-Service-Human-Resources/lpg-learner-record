@@ -493,7 +493,7 @@ public class EventTest extends IntegrationTestBase {
         Booking booking1 = testDataService.generateBooking(BookingStatus.CONFIRMED, learner1);
         Booking booking2 = testDataService.generateBooking(BookingStatus.REQUESTED, learner2);
         booking2.setBookingReference("BCDEF");
-        Booking booking3 = testDataService.generateBooking(BookingStatus.CONFIRMED, learner3);
+        Booking booking3 = testDataService.generateBooking(BookingStatus.CANCELLED, learner3);
         booking3.setBookingReference("CDEFG");
         List<Booking> bookings = List.of(booking1, booking2, booking3);
         event.setBookings(bookings);
@@ -530,21 +530,6 @@ public class EventTest extends IntegrationTestBase {
                             "reference": "UUID"
                         }
                         """, learner2.getLearnerEmail()));
-        stubService.getNotificationServiceStubService().sendEmail("CANCEL_EVENT",
-                String.format("""
-                        {
-                            "recipient": "%1$s",
-                            "personalisation": {
-                                "learnerName": "%1$s",
-                                "cancellationReason": "the event is no longer available",
-                                "courseTitle": "Course 1",
-                                "courseDate": "10 Mar 2025",
-                                "courseLocation": "London",
-                                "bookingReference": "CDEFG"
-                            },
-                            "reference": "UUID"
-                        }
-                        """, learner3.getLearnerEmail()));
         String json = """
                 {
                     "status": "CANCELLED",
@@ -561,6 +546,7 @@ public class EventTest extends IntegrationTestBase {
                 .andExpect(jsonPath("uri").value("http://localhost:9000/learning_catalogue/courses/courseId/modules/moduleId/events/" + event.getUid()))
                 .andExpect(jsonPath("status").value("Cancelled"))
                 .andExpect(jsonPath("cancellationReason").value("the event is no longer available"));
+        stubService.getNotificationServiceStubService().validateSentEmails("CANCEL_EVENT", 2);
     }
 
 }

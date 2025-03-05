@@ -50,11 +50,11 @@ public class DefaultEventService implements EventService {
         event.setStatus(eventStatus.getStatus());
         if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
             event.setCancellationReason(eventStatus.getCancellationReason());
+            messageDtos.addAll(messageService.createBulkCancelEventMessages(event, eventStatus.getCancellationReason()));
             event.getBookings().forEach(b -> {
                 b.setStatus(BookingStatus.CANCELLED);
                 b.setCancellationTime(utilService.getNowInstant());
             });
-            messageDtos.addAll(messageService.createBulkCancelEventMessages(event, eventStatus.getCancellationReason()));
         }
         eventRepository.save(event);
         notificationService.send(messageDtos);
