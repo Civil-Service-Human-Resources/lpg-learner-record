@@ -13,6 +13,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import uk.gov.cslearning.record.domain.converter.BookingStatusConverter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -78,6 +79,7 @@ public class ModuleRecord {
 
     private String paymentDetails;
 
+    @Convert(converter = BookingStatusConverter.class)
     private BookingStatus bookingStatus;
 
     @JsonIgnore
