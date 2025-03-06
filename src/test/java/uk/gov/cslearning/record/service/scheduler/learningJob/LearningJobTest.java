@@ -7,16 +7,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.cslearning.record.IntegrationTestBase;
 import uk.gov.cslearning.record.TestDataService;
-import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.ModuleRecord;
-import uk.gov.cslearning.record.domain.Notification;
-import uk.gov.cslearning.record.domain.State;
+import uk.gov.cslearning.record.domain.*;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.NotificationRepository;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.scheduler.LearningJob;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,6 +44,8 @@ public class LearningJobTest extends IntegrationTestBase {
     private CourseRecordRepository courseRecordRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private Clock clock;
 
     private Map<String, List<Course>> generateRequiredCourses() {
         Course course1 = testDataService.generateCourse("course1", "Course 1");
@@ -97,8 +97,6 @@ public class LearningJobTest extends IntegrationTestBase {
      * CO: coCivilServant1, coCivilServant2
      * DWP: dwpCivilServant1, dwpCivilServant2
      * HMRC: hmrcCivilServant1, hmrcCivilServant2
-     *
-     * @throws IOException
      */
     public void loadCoursesAndLearners() throws IOException {
 
@@ -303,5 +301,22 @@ public class LearningJobTest extends IntegrationTestBase {
         learningJob.sendReminderNotificationForIncompleteCourses();
         List<Notification> notifications = new ArrayList<>((Collection<Notification>) notificationRepository.findAll());
         assertEquals(7, notifications.size());
+        stubService.getNotificationServiceStubService().validateSentEmails("REQUIRED_LEARNING_DUE", 6);
+
+        // Running again in the same day. Notifications should not be sent if  they've already been sent
+        notificationRepository.deleteAll();
+        List<Notification> sentNotifications = List.of(
+                new Notification("course1", hmrcCivilServant1, LocalDateTime.now(clock), NotificationType.REMINDER),
+                new Notification("course1", dwpCivilServant2, LocalDateTime.now(clock), NotificationType.REMINDER),
+                new Notification("course3", coCivilServant2, LocalDateTime.now(clock), NotificationType.REMINDER),
+                new Notification("course3", coCivilServant1, LocalDateTime.now(clock), NotificationType.REMINDER)
+        );
+        notificationRepository.saveAll(sentNotifications);
+        mockIncompleteLearningEmail("hmrcCivilServant1@hmrc.gov.uk", "Course 2\\n", "1 day");
+        mockIncompleteLearningEmail("dwpCivilServant2@dwp.gov.uk", "Course 2\\n", "5 days");
+        mockIncompleteLearningEmail("coCivilServant2@cabinetoffice.gov.uk", "Course 1\\n", "5 days");
+        learningJob.sendReminderNotificationForIncompleteCourses();
+        stubService.getNotificationServiceStubService().validateSentEmails("REQUIRED_LEARNING_DUE", 9);
     }
+
 }

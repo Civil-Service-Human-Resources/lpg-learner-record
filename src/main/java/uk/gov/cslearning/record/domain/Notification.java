@@ -28,9 +28,9 @@ public class Notification {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
-    public Notification(String courseId, String identityUid, NotificationType type) {
+    public Notification(String courseId, String identityUid, LocalDateTime sent, NotificationType type) {
         this.courseId = courseId;
-        this.sent = LocalDateTime.now();
+        this.sent = sent;
         this.identityUid = identityUid;
         this.type = type;
     }

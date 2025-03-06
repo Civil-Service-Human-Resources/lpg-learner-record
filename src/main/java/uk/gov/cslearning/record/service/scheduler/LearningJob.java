@@ -21,6 +21,7 @@ import uk.gov.cslearning.record.service.identity.IdentitiesService;
 import uk.gov.cslearning.record.util.UtilService;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,7 @@ public class LearningJob {
     }
 
     public void sendReminderNotificationForIncompleteCourses() {
+        LocalDateTime now = utilService.getNowDateTime();
         log.info("Starting reminder for incomplete learning job");
         CourseNotificationJobHistory courseNotificationJobHistory = new CourseNotificationJobHistory(CourseNotificationJobHistory.JobName.INCOMPLETED_COURSES_JOB.name(), LocalDateTime.now());
         courseNotificationJobHistoryRepository.save(courseNotificationJobHistory);
@@ -81,6 +83,8 @@ public class LearningJob {
         List<IMessageParams> reminders = new ArrayList<>();
         List<Notification> notifications = new ArrayList<>();
         Map<String, String> uidsToEmails = new HashMap<>();
+        List<String> notificationsSentToday = notificationRepository.findAllBySentAfter(now.with(LocalTime.MIN))
+                .stream().map(n -> String.format("%s-%s", n.getCourseId(), n.getIdentityUid())).toList();
         for (LearningJobCourseData courseData : requiredLearningData.values()) {
             log.info("Processing course data: {}", courseData.toString());
             Map<String, List<CourseTitleWithId>> uidsToMissingCoursesMap = courseData.getUidsToMissingCourses(civilServants);
@@ -88,13 +92,21 @@ public class LearningJob {
             List<String> uidsNotAlreadyFetched = uidsToMissingCoursesMap.keySet().stream().filter(uid -> !uidsToEmails.containsKey(uid)).toList();
             uidsToEmails.putAll(identityService.getUidToEmailMap(uidsNotAlreadyFetched));
             uidsToMissingCoursesMap.forEach((uid, courses) -> {
-                notifications.addAll(courses.stream().map(c -> new Notification(c.courseId, uid, NotificationType.REMINDER)).toList());
-                String email = uidsToEmails.get(uid);
-                if (email != null) {
-                    IMessageParams messageDto = messageService.createIncompleteCoursesMessage(email, courses.stream().map(CourseTitleWithId::getCourseTitle).toList(), courseData.getPeriod().getText());
-                    reminders.add(messageDto);
-                } else {
-                    log.warn(String.format("Email for UID %s was not found", uid));
+                List<String> courseTitles = new ArrayList<>();
+                for (CourseTitleWithId course : courses) {
+                    if (!notificationsSentToday.contains(String.format("%s-%s", course.getCourseId(), uid))) {
+                        notifications.add(new Notification(course.getCourseId(), uid, now, NotificationType.REMINDER));
+                        courseTitles.add(course.getCourseTitle());
+                    }
+                }
+                if (!courseTitles.isEmpty()) {
+                    String email = uidsToEmails.get(uid);
+                    if (email != null) {
+                        IMessageParams messageDto = messageService.createIncompleteCoursesMessage(email, courseTitles, courseData.getPeriod().getText());
+                        reminders.add(messageDto);
+                    } else {
+                        log.warn(String.format("Email for UID %s was not found", uid));
+                    }
                 }
             });
         }
