@@ -2,6 +2,7 @@ package uk.gov.cslearning.record.service.scheduler;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.cslearning.record.domain.CourseRecords;
 import uk.gov.cslearning.record.service.catalogue.Course;
 import uk.gov.cslearning.record.service.catalogue.LearningPeriod;
@@ -12,6 +13,7 @@ import java.util.Map;
 
 @Data
 @RequiredArgsConstructor
+@Slf4j
 public class CoursePartial {
 
     private final String courseId;
@@ -29,11 +31,13 @@ public class CoursePartial {
         this.departmentCodes.add(depCode);
     }
 
-    public List<String> getCSUidsForIncompleteLearning(Map<String, List<CourseRecords>> civilServants) {
+    public List<String> getCSUidsForIncompleteLearning(Map<String, List<CourseRecords>> departmentCodesToCourseRecords) {
         List<String> uids = new ArrayList<>();
         for (String departmentCode : departmentCodes) {
-            civilServants.getOrDefault(departmentCode, List.of()).forEach(civilServantWithRecord -> {
+            log.debug("Checking completed records for department {}", departmentCode);
+            departmentCodesToCourseRecords.getOrDefault(departmentCode, List.of()).forEach(civilServantWithRecord -> {
                 if (!civilServantWithRecord.isCourseCompleted(courseId, requiredModuleIds, learningPeriod)) {
+                    log.debug("User {} has not completed course {} during this learning period", civilServantWithRecord.getUserId(), this.courseId);
                     uids.add(civilServantWithRecord.getUserId());
                 }
             });

@@ -35,4 +35,9 @@ public class LearningJobCourseDataMap extends HashMap<Long, LearningJobCourseDat
         this.courseIds.add(course.getId());
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s courses across %s organisations", courseIds.size(), orgCodes.size());
+    }
+
 }

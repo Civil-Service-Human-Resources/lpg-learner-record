@@ -24,7 +24,6 @@ public class CourseRecordController {
 
     @PostMapping
     public ResponseEntity<CourseRecord> createCourseRecord(@Valid @RequestBody CourseRecord inputCourse) {
-        log.debug("Creating course record");
         CourseRecord newRecord = courseRecordService.createCourseRecord(inputCourse);
         return new ResponseEntity<>(newRecord, HttpStatus.CREATED);
     }
