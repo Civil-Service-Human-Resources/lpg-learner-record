@@ -84,8 +84,9 @@ public class LearningJob {
             List<IMessageParams> reminders = new ArrayList<>();
             List<Notification> notifications = new ArrayList<>();
             Map<String, String> uidsToEmails = new HashMap<>();
-            List<String> notificationsSentToday = notificationRepository.findAllBySentAfter(now.with(LocalTime.MIN))
-                    .stream().map(n -> String.format("%s-%s", n.getCourseId(), n.getIdentityUid())).toList();
+            List<String> notificationsSentToday = new ArrayList<>();
+            notificationRepository.findAllBySentAfter(now.with(LocalTime.MIN))
+                    .forEach(n -> notificationsSentToday.add(String.format("%s-%s", n.getCourseId(), n.getIdentityUid())));
             for (LearningJobCourseData courseData : requiredLearningData.values()) {
                 log.info("Processing course data: {}", courseData.toString());
                 Map<String, List<CourseTitleWithId>> uidsToMissingCoursesMap = courseData.getUidsToMissingCourses(civilServants);
@@ -95,8 +96,10 @@ public class LearningJob {
                 uidsToMissingCoursesMap.forEach((uid, courses) -> {
                     List<String> courseTitles = new ArrayList<>();
                     for (CourseTitleWithId course : courses) {
-                        if (!notificationsSentToday.contains(String.format("%s-%s", course.getCourseId(), uid))) {
+                        String uidCourseTitle = String.format("%s-%s", course.getCourseId(), uid);
+                        if (!notificationsSentToday.contains(uidCourseTitle)) {
                             notifications.add(new Notification(course.getCourseId(), uid, now, NotificationType.REMINDER));
+                            notificationsSentToday.add(uidCourseTitle);
                             courseTitles.add(course.getCourseTitle());
                         }
                     }
