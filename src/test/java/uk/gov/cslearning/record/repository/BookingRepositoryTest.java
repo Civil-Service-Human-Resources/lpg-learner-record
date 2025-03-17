@@ -1,16 +1,15 @@
 package uk.gov.cslearning.record.repository;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.cslearning.record.IntegrationTestBase;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
-import uk.gov.cslearning.record.dto.BookingStatus;
 
-import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -19,15 +18,17 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+
 @Transactional
-public class BookingRepositoryTest {
+public class BookingRepositoryTest extends IntegrationTestBase {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @Test
     public void shouldSaveBooking() {
@@ -38,6 +39,8 @@ public class BookingRepositoryTest {
         Event event = new Event();
         event.setPath("test/path");
         event.setUid("SSB");
+
+        eventRepository.save(event);
 
         Booking booking = new Booking();
         booking.setEvent(event);
@@ -67,6 +70,8 @@ public class BookingRepositoryTest {
         Event event = new Event();
         event.setPath("test/path");
         event.setUid(eventUid);
+
+        eventRepository.save(event);
 
         Booking booking1 = new Booking();
         booking1.setEvent(event);
@@ -109,6 +114,8 @@ public class BookingRepositoryTest {
         Event event = new Event();
         event.setUid("SDBBL");
         event.setPath("test/path");
+
+        eventRepository.save(event);
 
         Instant baseInstant = ZonedDateTime.of(LocalDate.now().atStartOfDay(), ZoneId.systemDefault()).toInstant();
 

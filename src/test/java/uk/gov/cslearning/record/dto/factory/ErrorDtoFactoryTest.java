@@ -1,12 +1,13 @@
 package uk.gov.cslearning.record.dto.factory;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import uk.gov.cslearning.record.dto.ErrorDto;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ErrorDtoFactoryTest {
 

@@ -1,52 +1,50 @@
 package uk.gov.cslearning.record.validation.validators;
 
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import jakarta.validation.ConstraintValidatorContext;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.InviteService;
 
-import javax.validation.ConstraintValidatorContext;
 import java.net.URI;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(SpringExtension.class)
 public class LearnerNotInvitedValidatorTest {
     @Mock
     private InviteService inviteService;
 
+    @InjectMocks
     private LearnerNotInvitedValidator validator;
 
-    @Before
-    public void init(){
-        MockitoAnnotations.initMocks(this);
-        validator = new LearnerNotInvitedValidator(inviteService);
-    }
-
     @Test
-    public void shouldReturnFalseIfBookingExists() throws Exception{
+    public void shouldReturnFalseIfBookingExists() throws Exception {
         InviteDto invite = new InviteDto();
         invite.setEvent(new URI("http://test/path/SRTIBDNE"));
         invite.setLearnerEmail("user@test.com");
 
         when(inviteService.findByEventIdAndLearnerEmail("SRTIBDNE", "user@test.com")).thenReturn(Optional.of(new InviteDto()));
 
-        Assert.assertFalse(validator.isValid(invite, mock(ConstraintValidatorContext.class)));
+        assertFalse(validator.isValid(invite, mock(ConstraintValidatorContext.class)));
     }
 
     @Test
-    public void shouldReturnTrueIfBookingDoesNotExist() throws Exception{
+    public void shouldReturnTrueIfBookingDoesNotExist() throws Exception {
         InviteDto invite = new InviteDto();
         invite.setEvent(new URI("http://test/path/SRTIBDNE"));
         invite.setLearnerEmail("user@test.com");
 
         when(inviteService.findByEventIdAndLearnerEmail("SRTIBDNE", "user@test.com")).thenReturn(Optional.empty());
 
-        Assert.assertTrue(validator.isValid(invite, mock(ConstraintValidatorContext.class)));
+        assertTrue(validator.isValid(invite, mock(ConstraintValidatorContext.class)));
     }
 }

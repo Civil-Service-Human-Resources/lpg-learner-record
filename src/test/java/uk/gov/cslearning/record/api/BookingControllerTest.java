@@ -4,18 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.hibernate.exception.ConstraintViolationException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.cslearning.record.MockedTestConfiguration;
 import uk.gov.cslearning.record.SpringTestConfiguration;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.dto.*;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.EventService;
@@ -37,9 +38,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest({BookingController.class})
-@Import(SpringTestConfiguration.class)
+@WebMvcTest(controllers = BookingController.class)
+@Import({SpringTestConfiguration.class, MockedTestConfiguration.class})
+@AutoConfigureMockMvc
 @WithMockUser(username = "user")
 public class BookingControllerTest {
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
@@ -56,7 +57,7 @@ public class BookingControllerTest {
 
     private ObjectMapper objectMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -79,8 +80,8 @@ public class BookingControllerTest {
         when(bookingService.listByEventUid("test-event-id")).thenReturn(bookings);
 
         mockMvc.perform(
-                get("/event/test-event-id/booking")
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/event/test-event-id/booking")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", equalTo(11)))
@@ -92,8 +93,8 @@ public class BookingControllerTest {
         when(bookingService.listByEventUid("test-event-id")).thenReturn(new ArrayList<>());
 
         mockMvc.perform(
-                get("/event/test-event-id/booking")
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/event/test-event-id/booking")
+                                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", equalTo(new ArrayList<>())));
@@ -119,8 +120,8 @@ public class BookingControllerTest {
         when(bookingService.find(bookingId)).thenReturn(Optional.of(bookingDto));
 
         mockMvc.perform(
-                get("/event/blah/booking/" + bookingId)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/event/blah/booking/" + bookingId)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learner)))
@@ -154,8 +155,8 @@ public class BookingControllerTest {
         when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.of(bookingDto));
 
         mockMvc.perform(
-                get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
-                        .accept(MediaType.APPLICATION_JSON))
+                        get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
@@ -173,8 +174,8 @@ public class BookingControllerTest {
         when(bookingService.find(bookingId)).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                get("/event/blah/booking/" + bookingId)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/event/blah/booking/" + bookingId)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -186,8 +187,8 @@ public class BookingControllerTest {
         when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
-                        .accept(MediaType.APPLICATION_JSON))
+                        get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
@@ -220,20 +221,20 @@ public class BookingControllerTest {
 
         String json = objectMapper.writeValueAsString(booking);
 
-        when(bookingService.register(eq(booking))).thenReturn(savedBooking);
+        when(bookingService.create(eq("event-id"), eq(booking))).thenReturn(savedBooking);
 
         EventDto eventDto = new EventDto();
         eventDto.setStatus(EventStatus.ACTIVE);
 
-        when(eventService.findByUid("event-id")).thenReturn(eventDto);
+        when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
 
         mockMvc.perform(
-                post("/event/blah/booking/").with(csrf())
-                        .content(json)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/event/event-id/booking/").with(csrf())
+                                .content(json)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("location", "http://localhost/event/blah/booking/" + bookingId));
+                .andExpect(header().string("location", "http://localhost/event/event-id/booking/" + bookingId));
     }
 
     @Test
@@ -249,10 +250,10 @@ public class BookingControllerTest {
         booking.setEvent(new URI("test/path/to/eventId"));
 
         mockMvc.perform(
-                post("/event/blah/booking/").with(csrf())
-                        .content(objectMapper.writeValueAsString(booking))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/event/blah/booking/").with(csrf())
+                                .content(objectMapper.writeValueAsString(booking))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("A booking requires a learner")))
                 .andExpect(jsonPath("$.errors[1]", equalTo("A booking requires a learner email address")))
@@ -285,15 +286,15 @@ public class BookingControllerTest {
         booking.setEvent(event);
         booking.setLearner(learner);
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(status, "");
+        BookingStatusDto bookingStatus = new BookingStatusDto(status, BookingCancellationReason.PAYMENT);
 
         when(bookingService.updateStatus(eq(bookingId), eq(bookingStatus))).thenReturn(booking);
 
         mockMvc.perform(
-                patch("/event/blah/booking/" + bookingId).with(csrf())
-                        .content(objectMapper.writeValueAsString(bookingStatus))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        patch("/event/blah/booking/" + bookingId).with(csrf())
+                                .content(objectMapper.writeValueAsString(bookingStatus))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learner)))
@@ -309,19 +310,19 @@ public class BookingControllerTest {
         int bookingId = 930;
         BookingStatus status = BookingStatus.REQUESTED;
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(status, "");
+        BookingStatusDto bookingStatus = new BookingStatusDto(status, BookingCancellationReason.PAYMENT);
 
         mockMvc.perform(
-                patch("/event/blah/booking/" + bookingId).with(csrf())
-                        .content(objectMapper.writeValueAsString(bookingStatus))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        patch("/event/blah/booking/" + bookingId).with(csrf())
+                                .content(objectMapper.writeValueAsString(bookingStatus))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("Booking status cannot be updated to 'Requested'")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
-        verifyZeroInteractions(bookingService);
+        verifyNoInteractions(bookingService);
     }
 
     @Test
@@ -347,13 +348,13 @@ public class BookingControllerTest {
         when(exception.getSQLException()).thenReturn(sqlException);
         when(exception.toString()).thenReturn("constraint-violation");
 
-        doThrow(exception).when(bookingService).register(booking);
+        doThrow(exception).when(bookingService).create("eventuid", booking);
 
         mockMvc.perform(
-                post("/event/blah/booking/").with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(booking))
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/event/eventuid/booking/").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(booking))
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("Storage error")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
@@ -383,10 +384,10 @@ public class BookingControllerTest {
         when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
 
         mockMvc.perform(
-                post("/event/blah/booking/").with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(booking))
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/event/blah/booking/").with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(booking))
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]", equalTo("Cannot apply booking to a cancelled event.")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
@@ -418,15 +419,15 @@ public class BookingControllerTest {
         booking.setEvent(event);
         booking.setLearner(learnerUid);
 
-        BookingStatusDto bookingStatus = new BookingStatusDto(status, "");
+        BookingStatusDto bookingStatus = new BookingStatusDto(status, BookingCancellationReason.PAYMENT);
 
         when(bookingService.updateStatus(eq(eventUid), eq(learnerUid), eq(bookingStatus))).thenReturn(booking);
 
         mockMvc.perform(
-                patch(String.format("/event/%s/learner/%s", eventUid, learnerUid)).with(csrf())
-                        .content(objectMapper.writeValueAsString(bookingStatus))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        patch(String.format("/event/%s/learner/%s", eventUid, learnerUid)).with(csrf())
+                                .content(objectMapper.writeValueAsString(bookingStatus))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
@@ -449,8 +450,8 @@ public class BookingControllerTest {
         when(bookingService.findByLearnerUidAndEventUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
 
         mockMvc.perform((
-                get(String.format("/event/%s/booking/%s/active", eventUid, learnerUid)).with(csrf()))
-                .accept(MediaType.APPLICATION_JSON))
+                        get(String.format("/event/%s/booking/%s/active", eventUid, learnerUid)).with(csrf()))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(1)));
 

@@ -1,24 +1,25 @@
 package uk.gov.cslearning.record.service;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
-import uk.gov.cslearning.record.notifications.dto.MessageDto;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
-import uk.gov.cslearning.record.service.booking.BookingNotificationService;
+import uk.gov.cslearning.record.util.UtilService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,33 +28,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class DefaultBookingServiceTest {
 
     @Mock
+    private UtilService utilService;
+    @Mock
     private BookingFactory bookingFactory;
-
     @Mock
     private BookingDtoFactory bookingDtoFactory;
-
     @Mock
     private BookingRepository bookingRepository;
-
     @Mock
     private EventRepository eventRepository;
-
-    @Mock
-    private MessageService messageService;
-
     @Mock
     private NotificationService notificationService;
-
     @Mock
-    private BookingNotificationService bookingNotificationService;
+    private MessageService messageService;
 
     @InjectMocks
     private DefaultBookingService bookingService;
@@ -78,9 +73,7 @@ public class DefaultBookingServiceTest {
         Booking booking = new Booking();
         BookingDto bookingDto = new BookingDto();
 
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
-
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findByEventUidAndLearnerUid(eventUid, learnerUid)).thenReturn(Optional.of(booking));
         when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
 
         assertEquals(Optional.of(bookingDto), bookingService.find(eventUid, learnerUid));
@@ -101,9 +94,7 @@ public class DefaultBookingServiceTest {
         String eventUid = "event-uid";
         String learnerUid = "learner-uid";
 
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED, BookingStatus.CANCELLED);
-
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.empty());
+        when(bookingRepository.findByEventUidAndLearnerUid(eventUid, learnerUid)).thenReturn(Optional.empty());
 
         assertEquals(Optional.empty(), bookingService.find(eventUid, learnerUid));
     }
@@ -140,160 +131,17 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldSaveBookingButNotRegisterIfNotConfirmed() {
-        BookingDto unsavedBookingDto = new BookingDto();
-        unsavedBookingDto.setStatus(BookingStatus.REQUESTED);
-        unsavedBookingDto.setLearner("test-uid");
-        Booking unsavedBooking = new Booking();
-        BookingDto savedBookingDto = new BookingDto();
-        Booking savedBooking = new Booking();
-
-        when(bookingFactory.create(unsavedBookingDto)).thenReturn(unsavedBooking);
-        when(bookingRepository.saveBooking(unsavedBooking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.register(unsavedBookingDto));
-
-        verify(bookingRepository).saveBooking(unsavedBooking);
-        verify(bookingNotificationService).sendRequestedNotifications(savedBookingDto);
-    }
-
-    @Test
-    public void shouldUpdateBookingStatus() {
-        int bookingId = 99;
-        Booking booking = mock(Booking.class);
-        Booking updatedBooking = mock(Booking.class);
-        Booking savedBooking = mock(Booking.class);
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.REQUESTED);
-        bookingDto.setLearner("test-uid");
-        BookingDto savedBookingDto = new BookingDto();
-
-        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
-
-        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
-
-        BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED, "");
-
-        when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
-        when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.updateStatus(bookingId, bookingStatus));
-
-        verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
-
-    }
-
-    @Test
-    public void shouldUpdateBookingStatusWithEventUidAndLearnerUid() {
-        String eventUid = "event-uid";
-        String learnerUid = "learner-uid";
-
-        Booking booking = mock(Booking.class);
-        Booking updatedBooking = mock(Booking.class);
-        Booking savedBooking = mock(Booking.class);
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.REQUESTED);
-        bookingDto.setLearner("test-uid");
-        BookingDto savedBookingDto = new BookingDto();
-
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
-
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
-
-        when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
-
-        BookingStatusDto bookingStatus = new BookingStatusDto(BookingStatus.CONFIRMED, "");
-
-        when(bookingFactory.create(bookingDto)).thenReturn(updatedBooking);
-        when(bookingRepository.saveBooking(updatedBooking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.updateStatus(eventUid, learnerUid, bookingStatus));
-
-        verify(bookingNotificationService).sendConfirmedNotifications(savedBookingDto);
-    }
-
-    @Test
     public void shouldThrowBookingNotFoundException() {
         int bookingId = 99;
 
         when(bookingRepository.findById(bookingId)).thenReturn(Optional.empty());
 
         try {
-            bookingService.updateStatus(bookingId, new BookingStatusDto(BookingStatus.CONFIRMED, ""));
+            bookingService.updateStatus(bookingId, new BookingStatusDto(BookingStatus.CONFIRMED, BookingCancellationReason.PAYMENT));
             fail("Expected BookingNotFoundException");
         } catch (BookingNotFoundException e) {
             assertEquals("Booking does not exist with id: 99", e.getMessage());
         }
-    }
-
-    @Test
-    public void shouldUnregisterBookingWithBookingDtoIfConfirmed() {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.CONFIRMED);
-        BookingDto savedBookingDto = new BookingDto();
-
-        Booking booking = new Booking();
-        Booking savedBooking = new Booking();
-
-        when(bookingFactory.create(bookingDto)).thenReturn(booking);
-        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
-
-        verify(bookingRepository).saveBooking(booking);
-    }
-
-    @Test
-    public void shouldUnregisterBookingWithBookingDtoIfRequested() {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.REQUESTED);
-        BookingDto savedBookingDto = new BookingDto();
-
-        Booking booking = new Booking();
-        Booking savedBooking = new Booking();
-
-        when(bookingFactory.create(bookingDto)).thenReturn(booking);
-        when(bookingRepository.saveBooking(booking)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.unregister(bookingDto));
-
-        verify(bookingRepository).saveBooking(booking);
-    }
-
-    @Test
-    public void shouldUnregisterBookingWithBooking() {
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setStatus(BookingStatus.CONFIRMED);
-        BookingDto savedBookingDto = new BookingDto();
-
-        Booking booking1 = new Booking();
-        booking1.setId(1);
-        Booking booking2 = new Booking();
-        booking2.setId(2);
-
-        Booking savedBooking = new Booking();
-
-        MessageDto messageDto = new MessageDto();
-
-        when(messageService.createCancelEventMessage(booking1, "cancellation reason")).thenReturn(messageDto);
-        when(notificationService.send(messageDto)).thenReturn(true);
-        when(bookingDtoFactory.create(booking1)).thenReturn(bookingDto);
-        when(bookingFactory.create(bookingDto)).thenReturn(booking2);
-        when(bookingRepository.saveBooking(booking2)).thenReturn(savedBooking);
-        when(bookingDtoFactory.create(savedBooking)).thenReturn(savedBookingDto);
-
-        assertEquals(savedBookingDto, bookingService.unregister(booking1, "cancellation reason"));
-
-        verify(messageService).createCancelEventMessage(booking1, "cancellation reason");
-        verify(notificationService).send(messageDto);
-        verify(bookingRepository).saveBooking(booking2);
     }
 
     @Test
@@ -345,12 +193,12 @@ public class DefaultBookingServiceTest {
 
         List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
 
-        when(bookingRepository.findByEventUidLearnerUid(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
+        when(bookingRepository.findByEventUidAndLearnerUidAndStatusIn(eventUid, learnerUid, status)).thenReturn(Optional.of(booking));
         when(bookingDtoFactory.create(booking)).thenReturn(bookingDto);
 
         assertEquals(bookingService.findByLearnerUidAndEventUid(eventUid, learnerUid), Optional.of(bookingDto));
 
-        verify(bookingRepository).findByEventUidLearnerUid(eventUid, learnerUid, status);
+        verify(bookingRepository).findByEventUidAndLearnerUidAndStatusIn(eventUid, learnerUid, status);
         verify(bookingDtoFactory).create(booking);
     }
 

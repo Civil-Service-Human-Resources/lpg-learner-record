@@ -1,10 +1,9 @@
 package uk.gov.cslearning.record.validation.validators;
 
-import uk.gov.cslearning.record.dto.BookingStatus;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.validation.annotations.BookingStatusNotEquals;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class BookingStatusNotEqualsValidator implements ConstraintValidator<BookingStatusNotEquals, BookingStatus> {
     private BookingStatus annotationValue;

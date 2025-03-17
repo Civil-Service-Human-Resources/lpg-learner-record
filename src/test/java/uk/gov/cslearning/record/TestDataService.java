@@ -1,14 +1,68 @@
 package uk.gov.cslearning.record;
 
-import uk.gov.cslearning.record.domain.CourseRecord;
-import uk.gov.cslearning.record.domain.ModuleRecord;
-import uk.gov.cslearning.record.domain.State;
+import lombok.Data;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import uk.gov.cslearning.record.domain.*;
+import uk.gov.cslearning.record.dto.BookingCancellationReason;
+import uk.gov.cslearning.record.dto.EventStatus;
+import uk.gov.cslearning.record.service.catalogue.Audience;
+import uk.gov.cslearning.record.service.catalogue.Course;
+import uk.gov.cslearning.record.service.catalogue.Module;
+import uk.gov.cslearning.record.util.IUtilService;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+
+@Component
+@Data
 public class TestDataService {
 
     protected final String courseId = "testCourseId";
     protected final String moduleId = "testModuleId";
+    protected final String eventId = "testEventId";
     protected final String userId = "testUserId";
+    @Autowired
+    private IUtilService utilService;
+
+    public Learner generateLearner() {
+        String learnerId = generateLearnerId();
+        return new Learner(learnerId, String.format("%s@email.com", learnerId));
+    }
+
+    public String generateLearnerId() {
+        return String.format("learner-%s", generateRandomID());
+    }
+
+    public String generateRandomID() {
+        return RandomStringUtils.random(5, true, true);
+    }
+
+    public Booking generateBooking(BookingStatus status, Learner learner) {
+        Instant now = utilService.getNowInstant();
+        Booking booking = new Booking();
+        booking.setLearner(learner);
+        booking.setStatus(status);
+        booking.setBookingTime(now);
+        booking.setBookingReference("ABCDE");
+        if (status.equals(BookingStatus.CONFIRMED)) {
+            booking.setConfirmationTime(now);
+        } else if (status.equals(BookingStatus.CANCELLED)) {
+            booking.setCancellationReason(BookingCancellationReason.ILLNESS);
+            booking.setConfirmationTime(now);
+        }
+        return booking;
+    }
+
+    public Event generateLearnerRecordEvent() {
+        Event event = new Event();
+        event.setStatus(EventStatus.ACTIVE);
+        event.setPath("/courses/courseId/modules/moduleId/events/" + eventId);
+        event.setUid(eventId);
+        return event;
+    }
 
     public ModuleRecord generateModuleRecord() {
         ModuleRecord mr = new ModuleRecord();
@@ -36,5 +90,24 @@ public class TestDataService {
             cr.addModuleRecord(mr);
         }
         return cr;
+    }
+
+    public Course generateCourse(String id, String title) {
+        return new Course(id, title, List.of(), List.of());
+    }
+
+    public Module generateModule(String id, boolean optional) {
+        Module module = new Module();
+        module.setId(id);
+        module.setOptional(optional);
+        return module;
+    }
+
+    public Audience generateRequiredLearningAudience(List<String> departments, LocalDate requiredBy, String frequency) {
+        Audience audience = new Audience();
+        audience.setDepartments(departments);
+        audience.setRequiredBy(requiredBy);
+        audience.setFrequency(frequency);
+        return audience;
     }
 }

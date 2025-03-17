@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum CancellationReason {
-    UNAVAILABLE("the event is no longer available"),VENUE("short notice unavailability of the venue");
+    UNAVAILABLE("the event is no longer available"), VENUE("short notice unavailability of the venue");
 
     private final String value;
 
@@ -17,20 +17,20 @@ public enum CancellationReason {
         this.value = value;
     }
 
-    @JsonCreator
-    public static CancellationReason forValue(String value) {
-        return Arrays.stream(CancellationReason.values())
-                .filter(v -> v.value.equalsIgnoreCase(value))
-                .findAny()
-                .orElseThrow(() -> new UnknownStatusException(value));
-    }
-
-    public static Map<String, String> getKeyValuePairs(){
+    public static Map<String, String> getKeyValuePairs() {
         Map<String, String> map = new HashMap<>();
         map.put("UNAVAILABLE", UNAVAILABLE.getValue());
         map.put("VENUE", VENUE.getValue());
 
         return map;
+    }
+
+    @JsonCreator
+    public static CancellationReason forValue(String value) {
+        return Arrays.stream(CancellationReason.values())
+                .filter(v -> v.getValue().equalsIgnoreCase(value) || v.toString().equalsIgnoreCase(value))
+                .findAny()
+                .orElseThrow(() -> new UnknownStatusException(value));
     }
 
     @JsonValue

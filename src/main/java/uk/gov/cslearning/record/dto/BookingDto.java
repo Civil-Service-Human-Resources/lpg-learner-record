@@ -1,11 +1,12 @@
 package uk.gov.cslearning.record.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.validation.annotations.AttendeeNotBooked;
 import uk.gov.cslearning.record.validation.annotations.EventIsActive;
 
-import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,6 +27,9 @@ public class BookingDto {
 
     private String learnerName;
 
+    /**
+     * The full URI of the event, including catalogue domain
+     */
     @NotNull(message = "{booking.event.required}")
     @EventIsActive(message = "{booking.event.active}")
     private URI event;
@@ -33,7 +37,7 @@ public class BookingDto {
     @NotNull
     private BookingStatus status;
 
-    private Instant bookingTime = Instant.now();
+    private Instant bookingTime;
 
     private Instant confirmationTime;
 
@@ -66,4 +70,5 @@ public class BookingDto {
         }
         return Optional.empty();
     }
+
 }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Service
 public class DefaultNotificationService implements NotificationService {
 
-    private NotificationRepository notificationRepository;
+    private final NotificationRepository notificationRepository;
 
     public DefaultNotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;

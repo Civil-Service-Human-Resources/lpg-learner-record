@@ -24,12 +24,12 @@ public enum BookingCancellationReason {
     @JsonCreator
     public static BookingCancellationReason forValue(String value) {
         return Arrays.stream(BookingCancellationReason.values())
-                .filter(v -> v.value.equalsIgnoreCase(value))
+                .filter(v -> v.getValue().equalsIgnoreCase(value) || v.toString().equalsIgnoreCase(value))
                 .findAny()
                 .orElseThrow(() -> new UnknownStatusException(value));
     }
 
-    public static Map<String, String> getManagementKeyValuePairs(){
+    public static Map<String, String> getManagementKeyValuePairs() {
         Map<String, String> map = new HashMap<>();
         map.put("PAYMENT", PAYMENT.getValue());
         map.put("REQUESTED", REQUESTED.getValue());
@@ -37,7 +37,7 @@ public enum BookingCancellationReason {
         return map;
     }
 
-    public static Map<String, String> getUserKeyValuePairs(){
+    public static Map<String, String> getUserKeyValuePairs() {
         Map<String, String> map = new HashMap<>();
         map.put(BEREAVEMENT.name(), BEREAVEMENT.getValue());
         map.put(ILLNESS.name(), ILLNESS.getValue());

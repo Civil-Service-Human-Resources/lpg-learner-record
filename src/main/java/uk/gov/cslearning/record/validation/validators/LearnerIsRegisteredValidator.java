@@ -1,23 +1,22 @@
 package uk.gov.cslearning.record.validation.validators;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
-import uk.gov.cslearning.record.service.identity.IdentityService;
+import uk.gov.cslearning.record.service.identity.IdentitiesService;
 import uk.gov.cslearning.record.validation.annotations.LearnerIsRegistered;
-import uk.gov.cslearning.record.validation.annotations.LearnerNotInvited;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 @Component
 public class LearnerIsRegisteredValidator implements ConstraintValidator<LearnerIsRegistered, String> {
 
-    private final IdentityService identityService;
+    private final IdentitiesService identityService;
 
-    public LearnerIsRegisteredValidator(IdentityService identityService) {
+    public LearnerIsRegisteredValidator(IdentitiesService identityService) {
         this.identityService = identityService;
     }
 
-    public void initialise(LearnerIsRegistered constraint) {}
+    public void initialise(LearnerIsRegistered constraint) {
+    }
 
     @Override
     public boolean isValid(String learnerEmail, ConstraintValidatorContext context) {
