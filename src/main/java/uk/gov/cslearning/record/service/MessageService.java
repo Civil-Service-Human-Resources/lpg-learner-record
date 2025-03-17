@@ -6,7 +6,6 @@ import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.EventIds;
-import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.exception.CivilServantNotFoundException;
 import uk.gov.cslearning.record.notifications.dto.*;
@@ -15,7 +14,6 @@ import uk.gov.cslearning.record.service.catalogue.Event;
 import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 import uk.gov.cslearning.record.service.catalogue.Module;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -60,13 +58,6 @@ public class MessageService {
         IMessageParams lmParams = new CancelBookingLMMessageParams(civilServant.getLineManagerEmailAddress(), courseMessageDetails,
                 learnerMessageDetails, booking.getBookingReference());
         return List.of(learnerParams, lmParams);
-    }
-
-    public List<IMessageParams> createBulkCancelEventMessages(uk.gov.cslearning.record.domain.Event event, CancellationReason cancellationReason) {
-        CourseMessageDetails courseMessageDetails = getCourseMessageDetails(event.getEventIds());
-        List<IMessageParams> params = new ArrayList<>();
-        event.getActiveBookings().forEach(b -> params.add(new CancelEventMessageParams(b.getLearner().getLearnerEmail(), courseMessageDetails, cancellationReason.getValue(), b.getBookingReference())));
-        return params;
     }
 
     public List<IMessageParams> createRegisteredMessages(Booking booking) {

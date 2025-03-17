@@ -9,6 +9,7 @@ import lombok.ToString;
 import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventStatus;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,15 @@ public class Event {
     @JsonIgnore
     public List<Booking> getActiveBookings() {
         return this.bookings.stream().filter(b -> !b.getStatus().equals(BookingStatus.CANCELLED)).toList();
+    }
+
+    @JsonIgnore
+    public void cancel(CancellationReason reason, Instant cancellationTime) {
+        setCancellationReason(reason);
+        getBookings().forEach(b -> {
+            b.setStatus(BookingStatus.CANCELLED);
+            b.setCancellationTime(cancellationTime);
+        });
     }
 
     @JsonIgnore
