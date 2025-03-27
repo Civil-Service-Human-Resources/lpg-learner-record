@@ -198,10 +198,10 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
                         .with(csrf())
                         .contentType("application/json")
                         .content(jsonInput))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].lastUpdated").value("2023-01-01T10:00:00"))
-                .andExpect(jsonPath("$[1].lastUpdated").value("2023-01-01T10:00:00"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.courseRecords.length()").value(2))
+                .andExpect(jsonPath("$.courseRecords[0].lastUpdated").value("2023-01-01T10:00:00"))
+                .andExpect(jsonPath("$.courseRecords[1].lastUpdated").value("2023-01-01T10:00:00"));
 
         CourseRecord result = courseRecordRepository.findByUserId("testUserId").get(0);
         assert (result.getState().equals(State.APPROVED));
@@ -309,20 +309,22 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
     public void testGetCourseRecords() throws Exception {
         mockMvc.perform(get("/course_records")
                         .param("courseIds", "testCourse1,testCourse3")
-                        .param("userId", "user2"))
-                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
-                .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
-                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
-                .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse3"))
+                        .param("userIds", "user2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[1].userId").value("user2"))
-                .andExpect(jsonPath("$.courseRecords[1].state").value("IN_PROGRESS"));
+                .andExpect(jsonPath("$.courseRecords[1].state").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse3"))
+                .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
+                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"));
     }
 
     @Test
     @Transactional
     public void testGetAllCourseRecords() throws Exception {
         mockMvc.perform(get("/course_records")
-                        .param("userId", "user2"))
+                        .param("userIds", "user2"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse3"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
                 .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
@@ -336,7 +338,8 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
     public void testGetCourseRecord() throws Exception {
         mockMvc.perform(get("/course_records")
                         .param("courseIds", "testCourse1")
-                        .param("userId", "user1"))
+                        .param("userIds", "user1"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseRecords.length()").value(1))
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user1"))
@@ -351,7 +354,8 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
         cr.getModuleRecords().forEach(moduleRecordRepository::saveAndFlush);
         mockMvc.perform(get("/course_records")
                         .param("courseIds", cr.getCourseId())
-                        .param("userId", cr.getUserId()))
+                        .param("userIds", cr.getUserId()))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseRecords.length()").value(1))
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value(cr.getCourseId()))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value(cr.getUserId()))
