@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.IntegrationTestBase;
 import uk.gov.cslearning.record.TestDataService;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.CourseRecordIdentity;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.State;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
@@ -73,6 +74,52 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
 
     @Test
     @Transactional
+    public void testCreateMultipleCourseRecords() throws Exception {
+        CourseRecord cr = testDataService.generateCourseRecord(1);
+        CourseRecord cr2 = testDataService.generateCourseRecord(1);
+        cr2.setIdentity(new CourseRecordIdentity("testCourseId2", "testUserId2"));
+
+        String jsonInput = mapper.writeValueAsString(List.of(cr, cr2));
+
+        mockMvc.perform(post("/course_records/bulk")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(jsonInput))
+                .andExpect(status().isCreated());
+
+        CourseRecord result = courseRecordRepository.findByUserId("testUserId").get(0);
+        assert (result.isRequired());
+        assert (result.getCourseTitle()).equals("Test title");
+        assert (result.getCourseId()).equals("testCourseId");
+        assertTime(result.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+
+        ModuleRecord mrResult = result.getModuleRecords().stream().filter(mr -> mr.getModuleId().equals("testModuleId0")).findFirst().get();
+        assert (mrResult.getDuration()).equals(100L);
+        assert (mrResult.getModuleTitle()).equals("Test module title");
+        assert (mrResult.getModuleType()).equals("elearning");
+        assert (mrResult.getState()).equals(State.IN_PROGRESS);
+        assertTime(mrResult.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
+        assertTime(mrResult.getCreatedAt(), 1, 1, 2023, 10, 0, 0);
+        assert (!mrResult.getOptional());
+
+        CourseRecord result2 = courseRecordRepository.findByUserId("testUserId2").get(0);
+        assert (result2.isRequired());
+        assert (result2.getCourseTitle()).equals("Test title");
+        assert (result2.getCourseId()).equals("testCourseId2");
+        assertTime(result2.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+
+        ModuleRecord mrResult2 = result.getModuleRecords().stream().filter(mr -> mr.getModuleId().equals("testModuleId0")).findFirst().get();
+        assert (mrResult2.getDuration()).equals(100L);
+        assert (mrResult2.getModuleTitle()).equals("Test module title");
+        assert (mrResult2.getModuleType()).equals("elearning");
+        assert (mrResult2.getState()).equals(State.IN_PROGRESS);
+        assertTime(mrResult2.getUpdatedAt(), 1, 1, 2023, 10, 0, 0);
+        assertTime(mrResult2.getCreatedAt(), 1, 1, 2023, 10, 0, 0);
+        assert (!mrResult2.getOptional());
+    }
+
+    @Test
+    @Transactional
     public void testUpdateCourseRecordInvalidParams() throws Exception {
         String testDataDir = "src/test/resources/courseRecord/update/invalid";
         try (Stream<Path> pathsStream = Files.list(Paths.get(testDataDir))) {
@@ -129,6 +176,40 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
         CourseRecord result = courseRecordRepository.findByUserId("testUserId").get(0);
         assert (result.getState().equals(State.APPROVED));
         assertTime(result.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+    }
+
+    /**
+     * Should:
+     * - Update the course record state to APPROVED
+     *
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    public void testUpdateMultipleCourseRecords() throws Exception {
+
+        CourseRecord cr = testDataService.generateCourseRecord(1);
+        CourseRecord cr2 = testDataService.generateCourseRecord(1);
+        cr2.setIdentity(new CourseRecordIdentity("testCourseId2", "testUserId2"));
+        courseRecordRepository.saveAllAndFlush(List.of(cr, cr2));
+        String jsonInput = new String(Files.readAllBytes(Paths.get("src/test/resources/courseRecord/update/update-multiple-course-records.json")));
+
+        mockMvc.perform(put("/course_records/bulk")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(jsonInput))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.courseRecords.length()").value(2))
+                .andExpect(jsonPath("$.courseRecords[0].lastUpdated").value("2023-01-01T10:00:00"))
+                .andExpect(jsonPath("$.courseRecords[1].lastUpdated").value("2023-01-01T10:00:00"));
+
+        CourseRecord result = courseRecordRepository.findByUserId("testUserId").get(0);
+        assert (result.getState().equals(State.APPROVED));
+        assertTime(result.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
+
+        CourseRecord result2 = courseRecordRepository.findByUserId("testUserId2").get(0);
+        assert (result2.getState().equals(State.APPROVED));
+        assertTime(result2.getLastUpdated(), 1, 1, 2023, 10, 0, 0);
     }
 
     /**
@@ -228,20 +309,22 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
     public void testGetCourseRecords() throws Exception {
         mockMvc.perform(get("/course_records")
                         .param("courseIds", "testCourse1,testCourse3")
-                        .param("userId", "user2"))
-                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
-                .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
-                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
-                .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse3"))
+                        .param("userIds", "user2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.courseRecords[1].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[1].userId").value("user2"))
-                .andExpect(jsonPath("$.courseRecords[1].state").value("IN_PROGRESS"));
+                .andExpect(jsonPath("$.courseRecords[1].state").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse3"))
+                .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
+                .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"));
     }
 
     @Test
     @Transactional
     public void testGetAllCourseRecords() throws Exception {
         mockMvc.perform(get("/course_records")
-                        .param("userId", "user2"))
+                        .param("userIds", "user2"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse3"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user2"))
                 .andExpect(jsonPath("$.courseRecords[0].state").value("IN_PROGRESS"))
@@ -255,7 +338,8 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
     public void testGetCourseRecord() throws Exception {
         mockMvc.perform(get("/course_records")
                         .param("courseIds", "testCourse1")
-                        .param("userId", "user1"))
+                        .param("userIds", "user1"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseRecords.length()").value(1))
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value("testCourse1"))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value("user1"))
@@ -270,7 +354,8 @@ public class CourseRecordControllerTest extends IntegrationTestBase {
         cr.getModuleRecords().forEach(moduleRecordRepository::saveAndFlush);
         mockMvc.perform(get("/course_records")
                         .param("courseIds", cr.getCourseId())
-                        .param("userId", cr.getUserId()))
+                        .param("userIds", cr.getUserId()))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.courseRecords.length()").value(1))
                 .andExpect(jsonPath("$.courseRecords[0].courseId").value(cr.getCourseId()))
                 .andExpect(jsonPath("$.courseRecords[0].userId").value(cr.getUserId()))

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -24,8 +25,12 @@ public class Module {
 
     private boolean optional;
 
+    public Collection<Event> getEvents() {
+        return this.events == null ? Collections.emptyList() : events;
+    }
+
     public Event getEvent(String eventId) {
-        return events.stream().filter(event -> eventId.equals(event.getId())).findFirst().orElse(null);
+        return getEvents().stream().filter(event -> eventId.equals(event.getId())).findFirst().orElse(null);
     }
 
 }

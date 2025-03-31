@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class FetchCourseRecordParams {
     @NotNull
-    String userId;
+    List<String> userIds;
     List<String> courseIds;
 }

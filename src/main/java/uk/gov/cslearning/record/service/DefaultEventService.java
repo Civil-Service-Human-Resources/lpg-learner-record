@@ -9,12 +9,9 @@ import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.dto.factory.EventDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
-import uk.gov.cslearning.record.notifications.dto.IMessageParams;
-import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.util.IUtilService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,17 +19,13 @@ import java.util.stream.Collectors;
 public class DefaultEventService implements EventService {
     private final IUtilService utilService;
     private final EventRepository eventRepository;
-    private final NotificationService notificationService;
-    private final MessageService messageService;
     private final EventFactory eventFactory;
     private final EventDtoFactory eventDtoFactory;
 
-    public DefaultEventService(IUtilService utilService, EventRepository eventRepository, NotificationService notificationService,
-                               MessageService messageService, EventFactory eventFactory, EventDtoFactory eventDtoFactory) {
+    public DefaultEventService(IUtilService utilService, EventRepository eventRepository,
+                               EventFactory eventFactory, EventDtoFactory eventDtoFactory) {
         this.utilService = utilService;
         this.eventRepository = eventRepository;
-        this.notificationService = notificationService;
-        this.messageService = messageService;
         this.eventFactory = eventFactory;
         this.eventDtoFactory = eventDtoFactory;
     }
@@ -45,20 +38,16 @@ public class DefaultEventService implements EventService {
 
     @Override
     public EventDto updateStatus(String eventUid, EventStatusDto eventStatus) {
-        List<IMessageParams> messageDtos = new ArrayList<>();
-        Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
-        event.setStatus(eventStatus.getStatus());
-        if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
-            event.setCancellationReason(eventStatus.getCancellationReason());
-            messageDtos.addAll(messageService.createBulkCancelEventMessages(event, eventStatus.getCancellationReason()));
-            event.getBookings().forEach(b -> {
-                b.setStatus(BookingStatus.CANCELLED);
-                b.setCancellationTime(utilService.getNowInstant());
-            });
-        }
-        eventRepository.save(event);
-        notificationService.send(messageDtos);
-        return eventDtoFactory.create(eventRepository.save(event));
+        Event event = eventRepository.findByUid(eventUid)
+                .map(e -> {
+                    e.setStatus(eventStatus.getStatus());
+                    if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
+                        e.cancel(eventStatus.getCancellationReason(), utilService.getNowInstant());
+                    }
+                    return eventRepository.save(e);
+                })
+                .orElseThrow(() -> new EventNotFoundException(eventUid));
+        return eventDtoFactory.create(event);
     }
 
     private Integer getActiveBookingsCount(Integer eventId) {

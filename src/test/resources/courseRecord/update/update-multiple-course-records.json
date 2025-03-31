@@ -1,0 +1,14 @@
+[
+  {
+    "courseId": "testCourseId",
+    "userId": "testUserId",
+    "courseTitle": "title",
+    "state": "APPROVED"
+  },
+  {
+    "courseId": "testCourseId2",
+    "userId": "testUserId2",
+    "courseTitle": "title",
+    "state": "APPROVED"
+  }
+]

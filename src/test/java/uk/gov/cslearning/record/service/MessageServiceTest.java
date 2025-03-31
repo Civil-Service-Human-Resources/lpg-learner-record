@@ -12,10 +12,8 @@ import uk.gov.cslearning.record.config.NotificationTemplates;
 import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.service.RegistryService;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
-import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.notifications.dto.IMessageParams;
 import uk.gov.cslearning.record.notifications.dto.NotificationTemplate;
@@ -146,63 +144,6 @@ public class MessageServiceTest {
                 "cost", "10",
                 "bookingReference", "reference"
         ), NotificationTemplate.BOOKING_CANCELLED_LINE_MANAGER);
-    }
-
-    @Test
-    public void shouldCreateCancelEventMessags() {
-        uk.gov.cslearning.record.domain.Event recordEvent = new uk.gov.cslearning.record.domain.Event();
-        recordEvent.setPath("/courses/courseId/modules/moduleId/events/eventId");
-
-        Learner learner = new Learner();
-        learner.setLearnerEmail("test@domain.com");
-        learner.setUid("learnerId");
-
-        Booking booking = new Booking();
-        booking.setLearner(learner);
-        booking.setStatus(BookingStatus.CONFIRMED);
-        booking.setBookingReference("reference");
-        recordEvent.addBooking(booking);
-
-        Learner learner2 = new Learner();
-        learner2.setLearnerEmail("test2@domain.com");
-        learner2.setUid("learner2Id");
-
-        Booking booking2 = new Booking();
-        booking2.setLearner(learner2);
-        booking2.setStatus(BookingStatus.REQUESTED);
-        booking2.setBookingReference("reference");
-        recordEvent.addBooking(booking2);
-
-        Learner learner3 = new Learner();
-        learner3.setLearnerEmail("test2@domain.com");
-        learner3.setUid("learner3Id");
-
-        Booking booking3 = new Booking();
-        booking3.setLearner(learner3);
-        booking3.setStatus(BookingStatus.CANCELLED);
-        booking3.setBookingReference("reference");
-        recordEvent.addBooking(booking3);
-
-        List<IMessageParams> messageDtos = messageService.createBulkCancelEventMessages(recordEvent, CancellationReason.UNAVAILABLE);
-        IMessageParams learnerMessage = messageDtos.get(0);
-        validateIMessageParams(learnerMessage, "test@domain.com", Map.of(
-                "learnerName", "test@domain.com",
-                "cancellationReason", "the event is no longer available",
-                "courseTitle", "title",
-                "courseDate", "26 Feb 2025",
-                "courseLocation", "London",
-                "bookingReference", "reference"
-        ), NotificationTemplate.CANCEL_EVENT);
-        IMessageParams lmMessage = messageDtos.get(1);
-        validateIMessageParams(lmMessage, "test2@domain.com", Map.of(
-                "learnerName", "test2@domain.com",
-                "cancellationReason", "the event is no longer available",
-                "courseTitle", "title",
-                "courseDate", "26 Feb 2025",
-                "courseLocation", "London",
-                "bookingReference", "reference"
-        ), NotificationTemplate.CANCEL_EVENT);
-
     }
 
     @Test

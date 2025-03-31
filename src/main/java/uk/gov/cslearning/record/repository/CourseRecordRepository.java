@@ -23,8 +23,8 @@ public interface CourseRecordRepository extends JpaRepository<CourseRecord, Long
     @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId = ?1 AND cr.identity.courseId = ?2")
     Optional<CourseRecord> getCourseRecord(String userId, String courseId);
 
-    @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId = ?1 AND cr.identity.courseId in (?2)")
-    List<CourseRecord> findByUserIdAndCourseIdIn(String userId, List<String> courseId);
+    @Query("SELECT cr FROM CourseRecord cr WHERE cr.identity.userId in (?1) AND (?2 is NULL or cr.identity.courseId in (?2))")
+    List<CourseRecord> findByUserIdAndCourseIdIn(List<String> userIds, List<String> courseId);
 
     @Transactional
     @Modifying
