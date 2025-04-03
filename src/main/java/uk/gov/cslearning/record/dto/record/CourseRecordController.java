@@ -1,4 +1,4 @@
 package uk.gov.cslearning.record.dto.record;
 
-public interface CreateEventForRecord {
+public interface CourseRecordController {
 }

@@ -14,6 +14,7 @@ import uk.gov.cslearning.record.exception.LearnerRecordNotFoundException;
 import uk.gov.cslearning.record.repository.LearnerRecordEventRepository;
 import uk.gov.cslearning.record.repository.LearnerRecordRepository;
 import uk.gov.cslearning.record.service.factory.LearnerRecordEventFactory;
+import uk.gov.cslearning.record.util.IUtilService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +22,14 @@ import java.util.List;
 @Service
 public class LearnerRecordEventService {
 
+    private final IUtilService utilService;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
     private final LearnerRecordEventRepository learnerRecordEventRepository;
     private final LearnerRecordRepository learnerRecordRepository;
 
-    public LearnerRecordEventService(LearnerRecordEventFactory learnerRecordEventFactory, LearnerRecordEventRepository learnerRecordEventRepository, LearnerRecordRepository learnerRecordRepository) {
+    public LearnerRecordEventService(IUtilService utilService, LearnerRecordEventFactory learnerRecordEventFactory,
+                                     LearnerRecordEventRepository learnerRecordEventRepository, LearnerRecordRepository learnerRecordRepository) {
+        this.utilService = utilService;
         this.learnerRecordEventFactory = learnerRecordEventFactory;
         this.learnerRecordEventRepository = learnerRecordEventRepository;
         this.learnerRecordRepository = learnerRecordRepository;
@@ -33,7 +37,7 @@ public class LearnerRecordEventService {
 
     public Page<LearnerRecordEventDto> getRecords(Pageable pageableParams, LearnerRecordEventQuery query) {
         Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, query.getEventTypes(),
-                query.getUserId(), query.getBefore(), query.getAfter(), pageableParams);
+                query.getUserId(), utilService.localDateTimeToInstant(query.getBefore()), utilService.localDateTimeToInstant(query.getAfter()), pageableParams);
         return learnerRecordEventFactory.createDtos(pageableParams, events);
     }
 

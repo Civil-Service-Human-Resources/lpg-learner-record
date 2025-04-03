@@ -2,7 +2,9 @@ package uk.gov.cslearning.record.service.factory;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.record.LearnerRecordType;
+import uk.gov.cslearning.record.domain.record.event.LearnerRecordEventSource;
 import uk.gov.cslearning.record.domain.record.event.LearnerRecordEventType;
+import uk.gov.cslearning.record.dto.record.LearnerRecordEventSourceDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordEventTypeDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordTypeDto;
 
@@ -13,8 +15,28 @@ public class LookupValueFactory {
         return new LearnerRecordTypeDto(type.getId(), type.getRecordType());
     }
 
-    public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType) {
-        return new LearnerRecordEventTypeDto(eventType.getId(), eventType.getEventType(), eventType.getDescription());
+    public LearnerRecordTypeDto createLearnerRecordTypeDto(LearnerRecordType type, boolean includeEventTypes) {
+        LearnerRecordTypeDto dto = createLearnerRecordTypeDto(type);
+        if (includeEventTypes) {
+            dto.setValidEventTypes(type.getEventTypes().stream()
+                    .map(e -> this.createLearnerRecordEventTypeDto(e, true)).toList());
+        }
+        return dto;
     }
 
+    public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType) {
+        return new LearnerRecordEventTypeDto(eventType.getId(), eventType.getEventType());
+    }
+
+    public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType, boolean includeDescription) {
+        LearnerRecordEventTypeDto dto = createLearnerRecordEventTypeDto(eventType);
+        if (includeDescription) {
+            dto.setDescription(eventType.getDescription());
+        }
+        return dto;
+    }
+
+    public LearnerRecordEventSourceDto createLearnerRecordSourceDto(LearnerRecordEventSource eventSource) {
+        return new LearnerRecordEventSourceDto(eventSource.getId(), eventSource.getSource());
+    }
 }

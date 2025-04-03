@@ -8,6 +8,8 @@ public interface IUtilService {
 
     String generateSaltedString(int hashLength);
 
+    Instant localDateTimeToInstant(LocalDateTime dateTime);
+
     LocalDateTime getNowDateTime();
 
     Instant getNowInstant();

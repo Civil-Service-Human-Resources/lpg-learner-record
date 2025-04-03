@@ -1,13 +1,13 @@
 package uk.gov.cslearning.record.api.record;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LearnerRecordEventQuery {
@@ -15,7 +15,7 @@ public class LearnerRecordEventQuery {
     List<Integer> eventTypes;
     Integer eventSource;
     String userId;
-    Instant before;
-    Instant after;
+    LocalDateTime before;
+    LocalDateTime after;
 
 }

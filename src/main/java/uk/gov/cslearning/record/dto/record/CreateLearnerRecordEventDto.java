@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @Getter
@@ -13,7 +13,7 @@ public class CreateLearnerRecordEventDto {
     private Integer eventType;
     @NotNull
     private Integer eventSource;
-    private Instant eventTimestamp;
+    private LocalDateTime eventTimestamp;
     @NotNull(groups = {CreateEvent.class})
     private Long learnerRecordId;
 }

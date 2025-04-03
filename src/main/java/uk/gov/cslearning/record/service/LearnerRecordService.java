@@ -17,21 +17,24 @@ import uk.gov.cslearning.record.repository.LearnerRecordEventRepository;
 import uk.gov.cslearning.record.repository.LearnerRecordRepository;
 import uk.gov.cslearning.record.service.factory.LearnerRecordEventFactory;
 import uk.gov.cslearning.record.service.factory.LearnerRecordFactory;
+import uk.gov.cslearning.record.util.IUtilService;
 
 import java.util.List;
 
 @Service
 public class LearnerRecordService {
 
+    private final IUtilService utilService;
     private final LearnerRecordRepository learnerRecordRepository;
     private final LearnerRecordEventRepository learnerRecordEventepository;
     private final LearnerRecordFactory learnerRecordFactory;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
 
-    public LearnerRecordService(LearnerRecordRepository learnerRecordRepository,
+    public LearnerRecordService(IUtilService utilService, LearnerRecordRepository learnerRecordRepository,
                                 LearnerRecordEventRepository learnerRecordEventepository,
                                 LearnerRecordFactory learnerRecordFactory,
                                 LearnerRecordEventFactory learnerRecordEventFactory) {
+        this.utilService = utilService;
         this.learnerRecordRepository = learnerRecordRepository;
         this.learnerRecordEventepository = learnerRecordEventepository;
         this.learnerRecordFactory = learnerRecordFactory;
@@ -39,21 +42,15 @@ public class LearnerRecordService {
     }
 
     public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery learnerRecordQuery) {
-        Page<LearnerRecord> results = learnerRecordRepository.find(learnerRecordQuery.getUserId(), learnerRecordQuery.getResourceId(),
+        Page<LearnerRecord> results = learnerRecordRepository.find(learnerRecordQuery.getLearnerId(), learnerRecordQuery.getResourceId(),
                 learnerRecordQuery.getLearnerRecordTypes(), pageableParams);
-        List<LearnerRecordDto> dtos = results.get().map(lr -> new LearnerRecordDto(lr.getId(), lr.getLearnerRecordUid(), lr.getLearnerRecordType().getId(), lr.getParentRecord().getId(),
-                lr.getResourceId(), lr.getCreatedTimestamp(), lr.getLearnerId())).toList();
+        List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
         return new PageImpl<>(dtos, pageableParams, dtos.size());
     }
 
     public LearnerRecordDto getRecord(Long id, LearnerRecordQuery learnerRecordQuery) {
         LearnerRecord record = learnerRecordRepository.findById(id).orElseThrow(() -> new LearnerRecordNotFoundException(id));
-        LearnerRecordDto dto = new LearnerRecordDto(record.getId(), record.getLearnerRecordUid(), record.getLearnerRecordType().getId(), record.getParentRecord().getId(),
-                record.getResourceId(), record.getCreatedTimestamp(), record.getLearnerId());
-        if (learnerRecordQuery.isGetChildRecords()) {
-            dto.setChildren(record.getChildRecords().stream().map(this.learnerRecordFactory::createLearnerRecordDto).toList());
-        }
-        return dto;
+        return learnerRecordFactory.createLearnerRecordDto(record, learnerRecordQuery.isGetChildRecords(), false);
     }
 
     private LearnerRecord createRecordWithParent(Long parentId, CreateLearnerRecordDto dto) {
@@ -67,7 +64,7 @@ public class LearnerRecordService {
                 createRecordWithParent(dto.getParentId(), dto) :
                 learnerRecordFactory.createLearnerRecord(dto);
         learnerRecordRepository.save(record);
-        return learnerRecordFactory.createLearnerRecordDto(record);
+        return learnerRecordFactory.createLearnerRecordDto(record, true, true);
     }
 
     public List<LearnerRecordEventDto> createEvents(Long id, List<CreateLearnerRecordEventDto> dtos) {
@@ -81,7 +78,7 @@ public class LearnerRecordService {
 
     public Page<LearnerRecordEventDto> getEvents(Pageable pageable, Long recordId, LearnerRecordEventQuery query) {
         Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, query.getEventTypes(), null,
-                query.getBefore(), query.getAfter(), pageable);
+                utilService.localDateTimeToInstant(query.getBefore()), utilService.localDateTimeToInstant(query.getAfter()), pageable);
         return learnerRecordEventFactory.createDtos(pageable, events);
     }
 }

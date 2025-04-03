@@ -22,14 +22,7 @@ public class LearnerRecordTypeService {
 
     public List<LearnerRecordTypeDto> getLearnerRecordTypes(GetLearnerRecordTypesParams params) {
         return learnerRecordTypeRepository.findAll()
-                .stream().map(type -> {
-                    LearnerRecordTypeDto dto = factory.createLearnerRecordTypeDto(type);
-                    if (params.isIncludeEventTypes()) {
-                        dto.setValidEventTypes(type.getEventTypes().stream()
-                                .map(factory::createLearnerRecordEventTypeDto).toList());
-                    }
-                    return dto;
-                })
+                .stream().map(type -> factory.createLearnerRecordTypeDto(type, params.isIncludeEventTypes()))
                 .toList();
     }
 }

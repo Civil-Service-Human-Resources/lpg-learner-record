@@ -11,7 +11,7 @@ import java.util.List;
 public class LearnerRecordDto {
     private Long id;
     private String uid;
-    private Integer recordType;
+    private LearnerRecordTypeDto recordType;
     private Long parentId;
     private String resourceId;
     private Instant createdTimestamp;
@@ -19,7 +19,7 @@ public class LearnerRecordDto {
     private List<LearnerRecordDto> children;
     private List<LearnerRecordEventDto> events;
 
-    public LearnerRecordDto(Long id, String uid, Integer recordType, Long parentId, String resourceId,
+    public LearnerRecordDto(Long id, String uid, LearnerRecordTypeDto recordType, Long parentId, String resourceId,
                             Instant createdTimestamp, String learnerId) {
         this(id, uid, recordType, parentId, resourceId, createdTimestamp, learnerId, null, null);
     }

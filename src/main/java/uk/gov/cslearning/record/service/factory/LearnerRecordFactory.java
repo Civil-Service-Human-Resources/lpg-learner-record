@@ -7,6 +7,7 @@ import uk.gov.cslearning.record.domain.record.event.LearnerRecordEvent;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordEventDto;
+import uk.gov.cslearning.record.dto.record.LearnerRecordTypeDto;
 import uk.gov.cslearning.record.service.LookupValueService;
 import uk.gov.cslearning.record.util.UtilService;
 
@@ -17,25 +18,36 @@ import java.util.UUID;
 @Service
 public class LearnerRecordFactory {
     private final LearnerRecordEventFactory learnerRecordEventFactory;
+    private final LookupValueFactory lookupValueFactory;
     private final LookupValueService lookupValueService;
     private final UtilService utilService;
 
     public LearnerRecordFactory(LearnerRecordEventFactory learnerRecordEventFactory,
-                                LookupValueService lookupValueService, UtilService utilService) {
+                                LookupValueFactory lookupValueFactory, LookupValueService lookupValueService, UtilService utilService) {
         this.learnerRecordEventFactory = learnerRecordEventFactory;
+        this.lookupValueFactory = lookupValueFactory;
         this.lookupValueService = lookupValueService;
         this.utilService = utilService;
     }
 
     public LearnerRecordDto createLearnerRecordDto(LearnerRecord learnerRecord) {
-        LearnerRecordDto dto = new LearnerRecordDto(learnerRecord.getId(), learnerRecord.getLearnerRecordUid(), learnerRecord.getLearnerRecordType().getId(), learnerRecord.getParentId(),
+        LearnerRecordTypeDto typeDto = lookupValueFactory.createLearnerRecordTypeDto(learnerRecord.getLearnerRecordType());
+        return new LearnerRecordDto(learnerRecord.getId(), learnerRecord.getLearnerRecordUid(), typeDto, learnerRecord.getParentId(),
                 learnerRecord.getResourceId(), learnerRecord.getCreatedTimestamp(), learnerRecord.getLearnerId());
-        List<LearnerRecordDto> children = learnerRecord.getChildRecords()
-                .stream().map(this::createLearnerRecordDto).toList();
-        dto.setChildren(children);
-        List<LearnerRecordEventDto> events = learnerRecord.getEvents()
-                .stream().map(learnerRecordEventFactory::createDto).toList();
-        dto.setEvents(events);
+    }
+
+    public LearnerRecordDto createLearnerRecordDto(LearnerRecord learnerRecord, boolean includeChildren, boolean includeEvents) {
+        LearnerRecordDto dto = createLearnerRecordDto(learnerRecord);
+        if (includeChildren) {
+            List<LearnerRecordDto> children = learnerRecord.getChildRecords()
+                    .stream().map(this::createLearnerRecordDto).toList();
+            dto.setChildren(children);
+        }
+        if (includeEvents) {
+            List<LearnerRecordEventDto> events = learnerRecord.getEvents()
+                    .stream().map(learnerRecordEventFactory::createDto).toList();
+            dto.setEvents(events);
+        }
         return dto;
     }
 
@@ -46,7 +58,7 @@ public class LearnerRecordFactory {
     }
 
     public LearnerRecord createLearnerRecord(CreateLearnerRecordDto dto) {
-        Instant createdTimestamp = dto.getCreatedTimestamp() == null ? utilService.getNowInstant() : dto.getCreatedTimestamp();
+        Instant createdTimestamp = dto.getCreatedTimestamp() == null ? utilService.getNowInstant() : utilService.localDateTimeToInstant(dto.getCreatedTimestamp());
         LearnerRecordType learnerRecordType = lookupValueService.getLearnerRecordType(dto.getRecordType());
         LearnerRecord record = new LearnerRecord(learnerRecordType, UUID.randomUUID().toString(), dto.getLearnerId(),
                 dto.getResourceId(), createdTimestamp);

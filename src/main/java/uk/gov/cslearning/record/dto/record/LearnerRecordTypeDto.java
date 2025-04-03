@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -19,6 +18,5 @@ public class LearnerRecordTypeDto {
     public LearnerRecordTypeDto(Integer id, String type) {
         this.id = id;
         this.type = type;
-        this.validEventTypes = new ArrayList<>();
     }
 }

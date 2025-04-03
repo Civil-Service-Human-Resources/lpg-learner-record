@@ -1,16 +1,17 @@
-package uk.gov.cslearning.record.dto;
+package uk.gov.cslearning.record.dto.error;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 
 @Data
-public class ErrorDto {
+@AllArgsConstructor
+public class ErrorDto<T> {
     private final Instant timestamp = Instant.now();
-    private List<String> errors = new ArrayList<>();
+    private List<T> errors;
     private int status;
     private String message;
 }

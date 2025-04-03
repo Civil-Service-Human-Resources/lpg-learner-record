@@ -10,6 +10,8 @@ import uk.gov.cslearning.record.domain.record.event.LearnerRecordEventSource;
 import uk.gov.cslearning.record.domain.record.event.LearnerRecordEventType;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordEventDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordEventDto;
+import uk.gov.cslearning.record.dto.record.LearnerRecordEventSourceDto;
+import uk.gov.cslearning.record.dto.record.LearnerRecordEventTypeDto;
 import uk.gov.cslearning.record.service.LookupValueService;
 import uk.gov.cslearning.record.util.UtilService;
 
@@ -20,20 +22,22 @@ import java.util.List;
 public class LearnerRecordEventFactory {
 
     private final LookupValueService lookupValueService;
+    private final LookupValueFactory lookupValueFactory;
     private final UtilService utilService;
 
-    public LearnerRecordEventFactory(LookupValueService lookupValueService, UtilService utilService) {
+    public LearnerRecordEventFactory(LookupValueService lookupValueService, LookupValueFactory lookupValueFactory, UtilService utilService) {
         this.lookupValueService = lookupValueService;
+        this.lookupValueFactory = lookupValueFactory;
         this.utilService = utilService;
     }
 
     public LearnerRecordEvent createEvent(LearnerRecord record, CreateLearnerRecordEventDto dto) {
-        Instant creationTimestamp = dto.getEventTimestamp() == null ? utilService.getNowInstant() : dto.getEventTimestamp();
+        Instant creationTimestamp = dto.getEventTimestamp() == null ? utilService.getNowInstant() : utilService.localDateTimeToInstant(dto.getEventTimestamp());
         LearnerRecordEventType learnerRecordEventType = lookupValueService.getLearnerRecordEventType(record.getLearnerRecordType().getId(), dto.getEventType());
         LearnerRecordEventSource learnerRecordEventSource = lookupValueService.getLearnerRecordSource(dto.getEventSource());
         LearnerRecordEvent event = new LearnerRecordEvent(record, learnerRecordEventType, learnerRecordEventSource, creationTimestamp);
         if (dto.getEventTimestamp() != null) {
-            event.setEventTimestamp(dto.getEventTimestamp());
+            event.setEventTimestamp(utilService.localDateTimeToInstant(dto.getEventTimestamp()));
         }
         return event;
     }
@@ -44,7 +48,9 @@ public class LearnerRecordEventFactory {
     }
 
     public LearnerRecordEventDto createDto(LearnerRecordEvent event) {
-        return new LearnerRecordEventDto(event.getId(), event.getLearnerRecord().getId(),
-                event.getEventType().getId(), event.getEventSource().getId(), event.getEventTimestamp());
+        LearnerRecordEventTypeDto eventTypeDto = lookupValueFactory.createLearnerRecordEventTypeDto(event.getEventType());
+        LearnerRecordEventSourceDto eventSourceDto = lookupValueFactory.createLearnerRecordSourceDto(event.getEventSource());
+        return new LearnerRecordEventDto(event.getId(), event.getLearnerRecord().getId(), eventTypeDto, eventSourceDto,
+                event.getEventTimestamp());
     }
 }

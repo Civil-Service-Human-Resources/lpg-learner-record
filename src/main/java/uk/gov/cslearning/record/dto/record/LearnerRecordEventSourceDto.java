@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class LearnerRecordEventTypeDto {
+public class LearnerRecordEventSourceDto {
 
     private Integer id;
-    private String eventType;
+    private String source;
     private String description;
 
-    public LearnerRecordEventTypeDto(Integer id, String eventType) {
+    public LearnerRecordEventSourceDto(Integer id, String source) {
         this.id = id;
-        this.eventType = eventType;
+        this.source = source;
     }
 }

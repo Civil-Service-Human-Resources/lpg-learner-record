@@ -25,6 +25,11 @@ public class SpringTestConfiguration {
             }
 
             @Override
+            public Instant localDateTimeToInstant(LocalDateTime dateTime) {
+                return dateTime == null ? null : dateTime.atZone(ZoneOffset.UTC).toInstant();
+            }
+
+            @Override
             public LocalDateTime getNowDateTime() {
                 return LocalDateTime.now(clock());
             }

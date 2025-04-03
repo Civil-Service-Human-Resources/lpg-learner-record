@@ -3,6 +3,8 @@ package uk.gov.cslearning.record.api.record;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordDto;
@@ -26,7 +28,8 @@ public class LeanerRecordController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery learnerRecordQuery) {
+    public Page<LearnerRecordDto> getRecords(@PageableDefault(sort = {"createdTimestamp"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+                                             LearnerRecordQuery learnerRecordQuery) {
         return learnerRecordService.getRecords(pageableParams, learnerRecordQuery);
     }
 
@@ -52,9 +55,11 @@ public class LeanerRecordController {
     }
 
     @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}/events")
-    public Page<LearnerRecordEventDto> getEvents(@PathVariable Long id, Pageable pageableParams, LearnerRecordEventQuery query) {
+    public Page<LearnerRecordEventDto> getEvents(@PathVariable Long id,
+                                                 @PageableDefault(sort = {"eventTimestamp"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+                                                 LearnerRecordEventQuery query) {
         return learnerRecordService.getEvents(pageableParams, id, query);
     }
 }

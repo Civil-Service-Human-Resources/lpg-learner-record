@@ -10,7 +10,7 @@ import java.time.Instant;
 public class LearnerRecordEventDto {
     private Long id;
     private Long learnerRecordId;
-    private Integer eventType;
-    private Integer eventSource;
+    private LearnerRecordEventTypeDto eventType;
+    private LearnerRecordEventSourceDto eventSource;
     private Instant eventTimestamp;
 }
