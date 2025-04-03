@@ -25,7 +25,7 @@ public class LookupValueService {
     }
 
     public List<LearnerRecordEventTypeDto> getLearnerRecordEventTypes() {
-        return learnerRecordTypeMap.getAllEventTypes().stream().map(factory::createLearnerRecordEventTypeDto).toList();
+        return learnerRecordTypeMap.getAllEventTypes().stream().map(t -> factory.createLearnerRecordEventTypeDto(t, true, true)).toList();
     }
 
     public LearnerRecordEventSource getLearnerRecordSource(Integer id) {

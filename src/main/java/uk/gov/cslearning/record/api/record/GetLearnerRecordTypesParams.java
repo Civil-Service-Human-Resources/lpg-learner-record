@@ -1,10 +1,10 @@
 package uk.gov.cslearning.record.api.record;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetLearnerRecordTypesParams {

@@ -19,7 +19,7 @@ public class LookupValueFactory {
         LearnerRecordTypeDto dto = createLearnerRecordTypeDto(type);
         if (includeEventTypes) {
             dto.setValidEventTypes(type.getEventTypes().stream()
-                    .map(e -> this.createLearnerRecordEventTypeDto(e, true)).toList());
+                    .map(e -> this.createLearnerRecordEventTypeDto(e, true, false)).toList());
         }
         return dto;
     }
@@ -28,10 +28,14 @@ public class LookupValueFactory {
         return new LearnerRecordEventTypeDto(eventType.getId(), eventType.getEventType());
     }
 
-    public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType, boolean includeDescription) {
+    public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType, boolean includeDescription, boolean includeRecordType) {
         LearnerRecordEventTypeDto dto = createLearnerRecordEventTypeDto(eventType);
         if (includeDescription) {
             dto.setDescription(eventType.getDescription());
+        }
+        if (includeRecordType) {
+            LearnerRecordTypeDto typeDto = createLearnerRecordTypeDto(eventType.getRecordType());
+            dto.setLearnerRecordType(typeDto);
         }
         return dto;
     }
