@@ -5,6 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.*;
+import uk.gov.cslearning.record.domain.record.LearnerRecord;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.service.catalogue.Audience;
@@ -109,5 +110,11 @@ public class TestDataService {
         audience.setRequiredBy(requiredBy);
         audience.setFrequency(frequency);
         return audience;
+    }
+
+    // New records
+
+    public LearnerRecord createCourseRecord() {
+        return new LearnerRecord();
     }
 }
