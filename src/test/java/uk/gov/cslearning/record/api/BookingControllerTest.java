@@ -255,8 +255,8 @@ public class BookingControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", equalTo("A booking requires a learner")))
-                .andExpect(jsonPath("$.errors[1]", equalTo("A booking requires a learner email address")))
+                .andExpect(jsonPath("$.errors[0].error", equalTo("A booking requires a learner")))
+                .andExpect(jsonPath("$.errors[1].error", equalTo("A booking requires a learner email address")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
@@ -318,7 +318,7 @@ public class BookingControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", equalTo("Booking status cannot be updated to 'Requested'")))
+                .andExpect(jsonPath("$.errors[0].error", equalTo("Booking status cannot be updated to 'Requested'")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
@@ -389,7 +389,7 @@ public class BookingControllerTest {
                                 .content(objectMapper.writeValueAsString(booking))
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0]", equalTo("Cannot apply booking to a cancelled event.")))
+                .andExpect(jsonPath("$.errors[0].error", equalTo("Cannot apply booking to a cancelled event.")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
     }

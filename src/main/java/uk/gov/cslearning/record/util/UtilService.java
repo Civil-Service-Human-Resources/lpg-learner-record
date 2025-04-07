@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Service
@@ -29,13 +28,18 @@ public class UtilService implements IUtilService {
     }
 
     @Override
+    public Instant localDateTimeToInstant(LocalDateTime dateTime) {
+        return dateTime.atZone(clock.getZone()).toInstant();
+    }
+
+    @Override
     public LocalDateTime getNowDateTime() {
         return LocalDateTime.now(clock);
     }
 
     @Override
     public Instant getNowInstant() {
-        return getNowDateTime().toInstant(ZoneOffset.UTC);
+        return Instant.now(clock);
     }
 
 }

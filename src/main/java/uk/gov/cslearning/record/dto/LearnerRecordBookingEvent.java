@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-public class LearnerRecordEvent {
+public class LearnerRecordBookingEvent {
     private String bookingReference;
     private String courseId;
     private String courseName;
