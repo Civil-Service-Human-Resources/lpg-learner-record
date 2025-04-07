@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -35,29 +34,11 @@ public class HttpClient implements IHttpClient {
         }
     }
 
-    public <T, R> Map<String, T> executeMapRequest(RequestEntity<R> request, ParameterizedTypeReference<Map<String, T>> ptr) {
-        try {
-            log.debug("Sending request: {}", request);
-            ResponseEntity<Map<String, T>> response = restTemplate.exchange(request, ptr);
-            log.debug("Request response: {}", response);
-            return response.getBody();
-        } catch (RestClientResponseException e) {
-            String msg = String.format("Error sending '%s' request to endpoint", request.getMethod());
-            if (request.getBody() != null) {
-                msg = String.format("%s Body was: %s.", msg, request.getBody().toString());
-            }
-            msg = String.format("%s Error was: %s", msg, e.getMessage());
-            log.error(msg);
-            throw e;
-        }
-    }
-
     @Override
-    public <T, R> List<T> executeListRequest(RequestEntity<R> request, ParameterizedTypeReference<List<T>> parameterizedTypeReference) {
+    public <T, R> T executeTypeRequest(RequestEntity<R> request, ParameterizedTypeReference<T> parameterizedTypeReference) {
         try {
             log.debug("Sending request: {}", request);
-            ResponseEntity<List<T>> response = restTemplate.exchange(request, parameterizedTypeReference);
-
+            ResponseEntity<T> response = restTemplate.exchange(request, parameterizedTypeReference);
             log.debug("Request response: {}", response);
             return response.getBody();
         } catch (RestClientResponseException e) {
@@ -70,4 +51,9 @@ public class HttpClient implements IHttpClient {
             throw e;
         }
     }
+
+    public <T, R> Map<String, T> executeMapRequest(RequestEntity<R> request, ParameterizedTypeReference<Map<String, T>> ptr) {
+        return executeTypeRequest(request, ptr);
+    }
+
 }
