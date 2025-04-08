@@ -81,7 +81,10 @@ identity:
 registry-service:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
   getResourceByUidUrl: "/civilServants/resource/%s"
-  getResourceByOrgCodeUrl: "/civilServants/organisation/%s"
+  getResourceByOrgCodeUrl: "/civilServants/organisation"
+  organisationalUnitsUrl: "/v2/organisationalUnits"
+  getOrganisationsMaxPageSize: 200
+  getCSUidsMaxPageSize: 5000
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}

@@ -9,6 +9,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class OrganisationalUnit {
+    private Integer id;
+    private Integer parentId;
     private String code;
     private String name;
     private List<String> paymentMethods = new ArrayList<>();

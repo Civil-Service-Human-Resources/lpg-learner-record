@@ -125,7 +125,7 @@ public class LearningJob {
     }
 
     private List<CourseRecords> groupCourseRecordsByUserId(String orgCode, List<String> courseIds) {
-        List<String> uids = registryService.getCivilServantsByOrgCode(orgCode).stream().map(cs -> cs.getIdentity().getUid()).toList();
+        List<String> uids = registryService.getCivilServantsByOrgCode(orgCode);
         log.info("Fetched {} uids for department {}", uids.size(), orgCode);
         return courseRecordService.getCourseRecords(uids, courseIds);
     }

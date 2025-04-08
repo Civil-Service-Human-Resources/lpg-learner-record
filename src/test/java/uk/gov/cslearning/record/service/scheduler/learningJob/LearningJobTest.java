@@ -104,50 +104,40 @@ public class LearningJobTest extends IntegrationTestBase {
         String requiredLearningResponse = objectMapper.writeValueAsString(generateRequiredCourses());
         stubService.getLearningCatalogueStubService().getRequiredCoursesByDueDaysGroupedByOrg("1,5", requiredLearningResponse);
 
-        Map.of("CO", """
-                                [
-                                  {
-                                    "identity": {
-                                      "uid": "coCivilServant1"
-                                    }
-                                  },
-                                  {
-                                    "identity": {
-                                      "uid": "coCivilServant2"
-                                    }
-                                  }
-                                ]
-                                """,
-                        "DWP", """
-                                [
-                                  {
-                                    "identity": {
-                                      "uid": "dwpCivilServant1"
-                                    }
-                                  },
-                                  {
-                                    "identity": {
-                                      "uid": "dwpCivilServant2"
-                                    }
-                                  }
-                                ]
-                                                                
-                                """,
-                        "HMRC", """
-                                [
-                                  {
-                                    "identity": {
-                                      "uid": "hmrcCivilServant1"
-                                    }
-                                  },
-                                  {
-                                    "identity": {
-                                      "uid": "hmrcCivilServant2"
-                                    }
-                                  }
-                                ]
-                                """)
-                .forEach((depCode, json) -> stubService.getCsrsStubService().getCivilServantsForDepartment(depCode, json));
+        stubService.getCsrsStubService().getDepartments(0, 1, """
+                {"content": [{"code": "HMRC", "id": 1}], "totalElements": 4}
+                """);
+        stubService.getCsrsStubService().getDepartments(0, 200, """
+                {"content": [
+                    {"code": "HMRC","id": 1},
+                    {"code": "DWP","id": 2},
+                    {"code": "CO","id": 3},
+                    {"code": "COD", "id": 4, "parentId": 3}
+                ], "totalElements": 4}
+                """);
+
+        stubService.getCsrsStubService().getCivilServantsForDepartment("CO", 0, 1, """
+                {"content": [], "totalElements": 0}
+                """);
+
+        stubService.getCsrsStubService().getCivilServantsForDepartment("COD", 0, 1, """
+                {"content": ["coCivilServant1"], "totalElements": 2}
+                """);
+        stubService.getCsrsStubService().getCivilServantsForDepartment("COD", 0, 5000, """
+                {"content": ["coCivilServant1", "coCivilServant2"], "totalElements": 2}
+                """);
+        stubService.getCsrsStubService().getCivilServantsForDepartment("DWP", 0, 1, """
+                {"content": ["dwpCivilServant1"], "totalElements": 2}
+                """);
+        stubService.getCsrsStubService().getCivilServantsForDepartment("DWP", 0, 5000, """
+                {"content": ["dwpCivilServant1", "dwpCivilServant2"], "totalElements": 2}
+                """);
+        stubService.getCsrsStubService().getCivilServantsForDepartment("HMRC", 0, 1, """
+                {"content": ["hmrcCivilServant1"], "totalElements": 2}
+                """);
+        stubService.getCsrsStubService().getCivilServantsForDepartment("HMRC", 0, 5000, """
+                {"content": ["hmrcCivilServant1", "hmrcCivilServant2"], "totalElements": 2}
+                """);
     }
 
     private CourseRecord createCourseRecordForUser(String uid, String courseId, Map<String, LocalDateTime> moduleRecords) {

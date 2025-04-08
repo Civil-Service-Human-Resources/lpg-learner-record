@@ -8,6 +8,7 @@ import uk.gov.cslearning.record.util.IUtilService;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -38,13 +39,20 @@ public class CourseDataFactory {
         });
     }
 
-    public RequiredCourse transformCourse(Course course) {
+    public RequiredCourse transformCourse(Course course, List<List<String>> departmentHierarchies) {
         Map<String, LearningPeriod> learningPeriodMap = new HashMap<>();
         course.getAudiences().forEach(a -> {
             LearningPeriod learningPeriod = getLearningPeriod(a);
-            a.getDepartments().forEach(dep -> {
-                learningPeriodMap.putIfAbsent(dep, learningPeriod);
-            });
+            a.getDepartments().forEach(dep -> learningPeriodMap.putIfAbsent(dep, learningPeriod));
+        });
+        departmentHierarchies.forEach(hierarchy -> {
+            for (String org : hierarchy) {
+                LearningPeriod lp = learningPeriodMap.get(org);
+                if (lp != null) {
+                    learningPeriodMap.put(hierarchy.get(0), lp);
+                    break;
+                }
+            }
         });
         return new RequiredCourse(course.getId(), course.getTitle(), course.getModules(), course.getAudiences(),
                 learningPeriodMap);
