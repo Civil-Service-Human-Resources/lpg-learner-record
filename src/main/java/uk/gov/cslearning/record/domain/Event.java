@@ -1,13 +1,15 @@
 package uk.gov.cslearning.record.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventStatus;
 
-import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,4 +38,34 @@ public class Event {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CancellationReason cancellationReason;
+
+    @JsonIgnore
+    public List<Booking> getActiveBookings() {
+        return this.bookings.stream().filter(b -> !b.getStatus().equals(BookingStatus.CANCELLED)).toList();
+    }
+
+    @JsonIgnore
+    public void cancel(CancellationReason reason, Instant cancellationTime) {
+        setCancellationReason(reason);
+        getBookings().forEach(b -> {
+            b.setStatus(BookingStatus.CANCELLED);
+            b.setCancellationTime(cancellationTime);
+        });
+    }
+
+    @JsonIgnore
+    public EventIds getEventIds() {
+        String[] parts = this.path.split("/");
+        return new EventIds(parts[2], parts[4], parts[6]);
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+        bookings.forEach(b -> b.setEvent(this));
+    }
+
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setEvent(this);
+    }
 }

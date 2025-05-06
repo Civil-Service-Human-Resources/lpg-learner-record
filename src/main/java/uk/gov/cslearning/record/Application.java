@@ -1,18 +1,18 @@
 package uk.gov.cslearning.record;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.net.MalformedURLException;
 
 /**
  * Main Spring application configuration and entry point.
  */
 @SpringBootApplication
+@ConfigurationPropertiesScan
+@EnableConfigurationProperties
 @EnableScheduling
 @EnableCaching
 public class Application {

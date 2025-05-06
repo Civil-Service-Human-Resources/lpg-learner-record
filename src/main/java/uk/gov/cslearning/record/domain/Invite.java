@@ -1,13 +1,14 @@
 package uk.gov.cslearning.record.domain;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Invite {
 
     @Id
@@ -15,7 +16,7 @@ public class Invite {
     private Integer id;
 
     @OneToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name="eventId")
+    @JoinColumn(name = "eventId")
     private Event event;
 
     @Column(nullable = false, length = 50)

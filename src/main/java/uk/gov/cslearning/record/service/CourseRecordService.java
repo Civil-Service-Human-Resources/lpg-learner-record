@@ -2,9 +2,10 @@ package uk.gov.cslearning.record.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.api.FetchCourseRecordParams;
 import uk.gov.cslearning.record.domain.CourseRecord;
+import uk.gov.cslearning.record.domain.CourseRecords;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.CourseRecordAlreadyExistsException;
@@ -13,7 +14,6 @@ import uk.gov.cslearning.record.util.IUtilService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -53,18 +53,22 @@ public class CourseRecordService {
         return input;
     }
 
-    public List<CourseRecord> fetchCourseRecords(String userId, List<String> courseIds) {
-        if (CollectionUtils.isEmpty(courseIds)) {
-            log.info(String.format("Fetching all course records for user '%s'", userId));
-            return courseRecordRepository.findByUserId(userId);
-        } else {
-            log.info(String.format("Fetching all course records for user '%s' and course IDs '%s'", userId, courseIds));
-            return courseRecordRepository.findByUserIdAndCourseIdIn(userId, courseIds);
-        }
+    public List<CourseRecord> fetchCourseRecords(FetchCourseRecordParams fetchCourseRecordParams) {
+        log.info(String.format("Fetching all course records for user '%s' and course IDs '%s'", fetchCourseRecordParams.getUserIds(), fetchCourseRecordParams.getCourseIds()));
+        return courseRecordRepository.findByUserIdAndCourseIdIn(fetchCourseRecordParams.getUserIds(), fetchCourseRecordParams.getCourseIds());
+    }
+
+    public CourseRecords getCourseRecords(String userId, List<String> courseIds) {
+        List<CourseRecord> crs = courseRecordRepository.findByUserIdAndCourseIdIn(List.of(userId), courseIds);
+        return CourseRecords.create(userId, crs);
+    }
+
+    public List<CourseRecords> getCourseRecords(List<String> userIds, List<String> courseIds) {
+        return userIds.stream().map(uid -> getCourseRecords(uid, courseIds)).toList();
     }
 
     public CourseRecord createCourseRecord(CourseRecord courseRecord) {
-        if (courseRecordRepository.findByUserIdAndCourseIdIn(courseRecord.getUserId(), Collections.singletonList(courseRecord.getCourseId())).size() > 0) {
+        if (courseRecordRepository.getCourseRecord(courseRecord.getUserId(), courseRecord.getCourseId()).isPresent()) {
             throw new CourseRecordAlreadyExistsException(courseRecord.getCourseId(), courseRecord.getUserId());
         }
         LocalDateTime updated = utilService.getNowDateTime();

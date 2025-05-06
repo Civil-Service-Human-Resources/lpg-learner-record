@@ -1,18 +1,19 @@
 package uk.gov.cslearning.record.api;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.cslearning.record.MockedTestConfiguration;
 import uk.gov.cslearning.record.SpringTestConfiguration;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.dto.BookingDto;
-import uk.gov.cslearning.record.dto.BookingStatus;
 import uk.gov.cslearning.record.service.BookingService;
 
 import java.net.URI;
@@ -30,9 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest({ReportController.class})
-@Import(SpringTestConfiguration.class)
+@Import({SpringTestConfiguration.class, MockedTestConfiguration.class})
+@AutoConfigureMockMvc
 @WithMockUser(username = "user")
 public class ReportControllerTest {
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
@@ -73,11 +74,11 @@ public class ReportControllerTest {
                 .thenReturn(Collections.singletonList(booking));
 
         mockMvc.perform(
-                get("/reporting/bookings")
-                        .param("from", "2018-01-01")
-                        .param("to", "2018-01-31")
-                        .with(csrf())
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/reporting/bookings")
+                                .param("from", "2018-01-01")
+                                .param("to", "2018-01-31")
+                                .with(csrf())
+                                .accept(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id", equalTo(bookingId)))

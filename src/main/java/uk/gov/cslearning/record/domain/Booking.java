@@ -1,12 +1,12 @@
 package uk.gov.cslearning.record.domain;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
-import uk.gov.cslearning.record.dto.BookingStatus;
 
-import javax.persistence.*;
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -21,7 +21,7 @@ public class Booking {
     @JoinColumn(name = "learnerId")
     private Learner learner;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "eventId")
     private Event event;
 
@@ -50,4 +50,8 @@ public class Booking {
 
     @Column
     private String bookingReference;
+
+    public String getAccessibilityOptionsString() {
+        return Objects.requireNonNullElse(accessibilityOptions, "");
+    }
 }

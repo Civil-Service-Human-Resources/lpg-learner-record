@@ -4,9 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.EventDto;
-import uk.gov.cslearning.record.dto.EventStatus;
 
-import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 
 @Component
 public class EventDtoFactory {
@@ -21,7 +20,7 @@ public class EventDtoFactory {
         EventDto eventDto = new EventDto();
         eventDto.setId(event.getId());
         eventDto.setStatus(event.getStatus());
-        eventDto.setUri(UriBuilder.fromUri(learningCatalogueBaseUrl).path(event.getPath()).build());
+        eventDto.setUri(URI.create(String.format("%s%s", learningCatalogueBaseUrl, event.getPath())));
         eventDto.setUid(event.getUid());
         eventDto.setCancellationReason(event.getCancellationReason());
         return eventDto;

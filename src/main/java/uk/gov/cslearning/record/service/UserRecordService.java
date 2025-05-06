@@ -1,52 +1,20 @@
 package uk.gov.cslearning.record.service;
 
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import uk.gov.cslearning.record.csrs.service.RegistryService;
-import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.repository.CourseRecordRepository;
-import uk.gov.cslearning.record.service.catalogue.LearningCatalogueService;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 @Service
+@Slf4j
 public class UserRecordService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserRecordService.class);
-    private CourseRecordRepository courseRecordRepository;
+    private final CourseRecordRepository courseRecordRepository;
 
-    @Autowired
-    public UserRecordService(CourseRecordRepository courseRecordRepository,
-                             LearningCatalogueService learningCatalogueService) {
-        checkArgument(courseRecordRepository != null);
-        checkArgument(learningCatalogueService != null);
+    public UserRecordService(CourseRecordRepository courseRecordRepository) {
         this.courseRecordRepository = courseRecordRepository;
-    }
-
-    public Collection<CourseRecord> getUserRecord(String userId, List<String> activityIds) {
-        LOGGER.debug("Retrieving user record for user {}, activities {}", userId, activityIds);
-
-        Collection<CourseRecord> courseRecords = courseRecordRepository.findByUserId(userId);
-
-        if (activityIds != null && !activityIds.isEmpty()) {
-            return courseRecords.stream()
-                    .filter(courseRecord -> activityIds.stream().anyMatch(courseRecord::matchesActivityId))
-                    .collect(Collectors.toSet());
-        }
-
-        return courseRecords;
     }
 
     @Transactional

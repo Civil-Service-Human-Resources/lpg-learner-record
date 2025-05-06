@@ -1,10 +1,10 @@
 package uk.gov.cslearning.record.domain;
 
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,4 +25,9 @@ public class Learner {
     @ToString.Exclude
     @OneToMany(mappedBy = "learner")
     private List<Booking> bookings = new ArrayList<>();
+
+    public Learner(String uid, String learnerEmail) {
+        this.uid = uid;
+        this.learnerEmail = learnerEmail;
+    }
 }

@@ -31,10 +31,8 @@ public class EventController {
     }
 
     @PatchMapping(path = "/event/{eventUid}")
-    public ResponseEntity cancelEvent(@PathVariable String eventUid, @RequestBody EventStatusDto eventStatus) {
-        return eventService.updateStatus(eventUid, eventStatus).
-            map(e -> new ResponseEntity(e, OK))
-            .orElseGet(() -> new ResponseEntity(NOT_FOUND));
+    public ResponseEntity<EventDto> cancelEvent(@PathVariable String eventUid, @RequestBody EventStatusDto eventStatus) {
+        return new ResponseEntity<>(eventService.updateStatus(eventUid, eventStatus), OK);
     }
 
     @GetMapping(path = "/event/{eventUid}")
@@ -54,7 +52,7 @@ public class EventController {
 
         return ResponseEntity.created(
                 uriBuilder.path("/event/{eventId}").build(result.getUid())
-        ).build();
+        ).body(result);
     }
 
     @GetMapping(path = "/event/cancellationReasons")

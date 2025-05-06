@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.dto.factory;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
@@ -8,7 +9,7 @@ import uk.gov.cslearning.record.dto.EventStatus;
 
 import java.net.URI;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EventDtoFactoryTest {
     private static final String catalogueUrl = "http://example.org";
@@ -30,7 +31,7 @@ public class EventDtoFactoryTest {
         EventDto eventDto = eventDtoFactory.create(event);
 
         assertEquals(status, eventDto.getStatus());
-        assertEquals(URI.create(String.join("", catalogueUrl, path)), eventDto.getUri());
+        assertEquals(URI.create("http://example.org/path/to/event"), eventDto.getUri());
         assertEquals(uid, eventDto.getUid());
         assertEquals(CancellationReason.UNAVAILABLE, eventDto.getCancellationReason());
     }

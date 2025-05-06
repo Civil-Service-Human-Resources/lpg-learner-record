@@ -1,84 +1,71 @@
 package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
+import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.EventFactory;
-import uk.gov.cslearning.record.dto.*;
+import uk.gov.cslearning.record.dto.EventDto;
+import uk.gov.cslearning.record.dto.EventStatus;
+import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.dto.factory.EventDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.repository.EventRepository;
+import uk.gov.cslearning.record.util.IUtilService;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class DefaultEventService implements EventService {
+    private final IUtilService utilService;
     private final EventRepository eventRepository;
-    private final BookingService bookingService;
     private final EventFactory eventFactory;
     private final EventDtoFactory eventDtoFactory;
 
-    public DefaultEventService(EventRepository eventRepository, BookingService bookingService, EventFactory eventFactory, EventDtoFactory eventDtoFactory) {
+    public DefaultEventService(IUtilService utilService, EventRepository eventRepository,
+                               EventFactory eventFactory, EventDtoFactory eventDtoFactory) {
+        this.utilService = utilService;
         this.eventRepository = eventRepository;
-        this.bookingService = bookingService;
         this.eventFactory = eventFactory;
         this.eventDtoFactory = eventDtoFactory;
     }
 
-    private void createEventIfNotPresent(String eventUid, String path) {
-        if (!eventRepository.findByUid(eventUid).isPresent()) {
-            eventRepository.save(eventFactory.create(path));
-        }
-    }
-
     @Override
     public Event getEvent(String eventUid, String path) {
-        createEventIfNotPresent(eventUid, path);
-        return eventRepository.findByUid(eventUid).get();
+        return eventRepository.findByUid(eventUid)
+                .orElseGet(() -> eventRepository.save(eventFactory.create(path)));
     }
 
     @Override
-    public Optional<EventDto> updateStatus(String eventUid, EventStatusDto eventStatus) {
-        Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
-
-        EventDto eventDto = eventDtoFactory.create(event);
-        eventDto.setStatus(eventStatus.getStatus());
-
-        if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
-            eventDto.setCancellationReason(CancellationReason.valueOf(eventStatus.getCancellationReason()));
-            event.getBookings().forEach(booking -> bookingService.unregister(booking, eventDto.getCancellationReason().getValue()));
-        }
-
-        return Optional.of(eventDtoFactory.create(eventRepository.save(eventFactory.create(eventDto))));
+    public EventDto updateStatus(String eventUid, EventStatusDto eventStatus) {
+        Event event = eventRepository.findByUid(eventUid)
+                .map(e -> {
+                    e.setStatus(eventStatus.getStatus());
+                    if (eventStatus.getStatus().equals(EventStatus.CANCELLED)) {
+                        e.cancel(eventStatus.getCancellationReason(), utilService.getNowInstant());
+                    }
+                    return eventRepository.save(e);
+                })
+                .orElseThrow(() -> new EventNotFoundException(eventUid));
+        return eventDtoFactory.create(event);
     }
 
     private Integer getActiveBookingsCount(Integer eventId) {
-        Collection<BookingStatus> queryStatuses = new ArrayList<>();
-        queryStatuses.add(BookingStatus.CONFIRMED);
-        queryStatuses.add(BookingStatus.REQUESTED);
-        return eventRepository.countByBookings_StatusInAndIdEquals(queryStatuses, eventId);
-    }
-
-    @Override
-    public EventDto findByUid(String uid) {
-        return findByUid(uid, false);
+        return eventRepository.countByBookings_StatusInAndIdEquals(List.of(BookingStatus.CONFIRMED,
+                BookingStatus.REQUESTED), eventId);
     }
 
     @Override
     public EventDto findByUid(String uid, boolean getBookingCount) {
-        EventDto event = eventRepository.findByUid(uid)
-                .map(eventDtoFactory::create)
+        return eventRepository.findByUid(uid)
+                .map(e -> {
+                    EventDto dto = this.eventDtoFactory.create(e);
+                    if (getBookingCount) {
+                        dto.setActiveBookingCount(getActiveBookingsCount(e.getId()));
+                    }
+                    return dto;
+                })
                 .orElse(null);
-
-        if (event != null) {
-            if (getBookingCount) {
-                event.setActiveBookingCount(getActiveBookingsCount(event.getId()));
-            }
-        }
-        return event;
     }
 
     @Override
@@ -88,13 +75,13 @@ public class DefaultEventService implements EventService {
 
     @Override
     public List<EventDto> getEvents(List<String> eventUids, boolean getBookingCount) {
-         return eventRepository.findByUidIn(eventUids).stream()
-                 .map(eventDtoFactory::create)
-                 .peek(eventDto -> {
-                     if (getBookingCount) {
-                         eventDto.setActiveBookingCount(getActiveBookingsCount(eventDto.getId()));
-                     }
-                 })
-                 .collect(Collectors.toList());
+        return eventRepository.findByUidIn(eventUids).stream()
+                .map(eventDtoFactory::create)
+                .peek(eventDto -> {
+                    if (getBookingCount) {
+                        eventDto.setActiveBookingCount(getActiveBookingsCount(eventDto.getId()));
+                    }
+                })
+                .collect(Collectors.toList());
     }
 }

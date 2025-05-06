@@ -1,15 +1,14 @@
 package uk.gov.cslearning.record.domain.factory;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 
 import java.net.URI;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EventFactoryTest {
     private EventFactory eventFactory = new EventFactory();
@@ -21,8 +20,8 @@ public class EventFactoryTest {
 
         Event event = eventFactory.create(eventPath);
 
-        assertThat(event.getPath(), equalTo(eventPath));
-        assertThat(event.getUid(), equalTo(eventUid));
+        assertEquals(eventPath, event.getPath());
+        assertEquals(eventUid, event.getUid());
     }
 
     @Test

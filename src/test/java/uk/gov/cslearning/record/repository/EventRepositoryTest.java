@@ -1,27 +1,23 @@
 package uk.gov.cslearning.record.repository;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.cslearning.record.domain.Event;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.cslearning.record.IntegrationTestBase;
+import uk.gov.cslearning.record.domain.Event;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @Transactional
-public class EventRepositoryTest {
+public class EventRepositoryTest extends IntegrationTestBase {
 
     @Autowired
     private EventRepository eventRepository;
 
     @Test
-    public void shouldSaveEvent(){
+    public void shouldSaveEvent() {
         Event event = new Event();
         event.setPath("test/path");
         event.setUid("SSE");
@@ -31,7 +27,7 @@ public class EventRepositoryTest {
     }
 
     @Test
-    public void shouldBeAbleToFindEventByUid(){
+    public void shouldBeAbleToFindEventByUid() {
         Event event = new Event();
         event.setPath("test/path");
         event.setUid("SBATFEBC");

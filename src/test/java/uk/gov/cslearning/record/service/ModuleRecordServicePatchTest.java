@@ -1,10 +1,11 @@
 package uk.gov.cslearning.record.service;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
 import uk.gov.cslearning.record.dto.factory.ModuleRecordDtoFactory;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
@@ -13,10 +14,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(SpringExtension.class)
 public class ModuleRecordServicePatchTest {
 
     @Mock

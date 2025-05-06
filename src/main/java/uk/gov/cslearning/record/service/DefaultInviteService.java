@@ -2,7 +2,7 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.factory.InviteFactory;
+import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class DefaultInviteService implements InviteService {
-    private final InviteFactory inviteFactory;
     private final InviteDtoFactory inviteDtoFactory;
     private final InviteRepository inviteRepository;
     private final EventService eventService;
@@ -23,14 +22,12 @@ public class DefaultInviteService implements InviteService {
     private final MessageService messageService;
 
     public DefaultInviteService(
-            InviteFactory inviteFactory,
             InviteDtoFactory inviteDtoFactory,
             InviteRepository inviteRepository,
             EventService eventService,
             NotificationService notificationService,
             MessageService messageService
     ) {
-        this.inviteFactory = inviteFactory;
         this.inviteDtoFactory = inviteDtoFactory;
         this.inviteRepository = inviteRepository;
         this.eventService = eventService;
@@ -68,8 +65,8 @@ public class DefaultInviteService implements InviteService {
     @Override
     public Optional<InviteDto> save(InviteDto inviteDto) {
         Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
-
-        return Optional.of(inviteDtoFactory.create(inviteRepository.save(inviteFactory.create(inviteDto, event))));
+        Invite invite = new Invite(inviteDto.getId(), event, inviteDto.getLearnerEmail());
+        return Optional.of(inviteDtoFactory.create(inviteRepository.save(invite)));
     }
 
     @Override

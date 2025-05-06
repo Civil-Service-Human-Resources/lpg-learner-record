@@ -1,12 +1,12 @@
 package uk.gov.cslearning.record.validation.validators;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.InviteService;
 import uk.gov.cslearning.record.validation.annotations.LearnerNotInvited;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 import java.nio.file.Paths;
 
 @Component
@@ -18,7 +18,8 @@ public class LearnerNotInvitedValidator implements ConstraintValidator<LearnerNo
         this.inviteService = inviteService;
     }
 
-    public void initialise(LearnerNotInvited constraint) {}
+    public void initialise(LearnerNotInvited constraint) {
+    }
 
     @Override
     public boolean isValid(InviteDto invite, ConstraintValidatorContext context) {

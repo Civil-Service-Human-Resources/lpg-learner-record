@@ -1,10 +1,10 @@
 package uk.gov.cslearning.record.validation.annotations;
 
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.validation.validators.EventStatusNotEqualsValidator;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,7 +18,7 @@ public @interface EventStatusNotEquals {
 
     String message() default "";
 
-    Class<?>[] groups() default { };
+    Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default { };
+    Class<? extends Payload>[] payload() default {};
 }

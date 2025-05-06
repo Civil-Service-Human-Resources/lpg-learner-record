@@ -8,7 +8,6 @@ import uk.gov.cslearning.record.dto.BookingStatusDto;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 public interface BookingService {
@@ -25,19 +24,14 @@ public interface BookingService {
     Optional<BookingDto> findByLearnerUidAndEventUid(String eventUid, String learnerUid);
 
     @Transactional
-    BookingDto register(BookingDto booking);
-
-    @Transactional
     BookingDto updateStatus(int bookingId, BookingStatusDto bookingStatus);
 
     @Transactional
     BookingDto updateStatus(String eventUid, String learnerUid, BookingStatusDto bookingStatus);
 
-    @Transactional
-    BookingDto unregister(BookingDto booking);
+    BookingDto create(String eventUid, BookingDto bookingDto);
 
-    @Transactional
-    BookingDto unregister(Booking booking, String cancellationReason);
+    BookingDto update(Booking booking, BookingStatusDto bookingStatusDto);
 
     @Transactional(readOnly = true)
     Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);

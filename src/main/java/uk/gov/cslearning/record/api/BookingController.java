@@ -1,5 +1,6 @@
 package uk.gov.cslearning.record.api;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -8,7 +9,6 @@ import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.service.BookingService;
 
-import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,9 +42,7 @@ public class BookingController {
 
     @GetMapping(value = "/event/{eventUid}/learner/{learnerUid}", produces = "application/json")
     public ResponseEntity<BookingDto> getBooking(@PathVariable String eventUid, @PathVariable String learnerUid) {
-        Optional<BookingDto> booking = bookingService.find(eventUid, learnerUid);
-
-        return booking
+        return bookingService.find(eventUid, learnerUid)
                 .map(b -> new ResponseEntity<>(b, OK))
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     }
@@ -58,14 +56,13 @@ public class BookingController {
                 .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
     }
 
-
-    @PostMapping(value = "/event/{eventId}/booking/")
-    public ResponseEntity<BookingDto> createBooking(@PathVariable String eventId, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
-        BookingDto result = bookingService.register(booking);
+    @PostMapping(value = "/event/{eventUid}/booking/")
+    public ResponseEntity<BookingDto> createBooking(@PathVariable String eventUid, @Valid @RequestBody BookingDto booking, UriComponentsBuilder uriBuilder) {
+        BookingDto result = bookingService.create(eventUid, booking);
 
         return ResponseEntity.created(
-                uriBuilder.path("/event/{eventId}/booking/{bookingId}").build(eventId, result.getId())
-        ).build();
+                uriBuilder.path("/event/{eventUid}/booking/{bookingId}").build(eventUid, result.getId())
+        ).body(result);
     }
 
     @PatchMapping(value = "/event/{eventUid}/learner/{learnerUid}")
@@ -76,7 +73,7 @@ public class BookingController {
     }
 
     @PatchMapping(value = "/event/{eventId}/booking/{bookingId}")
-    public ResponseEntity<BookingDto> updateBooking(@PathVariable String eventId, @PathVariable int bookingId, @Valid @RequestBody BookingStatusDto bookingStatus) {
+    public ResponseEntity<BookingDto> updateBooking(@PathVariable int bookingId, @Valid @RequestBody BookingStatusDto bookingStatus) {
         BookingDto result = bookingService.updateStatus(bookingId, bookingStatus);
 
         return ResponseEntity.ok(result);
