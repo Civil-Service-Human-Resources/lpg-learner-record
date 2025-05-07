@@ -4,35 +4,34 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.ModuleRecord;
-import uk.gov.cslearning.record.dto.ModuleRecordDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long> {
-    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.uid, mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
+    @Query("SELECT mr " +
             "FROM ModuleRecord mr " +
             "left join CourseRecord cr on cr.identity.courseId = mr.courseRecord.identity.courseId " +
             "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
             "AND mr.courseRecord IS NOT NULL")
-    List<ModuleRecordDto> findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to);
+    List<ModuleRecord> findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to);
 
-    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.uid, mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
+    @Query("SELECT mr " +
             "FROM ModuleRecord mr " +
             "left join CourseRecord cr on cr.identity.courseId = mr.courseRecord.identity.courseId " +
             "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
             "AND mr.courseRecord.identity.userId in (?3) " +
             "AND mr.courseRecord IS NOT NULL " +
             "ORDER BY mr.courseRecord.identity.userId")
-    List<ModuleRecordDto> findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> learnerIds);
+    List<ModuleRecord> findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> learnerIds);
 
-    @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.uid, mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
+    @Query("SELECT mr " +
             "FROM ModuleRecord mr " +
             "left join CourseRecord cr on cr.identity.courseId = mr.courseRecord.identity.courseId " +
             "WHERE mr.updatedAt BETWEEN ?1 AND ?2 " +
             "AND mr.courseRecord.identity.courseId in (?3) " +
             "AND mr.courseRecord IS NOT NULL " +
             "ORDER BY mr.courseRecord.identity.userId")
-    List<ModuleRecordDto> findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> courseIds);
+    List<ModuleRecord> findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> courseIds);
 }

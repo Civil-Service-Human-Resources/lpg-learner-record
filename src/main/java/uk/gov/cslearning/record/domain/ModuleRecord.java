@@ -9,8 +9,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import uk.gov.cslearning.record.domain.converter.BookingStatusConverter;
@@ -106,28 +104,6 @@ public class ModuleRecord {
         this.setEventId(mr.getEventId());
         this.setUpdatedAt(mr.getUpdatedAt());
         this.setCompletionDate(mr.getCompletionDate());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ModuleRecord that = (ModuleRecord) o;
-
-        return new EqualsBuilder()
-                .append(moduleId, that.moduleId)
-                .append(eventId, that.eventId)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(moduleId)
-                .append(eventId)
-                .toHashCode();
     }
 
 }

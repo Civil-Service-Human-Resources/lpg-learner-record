@@ -42,20 +42,29 @@ public class ModuleRecordService {
         return moduleRecordRepository.saveAndFlush(moduleRecord);
     }
 
+    private ModuleRecordDto create(ModuleRecord moduleRecord) {
+        return new ModuleRecordDto(moduleRecord.getUid(), moduleRecord.getModuleId(), moduleRecord.getState(), moduleRecord.getCourseRecord().getUserId(),
+                moduleRecord.getUpdatedAt(), moduleRecord.getCompletionDate(), moduleRecord.getModuleTitle(), moduleRecord.getModuleType(),
+                moduleRecord.getCourseRecord().getCourseId(), moduleRecord.getCourseRecord().getCourseTitle());
+    }
+
     @Transactional(readOnly = true)
     public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
         return moduleRecordRepository
-                .findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay());
+                .findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay())
+                .stream().map(this::create).toList();
     }
 
     public List<ModuleRecordDto> listRecordsForPeriodAndLearnerIds(LocalDate periodStart, LocalDate periodEnd, List<String> learnerIds) {
         return moduleRecordRepository
-                .findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), learnerIds);
+                .findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), learnerIds)
+                .stream().map(this::create).toList();
     }
 
     public List<ModuleRecordDto> listRecordsForPeriodAndCourseIds(LocalDate periodStart, LocalDate periodEnd, List<String> courseIds) {
         return moduleRecordRepository
-                .findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), courseIds);
+                .findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), courseIds)
+                .stream().map(this::create).toList();
     }
 
 }
