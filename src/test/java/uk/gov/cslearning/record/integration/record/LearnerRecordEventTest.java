@@ -51,18 +51,18 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                 [
                     {
                         "learnerRecordId": 5,
-                        "eventType": 3,
-                        "eventSource": 1
+                        "eventType": "REMOVE_FROM_SUGGESTIONS",
+                        "eventSource": "dummy"
                     },
                     {
                         "learnerRecordId": 4,
-                        "eventType": 4,
-                        "eventSource": 1
+                        "eventType": "COMPLETE_COURSE",
+                        "eventSource": "dummy"
                     },
                     {
                         "learnerRecordId": 110,
-                        "eventType": 3,
-                        "eventSource": 1
+                        "eventType": "REMOVE_FROM_SUGGESTIONS",
+                        "eventSource": "dummy"
                     }
                 ]
                 """;
@@ -75,7 +75,7 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                 .andExpect(jsonPath("failedResources.length()").value(1))
                 .andExpect(jsonPath("successfulResources[0].eventType.eventType").value("REMOVE_FROM_SUGGESTIONS"))
                 .andExpect(jsonPath("successfulResources[1].eventType.eventType").value("COMPLETE_COURSE"))
-                .andExpect(jsonPath("failedResources[0].resource.eventType").value(3))
+                .andExpect(jsonPath("failedResources[0].resource.eventType").value("REMOVE_FROM_SUGGESTIONS"))
                 .andExpect(jsonPath("failedResources[0].reason").value("Learner record does not exist with  id: 110"));
     }
 

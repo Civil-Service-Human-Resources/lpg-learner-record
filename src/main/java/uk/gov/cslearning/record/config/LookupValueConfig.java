@@ -24,30 +24,29 @@ public class LookupValueConfig {
         this.learnerRecordEventSourceRepository = learnerRecordEventSourceRepository;
     }
 
-
     @Bean
     @Transactional
     public LearnerRecordTypeMapping learnerRecordTypeMap() {
-        Map<Integer, LearnerRecordType> typeMap = new HashMap<>();
-        Map<Integer, Map<Integer, LearnerRecordEventType>> eventTypeMap = new HashMap<>();
+        Map<String, LearnerRecordType> typeMap = new HashMap<>();
+        Map<String, Map<String, LearnerRecordEventType>> eventTypeMap = new HashMap<>();
 
         for (LearnerRecordType type : learnerRecordTypeRepository.findAll()) {
-            Map<Integer, LearnerRecordEventType> eventTypes = new HashMap<>();
-            typeMap.put(type.getId(), type);
+            Map<String, LearnerRecordEventType> eventTypes = new HashMap<>();
+            typeMap.put(type.getRecordType(), type);
             for (LearnerRecordEventType eventType : type.getEventTypes()) {
-                eventTypes.put(eventType.getId(), eventType);
+                eventTypes.put(eventType.getEventType(), eventType);
             }
-            eventTypeMap.put(type.getId(), eventTypes);
+            eventTypeMap.put(type.getRecordType(), eventTypes);
         }
 
         return new LearnerRecordTypeMapping(typeMap, eventTypeMap);
     }
 
     @Bean
-    public Map<Integer, LearnerRecordEventSource> learnerRecordEventSourceMap() {
-        Map<Integer, LearnerRecordEventSource> map = new HashMap<>();
+    public Map<String, LearnerRecordEventSource> learnerRecordEventSourceMap() {
+        Map<String, LearnerRecordEventSource> map = new HashMap<>();
         for (LearnerRecordEventSource source : learnerRecordEventSourceRepository.findAll()) {
-            map.put(source.getId(), source);
+            map.put(source.getUid(), source);
         }
         return map;
     }

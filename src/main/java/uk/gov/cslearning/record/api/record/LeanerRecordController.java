@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cslearning.record.api.output.BulkCreateOutput;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordDto;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordEventDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordDto;
@@ -45,6 +46,13 @@ public class LeanerRecordController {
     @PostMapping
     public LearnerRecordDto createRecord(@RequestBody @Valid CreateLearnerRecordDto dto) {
         return learnerRecordService.createRecord(dto);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/bulk")
+    public BulkCreateOutput<LearnerRecordDto, CreateLearnerRecordDto> createRecords(@RequestBody @Valid List<CreateLearnerRecordDto> dtos) {
+        return learnerRecordService.createRecords(dtos);
     }
 
     @ResponseBody

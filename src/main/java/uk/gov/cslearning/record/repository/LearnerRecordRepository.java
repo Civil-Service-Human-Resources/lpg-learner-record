@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cslearning.record.domain.record.LearnerRecord;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Long> {
@@ -15,10 +16,19 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
     @Query("""
                 select lr
                 from LearnerRecord lr
-                where (?1 is null or lr.learnerId = ?1)
-                and (?2 is null or lr.resourceId = ?2)
-                and (?3 is null or lr.learnerRecordType.id in (?3))
+                where (?1 is null or lr.learnerId in (?1))
+                and (?2 is null or lr.resourceId in (?2))
+                and (?3 is null or lr.learnerRecordType.recordType in (?3))
             """)
-    Page<LearnerRecord> find(String userId, String resourceId, List<Integer> typeIds, Pageable pageable);
+    Page<LearnerRecord> find(List<String> userIds, List<String> resourceIds, List<String> types, Pageable pageable);
+
+    @Query("""
+                select lr
+                from LearnerRecord lr
+                where lr.learnerId = ?1
+                and lr.resourceId = ?2
+                and lr.learnerRecordType.recordType = ?3
+            """)
+    Optional<LearnerRecord> find(String userId, String resourceId, String type);
 
 }

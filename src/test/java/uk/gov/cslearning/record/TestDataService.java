@@ -22,6 +22,7 @@ import java.util.List;
 public class TestDataService {
 
     protected final String courseId = "testCourseId";
+    protected final String courseTitle = "Test title";
     protected final String moduleId = "testModuleId";
     protected final String eventId = "testEventId";
     protected final String userId = "testUserId";
@@ -67,6 +68,9 @@ public class TestDataService {
 
     public ModuleRecord generateModuleRecord() {
         ModuleRecord mr = new ModuleRecord();
+        mr.setCourseId(courseId);
+        mr.setCourseTitle(courseTitle);
+        mr.setUserId(userId);
         mr.setModuleId(moduleId);
         mr.setDuration(100L);
         mr.setState(State.IN_PROGRESS);

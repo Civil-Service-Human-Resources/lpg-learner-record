@@ -14,9 +14,9 @@ import java.util.List;
 public class LearnerRecordQuery {
 
     @Null(groups = {CourseRecordController.class})
-    List<Integer> learnerRecordTypes;
-    String resourceId;
-    String learnerId;
+    List<String> learnerRecordTypes;
+    List<String> resourceIds;
+    List<String> learnerIds;
     String uid;
 
     boolean getChildRecords;

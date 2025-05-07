@@ -8,9 +8,14 @@ import uk.gov.cslearning.record.dto.ModuleRecordDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long> {
+
+    @Query("SELECT mr FROM ModuleRecord mr WHERE mr.courseRecord.identity.userId in (?1) AND (?2 is NULL or mr.moduleId in (?2))")
+    List<ModuleRecord> findByUserIdAndModuleIdIn(List<String> userIds, List<String> moduleIds);
+
     @Query("SELECT new uk.gov.cslearning.record.dto.ModuleRecordDto(mr.uid, mr.moduleId, mr.state, cr.identity.userId, mr.updatedAt,  mr.completionDate, mr.moduleTitle, mr.moduleType, mr.courseRecord.identity.courseId, mr.courseRecord.courseTitle) " +
             "FROM ModuleRecord mr " +
             "left join CourseRecord cr on cr.identity.courseId = mr.courseRecord.identity.courseId " +
@@ -35,4 +40,7 @@ public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long
             "AND mr.courseRecord IS NOT NULL " +
             "ORDER BY mr.courseRecord.identity.userId")
     List<ModuleRecordDto> findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(LocalDateTime from, LocalDateTime to, List<String> courseIds);
+
+    @Query("SELECT mr FROM ModuleRecord mr WHERE mr.courseRecord.identity.userId = ?1 AND mr.moduleId = ?2")
+    Optional<ModuleRecord> getModuleRecord(String userId, String moduleId);
 }

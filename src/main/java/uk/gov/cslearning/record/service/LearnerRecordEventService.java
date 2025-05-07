@@ -26,13 +26,16 @@ public class LearnerRecordEventService {
     private final LearnerRecordEventFactory learnerRecordEventFactory;
     private final LearnerRecordEventRepository learnerRecordEventRepository;
     private final LearnerRecordRepository learnerRecordRepository;
+    private final CourseCompletionService courseCompletionService;
 
     public LearnerRecordEventService(IUtilService utilService, LearnerRecordEventFactory learnerRecordEventFactory,
-                                     LearnerRecordEventRepository learnerRecordEventRepository, LearnerRecordRepository learnerRecordRepository) {
+                                     LearnerRecordEventRepository learnerRecordEventRepository, LearnerRecordRepository learnerRecordRepository,
+                                     CourseCompletionService courseCompletionService) {
         this.utilService = utilService;
         this.learnerRecordEventFactory = learnerRecordEventFactory;
         this.learnerRecordEventRepository = learnerRecordEventRepository;
         this.learnerRecordRepository = learnerRecordRepository;
+        this.courseCompletionService = courseCompletionService;
     }
 
     public Page<LearnerRecordEventDto> getRecords(Pageable pageableParams, LearnerRecordEventQuery query) {
@@ -46,12 +49,19 @@ public class LearnerRecordEventService {
         List<LearnerRecordEventDto> successful = new ArrayList<>();
         for (CreateLearnerRecordEventDto dto : dtos) {
             try {
+                LearnerRecord record;
                 Long learnerRecordId = dto.getLearnerRecordId();
-                LearnerRecord record = learnerRecordRepository.findById(learnerRecordId)
-                        .orElseThrow(() -> new LearnerRecordNotFoundException(learnerRecordId));
+                if (learnerRecordId != null) {
+                    record = learnerRecordRepository.findById(learnerRecordId)
+                            .orElseThrow(() -> new LearnerRecordNotFoundException(learnerRecordId));
+                } else {
+                    record = learnerRecordRepository.find(List.of(dto.getLearnerId()), List.of(dto.getResourceId()), null, null)
+                            .stream().findFirst().orElseThrow(() -> new LearnerRecordNotFoundException(dto.getLearnerId(), dto.getResourceId()));
+                }
                 LearnerRecordEvent event = learnerRecordEventFactory.createEvent(record, dto);
                 record.addEvent(event);
                 learnerRecordRepository.save(record);
+                courseCompletionService.checkAndCompleteCourseRecord(event);
                 LearnerRecordEventDto response = learnerRecordEventFactory.createDto(event);
                 successful.add(response);
             } catch (Exception e) {

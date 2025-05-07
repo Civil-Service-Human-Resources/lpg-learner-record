@@ -52,7 +52,7 @@ public class CourseRecordTest extends IntegrationTestBase {
     @Test
     public void testGetBulkCourseRecords() throws Exception {
         mockMvc.perform(get("/v2/course_records")
-                        .param("learnerId", "user2")
+                        .param("learnerIds", "user2")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content.length()").value(2))
