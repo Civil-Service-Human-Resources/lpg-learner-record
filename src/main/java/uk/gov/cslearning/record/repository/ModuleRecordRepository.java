@@ -11,7 +11,7 @@ import java.util.List;
 public interface ModuleRecordRepository extends JpaRepository<ModuleRecord, Long> {
     List<ModuleRecord> findAllByUpdatedAtBetween(LocalDateTime from, LocalDateTime to);
 
-    List<ModuleRecord> findAllByUpdatedAtBetweenAndCourseRecord_Identity_UserIdIn(LocalDateTime from, LocalDateTime to, List<String> learnerIds);
+    List<ModuleRecord> findAllByUpdatedAtBetweenAndCourseRecord_Identity_UserIdInOrderByCourseRecord_Identity_UserId(LocalDateTime from, LocalDateTime to, List<String> learnerIds);
 
-    List<ModuleRecord> findAllByUpdatedAtBetweenAndCourseRecord_Identity_CourseIdIn(LocalDateTime from, LocalDateTime to, List<String> courseIds);
+    List<ModuleRecord> findAllByUpdatedAtBetweenAndCourseRecord_Identity_CourseIdInOrderByCourseRecord_Identity_UserId(LocalDateTime from, LocalDateTime to, List<String> courseIds);
 }

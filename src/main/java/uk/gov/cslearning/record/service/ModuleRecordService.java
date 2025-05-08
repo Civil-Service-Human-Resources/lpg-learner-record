@@ -59,13 +59,13 @@ public class ModuleRecordService {
 
     public List<ModuleRecordDto> listRecordsForPeriodAndLearnerIds(FromToParamsUserIds params) {
         return moduleRecordRepository
-                .findAllByUpdatedAtBetweenAndCourseRecord_Identity_UserIdIn(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay(), params.getLearnerIds())
+                .findAllByUpdatedAtBetweenAndCourseRecord_Identity_UserIdInOrderByCourseRecord_Identity_UserId(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay(), params.getLearnerIds())
                 .stream().map(this::create).toList();
     }
 
     public List<ModuleRecordDto> listRecordsForPeriodAndCourseIds(FromToParamsCourseIds params) {
         return moduleRecordRepository
-                .findAllByUpdatedAtBetweenAndCourseRecord_Identity_CourseIdIn(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay(), params.getCourseIds())
+                .findAllByUpdatedAtBetweenAndCourseRecord_Identity_CourseIdInOrderByCourseRecord_Identity_UserId(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay(), params.getCourseIds())
                 .stream().map(this::create).toList();
     }
 
