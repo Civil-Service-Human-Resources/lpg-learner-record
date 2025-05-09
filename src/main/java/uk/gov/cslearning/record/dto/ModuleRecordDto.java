@@ -1,11 +1,13 @@
 package uk.gov.cslearning.record.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import uk.gov.cslearning.record.domain.State;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 public class ModuleRecordDto {
     private String uid;
     private String moduleId;

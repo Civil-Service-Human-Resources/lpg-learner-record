@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.api.FromToParams;
+import uk.gov.cslearning.record.api.FromToParamsCourseIds;
+import uk.gov.cslearning.record.api.FromToParamsUserIds;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.dto.ModuleRecordDto;
@@ -12,7 +15,6 @@ import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 import uk.gov.cslearning.record.util.IUtilService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,20 +44,29 @@ public class ModuleRecordService {
         return moduleRecordRepository.saveAndFlush(moduleRecord);
     }
 
+    private ModuleRecordDto create(ModuleRecord moduleRecord) {
+        return new ModuleRecordDto(moduleRecord.getUid(), moduleRecord.getModuleId(), moduleRecord.getState(), moduleRecord.getCourseRecord().getUserId(),
+                moduleRecord.getUpdatedAt(), moduleRecord.getCompletionDate(), moduleRecord.getModuleTitle(), moduleRecord.getModuleType(),
+                moduleRecord.getCourseRecord().getCourseId(), moduleRecord.getCourseRecord().getCourseTitle());
+    }
+
     @Transactional(readOnly = true)
-    public List<ModuleRecordDto> listRecordsForPeriod(LocalDate periodStart, LocalDate periodEnd) {
+    public List<ModuleRecordDto> listRecordsForPeriod(FromToParams params) {
         return moduleRecordRepository
-                .findAllByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay());
+                .findAllByUpdatedAtBetween(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay())
+                .stream().map(this::create).toList();
     }
 
-    public List<ModuleRecordDto> listRecordsForPeriodAndLearnerIds(LocalDate periodStart, LocalDate periodEnd, List<String> learnerIds) {
+    public List<ModuleRecordDto> listRecordsForPeriodAndLearnerIds(FromToParamsUserIds params) {
         return moduleRecordRepository
-                .findForLearnerIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), learnerIds);
+                .findAllByUpdatedAtBetweenAndCourseRecord_Identity_UserIdInOrderByCourseRecord_Identity_UserId(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay(), params.getLearnerIds())
+                .stream().map(this::create).toList();
     }
 
-    public List<ModuleRecordDto> listRecordsForPeriodAndCourseIds(LocalDate periodStart, LocalDate periodEnd, List<String> courseIds) {
+    public List<ModuleRecordDto> listRecordsForPeriodAndCourseIds(FromToParamsCourseIds params) {
         return moduleRecordRepository
-                .findForCourseIdsByCreatedAtBetweenAndCourseRecordIsNotNullNormalised(periodStart.atStartOfDay(), periodEnd.plusDays(1).atStartOfDay(), courseIds);
+                .findAllByUpdatedAtBetweenAndCourseRecord_Identity_CourseIdInOrderByCourseRecord_Identity_UserId(params.getFrom().atStartOfDay(), params.getTo().plusDays(1).atStartOfDay(), params.getCourseIds())
+                .stream().map(this::create).toList();
     }
 
 }
