@@ -44,7 +44,7 @@ public class SpringTestConfiguration {
     @Bean
     @Primary
     public Clock clock() {
-        return Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("Europe/London"));
+        return Clock.fixed(Instant.parse("2023-01-01T10:00:00.000Z"), ZoneId.of("UTC"));
     }
 
 }

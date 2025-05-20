@@ -81,7 +81,7 @@ public class LearnerRecordService {
         if (!dto.getEvents().isEmpty()) {
             record.getEvents().forEach(courseCompletionService::checkAndCompleteCourseRecord);
         }
-        return learnerRecordFactory.createLearnerRecordDto(record, true, true);
+        return learnerRecordFactory.createLearnerRecordDto(record, true, false);
     }
 
     public List<LearnerRecordEventDto> createEvents(Long id, List<CreateLearnerRecordEventDto> dtos) {

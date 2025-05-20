@@ -17,11 +17,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/learner_record_events")
-public class LeanerRecordEventController {
+public class LearnerRecordEventController {
 
     private final LearnerRecordEventService learnerRecordEventService;
 
-    public LeanerRecordEventController(LearnerRecordEventService learnerRecordEventService) {
+    public LearnerRecordEventController(LearnerRecordEventService learnerRecordEventService) {
         this.learnerRecordEventService = learnerRecordEventService;
     }
 

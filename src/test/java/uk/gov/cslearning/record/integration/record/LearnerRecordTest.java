@@ -80,8 +80,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("resourceId").value("course-id-456"))
                 .andExpect(jsonPath("createdTimestamp").value("2023-01-01T10:00:00Z"))
                 .andExpect(jsonPath("learnerId").value("user-id"))
-                .andExpect(jsonPath("events[0].eventType.eventType").value("MOVE_TO_LEARNING_PLAN"))
-                .andExpect(jsonPath("events[0].eventSource.source").value("CSL"));
+                .andExpect(jsonPath("latestEvent.eventType.eventType").value("MOVE_TO_LEARNING_PLAN"))
+                .andExpect(jsonPath("latestEvent.eventSource.source").value("CSL"));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("[0].eventTimestamp").value("2023-01-01T10:00:00Z"))
                 .andExpect(jsonPath("[1].eventType.eventType").value("REMOVE_FROM_SUGGESTIONS"))
                 .andExpect(jsonPath("[1].eventSource.source").value("CSL"))
-                .andExpect(jsonPath("[1].eventTimestamp").value("2025-06-01T11:00:00Z"));
+                .andExpect(jsonPath("[1].eventTimestamp").value("2025-06-01T12:00:00Z"));
     }
 
     @Test
@@ -156,4 +156,45 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("content[2].recordType.type").value("COURSE"))
                 .andExpect(jsonPath("content[2].uid").isNotEmpty());
     }
+
+    @Test
+    public void testCreateLearnerRecordWithEventsTest() throws Exception {
+        String json = """
+                [
+                  {
+                    "recordType": "COURSE",
+                    "resourceId": "bulkTest",
+                    "learnerId": "learnerBulkTest",
+                    "createdTimestamp": "2025-05-20T10:00:00Z",
+                    "events": [
+                      {
+                        "resourceId": "bulkTest",
+                        "learnerId": "learnerBulkTest",
+                        "eventSource": "dummy",
+                        "eventTimestamp": "2025-05-20T10:00:00Z",
+                        "eventType": "MOVE_TO_LEARNING_PLAN"
+                      }
+                    ]
+                  }
+                ]
+                """;
+        mockMvc.perform(post("/learner_records/bulk")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("successfulResources.length()").value(1))
+                .andExpect(jsonPath("successfulResources[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("successfulResources[0].resourceId").value("bulkTest"))
+                .andExpect(jsonPath("successfulResources[0].learnerId").value("learnerBulkTest"))
+                .andExpect(jsonPath("successfulResources[0].createdTimestamp").value("2025-05-20T10:00:00Z"))
+                .andExpect(jsonPath("successfulResources[0].eventCount").value(1))
+                .andExpect(jsonPath("successfulResources[0].latestEvent.resourceId").value("bulkTest"))
+                .andExpect(jsonPath("successfulResources[0].latestEvent.learnerId").value("learnerBulkTest"))
+                .andExpect(jsonPath("successfulResources[0].latestEvent.eventType.eventType").value("MOVE_TO_LEARNING_PLAN"))
+                .andExpect(jsonPath("successfulResources[0].latestEvent.eventSource.source").value("CSL"))
+                .andExpect(jsonPath("successfulResources[0].latestEvent.eventTimestamp").value("2025-05-20T10:00:00Z"));
+    }
+
+
 }

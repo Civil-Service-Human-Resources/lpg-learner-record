@@ -36,7 +36,7 @@ public class LearnerRecordTypeMapping {
                 return eventType;
             }
         }
-        throw new RuntimeException(String.format("Learner record event type with type id and event type %s is invalid", learnerRecordType, learnerRecordEventType));
+        throw new RuntimeException(String.format("Learner record event type with record type %s and event type %s is invalid", learnerRecordType, learnerRecordEventType));
     }
 
 }
