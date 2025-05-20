@@ -63,6 +63,12 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                         "learnerRecordId": 110,
                         "eventType": "REMOVE_FROM_SUGGESTIONS",
                         "eventSource": "dummy"
+                    },
+                    {
+                        "resourceId": "course3",
+                        "learnerId": "user3",
+                        "eventType": "REMOVE_FROM_SUGGESTIONS",
+                        "eventSource": "dummy"
                     }
                 ]
                 """;
@@ -71,7 +77,7 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                         .contentType("application/json")
                         .content(json))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("successfulResources.length()").value(2))
+                .andExpect(jsonPath("successfulResources.length()").value(3))
                 .andExpect(jsonPath("failedResources.length()").value(1))
                 .andExpect(jsonPath("successfulResources[0].eventType.eventType").value("REMOVE_FROM_SUGGESTIONS"))
                 .andExpect(jsonPath("successfulResources[1].eventType.eventType").value("COMPLETE_COURSE"))
