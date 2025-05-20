@@ -158,7 +158,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
     }
 
     @Test
-    public void testCreateLearnerRecordWithEventsTest() throws Exception {
+    public void testCreateLearnerRecordWithEventsBulk() throws Exception {
         String json = """
                 [
                   {
