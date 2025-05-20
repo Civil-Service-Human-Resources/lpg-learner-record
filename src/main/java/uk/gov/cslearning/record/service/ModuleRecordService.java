@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cslearning.record.api.FetchModuleRecordParams;
 import uk.gov.cslearning.record.api.FromToParams;
 import uk.gov.cslearning.record.api.FromToParamsCourseIds;
 import uk.gov.cslearning.record.api.FromToParamsUserIds;
-import uk.gov.cslearning.record.api.FetchModuleRecordParams;
 import uk.gov.cslearning.record.domain.CourseRecord;
 import uk.gov.cslearning.record.domain.ModuleRecord;
 import uk.gov.cslearning.record.domain.record.LearnerRecordTypeEnum;
@@ -19,7 +19,6 @@ import uk.gov.cslearning.record.repository.CourseRecordRepository;
 import uk.gov.cslearning.record.repository.ModuleRecordRepository;
 import uk.gov.cslearning.record.util.IUtilService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,7 +51,6 @@ public class ModuleRecordService {
         input.setUpdatedAt(createdTimestamp);
         input.setCourseRecord(courseRecord);
         courseRecord.addModuleRecord(input);
-//        moduleRecordRepository.saveAndFlush(input);
         courseRecordRepository.save(courseRecord);
         return input;
     }
