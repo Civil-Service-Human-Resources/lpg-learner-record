@@ -80,7 +80,9 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                 .andExpect(jsonPath("successfulResources.length()").value(3))
                 .andExpect(jsonPath("failedResources.length()").value(1))
                 .andExpect(jsonPath("successfulResources[0].eventType.eventType").value("REMOVE_FROM_SUGGESTIONS"))
+                .andExpect(jsonPath("successfulResources[0].eventType.learnerRecordType.type").value("COURSE"))
                 .andExpect(jsonPath("successfulResources[1].eventType.eventType").value("COMPLETE_COURSE"))
+                .andExpect(jsonPath("successfulResources[1].eventType.learnerRecordType.type").value("COURSE"))
                 .andExpect(jsonPath("failedResources[0].resource.eventType").value("REMOVE_FROM_SUGGESTIONS"))
                 .andExpect(jsonPath("failedResources[0].reason").value("Learner record does not exist with  id: 110"));
     }
