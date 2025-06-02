@@ -20,7 +20,7 @@ import java.util.List;
 public class CreateLearnerRecordDto {
     @NotNull
     @Null(groups = {CourseRecordController.class})
-    private Integer recordType;
+    private String recordType;
     @NotNull
     private String resourceId;
     @NotNull
@@ -28,13 +28,18 @@ public class CreateLearnerRecordDto {
     @Null(groups = {CourseRecordController.class})
     private Long parentId;
     private LocalDateTime createdTimestamp;
-
     @Valid
     @Size(max = 20, groups = {CourseRecordController.class})
     private List<CreateLearnerRecordDto> children = new ArrayList<>();
-
     @Size(max = 20)
     @Valid
     private List<CreateLearnerRecordEventDto> events = new ArrayList<>();
+
+    public CreateLearnerRecordDto(String recordType, String resourceId, String learnerId, LocalDateTime createdTimestamp) {
+        this.recordType = recordType;
+        this.resourceId = resourceId;
+        this.learnerId = learnerId;
+        this.createdTimestamp = createdTimestamp;
+    }
 
 }

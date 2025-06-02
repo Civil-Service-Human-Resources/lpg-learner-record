@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cslearning.record.api.output.BulkCreateOutput;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordDto;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordEventDto;
 import uk.gov.cslearning.record.dto.record.LearnerRecordDto;
@@ -45,6 +47,13 @@ public class LeanerRecordController {
     @PostMapping
     public LearnerRecordDto createRecord(@RequestBody @Valid CreateLearnerRecordDto dto) {
         return learnerRecordService.createRecord(dto);
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<BulkCreateOutput<LearnerRecordDto, CreateLearnerRecordDto>> createRecords(@RequestBody @Valid List<CreateLearnerRecordDto> dtos) {
+        BulkCreateOutput<LearnerRecordDto, CreateLearnerRecordDto> response = learnerRecordService.createRecords(dtos);
+        return ResponseEntity.status(response.getSuccessfulResources().size() == 0 ? HttpStatus.BAD_REQUEST : HttpStatus.CREATED)
+                .body(response);
     }
 
     @ResponseBody

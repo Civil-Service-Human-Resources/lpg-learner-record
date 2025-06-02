@@ -8,8 +8,9 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 public class LearnerRecordEventDto {
-    private Long id;
     private Long learnerRecordId;
+    private String resourceId;
+    private String learnerId;
     private LearnerRecordEventTypeDto eventType;
     private LearnerRecordEventSourceDto eventSource;
     private Instant eventTimestamp;

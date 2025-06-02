@@ -10,8 +10,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FetchCourseRecordParams {
+public class FetchModuleRecordParams {
     @NotNull
     List<String> userIds;
-    List<String> courseIds;
+    List<String> moduleIds;
 }

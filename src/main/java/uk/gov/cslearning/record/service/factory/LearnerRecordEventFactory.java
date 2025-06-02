@@ -33,7 +33,7 @@ public class LearnerRecordEventFactory {
 
     public LearnerRecordEvent createEvent(LearnerRecord record, CreateLearnerRecordEventDto dto) {
         Instant creationTimestamp = dto.getEventTimestamp() == null ? utilService.getNowInstant() : utilService.localDateTimeToInstant(dto.getEventTimestamp());
-        LearnerRecordEventType learnerRecordEventType = lookupValueService.getLearnerRecordEventType(record.getLearnerRecordType().getId(), dto.getEventType());
+        LearnerRecordEventType learnerRecordEventType = lookupValueService.getLearnerRecordEventType(record.getLearnerRecordType().getRecordType(), dto.getEventType());
         LearnerRecordEventSource learnerRecordEventSource = lookupValueService.getLearnerRecordSource(dto.getEventSource());
         LearnerRecordEvent event = new LearnerRecordEvent(record, learnerRecordEventType, learnerRecordEventSource, creationTimestamp);
         if (dto.getEventTimestamp() != null) {
@@ -50,7 +50,8 @@ public class LearnerRecordEventFactory {
     public LearnerRecordEventDto createDto(LearnerRecordEvent event) {
         LearnerRecordEventTypeDto eventTypeDto = lookupValueFactory.createLearnerRecordEventTypeDto(event.getEventType());
         LearnerRecordEventSourceDto eventSourceDto = lookupValueFactory.createLearnerRecordSourceDto(event.getEventSource());
-        return new LearnerRecordEventDto(event.getId(), event.getLearnerRecord().getId(), eventTypeDto, eventSourceDto,
+        LearnerRecord record = event.getLearnerRecord();
+        return new LearnerRecordEventDto(event.getLearnerRecord().getId(), record.getResourceId(), record.getLearnerId(), eventTypeDto, eventSourceDto,
                 event.getEventTimestamp());
     }
 }

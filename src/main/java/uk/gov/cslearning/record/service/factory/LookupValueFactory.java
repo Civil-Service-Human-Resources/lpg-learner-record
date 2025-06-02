@@ -25,7 +25,8 @@ public class LookupValueFactory {
     }
 
     public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType) {
-        return new LearnerRecordEventTypeDto(eventType.getId(), eventType.getEventType());
+        LearnerRecordTypeDto typeDto = createLearnerRecordTypeDto(eventType.getRecordType());
+        return new LearnerRecordEventTypeDto(eventType.getId(), eventType.getEventType(), typeDto);
     }
 
     public LearnerRecordEventTypeDto createLearnerRecordEventTypeDto(LearnerRecordEventType eventType, boolean includeDescription, boolean includeRecordType) {

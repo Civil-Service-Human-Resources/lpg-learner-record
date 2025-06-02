@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1001,
+    "userId": "testUserId",
+    "courseId": "testCourseId",
+    "moduleId": "testModule1",
+    "moduleTitle": "Module 1",
+    "optional": false,
+    "state": "APPROVED"
+  },
+  {
+    "id": 1002,
+    "userId": "testUserId2",
+    "courseId": "testCourseId2",
+    "moduleId": "testModule2",
+    "moduleTitle": "Module 2",
+    "optional": false,
+    "state": "APPROVED"
+  }
+]

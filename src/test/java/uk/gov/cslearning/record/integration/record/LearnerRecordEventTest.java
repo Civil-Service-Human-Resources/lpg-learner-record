@@ -51,18 +51,24 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                 [
                     {
                         "learnerRecordId": 5,
-                        "eventType": 3,
-                        "eventSource": 1
+                        "eventType": "REMOVE_FROM_SUGGESTIONS",
+                        "eventSource": "dummy"
                     },
                     {
                         "learnerRecordId": 4,
-                        "eventType": 4,
-                        "eventSource": 1
+                        "eventType": "COMPLETE_COURSE",
+                        "eventSource": "dummy"
                     },
                     {
                         "learnerRecordId": 110,
-                        "eventType": 3,
-                        "eventSource": 1
+                        "eventType": "REMOVE_FROM_SUGGESTIONS",
+                        "eventSource": "dummy"
+                    },
+                    {
+                        "resourceId": "course3",
+                        "learnerId": "user3",
+                        "eventType": "REMOVE_FROM_SUGGESTIONS",
+                        "eventSource": "dummy"
                     }
                 ]
                 """;
@@ -71,11 +77,13 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
                         .contentType("application/json")
                         .content(json))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("successfulResources.length()").value(2))
+                .andExpect(jsonPath("successfulResources.length()").value(3))
                 .andExpect(jsonPath("failedResources.length()").value(1))
                 .andExpect(jsonPath("successfulResources[0].eventType.eventType").value("REMOVE_FROM_SUGGESTIONS"))
+                .andExpect(jsonPath("successfulResources[0].eventType.learnerRecordType.type").value("COURSE"))
                 .andExpect(jsonPath("successfulResources[1].eventType.eventType").value("COMPLETE_COURSE"))
-                .andExpect(jsonPath("failedResources[0].resource.eventType").value(3))
+                .andExpect(jsonPath("successfulResources[1].eventType.learnerRecordType.type").value("COURSE"))
+                .andExpect(jsonPath("failedResources[0].resource.eventType").value("REMOVE_FROM_SUGGESTIONS"))
                 .andExpect(jsonPath("failedResources[0].reason").value("Learner record does not exist with  id: 110"));
     }
 
