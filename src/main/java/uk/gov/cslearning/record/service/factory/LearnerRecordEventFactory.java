@@ -44,7 +44,7 @@ public class LearnerRecordEventFactory {
 
     public Page<LearnerRecordEventDto> createDtos(Pageable pageable, Page<LearnerRecordEvent> events) {
         List<LearnerRecordEventDto> eventDtos = events.map(this::createDto).stream().toList();
-        return new PageImpl<>(eventDtos, pageable, eventDtos.size());
+        return new PageImpl<>(eventDtos, pageable, events.getTotalElements());
     }
 
     public LearnerRecordEventDto createDto(LearnerRecordEvent event) {

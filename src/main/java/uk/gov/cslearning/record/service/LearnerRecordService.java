@@ -53,7 +53,7 @@ public class LearnerRecordService {
         Page<LearnerRecord> results = learnerRecordRepository.find(learnerRecordQuery.getLearnerIds(), learnerRecordQuery.getResourceIds(),
                 learnerRecordQuery.getLearnerRecordTypes(), pageableParams);
         List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
-        return new PageImpl<>(dtos, pageableParams, dtos.size());
+        return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
     }
 
     public void createRecordIfNotExists(String resourceId, String learnerId, String type, LocalDateTime createdTimestamp) {

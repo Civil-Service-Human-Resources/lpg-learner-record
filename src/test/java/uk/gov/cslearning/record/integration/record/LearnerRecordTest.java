@@ -158,6 +158,37 @@ public class LearnerRecordTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetLearnerRecordsPagination() throws Exception {
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("resourceId", "course1")
+                        .param("size", "1")
+                        .param("page", "0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("totalElements").value(7))
+                .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[0].uid").isNotEmpty());
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("resourceId", "course1")
+                        .param("size", "1")
+                        .param("page", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("totalElements").value(7))
+                .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[0].uid").isNotEmpty());
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("resourceId", "course1")
+                        .param("size", "1")
+                        .param("page", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("totalElements").value(7))
+                .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[0].uid").isNotEmpty());
+    }
+
+    @Test
     public void testCreateLearnerRecordWithEventsBulk() throws Exception {
         String json = """
                 [
