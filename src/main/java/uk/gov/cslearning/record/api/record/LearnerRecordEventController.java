@@ -29,7 +29,7 @@ public class LearnerRecordEventController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public Page<LearnerRecordEventDto> getEvents(@PageableDefault(sort = {"eventTimestamp"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+    public Page<LearnerRecordEventDto> getEvents(@PageableDefault(sort = {"eventTimestamp", "id"}, direction = Sort.Direction.ASC) Pageable pageableParams,
                                                  LearnerRecordEventQuery query) {
         return learnerRecordEventService.getRecords(pageableParams, query);
     }
