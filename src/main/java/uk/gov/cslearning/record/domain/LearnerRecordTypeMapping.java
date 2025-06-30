@@ -8,39 +8,35 @@ import java.util.Map;
 
 public class LearnerRecordTypeMapping {
 
-    private final Map<Integer, LearnerRecordType> typeMap;
-    private final Map<Integer, Map<Integer, LearnerRecordEventType>> eventTypeMap;
+    private final Map<String, LearnerRecordType> typeMap;
+    private final Map<String, Map<String, LearnerRecordEventType>> eventTypeMap;
 
-    public LearnerRecordTypeMapping(Map<Integer, LearnerRecordType> typeMap, Map<Integer, Map<Integer, LearnerRecordEventType>> eventTypeMap) {
+    public LearnerRecordTypeMapping(Map<String, LearnerRecordType> typeMap, Map<String, Map<String, LearnerRecordEventType>> eventTypeMap) {
         this.typeMap = typeMap;
         this.eventTypeMap = eventTypeMap;
-    }
-
-    public List<LearnerRecordType> getAllTypes() {
-        return typeMap.values().stream().toList();
     }
 
     public List<LearnerRecordEventType> getAllEventTypes() {
         return eventTypeMap.values().stream().flatMap(map -> map.values().stream()).toList();
     }
 
-    public LearnerRecordType getType(Integer id) {
-        LearnerRecordType type = this.typeMap.get(id);
+    public LearnerRecordType getType(String name) {
+        LearnerRecordType type = this.typeMap.get(name);
         if (type == null) {
-            throw new RuntimeException(String.format("Learner record type with id %s is invalid", id));
+            throw new RuntimeException(String.format("Learner record type %s is invalid", name));
         }
         return type;
     }
 
-    public LearnerRecordEventType getEventType(Integer learnerRecordTypeId, Integer learnerRecordEventTypeId) {
-        Map<Integer, LearnerRecordEventType> map = eventTypeMap.get(learnerRecordTypeId);
+    public LearnerRecordEventType getEventType(String learnerRecordType, String learnerRecordEventType) {
+        Map<String, LearnerRecordEventType> map = eventTypeMap.get(learnerRecordType);
         if (map != null) {
-            LearnerRecordEventType eventType = map.get(learnerRecordEventTypeId);
+            LearnerRecordEventType eventType = map.get(learnerRecordEventType);
             if (eventType != null) {
                 return eventType;
             }
         }
-        throw new RuntimeException(String.format("Learner record event type with type id %s and event type id %s is invalid", learnerRecordTypeId, learnerRecordEventTypeId));
+        throw new RuntimeException(String.format("Learner record event type with record type %s and event type %s is invalid", learnerRecordType, learnerRecordEventType));
     }
 
 }

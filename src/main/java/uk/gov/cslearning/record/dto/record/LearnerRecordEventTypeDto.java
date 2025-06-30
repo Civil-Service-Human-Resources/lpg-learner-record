@@ -14,8 +14,9 @@ public class LearnerRecordEventTypeDto {
     private String description;
     private LearnerRecordTypeDto learnerRecordType;
 
-    public LearnerRecordEventTypeDto(Integer id, String eventType) {
+    public LearnerRecordEventTypeDto(Integer id, String eventType, LearnerRecordTypeDto learnerRecordType) {
         this.id = id;
         this.eventType = eventType;
+        this.learnerRecordType = learnerRecordType;
     }
 }

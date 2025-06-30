@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import uk.gov.cslearning.record.api.input.CreateModuleRecord;
+import uk.gov.cslearning.record.api.input.UpdateModuleRecord;
 import uk.gov.cslearning.record.domain.converter.BookingStatusConverter;
 
 import java.math.BigDecimal;
@@ -26,19 +28,36 @@ public class ModuleRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull(groups = UpdateModuleRecord.class)
     private Long id;
 
     @Column(length = 50, unique = true)
     private String uid;
 
+    // --Required until course_record is decommissioned
+
+    @NotBlank(message = "userId is required", groups = {UpdateModuleRecord.class, CreateModuleRecord.class})
+    @Transient
+    private String userId;
+
+    @NotBlank(message = "courseId is required", groups = {UpdateModuleRecord.class, CreateModuleRecord.class})
+    @Transient
+    private String courseId;
+
+    @NotBlank(message = "courseTitle is required", groups = {UpdateModuleRecord.class, CreateModuleRecord.class})
+    @Transient
+    private String courseTitle;
+
+    // --End
+
     @Column(nullable = false)
-    @NotBlank(message = "moduleId is required")
+    @NotBlank(message = "moduleId is required", groups = {UpdateModuleRecord.class, CreateModuleRecord.class})
     private String moduleId;
 
-    @NotBlank(message = "ModuleTitle is required")
+    @NotBlank(message = "ModuleTitle is required", groups = {CreateModuleRecord.class})
     private String moduleTitle;
 
-    @NotBlank(message = "moduleType is required")
+    @NotBlank(message = "moduleType is required", groups = {CreateModuleRecord.class})
     private String moduleType;
 
     private Long duration;
@@ -48,7 +67,7 @@ public class ModuleRecord {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate eventDate;
 
-    @NotNull(message = "optional is required")
+    @NotNull(message = "optional is required", groups = {CreateModuleRecord.class})
     private Boolean optional = Boolean.FALSE;
 
     private BigDecimal cost;
@@ -95,6 +114,18 @@ public class ModuleRecord {
     public ModuleRecord(String moduleId) {
         checkArgument(moduleId != null);
         this.moduleId = moduleId;
+    }
+
+    public String getUserId() {
+        return courseRecord == null ? this.userId : courseRecord.getUserId();
+    }
+
+    public String getCourseId() {
+        return courseRecord == null ? this.courseId : courseRecord.getCourseId();
+    }
+
+    public String getCourseTitle() {
+        return courseRecord == null ? this.courseTitle : courseRecord.getCourseTitle();
     }
 
     @JsonIgnore

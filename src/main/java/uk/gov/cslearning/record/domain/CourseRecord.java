@@ -33,15 +33,6 @@ public class CourseRecord {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    @Enumerated(EnumType.STRING)
-    private Preference preference;
-
-    @JsonIgnore
-    private String profession;
-
-    @JsonIgnore
-    private String department;
-
     @JsonIgnore
     private boolean isRequired;
 
@@ -75,15 +66,7 @@ public class CourseRecord {
     public Collection<ModuleRecord> getModuleRecords() {
         return moduleRecords;
     }
-
-    public boolean isRequired() {
-        return isRequired;
-    }
-
-    public void setRequired(boolean isRequired) {
-        this.isRequired = isRequired;
-    }
-
+    
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
         moduleRecord.setCourseRecord(this);
@@ -106,9 +89,4 @@ public class CourseRecord {
         }).min(LocalDateTime::compareTo).orElse(LocalDateTime.MIN);
     }
 
-    public void update(CourseRecord input) {
-        this.state = input.getState();
-        this.preference = input.getPreference();
-        this.lastUpdated = input.getLastUpdated();
-    }
 }

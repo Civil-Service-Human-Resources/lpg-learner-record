@@ -30,7 +30,7 @@ public class V2CourseRecordController {
     @GetMapping
     public Page<LearnerRecordDto> getRecords(@PageableDefault(sort = {"createdTimestamp"}, direction = Sort.Direction.ASC) Pageable pageableParams,
                                              @Validated(CourseRecordController.class) LearnerRecordQuery learnerRecordQuery) {
-        learnerRecordQuery.setLearnerRecordTypes(List.of(LearnerRecordTypeEnum.COURSE.getId()));
+        learnerRecordQuery.setLearnerRecordTypes(List.of(LearnerRecordTypeEnum.COURSE.name()));
         return learnerRecordService.getRecords(pageableParams, learnerRecordQuery);
     }
 
@@ -38,7 +38,7 @@ public class V2CourseRecordController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public LearnerRecordDto createRecord(@RequestBody @Validated(CourseRecordController.class) CreateLearnerRecordDto dto) {
-        dto.setRecordType(LearnerRecordTypeEnum.COURSE.getId());
+        dto.setRecordType(LearnerRecordTypeEnum.COURSE.name());
         return learnerRecordService.createRecord(dto);
     }
 

@@ -12,8 +12,9 @@ import uk.gov.cslearning.record.service.LookupValueService;
 import uk.gov.cslearning.record.util.UtilService;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class LearnerRecordFactory {
@@ -32,8 +33,15 @@ public class LearnerRecordFactory {
 
     public LearnerRecordDto createLearnerRecordDto(LearnerRecord learnerRecord) {
         LearnerRecordTypeDto typeDto = lookupValueFactory.createLearnerRecordTypeDto(learnerRecord.getLearnerRecordType());
+        List<LearnerRecordEvent> events = new ArrayList<>(learnerRecord.getEvents());
+        int eventCount = events.size();
+        LearnerRecordEventDto latestEvent = null;
+        if (eventCount > 0) {
+            events.sort(Comparator.comparing(LearnerRecordEvent::getEventTimestamp).reversed());
+            latestEvent = learnerRecordEventFactory.createDto(events.get(0));
+        }
         return new LearnerRecordDto(learnerRecord.getId(), learnerRecord.getLearnerRecordUid(), typeDto, learnerRecord.getParentId(),
-                learnerRecord.getResourceId(), learnerRecord.getCreatedTimestamp(), learnerRecord.getLearnerId());
+                learnerRecord.getResourceId(), learnerRecord.getCreatedTimestamp(), learnerRecord.getLearnerId(), eventCount, latestEvent);
     }
 
     public LearnerRecordDto createLearnerRecordDto(LearnerRecord learnerRecord, boolean includeChildren, boolean includeEvents) {
@@ -60,7 +68,7 @@ public class LearnerRecordFactory {
     public LearnerRecord createLearnerRecord(CreateLearnerRecordDto dto) {
         Instant createdTimestamp = dto.getCreatedTimestamp() == null ? utilService.getNowInstant() : utilService.localDateTimeToInstant(dto.getCreatedTimestamp());
         LearnerRecordType learnerRecordType = lookupValueService.getLearnerRecordType(dto.getRecordType());
-        LearnerRecord record = new LearnerRecord(learnerRecordType, UUID.randomUUID().toString(), dto.getLearnerId(),
+        LearnerRecord record = new LearnerRecord(learnerRecordType, utilService.generateUUID(), dto.getLearnerId(),
                 dto.getResourceId(), createdTimestamp);
         List<LearnerRecordEvent> events = dto.getEvents().stream()
                 .map(e -> learnerRecordEventFactory.createEvent(record, e)).toList();

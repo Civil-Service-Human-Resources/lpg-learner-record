@@ -18,10 +18,12 @@ public class LearnerRecordDto {
     private String learnerId;
     private List<LearnerRecordDto> children;
     private List<LearnerRecordEventDto> events;
+    private Integer eventCount;
+    private LearnerRecordEventDto latestEvent;
 
     public LearnerRecordDto(Long id, String uid, LearnerRecordTypeDto recordType, Long parentId, String resourceId,
-                            Instant createdTimestamp, String learnerId) {
-        this(id, uid, recordType, parentId, resourceId, createdTimestamp, learnerId, null, null);
+                            Instant createdTimestamp, String learnerId, Integer eventCount, LearnerRecordEventDto latestEvent) {
+        this(id, uid, recordType, parentId, resourceId, createdTimestamp, learnerId, null, null, eventCount, latestEvent);
     }
 
 }

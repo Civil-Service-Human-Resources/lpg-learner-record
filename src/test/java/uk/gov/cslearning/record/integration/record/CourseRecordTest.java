@@ -1,6 +1,7 @@
 package uk.gov.cslearning.record.integration.record;
 
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import uk.gov.cslearning.record.IntegrationTestBase;
 
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Transactional
 public class CourseRecordTest extends IntegrationTestBase {
 
     @Test
@@ -52,7 +54,7 @@ public class CourseRecordTest extends IntegrationTestBase {
     @Test
     public void testGetBulkCourseRecords() throws Exception {
         mockMvc.perform(get("/v2/course_records")
-                        .param("learnerId", "user2")
+                        .param("learnerIds", "user2")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content.length()").value(2))

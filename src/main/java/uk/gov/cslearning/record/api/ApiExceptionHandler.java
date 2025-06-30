@@ -14,7 +14,6 @@ import uk.gov.cslearning.record.dto.error.ErrorDto;
 import uk.gov.cslearning.record.dto.error.FieldErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
-import uk.gov.cslearning.record.exception.CourseRecordNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
@@ -44,7 +43,6 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({BookingNotFoundException.class,
             EventNotFoundException.class,
-            CourseRecordNotFoundException.class,
             ModuleRecordNotFoundException.class})
     protected ResponseEntity handleNotFoundException(RuntimeException e) {
         log.error("Not Found: ", e);

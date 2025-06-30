@@ -24,4 +24,7 @@ public class LearnerRecordEventSource {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "uid", nullable = false)
+    private String uid;
+
 }

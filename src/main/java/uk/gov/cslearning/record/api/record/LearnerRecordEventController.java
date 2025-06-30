@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cslearning.record.api.output.BulkCreateOutput;
@@ -17,27 +18,27 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/learner_record_events")
-public class LeanerRecordEventController {
+public class LearnerRecordEventController {
 
     private final LearnerRecordEventService learnerRecordEventService;
 
-    public LeanerRecordEventController(LearnerRecordEventService learnerRecordEventService) {
+    public LearnerRecordEventController(LearnerRecordEventService learnerRecordEventService) {
         this.learnerRecordEventService = learnerRecordEventService;
     }
 
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public Page<LearnerRecordEventDto> getEvents(@PageableDefault(sort = {"eventTimestamp"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+    public Page<LearnerRecordEventDto> getEvents(@PageableDefault(sort = {"eventTimestamp", "id"}, direction = Sort.Direction.ASC) Pageable pageableParams,
                                                  LearnerRecordEventQuery query) {
         return learnerRecordEventService.getRecords(pageableParams, query);
     }
 
-    @ResponseBody
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public BulkCreateOutput<LearnerRecordEventDto, CreateLearnerRecordEventDto> createEvents(@RequestBody @Validated(CreateEvent.class) List<CreateLearnerRecordEventDto> dto) {
-        return learnerRecordEventService.createRecord(dto);
+    public ResponseEntity<BulkCreateOutput<LearnerRecordEventDto, CreateLearnerRecordEventDto>> createEvents(@RequestBody @Validated(CreateEvent.class) List<CreateLearnerRecordEventDto> dto) {
+        BulkCreateOutput<LearnerRecordEventDto, CreateLearnerRecordEventDto> response = learnerRecordEventService.createRecord(dto);
+        return ResponseEntity.status(response.getSuccessfulResources().size() == 0 ? HttpStatus.BAD_REQUEST : HttpStatus.CREATED)
+                .body(response);
     }
 
 }
