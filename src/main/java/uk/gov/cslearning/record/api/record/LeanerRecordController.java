@@ -30,7 +30,7 @@ public class LeanerRecordController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public Page<LearnerRecordDto> getRecords(@PageableDefault(sort = {"createdTimestamp"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+    public Page<LearnerRecordDto> getRecords(@PageableDefault(sort = {"createdTimestamp", "id"}, direction = Sort.Direction.ASC) Pageable pageableParams,
                                              LearnerRecordQuery learnerRecordQuery) {
         return learnerRecordService.getRecords(pageableParams, learnerRecordQuery);
     }
