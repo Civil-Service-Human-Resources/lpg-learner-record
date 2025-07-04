@@ -16,6 +16,7 @@ import uk.gov.cslearning.record.repository.LearnerRecordRepository;
 import uk.gov.cslearning.record.service.factory.LearnerRecordEventFactory;
 import uk.gov.cslearning.record.util.IUtilService;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +43,9 @@ public class LearnerRecordEventService {
 
     public Page<LearnerRecordEventDto> getRecords(Pageable pageableParams, LearnerRecordEventQuery query) {
         List<Integer> eventTypeIds = query.getEventTypes() == null ? null : query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
-        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, eventTypeIds,
-                query.getUserId(), utilService.localDateTimeToInstant(query.getBefore()), utilService.localDateTimeToInstant(query.getAfter()), pageableParams);
+        Instant before = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getBefore());
+        Instant after = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getAfter());
+        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, eventTypeIds, query.getUserId(), before, after, pageableParams);
         return learnerRecordEventFactory.createDtos(pageableParams, events);
     }
 
