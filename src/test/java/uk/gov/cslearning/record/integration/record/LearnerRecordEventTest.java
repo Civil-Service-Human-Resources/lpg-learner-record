@@ -28,7 +28,7 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
     @Test
     public void testGetEventsForType() throws Exception {
         mockMvc.perform(get("/learner_record_events")
-                        .param("eventTypes", "4")
+                        .param("eventTypes", "COMPLETE_COURSE")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content.length()").value(3));

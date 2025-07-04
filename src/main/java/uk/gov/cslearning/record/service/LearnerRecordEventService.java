@@ -23,15 +23,17 @@ import java.util.List;
 public class LearnerRecordEventService {
 
     private final IUtilService utilService;
+    private final LookupValueService lookupValueService;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
     private final LearnerRecordEventRepository learnerRecordEventRepository;
     private final LearnerRecordRepository learnerRecordRepository;
     private final CourseCompletionService courseCompletionService;
 
-    public LearnerRecordEventService(IUtilService utilService, LearnerRecordEventFactory learnerRecordEventFactory,
+    public LearnerRecordEventService(IUtilService utilService, LookupValueService lookupValueService, LearnerRecordEventFactory learnerRecordEventFactory,
                                      LearnerRecordEventRepository learnerRecordEventRepository, LearnerRecordRepository learnerRecordRepository,
                                      CourseCompletionService courseCompletionService) {
         this.utilService = utilService;
+        this.lookupValueService = lookupValueService;
         this.learnerRecordEventFactory = learnerRecordEventFactory;
         this.learnerRecordEventRepository = learnerRecordEventRepository;
         this.learnerRecordRepository = learnerRecordRepository;
@@ -39,7 +41,8 @@ public class LearnerRecordEventService {
     }
 
     public Page<LearnerRecordEventDto> getRecords(Pageable pageableParams, LearnerRecordEventQuery query) {
-        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, query.getEventTypes(),
+        List<Integer> eventTypeIds = query.getEventTypes() == null ? null : query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
+        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, eventTypeIds,
                 query.getUserId(), utilService.localDateTimeToInstant(query.getBefore()), utilService.localDateTimeToInstant(query.getAfter()), pageableParams);
         return learnerRecordEventFactory.createDtos(pageableParams, events);
     }

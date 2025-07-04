@@ -31,17 +31,19 @@ import java.util.Optional;
 public class LearnerRecordService {
 
     private final IUtilService utilService;
+    private final LookupValueService lookupValueService;
     private final LearnerRecordRepository learnerRecordRepository;
     private final LearnerRecordEventRepository learnerRecordEventepository;
     private final LearnerRecordFactory learnerRecordFactory;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
     private final CourseCompletionService courseCompletionService;
 
-    public LearnerRecordService(IUtilService utilService, LearnerRecordRepository learnerRecordRepository,
+    public LearnerRecordService(IUtilService utilService, LookupValueService lookupValueService, LearnerRecordRepository learnerRecordRepository,
                                 LearnerRecordEventRepository learnerRecordEventepository,
                                 LearnerRecordFactory learnerRecordFactory,
                                 LearnerRecordEventFactory learnerRecordEventFactory, CourseCompletionService courseCompletionService) {
         this.utilService = utilService;
+        this.lookupValueService = lookupValueService;
         this.learnerRecordRepository = learnerRecordRepository;
         this.learnerRecordEventepository = learnerRecordEventepository;
         this.learnerRecordFactory = learnerRecordFactory;
@@ -97,7 +99,8 @@ public class LearnerRecordService {
     }
 
     public Page<LearnerRecordEventDto> getEvents(Pageable pageable, Long recordId, LearnerRecordEventQuery query) {
-        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, query.getEventTypes(), null,
+        List<Integer> eventTypeIds = query.getEventTypes() == null ? null : query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
+        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, eventTypeIds, null,
                 utilService.localDateTimeToInstant(query.getBefore()), utilService.localDateTimeToInstant(query.getAfter()), pageable);
         return learnerRecordEventFactory.createDtos(pageable, events);
     }

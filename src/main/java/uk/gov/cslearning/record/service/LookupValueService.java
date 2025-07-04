@@ -46,4 +46,8 @@ public class LookupValueService {
     public LearnerRecordEventType getLearnerRecordEventType(String learnerRecordType, String learnerRecordEventType) {
         return learnerRecordTypeMap.getEventType(learnerRecordType, learnerRecordEventType);
     }
+
+    public LearnerRecordEventType getLearnerRecordEventType(String learnerRecordEventType) {
+        return learnerRecordTypeMap.getEventType(learnerRecordEventType);
+    }
 }
