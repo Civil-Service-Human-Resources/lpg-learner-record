@@ -22,6 +22,7 @@ import uk.gov.cslearning.record.service.factory.LearnerRecordEventFactory;
 import uk.gov.cslearning.record.service.factory.LearnerRecordFactory;
 import uk.gov.cslearning.record.util.IUtilService;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +32,19 @@ import java.util.Optional;
 public class LearnerRecordService {
 
     private final IUtilService utilService;
+    private final LookupValueService lookupValueService;
     private final LearnerRecordRepository learnerRecordRepository;
     private final LearnerRecordEventRepository learnerRecordEventepository;
     private final LearnerRecordFactory learnerRecordFactory;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
     private final CourseCompletionService courseCompletionService;
 
-    public LearnerRecordService(IUtilService utilService, LearnerRecordRepository learnerRecordRepository,
+    public LearnerRecordService(IUtilService utilService, LookupValueService lookupValueService, LearnerRecordRepository learnerRecordRepository,
                                 LearnerRecordEventRepository learnerRecordEventepository,
                                 LearnerRecordFactory learnerRecordFactory,
                                 LearnerRecordEventFactory learnerRecordEventFactory, CourseCompletionService courseCompletionService) {
         this.utilService = utilService;
+        this.lookupValueService = lookupValueService;
         this.learnerRecordRepository = learnerRecordRepository;
         this.learnerRecordEventepository = learnerRecordEventepository;
         this.learnerRecordFactory = learnerRecordFactory;
@@ -97,8 +100,11 @@ public class LearnerRecordService {
     }
 
     public Page<LearnerRecordEventDto> getEvents(Pageable pageable, Long recordId, LearnerRecordEventQuery query) {
-        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, query.getEventTypes(), null,
-                utilService.localDateTimeToInstant(query.getBefore()), utilService.localDateTimeToInstant(query.getAfter()), pageable);
+        List<Integer> eventTypeIds = query.getEventTypes() == null ? null : query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
+        Instant before = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getBefore());
+        Instant after = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getAfter());
+        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, eventTypeIds, null,
+                before, after, pageable);
         return learnerRecordEventFactory.createDtos(pageable, events);
     }
 

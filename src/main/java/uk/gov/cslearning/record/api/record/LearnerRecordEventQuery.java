@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LearnerRecordEventQuery {
 
-    List<Integer> eventTypes;
+    List<String> eventTypes;
     Integer eventSource;
     String userId;
     LocalDateTime before;
