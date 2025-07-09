@@ -104,7 +104,7 @@ public class LearnerRecordService {
         Instant before = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getBefore());
         Instant after = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getAfter());
         Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, eventTypeIds, null,
-                before, after, pageable);
+                query.getResourceIds(), before, after, pageable);
         return learnerRecordEventFactory.createDtos(pageable, events);
     }
 
