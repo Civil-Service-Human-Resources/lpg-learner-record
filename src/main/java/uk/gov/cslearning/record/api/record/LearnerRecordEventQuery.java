@@ -15,6 +15,7 @@ public class LearnerRecordEventQuery {
     List<String> eventTypes;
     Integer eventSource;
     String userId;
+    List<String> resourceIds;
     LocalDateTime before;
     LocalDateTime after;
 
