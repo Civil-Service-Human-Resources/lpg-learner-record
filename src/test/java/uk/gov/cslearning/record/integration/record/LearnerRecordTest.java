@@ -158,6 +158,22 @@ public class LearnerRecordTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetLearnerRecordsWithNotEventTypes() throws Exception {
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("notEventTypes", "COMPLETE_COURSE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[0].uid").isNotEmpty())
+                .andExpect(jsonPath("content[1].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[1].uid").isNotEmpty())
+                .andExpect(jsonPath("content[2].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[2].uid").isNotEmpty())
+                .andExpect(jsonPath("content[3].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[3].uid").isNotEmpty());
+    }
+
+    @Test
     public void testGetLearnerRecordsPagination() throws Exception {
         mockMvc.perform(get("/learner_records")
                         .with(csrf())

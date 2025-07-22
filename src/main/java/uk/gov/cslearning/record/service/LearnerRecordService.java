@@ -52,9 +52,16 @@ public class LearnerRecordService {
         this.courseCompletionService = courseCompletionService;
     }
 
-    public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery learnerRecordQuery) {
-        Page<LearnerRecord> results = learnerRecordRepository.find(learnerRecordQuery.getLearnerIds(), learnerRecordQuery.getResourceIds(),
-                learnerRecordQuery.getLearnerRecordTypes(), pageableParams);
+    public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery query) {
+        Page<LearnerRecord> results;
+        if (query.getNotEventTypes() != null && !query.getNotEventTypes().isEmpty()) {
+            List<Integer> notEventTypeIds = query.getNotEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
+            results = learnerRecordRepository.findExcludeByEventTypes(query.getLearnerIds(), query.getResourceIds(),
+                    query.getLearnerRecordTypes(), notEventTypeIds, pageableParams);
+        } else {
+            results = learnerRecordRepository.find(query.getLearnerIds(), query.getResourceIds(),
+                    query.getLearnerRecordTypes(), pageableParams);
+        }
         List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
         return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
     }

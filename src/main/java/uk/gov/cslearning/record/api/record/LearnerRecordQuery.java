@@ -19,6 +19,8 @@ public class LearnerRecordQuery {
     List<String> learnerIds;
     String uid;
 
+    List<String> notEventTypes;
+
     boolean getChildRecords;
 
 }
