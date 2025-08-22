@@ -51,8 +51,7 @@ public class ModuleRecordService {
         input.setUpdatedAt(createdTimestamp);
         input.setCourseRecord(courseRecord);
         courseRecord.addModuleRecord(input);
-        courseRecordRepository.save(courseRecord);
-        return input;
+        return moduleRecordRepository.save(input);
     }
 
     public ModuleRecord updateModuleRecord(Long moduleRecordId, ModuleRecord newRecord) {

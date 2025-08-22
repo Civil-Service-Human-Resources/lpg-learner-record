@@ -85,7 +85,8 @@ public class ModuleRecordControllerTest extends IntegrationTestBase {
                         .with(csrf())
                         .contentType("application/json")
                         .content(jsonInput))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.moduleRecords[0].id").exists());
 
         List<ModuleRecord> moduleRecordList = moduleRecordRepository.findByUserIdAndModuleIdIn(List.of("testUserId"), null);
         assertEquals(2, moduleRecordList.size());
@@ -153,7 +154,7 @@ public class ModuleRecordControllerTest extends IntegrationTestBase {
 
     @Test
     @Transactional
-    public void testGetCourseRecords() throws Exception {
+    public void testGetModuleRecords() throws Exception {
         mockMvc.perform(get("/module_records")
                         .param("moduleIds", "testModule1,testModule2")
                         .param("userIds", "user1"))
@@ -168,7 +169,7 @@ public class ModuleRecordControllerTest extends IntegrationTestBase {
 
     @Test
     @Transactional
-    public void testGetAllCourseRecords() throws Exception {
+    public void testGetAllModuleRecords() throws Exception {
         mockMvc.perform(get("/module_records")
                         .param("userIds", "user1"))
                 .andExpect(status().isOk())
@@ -182,7 +183,7 @@ public class ModuleRecordControllerTest extends IntegrationTestBase {
 
     @Test
     @Transactional
-    public void testGetCourseRecord() throws Exception {
+    public void testGetModuleRecord() throws Exception {
         mockMvc.perform(get("/module_records")
                         .param("moduleIds", "testModule1")
                         .param("userIds", "user1"))
