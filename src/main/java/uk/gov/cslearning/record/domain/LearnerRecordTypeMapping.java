@@ -28,6 +28,12 @@ public class LearnerRecordTypeMapping {
         return type;
     }
 
+    public LearnerRecordEventType getEventType(String learnerRecordEventType) {
+        return eventTypeMap.values().stream().flatMap(e -> e.values().stream())
+                .filter(e -> e.getEventType().equals(learnerRecordEventType))
+                .findFirst().orElseThrow(() -> new RuntimeException(String.format("Learner record event type %s is invalid", learnerRecordEventType)));
+    }
+
     public LearnerRecordEventType getEventType(String learnerRecordType, String learnerRecordEventType) {
         Map<String, LearnerRecordEventType> map = eventTypeMap.get(learnerRecordType);
         if (map != null) {
