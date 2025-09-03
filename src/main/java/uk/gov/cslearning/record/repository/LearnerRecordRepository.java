@@ -23,11 +23,26 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
     Page<LearnerRecord> find(List<String> userIds, List<String> resourceIds, List<String> types, Pageable pageable);
 
     @Query("""
+                select distinct lr
+                from LearnerRecord lr
+                where not exists (
+                    select 1 from LearnerRecordEvent lre
+                    where lre.eventType.id in (:notEventTypes)
+                    and lre.learnerRecord = lr
+                )
+                and (:userIds is null or lr.learnerId in (:userIds))
+                and (:resourceIds is null or lr.resourceId in (:resourceIds))
+                and (:types is null or lr.learnerRecordType.recordType in (:types))
+            """)
+    Page<LearnerRecord> findExcludeByEventTypes(List<String> userIds, List<String> resourceIds, List<String> types, List<Integer> notEventTypes, Pageable pageable);
+
+
+    @Query("""
                 select lr
                 from LearnerRecord lr
-                where lr.learnerId = ?1
-                and lr.resourceId = ?2
-                and lr.learnerRecordType.recordType = ?3
+                where lr.learnerId = :userId
+                and lr.resourceId = :resourceId
+                and lr.learnerRecordType.recordType = :type
             """)
     Optional<LearnerRecord> find(String userId, String resourceId, String type);
 

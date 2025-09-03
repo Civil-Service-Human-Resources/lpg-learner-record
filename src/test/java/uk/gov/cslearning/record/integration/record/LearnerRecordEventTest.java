@@ -44,6 +44,15 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetEventsForNotEventTypes() throws Exception {
+        mockMvc.perform(get("/learner_record_events")
+                        .param("notEventTypes", "COMPLETE_COURSE", "REMOVE_FROM_SUGGESTIONS")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(4));
+    }
+
+    @Test
     public void testGetEventsForDates() throws Exception {
         mockMvc.perform(get("/learner_record_events")
                         .param("after", "2025-01-01T00:00")
