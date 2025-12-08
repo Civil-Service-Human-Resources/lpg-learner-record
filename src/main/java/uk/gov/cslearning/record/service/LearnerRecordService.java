@@ -52,9 +52,16 @@ public class LearnerRecordService {
         this.courseCompletionService = courseCompletionService;
     }
 
-    public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery learnerRecordQuery) {
-        Page<LearnerRecord> results = learnerRecordRepository.find(learnerRecordQuery.getLearnerIds(), learnerRecordQuery.getResourceIds(),
-                learnerRecordQuery.getLearnerRecordTypes(), pageableParams);
+    public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery query) {
+        Page<LearnerRecord> results;
+        if (query.getNotEventTypes() != null && !query.getNotEventTypes().isEmpty()) {
+            List<Integer> notEventTypeIds = query.getNotEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
+            results = learnerRecordRepository.findExcludeByEventTypes(query.getLearnerIds(), query.getResourceIds(),
+                    query.getLearnerRecordTypes(), notEventTypeIds, pageableParams);
+        } else {
+            results = learnerRecordRepository.find(query.getLearnerIds(), query.getResourceIds(),
+                    query.getLearnerRecordTypes(), pageableParams);
+        }
         List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
         return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
     }
@@ -101,9 +108,10 @@ public class LearnerRecordService {
 
     public Page<LearnerRecordEventDto> getEvents(Pageable pageable, Long recordId, LearnerRecordEventQuery query) {
         List<Integer> eventTypeIds = query.getEventTypes() == null ? null : query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
+        List<Integer> notEventTypeIds = query.getNotEventTypes() == null ? null : query.getNotEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
         Instant before = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getBefore());
         Instant after = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getAfter());
-        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, eventTypeIds, null,
+        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, eventTypeIds, notEventTypeIds, null,
                 query.getResourceIds(), before, after, pageable);
         return learnerRecordEventFactory.createDtos(pageable, events);
     }
