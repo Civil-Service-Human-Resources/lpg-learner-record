@@ -51,6 +51,14 @@ public class Booking {
     @Column
     private String bookingReference;
 
+    @Column
+    private String learnerUid;
+
+    public void setLearner(Learner learner) {
+        this.learner = learner;
+        this.learnerUid = learner.getUid();
+    }
+
     public String getAccessibilityOptionsString() {
         return Objects.requireNonNullElse(accessibilityOptions, "");
     }

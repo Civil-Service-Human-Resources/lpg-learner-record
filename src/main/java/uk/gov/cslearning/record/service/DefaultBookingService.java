@@ -90,16 +90,9 @@ public class DefaultBookingService implements BookingService {
     @Override
     public BookingDto create(String eventUid, BookingDto bookingDto) {
         Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
-        List<IMessageParams> notifications = new ArrayList<>();
         Booking booking = bookingFactory.create(bookingDto);
         event.addBooking(booking);
         bookingRepository.save(booking);
-        if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {
-            notifications.addAll(messageService.createBookedMessages(booking));
-        } else {
-            notifications.addAll(messageService.createRegisteredMessages(booking));
-        }
-        notificationService.send(notifications);
         return bookingDtoFactory.create(booking);
     }
 

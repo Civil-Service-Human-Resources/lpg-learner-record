@@ -17,8 +17,8 @@ import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.notifications.dto.IMessageParams;
 import uk.gov.cslearning.record.notifications.dto.NotificationTemplate;
-import uk.gov.cslearning.record.service.catalogue.Module;
 import uk.gov.cslearning.record.service.catalogue.*;
+import uk.gov.cslearning.record.service.catalogue.Module;
 import uk.gov.cslearning.record.util.IUtilService;
 
 import java.math.BigDecimal;
@@ -108,7 +108,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void shouldCreateUnregisterMessage() throws URISyntaxException {
+    public void shouldCreateUnregisterMessage() {
         Learner learner = new Learner("learnerId", "test@domain.com");
         Booking booking = new Booking();
         uk.gov.cslearning.record.domain.Event event = new uk.gov.cslearning.record.domain.Event();
@@ -147,47 +147,7 @@ public class MessageServiceTest {
     }
 
     @Test
-    public void shouldCreateBookingCreatedMessages() throws URISyntaxException {
-        Learner learner = new Learner("learnerId", "test@domain.com");
-        Booking booking = new Booking();
-        uk.gov.cslearning.record.domain.Event event = new uk.gov.cslearning.record.domain.Event();
-        event.setPath("host/course/courseId/module/moduleId/event/eventId");
-        booking.setEvent(event);
-        booking.setLearner(learner);
-        booking.setBookingReference("reference");
-        booking.setAccessibilityOptions("Accessibility option");
-
-        CivilServant cs = new CivilServant();
-        cs.setLineManagerEmailAddress("lmEmail@domain.com");
-        cs.setFullName("Learner");
-        when(registryService.getCivilServantResourceByUid("learnerId")).thenReturn(Optional.of(cs));
-
-        List<IMessageParams> messageDtos = messageService.createRegisteredMessages(booking);
-
-        IMessageParams learnerMessage = messageDtos.get(0);
-        validateIMessageParams(learnerMessage, "test@domain.com", Map.of(
-                "learnerName", "test@domain.com",
-                "courseTitle", "title",
-                "courseDate", "26 Feb 2025",
-                "courseLocation", "London",
-                "accessibility", "Accessibility option",
-                "bookingReference", "reference"
-        ), NotificationTemplate.BOOKING_REQUESTED);
-        IMessageParams lmMessage = messageDtos.get(1);
-        validateIMessageParams(lmMessage, "lmEmail@domain.com", Map.of(
-                "recipient", "lmEmail@domain.com",
-                "learnerName", "Learner",
-                "learnerEmail", "test@domain.com",
-                "courseTitle", "title",
-                "courseDate", "26 Feb 2025",
-                "courseLocation", "London",
-                "cost", "10",
-                "bookingReference", "reference"
-        ), NotificationTemplate.BOOKING_REQUEST_LINE_MANAGER);
-    }
-
-    @Test
-    public void shouldCreateBookingConfirmedMessages() throws URISyntaxException {
+    public void shouldCreateBookingConfirmedMessages() {
         Learner learner = new Learner("learnerId", "test@domain.com");
         Booking booking = new Booking();
         uk.gov.cslearning.record.domain.Event event = new uk.gov.cslearning.record.domain.Event();

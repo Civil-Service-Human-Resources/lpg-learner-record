@@ -20,13 +20,13 @@ public class BookingFactory {
         this.utilService = utilService;
         this.learnerRepository = learnerRepository;
     }
-    
+
     public Booking create(BookingDto bookingDto) {
         Learner learner = learnerRepository.findByUid(bookingDto.getLearner())
                 .orElse(new Learner(bookingDto.getLearner(), bookingDto.getLearnerEmail()));
         Instant creationTime = utilService.getNowInstant();
         Booking booking = new Booking();
-
+        
         booking.setStatus(bookingDto.getStatus());
         booking.setBookingTime(creationTime);
         if (bookingDto.getStatus().equals(BookingStatus.CONFIRMED)) {

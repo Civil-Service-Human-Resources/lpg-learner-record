@@ -59,17 +59,7 @@ public class MessageService {
                 learnerMessageDetails, booking.getBookingReference());
         return List.of(learnerParams, lmParams);
     }
-
-    public List<IMessageParams> createRegisteredMessages(Booking booking) {
-        CivilServant civilServant = getCivilServant(booking.getLearner().getUid());
-        LearnerMessageDetails learnerMessageDetails = new LearnerMessageDetails(civilServant.getFullName(), booking.getLearner().getLearnerEmail());
-        CourseMessageDetails courseMessageDetails = getCourseMessageDetails(booking.getEvent().getEventIds());
-        IMessageParams learnerParams = RequestBookingMessageParams.createFromBooking(booking, courseMessageDetails);
-        IMessageParams lmParams = new RequestBookingLMMessageParams(civilServant.getLineManagerEmailAddress(), learnerMessageDetails, courseMessageDetails,
-                booking.getBookingReference());
-        return List.of(learnerParams, lmParams);
-    }
-
+    
     public List<IMessageParams> createBookedMessages(Booking booking) {
         CivilServant civilServant = getCivilServant(booking.getLearner().getUid());
         LearnerMessageDetails learnerMessageDetails = new LearnerMessageDetails(civilServant.getFullName(), booking.getLearner().getLearnerEmail());
