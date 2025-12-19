@@ -7,9 +7,11 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
+import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
+import uk.gov.cslearning.record.exception.IncorrectStateException;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.util.UtilService;
@@ -83,6 +85,9 @@ public class DefaultBookingService implements BookingService {
     @Override
     public BookingDto create(String eventUid, BookingDto bookingDto) {
         Event event = eventRepository.findByUid(eventUid).orElseThrow(() -> new EventNotFoundException(eventUid));
+        if (!event.getStatus().equals(EventStatus.ACTIVE)) {
+            throw new IncorrectStateException(String.format("Event %s is not active", eventUid));
+        }
         Booking booking = bookingFactory.create(bookingDto);
         event.addBooking(booking);
         bookingRepository.save(booking);

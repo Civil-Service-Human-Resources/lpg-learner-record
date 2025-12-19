@@ -356,37 +356,6 @@ public class BookingControllerTest {
     }
 
     @Test
-    public void shouldReturnBadRequestIfEventIsCancelled() throws Exception {
-        String learner = "_learner";
-        BookingStatus status = BookingStatus.CONFIRMED;
-        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        String event = "event-id";
-        URI paymentDetails = new URI("payment-details");
-
-        BookingDto booking = new BookingDto();
-        booking.setLearner(learner);
-        booking.setStatus(status);
-        booking.setEventUid(event);
-        booking.setBookingTime(bookingTime);
-        booking.setPaymentDetails(paymentDetails);
-
-        EventDto eventDto = new EventDto();
-        eventDto.setStatus(EventStatus.CANCELLED);
-
-        when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
-
-        mockMvc.perform(
-                        post("/event/event-id/booking/").with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(booking))
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].error", equalTo("Cannot apply booking to a cancelled event.")))
-                .andExpect(jsonPath("$.status", equalTo(400)))
-                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
-    }
-
-    @Test
     public void shouldUpdateBookingWithEventUidAndLearnerUid() throws Exception {
         String learnerUid = "learner-uid";
         String eventUid = "eventUid-uid";

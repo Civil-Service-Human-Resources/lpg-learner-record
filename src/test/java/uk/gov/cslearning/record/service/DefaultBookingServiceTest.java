@@ -13,8 +13,10 @@ import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
+import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.exception.IncorrectStateException;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
@@ -27,8 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -99,6 +100,17 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
+    public void shouldThrowExceptionIfBookingIsCreatedForInactiveEvent() {
+        String eventUid = "eventUid-uid";
+        Event event = new Event();
+        event.setStatus(EventStatus.CANCELLED);
+
+        when(eventRepository.findByUid(eventUid)).thenReturn(Optional.of(event));
+
+        assertThrows(IncorrectStateException.class, () -> bookingService.create(eventUid, new BookingDto()));
+    }
+
+    @Test
     public void shouldListBookingsByEventUid() {
         String eventId = "test-eventUid-id";
 
@@ -142,7 +154,7 @@ public class DefaultBookingServiceTest {
             assertEquals("Booking does not exist with id: 99", e.getMessage());
         }
     }
-    
+
     @Test
     public void shouldListAllBookingsForPeriod() {
         LocalDate from = LocalDate.parse("2018-01-01");
