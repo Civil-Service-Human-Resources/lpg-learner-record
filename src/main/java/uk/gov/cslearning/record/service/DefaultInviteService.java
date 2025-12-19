@@ -39,11 +39,6 @@ public class DefaultInviteService implements InviteService {
     }
 
     @Override
-    public Optional<InviteDto> findByEventIdAndLearnerEmail(String eventUid, String learnerUid) {
-        return inviteRepository.findByEventUidAndLearnerUid(eventUid, learnerUid).map(inviteDtoFactory::create);
-    }
-
-    @Override
     public InviteDto save(String eventUid, InviteDto inviteDto) {
         Event event = eventService.getEventAndCreateIfMissing(eventUid);
         if (event.isLearnerBookedOrInvited(inviteDto.getLearnerUid())) {
