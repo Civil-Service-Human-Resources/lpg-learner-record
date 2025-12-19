@@ -7,31 +7,24 @@ import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 
-import java.net.URI;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EventDtoFactoryTest {
-    private static final String catalogueUrl = "http://example.org";
-
-    private EventDtoFactory eventDtoFactory = new EventDtoFactory(catalogueUrl);
+    private EventDtoFactory eventDtoFactory = new EventDtoFactory();
 
     @Test
     public void shouldReturnEventDto() {
         EventStatus status = EventStatus.ACTIVE;
-        String path = "/path/to/event";
-        String uid = "event-uid";
+        String uid = "eventUid-uid";
 
         Event event = new Event();
         event.setStatus(status);
-        event.setPath(path);
         event.setUid(uid);
         event.setCancellationReason(CancellationReason.UNAVAILABLE);
 
         EventDto eventDto = eventDtoFactory.create(event);
 
         assertEquals(status, eventDto.getStatus());
-        assertEquals(URI.create("http://example.org/path/to/event"), eventDto.getUri());
         assertEquals(uid, eventDto.getUid());
         assertEquals(CancellationReason.UNAVAILABLE, eventDto.getCancellationReason());
     }

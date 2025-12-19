@@ -15,10 +15,14 @@ public class Invite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "eventId")
     private Event event;
 
     @Column(nullable = false, length = 50)
     private String learnerEmail;
+
+    @Column(nullable = false, length = 60)
+    private String learnerUid;
 }
+

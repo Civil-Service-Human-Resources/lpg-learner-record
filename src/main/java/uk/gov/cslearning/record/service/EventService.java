@@ -10,7 +10,7 @@ import java.util.List;
 public interface EventService {
 
     @Transactional(readOnly = true)
-    Event getEvent(String eventUid, String path);
+    Event getEventAndCreateIfMissing(String eventUid);
 
     @Transactional
     EventDto updateStatus(String eventUid, EventStatusDto eventStatus);

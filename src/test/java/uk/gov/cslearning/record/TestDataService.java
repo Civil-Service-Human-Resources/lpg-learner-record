@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.*;
-import uk.gov.cslearning.record.domain.record.LearnerRecord;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.service.catalogue.Audience;
@@ -29,11 +28,6 @@ public class TestDataService {
     @Autowired
     private IUtilService utilService;
 
-    public Learner generateLearner() {
-        String learnerId = generateLearnerId();
-        return new Learner(learnerId, String.format("%s@email.com", learnerId));
-    }
-
     public String generateLearnerId() {
         return String.format("learner-%s", generateRandomID());
     }
@@ -42,10 +36,10 @@ public class TestDataService {
         return RandomStringUtils.random(5, true, true);
     }
 
-    public Booking generateBooking(BookingStatus status, Learner learner) {
+    public Booking generateBooking(BookingStatus status, String learnerUid) {
         Instant now = utilService.getNowInstant();
         Booking booking = new Booking();
-        booking.setLearner(learner);
+        booking.setLearnerUid(learnerUid);
         booking.setStatus(status);
         booking.setBookingTime(now);
         booking.setBookingReference("ABCDE");
@@ -61,7 +55,6 @@ public class TestDataService {
     public Event generateLearnerRecordEvent() {
         Event event = new Event();
         event.setStatus(EventStatus.ACTIVE);
-        event.setPath("/courses/courseId/modules/moduleId/events/" + eventId);
         event.setUid(eventId);
         return event;
     }
@@ -116,9 +109,4 @@ public class TestDataService {
         return audience;
     }
 
-    // New records
-
-    public LearnerRecord createCourseRecord() {
-        return new LearnerRecord();
-    }
 }

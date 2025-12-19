@@ -8,11 +8,8 @@ import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.service.EventService;
 import uk.gov.cslearning.record.validation.annotations.EventIsActive;
 
-import java.net.URI;
-import java.nio.file.Paths;
-
 @Component
-public class EventIsActiveValidator implements ConstraintValidator<EventIsActive, URI> {
+public class EventIsActiveValidator implements ConstraintValidator<EventIsActive, String> {
 
     private final EventService eventService;
 
@@ -23,12 +20,11 @@ public class EventIsActiveValidator implements ConstraintValidator<EventIsActive
     public void initialize(EventIsActive constraint) {
     }
 
-    public boolean isValid(URI eventUri, ConstraintValidatorContext context) {
-        if (null == eventUri) {
+    public boolean isValid(String eventUid, ConstraintValidatorContext context) {
+        if (null == eventUid) {
             return true;
         }
 
-        String eventUid = Paths.get(eventUri.getPath()).getFileName().toString();
         EventDto event = eventService.findByUid(eventUid, false);
         if (event != null) {
             return event.getStatus().equals(EventStatus.ACTIVE);

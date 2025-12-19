@@ -52,7 +52,7 @@ public class DefaultEventServiceTest {
     private DefaultEventService eventService;
 
     @Test
-    public void shouldGetEvent() {
+    public void shouldGetEventAndCreateIfMissing() {
         String eventUid = "test-id";
         String path = "/test/test-id";
 
@@ -60,27 +60,26 @@ public class DefaultEventServiceTest {
 
         Mockito.when(eventRepository.findByUid(eventUid)).thenReturn(Optional.of(event));
 
-        assertEquals(event, eventService.getEvent(eventUid, path));
+        assertEquals(event, eventService.getEventAndCreateIfMissing(eventUid));
     }
 
     @Test
     public void shouldCreateEventIfNotPresent() {
         String eventUid = "test-id";
-        String path = "/test/test-id";
 
         Event event = new Event();
 
         when(eventRepository.findByUid(eventUid)).thenReturn(Optional.empty()).thenReturn(Optional.of(event));
-        when(eventFactory.create(path)).thenReturn(event);
+        when(eventFactory.create(eventUid)).thenReturn(event);
         when(eventRepository.save(event)).thenReturn(event);
 
-        assertEquals(event, eventService.getEvent(eventUid, path));
+        assertEquals(event, eventService.getEventAndCreateIfMissing(eventUid));
         verify(eventRepository).save(event);
     }
 
     @Test
     public void shouldThrowEventNotFoundException() {
-        String eventUid = "event-id";
+        String eventUid = "eventUid-id";
 
         when(eventRepository.findByUid(eventUid)).thenReturn(Optional.empty());
 

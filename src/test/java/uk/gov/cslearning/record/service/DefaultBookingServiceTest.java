@@ -9,7 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
@@ -67,7 +66,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldFindBookingByEventUidAndLearnerUid() {
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         String learnerUid = "learner-uid";
 
         Booking booking = new Booking();
@@ -91,7 +90,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldReturnEmptyOptionalIfBookingNotFoundByEventUidAndLearnerUid() {
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         String learnerUid = "learner-uid";
 
         when(bookingRepository.findByEventUidAndLearnerUid(eventUid, learnerUid)).thenReturn(Optional.empty());
@@ -101,7 +100,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldListBookingsByEventUid() {
-        String eventId = "test-event-id";
+        String eventId = "test-eventUid-id";
 
         Booking booking1 = new Booking();
         booking1.setId(11);
@@ -143,19 +142,7 @@ public class DefaultBookingServiceTest {
             assertEquals("Booking does not exist with id: 99", e.getMessage());
         }
     }
-
-    @Test
-    public void shouldReturnLearnerIfBooked() {
-        String learnerEmail = "test@domain.com";
-        String eventUid = "eventUid";
-        Booking booking = new Booking();
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
-
-        when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status)).thenReturn(Optional.of(booking));
-
-        assertEquals(Optional.of(booking), bookingService.findActiveBookingByEmailAndEvent(learnerEmail, eventUid));
-    }
-
+    
     @Test
     public void shouldListAllBookingsForPeriod() {
         LocalDate from = LocalDate.parse("2018-01-01");
@@ -186,7 +173,7 @@ public class DefaultBookingServiceTest {
     @Test
     public void shouldReturnBookingForLearnerUidAndEventUid() {
         String learnerUid = "learner-id";
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
 
         Booking booking = new Booking();
         BookingDto bookingDto = new BookingDto();
@@ -202,12 +189,4 @@ public class DefaultBookingServiceTest {
         verify(bookingDtoFactory).create(booking);
     }
 
-    @Test
-    public void shouldDeleteAllByLearner() {
-        Learner learner = new Learner();
-
-        bookingService.deleteAllByLearner(learner);
-
-        verify(bookingRepository).deleteAllByLearner(learner);
-    }
 }

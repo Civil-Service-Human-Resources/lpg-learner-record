@@ -22,12 +22,12 @@ public class InviteRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldSaveInvite() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
         invite.setLearnerEmail("test@test.com");
+        invite.setLearnerUid("testUid");
 
         inviteRepository.save(invite);
 
@@ -37,12 +37,12 @@ public class InviteRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldFindInviteById() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
         invite.setLearnerEmail("test@test.com");
+        invite.setLearnerUid("testUid");
 
         inviteRepository.save(invite);
 
@@ -56,12 +56,12 @@ public class InviteRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldContainCorrectEvent() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("test-catalogue-id");
 
         Invite invite = new Invite();
         invite.setEvent(event);
         invite.setLearnerEmail("test@test.com");
+        invite.setLearnerUid("testUid");
 
         inviteRepository.save(invite);
 

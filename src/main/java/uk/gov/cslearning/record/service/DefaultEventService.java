@@ -31,9 +31,9 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    public Event getEvent(String eventUid, String path) {
+    public Event getEventAndCreateIfMissing(String eventUid) {
         return eventRepository.findByUid(eventUid)
-                .orElseGet(() -> eventRepository.save(eventFactory.create(path)));
+                .orElseGet(() -> eventRepository.save(eventFactory.create(eventUid)));
     }
 
     @Override

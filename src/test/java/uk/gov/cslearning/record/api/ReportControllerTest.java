@@ -59,14 +59,14 @@ public class ReportControllerTest {
                         12,
                         500).toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
-        URI event = new URI("http://event");
+        String event = "event";
 
         BookingDto booking = new BookingDto();
         booking.setId(bookingId);
         booking.setStatus(status);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
-        booking.setEvent(event);
+        booking.setEventUid(event);
         booking.setLearner(learnerUid);
         booking.setBookingReference("AB45C");
 
@@ -84,7 +84,7 @@ public class ReportControllerTest {
                 .andExpect(jsonPath("$[0].id", equalTo(bookingId)))
                 .andExpect(jsonPath("$[0].learner", equalTo(learnerUid)))
                 .andExpect(jsonPath("$[0].status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$[0].event", equalTo(event.toString())))
+                .andExpect(jsonPath("$[0].eventUid", equalTo(event)))
                 .andExpect(jsonPath("$[0].paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$[0].bookingTime",
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));

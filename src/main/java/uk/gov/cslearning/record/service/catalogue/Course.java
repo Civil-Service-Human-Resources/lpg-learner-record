@@ -21,10 +21,6 @@ public class Course {
     private Collection<Module> modules;
     private Collection<Audience> audiences;
 
-    public Module getModule(String moduleId) {
-        return modules.stream().filter(module -> moduleId.equals(module.getId())).findFirst().orElse(null);
-    }
-
     public List<String> getRequiredModuleIds() {
         List<String> optionalModuleIds = new ArrayList<>();
         List<String> nonOptionalModuleIds = new ArrayList<>();
@@ -36,7 +32,7 @@ public class Course {
                 nonOptionalModuleIds.add(id);
             }
         });
-        return nonOptionalModuleIds.size() > 0 ? nonOptionalModuleIds : optionalModuleIds;
+        return !nonOptionalModuleIds.isEmpty() ? nonOptionalModuleIds : optionalModuleIds;
     }
 
     @Override
@@ -44,16 +40,6 @@ public class Course {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .toString();
-    }
-
-    public Event getEvent(String eventId) {
-        for (Module module : this.modules) {
-            Event event = module.getEvent(eventId);
-            if (event != null) {
-                return event;
-            }
-        }
-        return null;
     }
 
 }

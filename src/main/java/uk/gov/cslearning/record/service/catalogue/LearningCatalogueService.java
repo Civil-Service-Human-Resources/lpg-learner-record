@@ -54,8 +54,4 @@ public class LearningCatalogueService {
         return response;
     }
 
-    public Course getCourse(String courseId) {
-        return learningCatalogueClient.getCourse(courseId);
-    }
-
 }

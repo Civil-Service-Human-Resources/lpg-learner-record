@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 
 import java.time.Instant;
-import java.util.Objects;
 
 @Entity
 @Data
@@ -16,10 +15,6 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "learnerId")
-    private Learner learner;
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "eventId")
@@ -54,12 +49,4 @@ public class Booking {
     @Column
     private String learnerUid;
 
-    public void setLearner(Learner learner) {
-        this.learner = learner;
-        this.learnerUid = learner.getUid();
-    }
-
-    public String getAccessibilityOptionsString() {
-        return Objects.requireNonNullElse(accessibilityOptions, "");
-    }
 }

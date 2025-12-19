@@ -4,15 +4,12 @@ import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
-import uk.gov.cslearning.record.notifications.dto.IMessageParams;
-import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.util.UtilService;
@@ -33,19 +30,15 @@ public class DefaultBookingService implements BookingService {
     private final BookingDtoFactory bookingDtoFactory;
     private final BookingRepository bookingRepository;
     private final EventRepository eventRepository;
-    private final MessageService messageService;
-    private final NotificationService notificationService;
 
     public DefaultBookingService(UtilService utilService, BookingFactory bookingFactory,
                                  BookingDtoFactory bookingDtoFactory, BookingRepository bookingRepository,
-                                 EventRepository eventRepository, MessageService messageService, NotificationService notificationService) {
+                                 EventRepository eventRepository) {
         this.utilService = utilService;
         this.bookingFactory = bookingFactory;
         this.bookingDtoFactory = bookingDtoFactory;
         this.bookingRepository = bookingRepository;
         this.eventRepository = eventRepository;
-        this.messageService = messageService;
-        this.notificationService = notificationService;
     }
 
     @Override
@@ -98,25 +91,16 @@ public class DefaultBookingService implements BookingService {
 
     @Override
     public BookingDto update(Booking booking, BookingStatusDto bookingStatusDto) {
-        List<IMessageParams> notifications = new ArrayList<>();
         Instant updateTimestamp = utilService.getNowInstant();
         booking.setStatus(bookingStatusDto.getStatus());
         if (bookingStatusDto.getStatus().equals(BookingStatus.CONFIRMED)) {
             booking.setConfirmationTime(updateTimestamp);
-            notifications.addAll(messageService.createBookedMessages(booking));
         } else {
             booking.setCancellationTime(updateTimestamp);
             booking.setCancellationReason(bookingStatusDto.getCancellationReason());
-            notifications.addAll(messageService.createCancelBookingMessages(booking));
         }
         bookingRepository.save(booking);
-        notificationService.send(notifications);
         return bookingDtoFactory.create(booking);
-    }
-
-    @Override
-    public Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid) {
-        return bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, List.of(BookingStatus.REQUESTED, BookingStatus.CONFIRMED));
     }
 
     @Override
@@ -132,8 +116,8 @@ public class DefaultBookingService implements BookingService {
     }
 
     @Override
-    public void deleteAllByLearner(Learner learner) {
-        bookingRepository.deleteAllByLearner(learner);
+    public void deleteAllByLearnerUid(String learnerUid) {
+        bookingRepository.deleteAllByLearnerUid(learnerUid);
     }
 
     @Override

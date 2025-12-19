@@ -22,8 +22,6 @@ import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
 import uk.gov.cslearning.record.service.EventService;
 
-import java.net.URI;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -55,13 +53,10 @@ public class EventControllerTest {
 
     @Test
     public void shouldReturnEventOnGet() throws Exception {
-        String eventUid = "event-id";
-        URI uri = URI.create("http://localhost:9001/courses/course-id/modules/module-id/events/event-id");
-
+        String eventUid = "eventUid-id";
         EventDto event = new EventDto();
         event.setStatus(EventStatus.CANCELLED);
         event.setUid(eventUid);
-        event.setUri(uri);
 
         when(eventService.findByUid(eventUid, false)).thenReturn(event);
 
@@ -71,8 +66,7 @@ public class EventControllerTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uid", equalTo(eventUid)))
-                .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())))
-                .andExpect(jsonPath("$.uri", equalTo(uri.toString())));
+                .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())));
 
         verify(eventService).findByUid(eventUid, false);
     }
@@ -80,15 +74,13 @@ public class EventControllerTest {
 
     @Test
     public void shouldReturnEventOnPatch() throws Exception {
-        String eventUid = "event-id";
-        URI uri = URI.create("http://localhost:9001/courses/course-id/modules/module-id/events/event-id");
+        String eventUid = "eventUid-id";
 
         EventStatusDto eventStatusDto = new EventStatusDto(EventStatus.CANCELLED, CancellationReason.UNAVAILABLE);
 
         EventDto event = new EventDto();
         event.setStatus(EventStatus.CANCELLED);
         event.setUid(eventUid);
-        event.setUri(uri);
 
         when(eventService.updateStatus(eventUid, eventStatusDto)).thenReturn(event);
 
@@ -104,15 +96,14 @@ public class EventControllerTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uid", equalTo(eventUid)))
-                .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())))
-                .andExpect(jsonPath("$.uri", equalTo(uri.toString())));
+                .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())));
 
         verify(eventService).updateStatus(eventUid, eventStatusDto);
     }
 
     @Test
     public void shouldReturnNotFoundIfEventNotFoundOnPatch() throws Exception {
-        String eventUid = "event-id";
+        String eventUid = "eventUid-id";
         EventStatusDto eventStatus = new EventStatusDto(EventStatus.CANCELLED, CancellationReason.UNAVAILABLE);
 
         EventNotFoundException exception = mock(EventNotFoundException.class);
@@ -136,7 +127,7 @@ public class EventControllerTest {
 
     @Test
     public void shouldReturnNotFoundIfEventNotFoundOnGet() throws Exception {
-        String eventUid = "event-id";
+        String eventUid = "eventUid-id";
 
         when(eventService.findByUid(eventUid, false)).thenReturn(null);
 

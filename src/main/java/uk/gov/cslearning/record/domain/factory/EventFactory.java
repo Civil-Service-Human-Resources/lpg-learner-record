@@ -5,26 +5,20 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatus;
 
-import java.nio.file.Paths;
-
 @Component
 public class EventFactory {
 
-    public Event create(String path) {
+    public Event create(String uid) {
         Event event = new Event();
-        event.setPath(path);
-        event.setUid(Paths.get(path).getFileName().toString());
+        event.setUid(uid);
         event.setStatus(EventStatus.ACTIVE);
         return event;
     }
 
     public Event create(EventDto eventDto) {
-        String path = eventDto.getUri().getPath();
-
         Event event = new Event();
         event.setId(eventDto.getId());
-        event.setPath(path);
-        event.setUid(Paths.get(path).getFileName().toString());
+        event.setUid(eventDto.getUid());
         event.setStatus(eventDto.getStatus());
         event.setCancellationReason(eventDto.getCancellationReason());
         return event;

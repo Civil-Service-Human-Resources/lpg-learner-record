@@ -51,7 +51,7 @@ public class EventController {
         EventDto result = eventService.create(event);
 
         return ResponseEntity.created(
-                uriBuilder.path("/event/{eventId}").build(result.getUid())
+                uriBuilder.path("/eventUid/{eventId}").build(result.getUid())
         ).body(result);
     }
 

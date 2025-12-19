@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum CancellationReason {
-    UNAVAILABLE("the event is no longer available"), VENUE("short notice unavailability of the venue");
+    UNAVAILABLE("the eventUid is no longer available"), VENUE("short notice unavailability of the venue");
 
     private final String value;
 

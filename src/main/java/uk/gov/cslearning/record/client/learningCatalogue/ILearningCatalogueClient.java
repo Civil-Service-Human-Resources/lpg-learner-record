@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface ILearningCatalogueClient {
-    
-    Map<String, List<Course>> getRequiredCoursesByDueDaysGroupedByOrg(List<String> dueDays);
 
-    Course getCourse(String courseId);
+    Map<String, List<Course>> getRequiredCoursesByDueDaysGroupedByOrg(List<String> dueDays);
 }

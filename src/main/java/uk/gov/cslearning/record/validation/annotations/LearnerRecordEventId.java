@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = LearnerRecordEventIdValidator.class)
 public @interface LearnerRecordEventId {
 
-    String message() default "Either [resourceId, learnerId] or [learnerRecordId] must be provided when creating a learner record event.";
+    String message() default "Either [resourceId, learnerId] or [learnerRecordId] must be provided when creating a learner record eventUid.";
 
     Class<?>[] groups() default {};
 
