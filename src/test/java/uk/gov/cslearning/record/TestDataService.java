@@ -109,4 +109,10 @@ public class TestDataService {
         return audience;
     }
 
+    public Invite generateInvite(String learnerUid, String learnerEmail) {
+        Invite invite = new Invite();
+        invite.setLearnerUid(learnerUid);
+        invite.setLearnerEmail(learnerEmail);
+        return invite;
+    }
 }

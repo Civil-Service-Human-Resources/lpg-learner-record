@@ -3,6 +3,7 @@ package uk.gov.cslearning.record.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.api.input.FindEventParams;
 import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
 import uk.gov.cslearning.record.dto.EventStatusDto;
@@ -36,9 +37,8 @@ public class EventController {
     }
 
     @GetMapping(path = "/event/{eventUid}")
-    public ResponseEntity<EventDto> find(@PathVariable String eventUid,
-                                         @RequestParam(value = "getBookingCount", defaultValue = "false") boolean getBookingCount) {
-        EventDto event = eventService.findByUid(eventUid, getBookingCount);
+    public ResponseEntity<EventDto> find(@PathVariable String eventUid, FindEventParams params) {
+        EventDto event = eventService.findByUid(eventUid, params);
         if (event == null) {
             return new ResponseEntity<>(NOT_FOUND);
         } else {

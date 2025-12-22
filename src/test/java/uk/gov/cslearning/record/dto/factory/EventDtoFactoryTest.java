@@ -2,6 +2,10 @@ package uk.gov.cslearning.record.dto.factory;
 
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.dto.CancellationReason;
 import uk.gov.cslearning.record.dto.EventDto;
@@ -9,8 +13,17 @@ import uk.gov.cslearning.record.dto.EventStatus;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(SpringExtension.class)
 public class EventDtoFactoryTest {
-    private EventDtoFactory eventDtoFactory = new EventDtoFactory();
+
+    @Mock
+    private InviteDtoFactory inviteDtoFactory;
+
+    @Mock
+    private BookingDtoFactory bookingDtoFactory;
+
+    @InjectMocks
+    private EventDtoFactory eventDtoFactory;
 
     @Test
     public void shouldReturnEventDto() {

@@ -25,7 +25,8 @@ import uk.gov.cslearning.record.service.EventService;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,27 +49,6 @@ public class EventControllerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
-
-
-    @Test
-    public void shouldReturnEventOnGet() throws Exception {
-        String eventUid = "eventUid-id";
-        EventDto event = new EventDto();
-        event.setStatus(EventStatus.CANCELLED);
-        event.setUid(eventUid);
-
-        when(eventService.findByUid(eventUid, false)).thenReturn(event);
-
-        mockMvc.perform(
-                        get("/event/" + eventUid).with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.uid", equalTo(eventUid)))
-                .andExpect(jsonPath("$.status", equalTo(EventStatus.CANCELLED.getValue())));
-
-        verify(eventService).findByUid(eventUid, false);
     }
 
 
@@ -123,21 +103,6 @@ public class EventControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(eventService).updateStatus(eventUid, eventStatus);
-    }
-
-    @Test
-    public void shouldReturnNotFoundIfEventNotFoundOnGet() throws Exception {
-        String eventUid = "eventUid-id";
-
-        when(eventService.findByUid(eventUid, false)).thenReturn(null);
-
-        mockMvc.perform(
-                        get("/event/" + eventUid).with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-
-        verify(eventService).findByUid(eventUid, false);
     }
 
     @Test

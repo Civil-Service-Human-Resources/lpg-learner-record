@@ -10,6 +10,7 @@ import uk.gov.cslearning.record.TestDataService;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
+import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.repository.InviteRepository;
@@ -19,8 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,49 +35,7 @@ public class EventTest extends IntegrationTestBase {
     private InviteRepository inviteRepository;
     @Autowired
     private TestDataService testDataService;
-    private String course = """
-            {
-                  "id": "courseId",
-                  "title": "Course 1",
-                  "shortDescription": "Course 1",
-                  "description": "Course 1",
-                  "modules": [
-                          {
-                                  "id": "moduleId",
-                                  "type": "face-to-face",
-                                  "title": "module1",
-                                  "description": "module1",
-                                  "optional": false,
-                                  "moduleType": "face-to-face",
-                                  "cost": 10.0,
-                                  "events": [
-                                    {
-                                        "id": "testEventId",
-                                        "dateRanges": [
-                                            {
-                                                "date": "2025-03-10",
-                                                "startTime": "10:00",
-                                                "endTime": "11:00"
-                                            },
-                                            {
-                                                "date": "2025-04-10",
-                                                "startTime": "10:00",
-                                                "endTime": "11:00"
-                                            }
-                                        ],
-                                        "venue": {
-                                            "location": "London",
-                                            "address": "10 London Road",
-                                            "capacity": 10,
-                                            "minCapacity": 1
-                                        }
-                                    }
-                                  ]
-                          }
-                  ],
-                  "visibility": "PUBLIC",
-                  "status": "Published"
-              }""";
+
 
     @AfterEach
     public void cleanup() {
@@ -88,6 +46,52 @@ public class EventTest extends IntegrationTestBase {
         Event e = eventRepository.save(testDataService.generateLearnerRecordEvent());
         eventIds.add(e.getId());
         return e;
+    }
+
+    @Test
+    public void testFindEventWithActiveBookingCount() throws Exception {
+        Event event = generateEvent();
+        Booking booking1 = testDataService.generateBooking(BookingStatus.CONFIRMED, "learnerUid1");
+        booking1.setEvent(event);
+        Booking booking2 = testDataService.generateBooking(BookingStatus.REQUESTED, "learnerUid2");
+        booking2.setEvent(event);
+        bookingRepository.saveAll(List.of(booking1, booking2));
+        mockMvc.perform(get("/event/" + event.getUid())
+                        .param("getBookingCount", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("uid").value("testEventId"))
+                .andExpect(jsonPath("activeBookingCount").value("2"));
+    }
+
+    @Test
+    public void testFindEventWithParams() throws Exception {
+        Event event = generateEvent();
+
+        Booking booking1 = testDataService.generateBooking(BookingStatus.CONFIRMED, "learnerUid1");
+        booking1.setEvent(event);
+        Booking booking2 = testDataService.generateBooking(BookingStatus.REQUESTED, "learnerUid2");
+        booking2.setEvent(event);
+        Booking booking3 = testDataService.generateBooking(BookingStatus.CANCELLED, "learnerUid3");
+        booking3.setEvent(event);
+        bookingRepository.saveAll(List.of(booking1, booking2));
+
+        Invite invite = testDataService.generateInvite("learnerUid1", "learner@email.com");
+        invite.setEvent(event);
+        inviteRepository.saveAll(List.of(invite));
+
+        mockMvc.perform(get("/event/" + event.getUid())
+                        .param("getBookingCount", "true")
+                        .param("getInvites", "true")
+                        .param("getBookings", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("uid").value("testEventId"))
+                .andExpect(jsonPath("activeBookingCount").value("2"))
+                .andExpect(jsonPath("activeBookings.length()").value("2"))
+                .andExpect(jsonPath("activeBookings[0].status").value("Confirmed"))
+                .andExpect(jsonPath("activeBookings[1].status").value("Requested"))
+                .andExpect(jsonPath("invites.length()").value("1"))
+                .andExpect(jsonPath("invites[0].learnerEmail").value("learner@email.com"))
+                .andExpect(jsonPath("invites[0].learnerUid").value("learnerUid1"));
     }
 
     @Test

@@ -25,7 +25,7 @@ public class EventIsActiveValidator implements ConstraintValidator<EventIsActive
             return true;
         }
 
-        EventDto event = eventService.findByUid(eventUid, false);
+        EventDto event = eventService.findByUid(eventUid);
         if (event != null) {
             return event.getStatus().equals(EventStatus.ACTIVE);
         }

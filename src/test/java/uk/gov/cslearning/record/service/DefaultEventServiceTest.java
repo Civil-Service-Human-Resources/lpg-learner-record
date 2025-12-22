@@ -49,7 +49,7 @@ public class DefaultEventServiceTest {
     private MessageService messageService;
 
     @InjectMocks
-    private DefaultEventService eventService;
+    private EventService eventService;
 
     @Test
     public void shouldGetEventAndCreateIfMissing() {

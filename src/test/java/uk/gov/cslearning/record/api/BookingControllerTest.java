@@ -223,7 +223,7 @@ public class BookingControllerTest {
         EventDto eventDto = new EventDto();
         eventDto.setStatus(EventStatus.ACTIVE);
 
-        when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
+        when(eventService.findByUid("event-id")).thenReturn(eventDto);
 
         mockMvc.perform(
                         post("/event/event-id/booking/").with(csrf())
