@@ -73,7 +73,7 @@ public class EventTest extends IntegrationTestBase {
         booking2.setEvent(event);
         Booking booking3 = testDataService.generateBooking(BookingStatus.CANCELLED, "learnerUid3");
         booking3.setEvent(event);
-        bookingRepository.saveAll(List.of(booking1, booking2));
+        bookingRepository.saveAll(List.of(booking1, booking2, booking3));
 
         Invite invite = testDataService.generateInvite("learnerUid1", "learner@email.com");
         invite.setEvent(event);

@@ -35,12 +35,11 @@ public class EventDtoFactory {
         if (params.isGetBookings() || params.isGetBookingCount()) {
             List<BookingDto> bookings = event.getBookings()
                     .stream().map(bookingDtoFactory::create)
+                    .filter(b -> List.of(BookingStatus.CONFIRMED,
+                            BookingStatus.REQUESTED).contains(b.getStatus()))
                     .toList();
             if (params.isGetBookingCount()) {
-                Integer count = bookings
-                        .stream().filter(b -> List.of(BookingStatus.CONFIRMED,
-                                BookingStatus.REQUESTED).contains(b.getStatus()))
-                        .toList().size();
+                Integer count = bookings.size();
                 eventDto.setActiveBookingCount(count);
             }
             if (params.isGetBookings()) {
