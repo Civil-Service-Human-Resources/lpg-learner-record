@@ -3,7 +3,6 @@ package uk.gov.cslearning.record.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.cslearning.record.repository.LearnerRepository;
 import uk.gov.cslearning.record.util.UtilService;
 
 import java.time.LocalDateTime;
@@ -15,7 +14,6 @@ import java.time.temporal.ChronoUnit;
 public class DefaultLearnerService implements LearnerService {
 
     private final UtilService utilService;
-    private final LearnerRepository learnerRepository;
 
     private final BookingService bookingService;
 
@@ -27,9 +25,8 @@ public class DefaultLearnerService implements LearnerService {
 
     private final int dataRetentionTime;
 
-    public DefaultLearnerService(UtilService utilService, @Value("${retention.timeInMonths}") int dataRetentionTime, LearnerRepository learnerRepository, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
+    public DefaultLearnerService(UtilService utilService, @Value("${retention.timeInMonths}") int dataRetentionTime, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
         this.utilService = utilService;
-        this.learnerRepository = learnerRepository;
         this.bookingService = bookingService;
         this.userRecordService = userRecordService;
         this.inviteService = inviteService;
@@ -39,12 +36,8 @@ public class DefaultLearnerService implements LearnerService {
 
     public void deleteLearnerByUid(String uid) {
         notificationService.deleteByLearnerUid(uid);
-        learnerRepository.findByUid(uid).ifPresent(learner -> {
-            bookingService.deleteAllByLearner(learner);
-            inviteService.deleteByLearnerEmail(learner.getLearnerEmail());
-            learnerRepository.delete(learner);
-        });
-
+        bookingService.deleteAllByLearnerUid(uid);
+        inviteService.deleteByLearnerUid(uid);
         userRecordService.deleteUserRecords(uid);
     }
 

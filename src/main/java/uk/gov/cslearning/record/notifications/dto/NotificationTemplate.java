@@ -9,9 +9,7 @@ public enum NotificationTemplate {
     CANCEL_BOOKING("cancelBooking"),
     BOOKING_CONFIRMED("bookingConfirmed"),
     BOOKING_CONFIRMED_LINE_MANAGER("bookingConfirmedLineManager"),
-    BOOKING_REQUEST_LINE_MANAGER("bookingRequestLineManager"),
     BOOKING_CANCELLED_LINE_MANAGER("bookingCancelledLineManager"),
-    BOOKING_REQUESTED("bookingRequested"),
     ;
 
     private final String configName;

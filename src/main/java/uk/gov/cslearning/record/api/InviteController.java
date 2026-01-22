@@ -36,8 +36,7 @@ public class InviteController {
 
     @PostMapping("/{eventId}/invitee")
     public ResponseEntity<InviteDto> addInvitee(@PathVariable("eventId") String eventUid, @Valid @RequestBody InviteDto inviteDto, UriComponentsBuilder builder) {
-        return inviteService.inviteLearner(inviteDto)
-                .map(i -> ResponseEntity.created(builder.path("/event/{eventId}/invitee").build(eventUid)).body(i))
-                .orElseThrow(() -> new IllegalStateException("Unable to save invite"));
+        inviteDto = inviteService.save(eventUid, inviteDto);
+        return ResponseEntity.created(builder.path("/eventUid/{eventId}/invitee").build(eventUid)).body(inviteDto);
     }
 }

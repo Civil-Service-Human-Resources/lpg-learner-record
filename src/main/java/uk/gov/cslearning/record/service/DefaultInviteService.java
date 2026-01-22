@@ -5,10 +5,9 @@ import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
-import uk.gov.cslearning.record.notifications.service.NotificationService;
+import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
 import uk.gov.cslearning.record.repository.InviteRepository;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,31 +17,20 @@ public class DefaultInviteService implements InviteService {
     private final InviteDtoFactory inviteDtoFactory;
     private final InviteRepository inviteRepository;
     private final EventService eventService;
-    private final NotificationService notificationService;
-    private final MessageService messageService;
 
-    public DefaultInviteService(
-            InviteDtoFactory inviteDtoFactory,
-            InviteRepository inviteRepository,
-            EventService eventService,
-            NotificationService notificationService,
-            MessageService messageService
-    ) {
+    public DefaultInviteService(InviteDtoFactory inviteDtoFactory, InviteRepository inviteRepository,
+                                EventService eventService) {
         this.inviteDtoFactory = inviteDtoFactory;
         this.inviteRepository = inviteRepository;
         this.eventService = eventService;
-        this.notificationService = notificationService;
-        this.messageService = messageService;
     }
 
     @Override
     public Collection<InviteDto> findByEventId(String eventId) {
-        Collection<InviteDto> result = inviteRepository.findAllByEventUid(eventId)
+        return inviteRepository.findAllByEventUid(eventId)
                 .stream().map(
                         inviteDtoFactory::create
                 ).collect(Collectors.toList());
-
-        return result;
     }
 
     @Override
@@ -51,26 +39,17 @@ public class DefaultInviteService implements InviteService {
     }
 
     @Override
-    public Optional<InviteDto> findByEventIdAndLearnerEmail(String eventUid, String learnerEmail) {
-        return inviteRepository.findByEventUidAndLearnerEmail(eventUid, learnerEmail).map(inviteDtoFactory::create);
+    public InviteDto save(String eventUid, InviteDto inviteDto) {
+        Event event = eventService.getEventAndCreateIfMissing(eventUid);
+        if (event.isLearnerBookedOrInvited(inviteDto.getLearnerUid())) {
+            throw new ResourceExistsException(String.format("Learner %s is already booked or invited to this event", inviteDto.getLearnerUid()));
+        }
+        Invite invite = new Invite(inviteDto.getId(), event, inviteDto.getLearnerEmail(), inviteDto.getLearnerUid());
+        return inviteDtoFactory.create(inviteRepository.save(invite));
     }
 
     @Override
-    public Optional<InviteDto> inviteLearner(InviteDto inviteDto) {
-        notificationService.send(messageService.createInviteMessage(inviteDto));
-
-        return save(inviteDto);
-    }
-
-    @Override
-    public Optional<InviteDto> save(InviteDto inviteDto) {
-        Event event = eventService.getEvent(Paths.get(inviteDto.getEvent().getPath()).getFileName().toString(), inviteDto.getEvent().getPath());
-        Invite invite = new Invite(inviteDto.getId(), event, inviteDto.getLearnerEmail());
-        return Optional.of(inviteDtoFactory.create(inviteRepository.save(invite)));
-    }
-
-    @Override
-    public void deleteByLearnerEmail(String learnerEmail) {
-        inviteRepository.deleteAllByLearnerEmail(learnerEmail);
+    public void deleteByLearnerUid(String learnerUid) {
+        inviteRepository.deleteAllByLearnerUid(learnerUid);
     }
 }

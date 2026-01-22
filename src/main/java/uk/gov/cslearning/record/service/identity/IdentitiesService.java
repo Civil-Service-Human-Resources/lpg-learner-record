@@ -9,7 +9,6 @@ import uk.gov.cslearning.record.domain.identity.Identity;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -49,8 +48,5 @@ public class IdentitiesService {
                 .collect(Collectors.toMap(Identity::getUid, Identity::getUsername));
     }
 
-    public Optional<Identity> getIdentityByEmailAddress(String emailAddress) {
-        return iIdentitiesClient.getIdentityWithEmail(emailAddress);
-    }
 
 }

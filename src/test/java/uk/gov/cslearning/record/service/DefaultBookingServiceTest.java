@@ -9,13 +9,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.cslearning.record.domain.Booking;
 import uk.gov.cslearning.record.domain.BookingStatus;
 import uk.gov.cslearning.record.domain.Event;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.domain.factory.BookingFactory;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
+import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
+import uk.gov.cslearning.record.exception.IncorrectStateException;
 import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
@@ -28,8 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -67,7 +67,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldFindBookingByEventUidAndLearnerUid() {
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         String learnerUid = "learner-uid";
 
         Booking booking = new Booking();
@@ -91,7 +91,7 @@ public class DefaultBookingServiceTest {
 
     @Test
     public void shouldReturnEmptyOptionalIfBookingNotFoundByEventUidAndLearnerUid() {
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         String learnerUid = "learner-uid";
 
         when(bookingRepository.findByEventUidAndLearnerUid(eventUid, learnerUid)).thenReturn(Optional.empty());
@@ -100,8 +100,19 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
+    public void shouldThrowExceptionIfBookingIsCreatedForInactiveEvent() {
+        String eventUid = "eventUid-uid";
+        Event event = new Event();
+        event.setStatus(EventStatus.CANCELLED);
+
+        when(eventRepository.findByUid(eventUid)).thenReturn(Optional.of(event));
+
+        assertThrows(IncorrectStateException.class, () -> bookingService.create(eventUid, new BookingDto()));
+    }
+
+    @Test
     public void shouldListBookingsByEventUid() {
-        String eventId = "test-event-id";
+        String eventId = "test-eventUid-id";
 
         Booking booking1 = new Booking();
         booking1.setId(11);
@@ -145,18 +156,6 @@ public class DefaultBookingServiceTest {
     }
 
     @Test
-    public void shouldReturnLearnerIfBooked() {
-        String learnerEmail = "test@domain.com";
-        String eventUid = "eventUid";
-        Booking booking = new Booking();
-        List<BookingStatus> status = Arrays.asList(BookingStatus.REQUESTED, BookingStatus.CONFIRMED);
-
-        when(bookingRepository.findByLearnerEmailAndEventUid(learnerEmail, eventUid, status)).thenReturn(Optional.of(booking));
-
-        assertEquals(Optional.of(booking), bookingService.findActiveBookingByEmailAndEvent(learnerEmail, eventUid));
-    }
-
-    @Test
     public void shouldListAllBookingsForPeriod() {
         LocalDate from = LocalDate.parse("2018-01-01");
         LocalDate to = LocalDate.parse("2018-01-07");
@@ -186,7 +185,7 @@ public class DefaultBookingServiceTest {
     @Test
     public void shouldReturnBookingForLearnerUidAndEventUid() {
         String learnerUid = "learner-id";
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
 
         Booking booking = new Booking();
         BookingDto bookingDto = new BookingDto();
@@ -202,12 +201,4 @@ public class DefaultBookingServiceTest {
         verify(bookingDtoFactory).create(booking);
     }
 
-    @Test
-    public void shouldDeleteAllByLearner() {
-        Learner learner = new Learner();
-
-        bookingService.deleteAllByLearner(learner);
-
-        verify(bookingRepository).deleteAllByLearner(learner);
-    }
 }

@@ -7,17 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cslearning.record.domain.Booking;
+import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Invite;
 import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.dto.factory.InviteDtoFactory;
+import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
 import uk.gov.cslearning.record.repository.InviteRepository;
 
-import java.net.URI;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(SpringExtension.class)
@@ -35,20 +38,31 @@ public class DefaultInviteServiceTest {
     private DefaultInviteService inviteService;
 
     @Test
-    public void shouldFindInvitesEventById() {
-        String eventId = "test-id";
-        URI eventURI = UriComponentsBuilder.fromPath("http://test/test-id").build().toUri();
+    public void shouldThrowExceptionIfLearnerIsAlreadyInvited() {
         Invite invite = new Invite();
+        invite.setLearnerUid("userUid");
+        Event event = new Event();
+        event.setInvites(List.of(invite));
+
+        when(eventService.getEventAndCreateIfMissing("SAI")).thenReturn(event);
+
         InviteDto inviteDto = new InviteDto();
-        inviteDto.setEvent(eventURI);
+        inviteDto.setLearnerUid("userUid");
+        assertThrows(ResourceExistsException.class, () -> inviteService.save("SAI", inviteDto));
+    }
 
-        ArrayList<Invite> invites = new ArrayList<>();
-        invites.add(invite);
+    @Test
+    public void shouldThrowExceptionIfLearnerIsAlreadyBooked() {
+        Booking booking = new Booking();
+        booking.setLearnerUid("userUid");
+        Event event = new Event();
+        event.setBookings(List.of(booking));
 
-        Mockito.when(inviteRepository.findAllByEventUid(eventId)).thenReturn(invites);
-        Mockito.when(inviteDtoFactory.create(invite)).thenReturn(inviteDto);
+        when(eventService.getEventAndCreateIfMissing("SAI")).thenReturn(event);
 
-        assertEquals(inviteDto, inviteService.findByEventId(eventId).stream().findFirst().get());
+        InviteDto inviteDto = new InviteDto();
+        inviteDto.setLearnerUid("userUid");
+        assertThrows(ResourceExistsException.class, () -> inviteService.save("SAI", inviteDto));
     }
 
     @Test

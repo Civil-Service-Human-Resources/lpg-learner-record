@@ -34,7 +34,7 @@ public class LookupValueService {
     public LearnerRecordEventSource getLearnerRecordSource(String uid) {
         LearnerRecordEventSource source = this.learnerRecordEventSourceMap.get(uid);
         if (source == null) {
-            throw new RuntimeException(String.format("Learner record event source with uid %s is invalid", uid));
+            throw new RuntimeException(String.format("Learner record eventUid source with uid %s is invalid", uid));
         }
         return source;
     }

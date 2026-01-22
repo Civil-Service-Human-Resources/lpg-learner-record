@@ -31,7 +31,7 @@ public class LearnerRecordTypeMapping {
     public LearnerRecordEventType getEventType(String learnerRecordEventType) {
         return eventTypeMap.values().stream().flatMap(e -> e.values().stream())
                 .filter(e -> e.getEventType().equals(learnerRecordEventType))
-                .findFirst().orElseThrow(() -> new RuntimeException(String.format("Learner record event type %s is invalid", learnerRecordEventType)));
+                .findFirst().orElseThrow(() -> new RuntimeException(String.format("Learner record eventUid type %s is invalid", learnerRecordEventType)));
     }
 
     public LearnerRecordEventType getEventType(String learnerRecordType, String learnerRecordEventType) {
@@ -42,7 +42,7 @@ public class LearnerRecordTypeMapping {
                 return eventType;
             }
         }
-        throw new RuntimeException(String.format("Learner record event type with record type %s and event type %s is invalid", learnerRecordType, learnerRecordEventType));
+        throw new RuntimeException(String.format("Learner record eventUid type with record type %s and eventUid type %s is invalid", learnerRecordType, learnerRecordEventType));
     }
 
 }

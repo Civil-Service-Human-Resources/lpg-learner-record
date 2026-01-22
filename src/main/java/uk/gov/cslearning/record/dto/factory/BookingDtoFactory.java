@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
 
 import java.net.URI;
@@ -13,13 +12,9 @@ import java.util.Collection;
 @Slf4j
 @Component
 public class BookingDtoFactory {
-    private final String learningCatalogueBaseUrl;
     private final String csrsBaseUrl;
 
-    public BookingDtoFactory(
-            @Value("${catalogue.serviceUrl}") String learningCatalogueBaseUrl,
-            @Value("${registry-service.serviceUrl}") String csrsBaseUrl) {
-        this.learningCatalogueBaseUrl = learningCatalogueBaseUrl;
+    public BookingDtoFactory(@Value("${registry-service.serviceUrl}") String csrsBaseUrl) {
         this.csrsBaseUrl = csrsBaseUrl;
     }
 
@@ -30,10 +25,8 @@ public class BookingDtoFactory {
     public BookingDto create(Booking booking) {
         BookingDto bookingDto = new BookingDto();
         bookingDto.setId(booking.getId());
-        bookingDto.setEvent(URI.create(String.format("%s%s", learningCatalogueBaseUrl, booking.getEvent().getPath())));
-        Learner learner = booking.getLearner();
-        bookingDto.setLearner(learner.getUid());
-        bookingDto.setLearnerEmail(learner.getLearnerEmail());
+        bookingDto.setEventUid(booking.getEvent().getUid());
+        bookingDto.setLearner(booking.getLearnerUid());
         bookingDto.setBookingTime(booking.getBookingTime());
         bookingDto.setConfirmationTime(booking.getConfirmationTime());
         bookingDto.setCancellationTime(booking.getCancellationTime());

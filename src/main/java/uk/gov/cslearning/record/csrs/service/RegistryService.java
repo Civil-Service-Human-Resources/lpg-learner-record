@@ -3,13 +3,11 @@ package uk.gov.cslearning.record.csrs.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.cslearning.record.client.civilServantRegistry.ICivilServantRegistryClient;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.domain.OrganisationalUnit;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,10 +18,6 @@ public class RegistryService {
 
     public RegistryService(ICivilServantRegistryClient civilServantRegistryClient) {
         this.civilServantRegistryClient = civilServantRegistryClient;
-    }
-
-    public Optional<CivilServant> getCivilServantResourceByUid(String uid) {
-        return civilServantRegistryClient.getCivilServantResourceByUid(uid);
     }
 
     public List<String> getCivilServantsByOrgCode(String code) {
