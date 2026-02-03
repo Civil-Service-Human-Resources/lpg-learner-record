@@ -33,7 +33,7 @@ public class CourseRecordRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldReturnAllCourseRecordsContainingAnEvent() {
 
-        // Add a non-event record for good measure
+        // Add a non-eventUid record for good measure
         CourseRecord courseRecord = new CourseRecord("courseId", "userId");
         courseRecord.setCourseTitle("title");
         courseRecordRepository.save(courseRecord);

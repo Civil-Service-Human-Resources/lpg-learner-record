@@ -24,9 +24,6 @@ public class Event {
     @Column(nullable = false, length = 60, unique = true)
     private String uid;
 
-    @Column(nullable = false, unique = true)
-    private String path;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private EventStatus status;
@@ -35,14 +32,12 @@ public class Event {
     @OneToMany(mappedBy = "event")
     private List<Booking> bookings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "event")
+    private List<Invite> invites = new ArrayList<>();
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private CancellationReason cancellationReason;
-
-    @JsonIgnore
-    public List<Booking> getActiveBookings() {
-        return this.bookings.stream().filter(b -> !b.getStatus().equals(BookingStatus.CANCELLED)).toList();
-    }
 
     @JsonIgnore
     public void cancel(CancellationReason reason, Instant cancellationTime) {
@@ -53,12 +48,6 @@ public class Event {
         });
     }
 
-    @JsonIgnore
-    public EventIds getEventIds() {
-        String[] parts = this.path.split("/");
-        return new EventIds(parts[2], parts[4], parts[6]);
-    }
-
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
         bookings.forEach(b -> b.setEvent(this));
@@ -67,5 +56,17 @@ public class Event {
     public void addBooking(Booking booking) {
         bookings.add(booking);
         booking.setEvent(this);
+    }
+
+    public boolean isLearnerBooked(String learnerUid) {
+        return this.bookings.stream().anyMatch(b -> b.getLearnerUid().equals(learnerUid));
+    }
+
+    public boolean isLearnerInvited(String learnerUid) {
+        return this.invites.stream().anyMatch(b -> b.getLearnerUid().equals(learnerUid));
+    }
+
+    public boolean isLearnerBookedOrInvited(String learnerUid) {
+        return isLearnerBooked(learnerUid) || isLearnerInvited(learnerUid);
     }
 }

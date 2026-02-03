@@ -19,7 +19,6 @@ public class EventRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldSaveEvent() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("SSE");
         eventRepository.save(event);
 
@@ -29,7 +28,6 @@ public class EventRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldBeAbleToFindEventByUid() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("SBATFEBC");
 
         eventRepository.save(event);

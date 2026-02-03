@@ -11,7 +11,7 @@
     </TelemetryModules>
 
     <!-- Events correlation (not required for bare API) -->
-    <!-- These initializers add context data to each event -->
+    <!-- These initializers add context data to each eventUid -->
     <TelemetryInitializers>
         <Add type="com.microsoft.applicationinsights.web.extensibility.initializers.WebOperationIdTelemetryInitializer"/>
         <Add type="com.microsoft.applicationinsights.web.extensibility.initializers.WebOperationNameTelemetryInitializer"/>

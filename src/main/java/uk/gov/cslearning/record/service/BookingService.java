@@ -2,7 +2,6 @@ package uk.gov.cslearning.record.service;
 
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cslearning.record.domain.Booking;
-import uk.gov.cslearning.record.domain.Learner;
 import uk.gov.cslearning.record.dto.BookingDto;
 import uk.gov.cslearning.record.dto.BookingStatusDto;
 
@@ -32,15 +31,11 @@ public interface BookingService {
     BookingDto create(String eventUid, BookingDto bookingDto);
 
     BookingDto update(Booking booking, BookingStatusDto bookingStatusDto);
-
-    @Transactional(readOnly = true)
-    Optional<Booking> findActiveBookingByEmailAndEvent(String learnerEmail, String eventUid);
-
+    
     @Transactional(readOnly = true)
     Iterable<BookingDto> findAllForPeriod(LocalDate from, LocalDate to);
 
-    @Transactional
-    void deleteAllByLearner(Learner learner);
+    void deleteAllByLearnerUid(String learnerUid);
 
     @Transactional
     void deleteAllByAge(Instant instant);

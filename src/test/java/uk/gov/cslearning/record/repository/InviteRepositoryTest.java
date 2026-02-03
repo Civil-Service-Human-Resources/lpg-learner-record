@@ -5,8 +5,10 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.cslearning.record.IntegrationTestBase;
+import uk.gov.cslearning.record.TestDataService;
 import uk.gov.cslearning.record.domain.Event;
 import uk.gov.cslearning.record.domain.Invite;
+import uk.gov.cslearning.record.dto.EventStatus;
 
 import java.util.Optional;
 
@@ -19,15 +21,22 @@ public class InviteRepositoryTest extends IntegrationTestBase {
     @Autowired
     private InviteRepository inviteRepository;
 
+    @Autowired
+    private EventRepository eventRepository;
+    @Autowired
+    private TestDataService testDataService;
+
     @Test
     public void shouldSaveInvite() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("test-catalogue-id");
+        event.setStatus(EventStatus.ACTIVE);
+        eventRepository.save(event);
 
         Invite invite = new Invite();
         invite.setEvent(event);
         invite.setLearnerEmail("test@test.com");
+        invite.setLearnerUid("testUid");
 
         inviteRepository.save(invite);
 
@@ -37,12 +46,14 @@ public class InviteRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldFindInviteById() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("test-catalogue-id");
+        event.setStatus(EventStatus.ACTIVE);
+        eventRepository.save(event);
 
         Invite invite = new Invite();
         invite.setEvent(event);
         invite.setLearnerEmail("test@test.com");
+        invite.setLearnerUid("testUid");
 
         inviteRepository.save(invite);
 
@@ -56,12 +67,14 @@ public class InviteRepositoryTest extends IntegrationTestBase {
     @Test
     public void shouldContainCorrectEvent() {
         Event event = new Event();
-        event.setPath("test/path");
         event.setUid("test-catalogue-id");
+        event.setStatus(EventStatus.ACTIVE);
+        eventRepository.save(event);
 
         Invite invite = new Invite();
         invite.setEvent(event);
         invite.setLearnerEmail("test@test.com");
+        invite.setLearnerUid("testUid");
 
         inviteRepository.save(invite);
 

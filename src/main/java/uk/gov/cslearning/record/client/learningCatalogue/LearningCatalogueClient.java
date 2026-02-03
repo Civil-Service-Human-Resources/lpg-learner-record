@@ -16,14 +16,11 @@ import java.util.Map;
 @Component
 public class LearningCatalogueClient implements ILearningCatalogueClient {
     private final IHttpClient httpClient;
-    private final String courseUrlFormat;
     private final String requiredLearningUrlByDaysFormat;
 
     public LearningCatalogueClient(@Qualifier("learningCatalogueHttpClient") IHttpClient httpClient,
-                                   @Value("${catalogue.courseUrlFormat}") String courseUrlFormat,
                                    @Value("${catalogue.requiredLearningUrlByDaysFormat}") String requiredLearningUrlByDaysFormat) {
         this.httpClient = httpClient;
-        this.courseUrlFormat = courseUrlFormat;
         this.requiredLearningUrlByDaysFormat = requiredLearningUrlByDaysFormat;
     }
 
@@ -39,12 +36,4 @@ public class LearningCatalogueClient implements ILearningCatalogueClient {
         });
     }
 
-    @Override
-    public Course getCourse(String courseId) {
-        String url = String.format(courseUrlFormat, courseId);
-        RequestEntity<Void> request = RequestEntity
-                .get(url)
-                .build();
-        return httpClient.executeRequest(request, Course.class);
-    }
 }

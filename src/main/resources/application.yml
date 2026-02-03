@@ -80,7 +80,6 @@ identity:
 
 registry-service:
   serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
-  getResourceByUidUrl: "/civilServants/resource/%s"
   getResourceByOrgCodeUrl: "/civilServants/organisation"
   organisationalUnitsUrl: "/v2/organisationalUnits"
   getOrganisationsMaxPageSize: 200
@@ -88,7 +87,6 @@ registry-service:
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
-  courseUrlFormat: "/courses/%s"
   requiredLearningUrlByDaysFormat: "/courses?mandatory=true&days=%s&size=1000000000"
 
 notify:
@@ -96,18 +94,6 @@ notify:
   sendEmailEndpointTemplate: /notifications/emails/{{TEMPLATE_NAME}}/send
   templates:
     requiredLearningDue: ${REQUIRED_LEARNING_DUE:REQUIRED_LEARNING_DUE}
-    inviteLearner: ${INVITE_LEARNER:INVITE_LEARNER}
-    cancelBooking: ${CANCEL_BOOKING:CANCEL_BOOKING}
-    cancelEvent: ${CANCEL_EVENT:CANCEL_EVENT}
-    bookingConfirmed: ${BOOKING_CONFIRMED:BOOKING_CONFIRMED}
-    bookingConfirmedLineManager: ${BOOKING_CONFIRMED_LINE_MANAGER:BOOKING_CONFIRMED_LINE_MANAGER}
-    bookingRequestLineManager: ${BOOKING_REQUEST_LINE_MANAGER:BOOKING_REQUEST_LINE_MANAGER}
-    bookingCancelledLineManager: ${BOOKING_CANCELLED_LINE_MANAGER:BOOKING_CANCELLED_LINE_MANAGER}
-    bookingRequested: ${BOOKING_REQUESTED:BOOKING_REQUESTED}
-
-lpg-ui:
-  serviceUrl: ${LPG_UI_URL:http://localhost:3001}
-  bookingUrlFormat: "${lpg-ui.serviceUrl}/book/%s/%s/choose-date"
 
 retention:
   timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}

@@ -7,13 +7,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.client.IHttpClient;
-import uk.gov.cslearning.record.csrs.domain.CivilServant;
 import uk.gov.cslearning.record.csrs.domain.GetPageResponse;
 import uk.gov.cslearning.record.csrs.domain.OrganisationalUnit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 
@@ -24,34 +22,21 @@ import static java.util.stream.Collectors.toList;
 public class CivilServantRegistryClient implements ICivilServantRegistryClient {
 
     private final IHttpClient httpClient;
-    private final String getResourceByUidUrl;
     private final String getResourceByOrgCodeUrl;
     private final String organisationalUnitsUrl;
     private final Integer getOrganisationsMaxPageSize;
     private final Integer getCSUidsMaxPageSize;
 
     public CivilServantRegistryClient(@Qualifier("civilServantRegistryHttpClient") IHttpClient httpClient,
-                                      @Value("${registry-service.getResourceByUidUrl}") String getResourceByUidUrl,
                                       @Value("${registry-service.getResourceByOrgCodeUrl}") String getResourceByOrgCodeUrl,
                                       @Value("${registry-service.organisationalUnitsUrl}") String organisationalUnitsUrl,
                                       @Value("${registry-service.getOrganisationsMaxPageSize}") Integer getOrganisationsMaxPageSize,
                                       @Value("${registry-service.getCSUidsMaxPageSize}") Integer getCSUidsMaxPageSize) {
         this.httpClient = httpClient;
-        this.getResourceByUidUrl = getResourceByUidUrl;
         this.getResourceByOrgCodeUrl = getResourceByOrgCodeUrl;
         this.organisationalUnitsUrl = organisationalUnitsUrl;
         this.getOrganisationsMaxPageSize = getOrganisationsMaxPageSize;
         this.getCSUidsMaxPageSize = getCSUidsMaxPageSize;
-    }
-
-    @Override
-    public Optional<CivilServant> getCivilServantResourceByUid(String uid) {
-        log.debug("Getting profile details for civil servant with UID {}", uid);
-        String url = String.format(getResourceByUidUrl, uid);
-        RequestEntity<Void> request = RequestEntity
-                .get(url)
-                .build();
-        return Optional.ofNullable(httpClient.executeRequest(request, CivilServant.class));
     }
 
     private GetPageResponse<OrganisationalUnit> getOrganisations(Integer size, Integer page) {

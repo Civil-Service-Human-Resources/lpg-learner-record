@@ -15,6 +15,7 @@ import uk.gov.cslearning.record.dto.error.FieldErrorDto;
 import uk.gov.cslearning.record.dto.factory.ErrorDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
+import uk.gov.cslearning.record.exception.IncorrectStateException;
 import uk.gov.cslearning.record.exception.ModuleRecordNotFoundException;
 import uk.gov.cslearning.record.exception.ResourceExists.ResourceExistsException;
 
@@ -63,5 +64,11 @@ public class ApiExceptionHandler {
         ErrorDto<String> error = errorDtoFactory.create(HttpStatus.BAD_REQUEST, Collections.singletonList("Storage error"));
 
         return ResponseEntity.badRequest().body(error);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({IncorrectStateException.class})
+    protected ResponseEntity<ErrorDto<String>> handleIncorrectStateException(IncorrectStateException e) {
+        return ResponseEntity.badRequest().body(errorDtoFactory.create(HttpStatus.BAD_REQUEST, Collections.singletonList(e.getMessage())));
     }
 }

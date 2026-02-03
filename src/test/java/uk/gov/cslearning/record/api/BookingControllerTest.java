@@ -68,19 +68,19 @@ public class BookingControllerTest {
     public void shouldListAllBookingsOnEvent() throws Exception {
         BookingDto bookingDto1 = new BookingDto();
         bookingDto1.setId(11);
-        bookingDto1.setEvent(URI.create("http://path/to/eventUid"));
+        bookingDto1.setEventUid("eventUid");
         BookingDto bookingDto2 = new BookingDto();
         bookingDto2.setId(21);
-        bookingDto2.setEvent(URI.create("http://path/to/eventUid"));
+        bookingDto2.setEventUid("eventUid");
 
         ArrayList<BookingDto> bookings = new ArrayList<>();
         bookings.add(bookingDto1);
         bookings.add(bookingDto2);
 
-        when(bookingService.listByEventUid("test-event-id")).thenReturn(bookings);
+        when(bookingService.listByEventUid("eventUid")).thenReturn(bookings);
 
         mockMvc.perform(
-                        get("/event/test-event-id/booking")
+                        get("/event/eventUid/booking")
                                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -105,7 +105,7 @@ public class BookingControllerTest {
         int bookingId = 99;
         String learner = "_learner";
         BookingStatus status = BookingStatus.CONFIRMED;
-        URI event = new URI("_event");
+        String event = "eventUid";
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
 
@@ -113,20 +113,20 @@ public class BookingControllerTest {
         bookingDto.setId(bookingId);
         bookingDto.setLearner(learner);
         bookingDto.setStatus(status);
-        bookingDto.setEvent(event);
+        bookingDto.setEventUid(event);
         bookingDto.setBookingTime(bookingTime);
         bookingDto.setPaymentDetails(paymentDetails);
 
         when(bookingService.find(bookingId)).thenReturn(Optional.of(bookingDto));
 
         mockMvc.perform(
-                        get("/event/blah/booking/" + bookingId)
+                        get("/event/eventUid/booking/" + bookingId)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learner)))
                 .andExpect(jsonPath("$.status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.eventUid", equalTo(event)))
                 .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
@@ -138,9 +138,9 @@ public class BookingControllerTest {
 
         int bookingId = 99;
         String learnerUid = "learner-uid";
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         BookingStatus status = BookingStatus.CONFIRMED;
-        URI event = new URI("_event");
+        String event = "_event";
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
 
@@ -148,7 +148,7 @@ public class BookingControllerTest {
         bookingDto.setId(bookingId);
         bookingDto.setLearner(learnerUid);
         bookingDto.setStatus(status);
-        bookingDto.setEvent(event);
+        bookingDto.setEventUid(event);
         bookingDto.setBookingTime(bookingTime);
         bookingDto.setPaymentDetails(paymentDetails);
 
@@ -161,7 +161,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
                 .andExpect(jsonPath("$.status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.eventUid", equalTo(event)))
                 .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
@@ -181,13 +181,13 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturn404IfNotFoundFromEventUidAndLearnerUid() throws Exception {
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         String learnerUid = "learner-uid";
 
         when(bookingService.find(eventUid, learnerUid)).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                        get(String.format("/event/%s/learner/%s", eventUid, learnerUid))
+                        get(String.format("/eventUid/%s/learner/%s", eventUid, learnerUid))
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -196,26 +196,23 @@ public class BookingControllerTest {
     public void shouldCreateBooking() throws Exception {
         int bookingId = 99;
         String learner = "_learner";
-        String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        URI event = new URI("http://example.org/path/to/event/event-id");
+        String event = "event-id";
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
-        booking.setLearnerEmail(learnerEmail);
         booking.setStatus(status);
-        booking.setEvent(event);
+        booking.setEventUid(event);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
 
         BookingDto savedBooking = new BookingDto();
         savedBooking.setId(bookingId);
         savedBooking.setLearner(learner);
-        savedBooking.setLearnerEmail(learnerEmail);
         savedBooking.setStatus(status);
-        savedBooking.setEvent(event);
+        savedBooking.setEventUid(event);
         savedBooking.setBookingTime(bookingTime);
         savedBooking.setPaymentDetails(paymentDetails);
 
@@ -226,7 +223,7 @@ public class BookingControllerTest {
         EventDto eventDto = new EventDto();
         eventDto.setStatus(EventStatus.ACTIVE);
 
-        when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
+        when(eventService.findByUid("event-id")).thenReturn(eventDto);
 
         mockMvc.perform(
                         post("/event/event-id/booking/").with(csrf())
@@ -247,7 +244,7 @@ public class BookingControllerTest {
         booking.setStatus(status);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
-        booking.setEvent(new URI("test/path/to/eventId"));
+        booking.setEventUid("eventId");
 
         mockMvc.perform(
                         post("/event/blah/booking/").with(csrf())
@@ -256,7 +253,6 @@ public class BookingControllerTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0].error", equalTo("A booking requires a learner")))
-                .andExpect(jsonPath("$.errors[1].error", equalTo("A booking requires a learner email address")))
                 .andExpect(jsonPath("$.status", equalTo(400)))
                 .andExpect(jsonPath("$.message", equalTo("Bad Request")));
 
@@ -275,7 +271,7 @@ public class BookingControllerTest {
                         12,
                         500).toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
-        URI event = new URI("http://event");
+        String event = "eventUid";
         String learner = "_learner";
 
         BookingDto booking = new BookingDto();
@@ -283,7 +279,7 @@ public class BookingControllerTest {
         booking.setStatus(status);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
-        booking.setEvent(event);
+        booking.setEventUid(event);
         booking.setLearner(learner);
 
         BookingStatusDto bookingStatus = new BookingStatusDto(status, BookingCancellationReason.PAYMENT);
@@ -291,7 +287,7 @@ public class BookingControllerTest {
         when(bookingService.updateStatus(eq(bookingId), eq(bookingStatus))).thenReturn(booking);
 
         mockMvc.perform(
-                        patch("/event/blah/booking/" + bookingId).with(csrf())
+                        patch("/event/eventUid/booking/" + bookingId).with(csrf())
                                 .content(objectMapper.writeValueAsString(bookingStatus))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -299,7 +295,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learner)))
                 .andExpect(jsonPath("$.status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.eventUid", equalTo(event)))
                 .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
@@ -328,17 +324,15 @@ public class BookingControllerTest {
     @Test
     public void shouldReturnBadRequestOnConstraintViolationException() throws Exception {
         String learner = "_learner";
-        String learnerEmail = "test@domain.com";
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        URI event = new URI("http://path/to/eventuid");
+        String event = "eventuid";
         URI paymentDetails = new URI("payment-details");
 
         BookingDto booking = new BookingDto();
         booking.setLearner(learner);
-        booking.setLearnerEmail(learnerEmail);
         booking.setStatus(status);
-        booking.setEvent(event);
+        booking.setEventUid(event);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
 
@@ -362,42 +356,9 @@ public class BookingControllerTest {
     }
 
     @Test
-    public void shouldReturnBadRequestIfEventIsCancelled() throws Exception {
-        String learner = "_learner";
-        String learnerEmail = "test@domain.com";
-        BookingStatus status = BookingStatus.CONFIRMED;
-        Instant bookingTime = LocalDateTime.now().toInstant(ZoneOffset.UTC);
-        URI event = new URI("http://example.org/path/to/event/event-id");
-        URI paymentDetails = new URI("payment-details");
-
-        BookingDto booking = new BookingDto();
-        booking.setLearner(learner);
-        booking.setLearnerEmail(learnerEmail);
-        booking.setStatus(status);
-        booking.setEvent(event);
-        booking.setBookingTime(bookingTime);
-        booking.setPaymentDetails(paymentDetails);
-
-        EventDto eventDto = new EventDto();
-        eventDto.setStatus(EventStatus.CANCELLED);
-
-        when(eventService.findByUid("event-id", false)).thenReturn(eventDto);
-
-        mockMvc.perform(
-                        post("/event/blah/booking/").with(csrf())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(booking))
-                                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors[0].error", equalTo("Cannot apply booking to a cancelled event.")))
-                .andExpect(jsonPath("$.status", equalTo(400)))
-                .andExpect(jsonPath("$.message", equalTo("Bad Request")));
-    }
-
-    @Test
     public void shouldUpdateBookingWithEventUidAndLearnerUid() throws Exception {
         String learnerUid = "learner-uid";
-        String eventUid = "event-uid";
+        String eventUid = "eventUid-uid";
         int bookingId = 99;
         BookingStatus status = BookingStatus.CONFIRMED;
         Instant bookingTime =
@@ -409,14 +370,14 @@ public class BookingControllerTest {
                         12,
                         500).toInstant(ZoneOffset.UTC);
         URI paymentDetails = new URI("payment-details");
-        URI event = new URI("http://event");
+        String event = "event";
 
         BookingDto booking = new BookingDto();
         booking.setId(bookingId);
         booking.setStatus(status);
         booking.setBookingTime(bookingTime);
         booking.setPaymentDetails(paymentDetails);
-        booking.setEvent(event);
+        booking.setEventUid(event);
         booking.setLearner(learnerUid);
 
         BookingStatusDto bookingStatus = new BookingStatusDto(status, BookingCancellationReason.PAYMENT);
@@ -432,7 +393,7 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("$.id", equalTo(bookingId)))
                 .andExpect(jsonPath("$.learner", equalTo(learnerUid)))
                 .andExpect(jsonPath("$.status", equalTo(status.getValue())))
-                .andExpect(jsonPath("$.event", equalTo(event.toString())))
+                .andExpect(jsonPath("$.eventUid", equalTo(event)))
                 .andExpect(jsonPath("$.paymentDetails", equalTo(paymentDetails.toString())))
                 .andExpect(jsonPath("$.bookingTime",
                         equalTo(DATE_TIME_FORMATTER.format(bookingTime))));
@@ -442,7 +403,7 @@ public class BookingControllerTest {
 
     @Test
     public void shouldReturnActiveBooking() throws Exception {
-        String eventUid = "event-id";
+        String eventUid = "eventUid-id";
         String learnerUid = "learner-id";
         BookingDto booking = new BookingDto();
         booking.setId(1);
