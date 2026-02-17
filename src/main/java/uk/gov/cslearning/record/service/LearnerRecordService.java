@@ -9,6 +9,7 @@ import uk.gov.cslearning.record.api.output.BulkCreateOutput;
 import uk.gov.cslearning.record.api.output.FailedResource;
 import uk.gov.cslearning.record.api.record.LearnerRecordEventQuery;
 import uk.gov.cslearning.record.api.record.LearnerRecordQuery;
+import uk.gov.cslearning.record.api.record.LearnerRecordSearchQuery;
 import uk.gov.cslearning.record.domain.record.LearnerRecord;
 import uk.gov.cslearning.record.domain.record.event.LearnerRecordEvent;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordDto;
@@ -50,6 +51,14 @@ public class LearnerRecordService {
         this.learnerRecordFactory = learnerRecordFactory;
         this.learnerRecordEventFactory = learnerRecordEventFactory;
         this.courseCompletionService = courseCompletionService;
+    }
+
+    public Page<LearnerRecordDto> searchRecords(Pageable pageableParams, LearnerRecordSearchQuery query) {
+        Page<LearnerRecord> results = learnerRecordRepository.find(query.getLearnerIds(),
+                query.getLearnerRecordTypes(), utilService.localDateTimeToInstant(query.getCreatedTimestampGte()),
+                utilService.localDateTimeToInstant(query.getUpdatedTimestampGte()), pageableParams);
+        List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
+        return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
     }
 
     public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery query) {
@@ -130,4 +139,5 @@ public class LearnerRecordService {
         }
         return new BulkCreateOutput<>(successful, failures);
     }
+
 }
