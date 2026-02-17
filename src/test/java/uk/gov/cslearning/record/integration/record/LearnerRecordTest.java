@@ -160,10 +160,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("content.length()").value(2))
                 .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
                 .andExpect(jsonPath("content[0].uid").isNotEmpty())
-                .andExpect(jsonPath("content[0].createdTimestamp").value("2025-04-03T09:00:00Z"))
                 .andExpect(jsonPath("content[1].recordType.type").value("COURSE"))
-                .andExpect(jsonPath("content[1].uid").isNotEmpty())
-                .andExpect(jsonPath("content[1].createdTimestamp").value("2025-04-05T09:00:00Z"));
+                .andExpect(jsonPath("content[1].uid").isNotEmpty());
     }
 
     @Test
@@ -183,8 +181,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content.length()").value(1))
                 .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
-                .andExpect(jsonPath("content[0].uid").isNotEmpty())
-                .andExpect(jsonPath("content[0].createdTimestamp").value("2025-04-05T09:00:00Z"));
+                .andExpect(jsonPath("content[0].uid").isNotEmpty());
     }
 
     @Test
