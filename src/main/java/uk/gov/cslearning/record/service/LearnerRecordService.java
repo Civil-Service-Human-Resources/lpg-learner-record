@@ -54,9 +54,10 @@ public class LearnerRecordService {
     }
 
     public Page<LearnerRecordDto> searchRecords(Pageable pageableParams, LearnerRecordSearchQuery query) {
+        Instant createdTimestampGte = query.getCreatedTimestampGte() != null ? utilService.localDateTimeToInstant(query.getCreatedTimestampGte()) : null;
+        Instant updatedTimestampGte = query.getUpdatedTimestampGte() != null ? utilService.localDateTimeToInstant(query.getUpdatedTimestampGte()) : null;
         Page<LearnerRecord> results = learnerRecordRepository.find(query.getLearnerIds(),
-                query.getLearnerRecordTypes(), utilService.localDateTimeToInstant(query.getCreatedTimestampGte()),
-                utilService.localDateTimeToInstant(query.getUpdatedTimestampGte()), pageableParams);
+                query.getLearnerRecordTypes(), createdTimestampGte, updatedTimestampGte, pageableParams);
         List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
         return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
     }

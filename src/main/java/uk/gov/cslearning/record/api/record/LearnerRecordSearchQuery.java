@@ -23,11 +23,4 @@ public class LearnerRecordSearchQuery {
     LocalDateTime createdTimestampGte;
     LocalDateTime updatedTimestampGte;
 
-    public LocalDateTime getCreatedTimestampGte() {
-        return createdTimestampGte == null ? LocalDateTime.MIN : createdTimestampGte;
-    }
-
-    public LocalDateTime getUpdatedTimestampGte() {
-        return updatedTimestampGte == null ? LocalDateTime.MIN : updatedTimestampGte;
-    }
 }

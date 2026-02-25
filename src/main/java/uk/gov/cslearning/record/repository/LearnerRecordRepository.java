@@ -28,12 +28,12 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
                 from LearnerRecord lr
                 where (?1 is null or lr.learnerId in (?1))
                 and (?2 is null or lr.learnerRecordType.recordType in (?2))
-                and lr.createdTimestamp >= ?3
-                and exists (
+                and (?3 is null or lr.createdTimestamp >= ?3)
+                and (?4 is null or exists (
                     select 1 from LearnerRecordEvent lre
                     where lre.eventTimestamp >= ?4
                     and lre.learnerRecord = lr
-                )
+                ))
             """)
     Page<LearnerRecord> find(List<String> userIds, List<String> types, Instant createdTimestampGte,
                              Instant eventTimestampGte, Pageable pageable);

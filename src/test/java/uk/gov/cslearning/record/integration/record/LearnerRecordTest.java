@@ -183,7 +183,7 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
                 .andExpect(jsonPath("content[0].uid").isNotEmpty());
     }
-
+    
     @Test
     public void testGetLearnerRecords() throws Exception {
         mockMvc.perform(get("/learner_records")
