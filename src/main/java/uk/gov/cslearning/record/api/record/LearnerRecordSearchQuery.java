@@ -19,6 +19,7 @@ public class LearnerRecordSearchQuery {
     @Null(groups = {CourseRecordController.class})
     List<String> learnerRecordTypes;
     List<String> learnerIds;
+    List<String> eventTypes;
 
     LocalDateTime createdTimestampGte;
     LocalDateTime updatedTimestampGte;
