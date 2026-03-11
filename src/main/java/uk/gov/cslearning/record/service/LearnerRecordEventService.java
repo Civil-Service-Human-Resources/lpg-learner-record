@@ -61,7 +61,6 @@ public class LearnerRecordEventService {
                     record = learnerRecordRepository.findById(learnerRecordId)
                             .orElseThrow(() -> new LearnerRecordNotFoundException(learnerRecordId));
                 } else {
-                    // Added null for notResourceIds
                     record = learnerRecordRepository.find(List.of(dto.getLearnerId()), List.of(dto.getResourceId()), null, null, null)
                             .stream().findFirst().orElseThrow(() -> new LearnerRecordNotFoundException(dto.getLearnerId(), dto.getResourceId()));
                 }
