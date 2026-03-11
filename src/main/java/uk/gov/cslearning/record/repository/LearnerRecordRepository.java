@@ -20,8 +20,9 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
                 where (?1 is null or lr.learnerId in (?1))
                 and (?2 is null or lr.resourceId in (?2))
                 and (?3 is null or lr.learnerRecordType.recordType in (?3))
+                and (?4 is null or lr.resourceId not in (?4))
             """)
-    Page<LearnerRecord> find(List<String> userIds, List<String> resourceIds, List<String> types, Pageable pageable);
+    Page<LearnerRecord> find(List<String> userIds, List<String> resourceIds, List<String> types, List<String> notResourceIds, Pageable pageable);
 
     @Query("""
                 select lr
@@ -49,9 +50,10 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
                 )
                 and (:userIds is null or lr.learnerId in (:userIds))
                 and (:resourceIds is null or lr.resourceId in (:resourceIds))
+                and (:notResourceIds is null or lr.resourceId not in (:notResourceIds))
                 and (:types is null or lr.learnerRecordType.recordType in (:types))
             """)
-    Page<LearnerRecord> findExcludeByEventTypes(List<String> userIds, List<String> resourceIds, List<String> types, List<Integer> notEventTypes, Pageable pageable);
+    Page<LearnerRecord> findExcludeByEventTypes(List<String> userIds, List<String> resourceIds, List<String> notResourceIds, List<String> types, List<Integer> notEventTypes, Pageable pageable);
 
 
     @Query("""
