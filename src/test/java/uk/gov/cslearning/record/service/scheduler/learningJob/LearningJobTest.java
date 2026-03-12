@@ -123,19 +123,19 @@ public class LearningJobTest extends IntegrationTestBase {
         stubService.getCsrsStubService().getCivilServantsForDepartment("COD", 0, 1, """
                 {"content": ["coCivilServant1"], "totalElements": 2}
                 """);
-        stubService.getCsrsStubService().getCivilServantsForDepartment("COD", 0, 5000, """
+        stubService.getCsrsStubService().getCivilServantsForDepartment("COD", 0, 1000, """
                 {"content": ["coCivilServant1", "coCivilServant2"], "totalElements": 2}
                 """);
         stubService.getCsrsStubService().getCivilServantsForDepartment("DWP", 0, 1, """
                 {"content": ["dwpCivilServant1"], "totalElements": 2}
                 """);
-        stubService.getCsrsStubService().getCivilServantsForDepartment("DWP", 0, 5000, """
+        stubService.getCsrsStubService().getCivilServantsForDepartment("DWP", 0, 1000, """
                 {"content": ["dwpCivilServant1", "dwpCivilServant2"], "totalElements": 2}
                 """);
         stubService.getCsrsStubService().getCivilServantsForDepartment("HMRC", 0, 1, """
                 {"content": ["hmrcCivilServant1"], "totalElements": 2}
                 """);
-        stubService.getCsrsStubService().getCivilServantsForDepartment("HMRC", 0, 5000, """
+        stubService.getCsrsStubService().getCivilServantsForDepartment("HMRC", 0, 1000, """
                 {"content": ["hmrcCivilServant1", "hmrcCivilServant2"], "totalElements": 2}
                 """);
     }

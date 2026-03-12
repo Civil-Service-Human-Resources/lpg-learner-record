@@ -83,7 +83,7 @@ registry-service:
   getResourceByOrgCodeUrl: "/civilServants/organisation"
   organisationalUnitsUrl: "/v2/organisationalUnits"
   getOrganisationsMaxPageSize: 200
-  getCSUidsMaxPageSize: 5000
+  getCSUidsMaxPageSize: ${REGISTRY_SERVICE_CS_UIDS_MAX_PAGE_SIZE:1000}
 
 catalogue:
   serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
