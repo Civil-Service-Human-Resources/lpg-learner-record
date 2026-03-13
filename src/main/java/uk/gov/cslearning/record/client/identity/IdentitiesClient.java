@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cslearning.record.client.IHttpClient;
 import uk.gov.cslearning.record.domain.identity.Identity;
 
@@ -28,8 +29,8 @@ public class IdentitiesClient implements IIdentitiesClient {
 
     @Override
     public Map<String, Identity> fetchByUids(List<String> uids) {
-        String url = String.format("%s?uids=%s", uidMapUrl, String.join(",", uids));
-        RequestEntity<Void> request = RequestEntity.get(url).build();
+        UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(uidMapUrl).queryParam("uids", String.join(",", uids));
+        RequestEntity<Void> request = RequestEntity.get(uri.build().toUriString()).build();
         return httpClient.executeMapRequest(request, new ParameterizedTypeReference<>() {
         });
     }
