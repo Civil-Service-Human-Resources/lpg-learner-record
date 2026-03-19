@@ -16,6 +16,7 @@ public class LearnerRecordQuery {
     @Null(groups = {CourseRecordController.class})
     List<String> learnerRecordTypes;
     List<String> resourceIds;
+    List<String> notResourceIds;
     List<String> learnerIds;
     String uid;
 

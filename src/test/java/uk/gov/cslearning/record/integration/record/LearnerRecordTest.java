@@ -216,6 +216,33 @@ public class LearnerRecordTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetLearnerRecordsWithNotResourceIds() throws Exception {
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("learnerIds", "user1")
+                        .param("notResourceIds", "course2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(2))
+                .andExpect(jsonPath("content[0].resourceId").value("course1"))
+                .andExpect(jsonPath("content[1].resourceId").value("course3"))
+                .andExpect(jsonPath("content[?(@.resourceId == 'course2')]").doesNotExist());
+    }
+
+    @Test
+    public void testGetLearnerRecordsWithNotEventTypesAndNotResourceIds() throws Exception {
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("notEventTypes", "COMPLETE_COURSE")
+                        .param("notResourceIds", "course2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(3))
+                .andExpect(jsonPath("content[0].resourceId").value("course1"))
+                .andExpect(jsonPath("content[1].resourceId").value("course3"))
+                .andExpect(jsonPath("content[2].resourceId").value("course3"))
+                .andExpect(jsonPath("content[?(@.resourceId == 'course2')]").doesNotExist());
+    }
+
+    @Test
     public void testGetLearnerRecordsPagination() throws Exception {
         mockMvc.perform(get("/learner_records")
                         .with(csrf())
