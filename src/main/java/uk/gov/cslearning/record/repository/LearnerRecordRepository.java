@@ -29,10 +29,10 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
                 where (:userIds is null or lr.learnerId in (:userIds))
                 and (:types is null or lr.learnerRecordType.recordType in (:types))
                 and (:createdTimestampGte is null or lr.createdTimestamp >= :createdTimestampGte)
-                and (:eventTimestampGte is null or exists (
+                and (:eventTypes is null or exists (
                     select 1 from LearnerRecordEvent lre
-                    where lre.eventTimestamp >= :eventTimestampGte
-                    and (:eventTypes is null or lre.eventType.id in (:eventTypes))
+                    where (:eventTimestampGte is null or lre.eventTimestamp >= :eventTimestampGte)
+                    and lre.eventType.id in (:eventTypes)
                     and lre.learnerRecord = lr
                 ))
             """)

@@ -35,19 +35,19 @@ public class LearnerRecordService {
     private final IUtilService utilService;
     private final LookupValueService lookupValueService;
     private final LearnerRecordRepository learnerRecordRepository;
-    private final LearnerRecordEventRepository learnerRecordEventepository;
+    private final LearnerRecordEventRepository learnerRecordEventRepository;
     private final LearnerRecordFactory learnerRecordFactory;
     private final LearnerRecordEventFactory learnerRecordEventFactory;
     private final CourseCompletionService courseCompletionService;
 
     public LearnerRecordService(IUtilService utilService, LookupValueService lookupValueService, LearnerRecordRepository learnerRecordRepository,
-                                LearnerRecordEventRepository learnerRecordEventepository,
+                                LearnerRecordEventRepository learnerRecordEventRepository,
                                 LearnerRecordFactory learnerRecordFactory,
                                 LearnerRecordEventFactory learnerRecordEventFactory, CourseCompletionService courseCompletionService) {
         this.utilService = utilService;
         this.lookupValueService = lookupValueService;
         this.learnerRecordRepository = learnerRecordRepository;
-        this.learnerRecordEventepository = learnerRecordEventepository;
+        this.learnerRecordEventRepository = learnerRecordEventRepository;
         this.learnerRecordFactory = learnerRecordFactory;
         this.learnerRecordEventFactory = learnerRecordEventFactory;
         this.courseCompletionService = courseCompletionService;
@@ -122,7 +122,7 @@ public class LearnerRecordService {
         List<Integer> notEventTypeIds = query.getNotEventTypes() == null ? null : query.getNotEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
         Instant before = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getBefore());
         Instant after = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getAfter());
-        Page<LearnerRecordEvent> events = learnerRecordEventepository.find(recordId, eventTypeIds, notEventTypeIds, null,
+        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(recordId, eventTypeIds, notEventTypeIds, null,
                 query.getResourceIds(), before, after, pageable);
         return learnerRecordEventFactory.createDtos(pageable, events);
     }
