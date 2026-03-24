@@ -59,7 +59,7 @@ public class LearnerRecordService {
         List<Integer> eventTypeIds = query.getEventTypes() != null ? query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList() : null;
         Page<LearnerRecord> results = learnerRecordRepository.find(query.getLearnerIds(),
                 query.getLearnerRecordTypes(), eventTypeIds, createdTimestampGte, updatedTimestampGte, pageableParams);
-        List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
+        List<LearnerRecordDto> dtos = results.get().map(lr -> this.learnerRecordFactory.createLearnerRecordDto(lr, false, query.isIncludeEvents(), eventTypeIds)).toList();
         return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
     }
 

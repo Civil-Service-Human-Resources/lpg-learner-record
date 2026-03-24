@@ -195,7 +195,8 @@ public class LearnerRecordTest extends IntegrationTestBase {
                     "learnerIds": ["user1"],
                     "createdTimestampGte": "2025-04-01T11:00:00Z",
                     "updatedTimestampGte": "2025-04-01T11:00:00Z",
-                    "eventTypes": ["COMPLETE_COURSE"]
+                    "eventTypes": ["COMPLETE_COURSE"],
+                    "includeEvents": true
                 }
                 """;
         mockMvc.perform(post("/learner_records/search")

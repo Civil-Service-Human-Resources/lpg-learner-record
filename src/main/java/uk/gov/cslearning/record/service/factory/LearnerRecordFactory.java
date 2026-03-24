@@ -13,6 +13,7 @@ import uk.gov.cslearning.record.util.UtilService;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -45,6 +46,10 @@ public class LearnerRecordFactory {
     }
 
     public LearnerRecordDto createLearnerRecordDto(LearnerRecord learnerRecord, boolean includeChildren, boolean includeEvents) {
+        return this.createLearnerRecordDto(learnerRecord, includeChildren, includeEvents, List.of());
+    }
+
+    public LearnerRecordDto createLearnerRecordDto(LearnerRecord learnerRecord, boolean includeChildren, boolean includeEvents, Collection<Integer> eventTypeIds) {
         LearnerRecordDto dto = createLearnerRecordDto(learnerRecord);
         if (includeChildren) {
             List<LearnerRecordDto> children = learnerRecord.getChildRecords()
@@ -53,7 +58,13 @@ public class LearnerRecordFactory {
         }
         if (includeEvents) {
             List<LearnerRecordEventDto> events = learnerRecord.getEvents()
-                    .stream().map(learnerRecordEventFactory::createDto).toList();
+                    .stream().map(learnerRecordEventFactory::createDto)
+                    .filter(lre -> {
+                        if (eventTypeIds != null && !eventTypeIds.isEmpty()) {
+                            return eventTypeIds.contains(lre.getEventType().getId());
+                        }
+                        return true;
+                    }).toList();
             dto.setEvents(events);
         }
         return dto;

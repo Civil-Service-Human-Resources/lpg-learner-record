@@ -20,6 +20,7 @@ public class LearnerRecordSearchQuery {
     List<String> learnerRecordTypes;
     List<String> learnerIds;
     List<String> eventTypes;
+    boolean includeEvents = false;
 
     LocalDateTime createdTimestampGte;
     LocalDateTime updatedTimestampGte;
