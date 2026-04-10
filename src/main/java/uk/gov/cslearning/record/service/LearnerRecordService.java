@@ -143,4 +143,10 @@ public class LearnerRecordService {
         return new BulkCreateOutput<>(successful, failures);
     }
 
+    public Page<String> getRecordResourceIds(Pageable pageableParams, LearnerRecordQuery query) {
+        List<String> notResourceIds = query.getNotResourceIds() != null && !query.getNotResourceIds().isEmpty() ? query.getNotResourceIds() : null;
+        Page<String> results = learnerRecordRepository.findResourceIds(query.getLearnerIds(), query.getResourceIds(),
+                query.getLearnerRecordTypes(), notResourceIds, pageableParams);
+        return new PageImpl<>(results.getContent(), pageableParams, results.getTotalElements());
+    }
 }

@@ -200,6 +200,16 @@ public class LearnerRecordTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testGetLearnerRecordResourceIds() throws Exception {
+        mockMvc.perform(get("/learner_records/resource_ids")
+                        .with(csrf())
+                        .param("notResourceIds", "course1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content[0]").value("course2"))
+                .andExpect(jsonPath("content[1]").value("course3"));
+    }
+
+    @Test
     public void testGetLearnerRecordsWithNotEventTypes() throws Exception {
         mockMvc.perform(get("/learner_records")
                         .with(csrf())
