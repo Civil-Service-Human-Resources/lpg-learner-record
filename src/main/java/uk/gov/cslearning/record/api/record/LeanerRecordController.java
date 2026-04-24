@@ -45,6 +45,13 @@ public class LeanerRecordController {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/resource_ids")
+    public Page<String> getRecordResourceIds(Pageable pageableParams, LearnerRecordQuery learnerRecordQuery) {
+        return learnerRecordService.getRecordResourceIds(pageableParams, learnerRecordQuery);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public LearnerRecordDto getRecord(@PathVariable Long id, LearnerRecordQuery learnerRecordQuery) {
         return learnerRecordService.getRecord(id, learnerRecordQuery);

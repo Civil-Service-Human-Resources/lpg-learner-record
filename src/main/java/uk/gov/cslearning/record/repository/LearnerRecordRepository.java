@@ -65,4 +65,14 @@ public interface LearnerRecordRepository extends JpaRepository<LearnerRecord, Lo
             """)
     Optional<LearnerRecord> find(String userId, String resourceId, String type);
 
+    @Query("""
+                select lr.resourceId
+                from LearnerRecord lr
+                where (?1 is null or lr.learnerId in (?1))
+                and (?2 is null or lr.resourceId in (?2))
+                and (?3 is null or lr.learnerRecordType.recordType in (?3))
+                and (?4 is null or lr.resourceId not in (?4))
+                group by lr.resourceId
+            """)
+    Page<String> findResourceIds(List<String> learnerIds, List<String> resourceIds, List<String> learnerRecordTypes, List<String> notResourceIds, Pageable pageableParams);
 }
