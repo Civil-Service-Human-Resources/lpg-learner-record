@@ -9,6 +9,7 @@ import uk.gov.cslearning.record.api.output.BulkCreateOutput;
 import uk.gov.cslearning.record.api.output.FailedResource;
 import uk.gov.cslearning.record.api.record.LearnerRecordEventQuery;
 import uk.gov.cslearning.record.api.record.LearnerRecordQuery;
+import uk.gov.cslearning.record.api.record.LearnerRecordSearchQuery;
 import uk.gov.cslearning.record.domain.record.LearnerRecord;
 import uk.gov.cslearning.record.domain.record.event.LearnerRecordEvent;
 import uk.gov.cslearning.record.dto.record.CreateLearnerRecordDto;
@@ -52,15 +53,26 @@ public class LearnerRecordService {
         this.courseCompletionService = courseCompletionService;
     }
 
+    public Page<LearnerRecordDto> searchRecords(Pageable pageableParams, LearnerRecordSearchQuery query) {
+        Instant createdTimestampGte = query.getCreatedTimestampGte() != null ? utilService.localDateTimeToInstant(query.getCreatedTimestampGte()) : null;
+        Instant updatedTimestampGte = query.getUpdatedTimestampGte() != null ? utilService.localDateTimeToInstant(query.getUpdatedTimestampGte()) : null;
+        List<Integer> eventTypeIds = query.getEventTypes() != null ? query.getEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList() : null;
+        Page<LearnerRecord> results = learnerRecordRepository.find(query.getLearnerIds(),
+                query.getLearnerRecordTypes(), eventTypeIds, createdTimestampGte, updatedTimestampGte, pageableParams);
+        List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
+        return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
+    }
+
     public Page<LearnerRecordDto> getRecords(Pageable pageableParams, LearnerRecordQuery query) {
         Page<LearnerRecord> results;
+        List<String> notResourceIds = query.getNotResourceIds() != null && !query.getNotResourceIds().isEmpty() ? query.getNotResourceIds() : null;
         if (query.getNotEventTypes() != null && !query.getNotEventTypes().isEmpty()) {
             List<Integer> notEventTypeIds = query.getNotEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
-            results = learnerRecordRepository.findExcludeByEventTypes(query.getLearnerIds(), query.getResourceIds(),
+            results = learnerRecordRepository.findExcludeByEventTypes(query.getLearnerIds(), query.getResourceIds(), notResourceIds,
                     query.getLearnerRecordTypes(), notEventTypeIds, pageableParams);
         } else {
             results = learnerRecordRepository.find(query.getLearnerIds(), query.getResourceIds(),
-                    query.getLearnerRecordTypes(), pageableParams);
+                    query.getLearnerRecordTypes(), notResourceIds, pageableParams);
         }
         List<LearnerRecordDto> dtos = results.get().map(this.learnerRecordFactory::createLearnerRecordDto).toList();
         return new PageImpl<>(dtos, pageableParams, results.getTotalElements());
@@ -130,4 +142,5 @@ public class LearnerRecordService {
         }
         return new BulkCreateOutput<>(successful, failures);
     }
+
 }

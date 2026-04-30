@@ -29,6 +29,14 @@ public class LeanerRecordController {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/search")
+    public Page<LearnerRecordDto> searchRecords(@PageableDefault(sort = {"createdTimestamp", "id"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+                                                @RequestBody LearnerRecordSearchQuery learnerRecordQuery) {
+        return learnerRecordService.searchRecords(pageableParams, learnerRecordQuery);
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public Page<LearnerRecordDto> getRecords(@PageableDefault(sort = {"createdTimestamp", "id"}, direction = Sort.Direction.ASC) Pageable pageableParams,
                                              LearnerRecordQuery learnerRecordQuery) {

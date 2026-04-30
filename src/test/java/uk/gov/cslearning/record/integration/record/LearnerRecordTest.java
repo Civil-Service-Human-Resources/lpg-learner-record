@@ -144,6 +144,48 @@ public class LearnerRecordTest extends IntegrationTestBase {
     }
 
     @Test
+    public void testSearchLearnerRecords() throws Exception {
+        String json = """
+                {
+                    "learnerRecordTypes": ["COURSE"],
+                    "learnerIds": ["user1"],
+                    "createdTimestampGte": "2025-04-03T09:00:00Z"
+                }
+                """;
+        mockMvc.perform(post("/learner_records/search")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(2))
+                .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[0].uid").isNotEmpty())
+                .andExpect(jsonPath("content[1].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[1].uid").isNotEmpty());
+    }
+
+    @Test
+    public void testSearchLearnerRecordsWithDates() throws Exception {
+        String json = """
+                {
+                    "learnerRecordTypes": ["COURSE"],
+                    "learnerIds": ["user1"],
+                    "createdTimestampGte": "2025-04-01T11:00:00Z",
+                    "updatedTimestampGte": "2025-04-01T11:00:00Z",
+                    "eventTypes": ["COMPLETE_COURSE"]
+                }
+                """;
+        mockMvc.perform(post("/learner_records/search")
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(1))
+                .andExpect(jsonPath("content[0].recordType.type").value("COURSE"))
+                .andExpect(jsonPath("content[0].uid").isNotEmpty());
+    }
+
+    @Test
     public void testGetLearnerRecords() throws Exception {
         mockMvc.perform(get("/learner_records")
                         .with(csrf())
@@ -171,6 +213,33 @@ public class LearnerRecordTest extends IntegrationTestBase {
                 .andExpect(jsonPath("content[2].uid").isNotEmpty())
                 .andExpect(jsonPath("content[3].recordType.type").value("COURSE"))
                 .andExpect(jsonPath("content[3].uid").isNotEmpty());
+    }
+
+    @Test
+    public void testGetLearnerRecordsWithNotResourceIds() throws Exception {
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("learnerIds", "user1")
+                        .param("notResourceIds", "course2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(2))
+                .andExpect(jsonPath("content[0].resourceId").value("course1"))
+                .andExpect(jsonPath("content[1].resourceId").value("course3"))
+                .andExpect(jsonPath("content[?(@.resourceId == 'course2')]").doesNotExist());
+    }
+
+    @Test
+    public void testGetLearnerRecordsWithNotEventTypesAndNotResourceIds() throws Exception {
+        mockMvc.perform(get("/learner_records")
+                        .with(csrf())
+                        .param("notEventTypes", "COMPLETE_COURSE")
+                        .param("notResourceIds", "course2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content.length()").value(3))
+                .andExpect(jsonPath("content[0].resourceId").value("course1"))
+                .andExpect(jsonPath("content[1].resourceId").value("course3"))
+                .andExpect(jsonPath("content[2].resourceId").value("course3"))
+                .andExpect(jsonPath("content[?(@.resourceId == 'course2')]").doesNotExist());
     }
 
     @Test
