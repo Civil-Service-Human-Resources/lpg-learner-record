@@ -46,7 +46,7 @@ public class LearnerRecordEventService {
         List<Integer> notEventTypeIds = query.getNotEventTypes() == null ? null : query.getNotEventTypes().stream().map(e -> lookupValueService.getLearnerRecordEventType(e).getId()).toList();
         Instant before = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getBefore());
         Instant after = query.getBefore() == null ? null : utilService.localDateTimeToInstant(query.getAfter());
-        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, eventTypeIds, notEventTypeIds, query.getUserId(), query.getResourceIds(), before, after, pageableParams);
+        Page<LearnerRecordEvent> events = learnerRecordEventRepository.find(null, eventTypeIds, notEventTypeIds, query.getUserIds(), query.getResourceIds(), before, after, pageableParams);
         return learnerRecordEventFactory.createDtos(pageableParams, events);
     }
 

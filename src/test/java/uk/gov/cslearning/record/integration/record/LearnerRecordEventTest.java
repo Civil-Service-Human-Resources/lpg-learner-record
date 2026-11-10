@@ -17,7 +17,23 @@ public class LearnerRecordEventTest extends IntegrationTestBase {
     @Test
     public void testGetEventsForUser() throws Exception {
         mockMvc.perform(get("/learner_record_events")
-                        .param("userId", "user2")
+                        .param("userIds", "user2")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content[0].eventType.eventType").value("MOVE_TO_LEARNING_PLAN"))
+                .andExpect(jsonPath("content[1].eventType.eventType").value("REMOVE_FROM_SUGGESTIONS"))
+                .andExpect(jsonPath("content[2].eventType.eventType").value("COMPLETE_COURSE"));
+    }
+
+    @Test
+    public void testQueryEventsForUser() throws Exception {
+        mockMvc.perform(post("/learner_record_events/query")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                    "userIds": ["user2"]
+                                }
+                                """)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("content[0].eventType.eventType").value("MOVE_TO_LEARNING_PLAN"))

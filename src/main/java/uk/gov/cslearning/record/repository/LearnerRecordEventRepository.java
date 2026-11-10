@@ -19,11 +19,11 @@ public interface LearnerRecordEventRepository extends JpaRepository<LearnerRecor
                 and (:notLearnerRecordEventTypeIds is null or lre.eventType.id not in :notLearnerRecordEventTypeIds)
                 and (:before is null or lre.eventTimestamp <= :before)
                 and (:after is null or lre.eventTimestamp >= :after)
-                and (:userId is null or lre.learnerRecord.learnerId = :userId)
+                and (:userIds is null or lre.learnerRecord.learnerId in :userIds)
                 and (:resourceIds is null or lre.learnerRecord.resourceId in :resourceIds)
             """)
     Page<LearnerRecordEvent> find(Long learnerRecordId, List<Integer> learnerRecordEventTypeIds,
-                                  List<Integer> notLearnerRecordEventTypeIds, String userId,
+                                  List<Integer> notLearnerRecordEventTypeIds, List<String> userIds,
                                   List<String> resourceIds, Instant before, Instant after, Pageable pageable);
 
 }

@@ -34,6 +34,14 @@ public class LearnerRecordEventController {
         return learnerRecordEventService.getRecords(pageableParams, query);
     }
 
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping("/query")
+    public Page<LearnerRecordEventDto> queryEvents(@PageableDefault(sort = {"eventTimestamp", "id"}, direction = Sort.Direction.ASC) Pageable pageableParams,
+                                                   @RequestBody LearnerRecordEventQuery query) {
+        return learnerRecordEventService.getRecords(pageableParams, query);
+    }
+
     @PostMapping
     public ResponseEntity<BulkCreateOutput<LearnerRecordEventDto, CreateLearnerRecordEventDto>> createEvents(@RequestBody @Validated(CreateEvent.class) List<CreateLearnerRecordEventDto> dto) {
         BulkCreateOutput<LearnerRecordEventDto, CreateLearnerRecordEventDto> response = learnerRecordEventService.createRecord(dto);
