@@ -14,7 +14,6 @@ import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.EventStatusDto;
 import uk.gov.cslearning.record.dto.factory.EventDtoFactory;
 import uk.gov.cslearning.record.exception.EventNotFoundException;
-import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.util.UtilService;
 
@@ -42,11 +41,6 @@ public class DefaultEventServiceTest {
 
     @Mock
     private BookingService bookingService;
-
-    @Mock
-    private NotificationService notificationService;
-    @Mock
-    private MessageService messageService;
 
     @InjectMocks
     private EventService eventService;

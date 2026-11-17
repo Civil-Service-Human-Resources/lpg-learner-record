@@ -1,0 +1,3 @@
+DROP TABLE course_notification_job_history;
+DROP TABLE notification;
+DROP TABLE required_learning_due_notification_event;

@@ -3,9 +3,11 @@ package uk.gov.cslearning.record.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
 
 import java.io.Serializable;
 
+@Getter
 @Embeddable
 public class CourseRecordIdentity implements Serializable {
 
@@ -26,20 +28,5 @@ public class CourseRecordIdentity implements Serializable {
         this.userId = userId;
     }
 
-    public String getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
 }

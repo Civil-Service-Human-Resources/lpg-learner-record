@@ -13,7 +13,4 @@ public class EventStatusDto {
     private EventStatus status;
     private CancellationReason cancellationReason;
 
-    public void setCancellationReason(String reason) {
-        this.cancellationReason = CancellationReason.valueOf(reason);
-    }
 }

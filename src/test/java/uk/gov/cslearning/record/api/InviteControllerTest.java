@@ -17,7 +17,6 @@ import uk.gov.cslearning.record.dto.InviteDto;
 import uk.gov.cslearning.record.service.BookingService;
 import uk.gov.cslearning.record.service.EventService;
 import uk.gov.cslearning.record.service.InviteService;
-import uk.gov.cslearning.record.service.identity.IdentitiesService;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -40,9 +39,6 @@ public class InviteControllerTest {
 
     @MockBean
     private InviteService inviteService;
-
-    @MockBean
-    private IdentitiesService identityService;
 
     @MockBean
     private BookingService bookingService;

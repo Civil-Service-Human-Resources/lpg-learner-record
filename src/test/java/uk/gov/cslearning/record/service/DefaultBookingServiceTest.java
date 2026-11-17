@@ -17,7 +17,6 @@ import uk.gov.cslearning.record.dto.EventStatus;
 import uk.gov.cslearning.record.dto.factory.BookingDtoFactory;
 import uk.gov.cslearning.record.exception.BookingNotFoundException;
 import uk.gov.cslearning.record.exception.IncorrectStateException;
-import uk.gov.cslearning.record.notifications.service.NotificationService;
 import uk.gov.cslearning.record.repository.BookingRepository;
 import uk.gov.cslearning.record.repository.EventRepository;
 import uk.gov.cslearning.record.util.UtilService;
@@ -45,10 +44,6 @@ public class DefaultBookingServiceTest {
     private BookingRepository bookingRepository;
     @Mock
     private EventRepository eventRepository;
-    @Mock
-    private NotificationService notificationService;
-    @Mock
-    private MessageService messageService;
 
     @InjectMocks
     private DefaultBookingService bookingService;

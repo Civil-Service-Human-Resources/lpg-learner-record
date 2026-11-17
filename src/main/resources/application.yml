@@ -48,17 +48,6 @@ management:
   endpoint:
     health:
       show-details: always
-jobs:
-  learning-reminders:
-    enabled: ${INCOMPLETED_JOB_ENABLED:true}
-    cron: ${INCOMPLETE_JOB_CRON:0 0 2 * * *}
-    reminder-periods:
-      - days: 1
-        text: 1 day
-      - days: 7
-        text: 1 week
-      - days: 30
-        text: 1 month
 
 oauth:
   serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
@@ -69,31 +58,6 @@ oauth:
   tokenEndpoint: ${OAUTH_TOKEN_ENDPOINT:/oauth/token}
   tokenUrl: "${oauth.serviceUrl}${oauth.tokenEndpoint}"
   jwtKey: ${JWT_KEY:TONterOunSTRUcIenscaDiSHoUrPanti}
-  refresh:
-    serviceTokenCache:
-      beforeSecondsToExpire: ${REFRESH_SERVICETOKENCACHE_BEFORE_SECONDS_TOEXPIRE:0}
-
-identity:
-  identitiesUrl: "${IDENTITY_API_IDENTITIES_URL:/api/identities}"
-  UidMapUrl: "${identity.identitiesUrl}/map-for-uids"
-  identityMapMaxBatchSize: ${IDENTITY_MAP_MAX_BATCH_SIZE:20}
-
-registry-service:
-  serviceUrl: ${REGISTRY_SERVICE_URL:http://localhost:9002}
-  getResourceByOrgCodeUrl: "/civilServants/organisation"
-  organisationalUnitsUrl: "/v2/organisationalUnits"
-  getOrganisationsMaxPageSize: 200
-  getCSUidsMaxPageSize: ${REGISTRY_SERVICE_CS_UIDS_MAX_PAGE_SIZE:1000}
-
-catalogue:
-  serviceUrl: ${LEARNING_CATALOGUE_SERVICE_URL:http://localhost:9001}
-  requiredLearningUrlByDaysFormat: "/courses?mandatory=true&days=%s&size=1000000000"
-
-notify:
-  serviceUrl: ${NOTIFICATION_SERVICE_URL:http://localhost:9006}
-  sendEmailEndpointTemplate: /notifications/emails/{{TEMPLATE_NAME}}/send
-  templates:
-    requiredLearningDue: ${REQUIRED_LEARNING_DUE:REQUIRED_LEARNING_DUE}
 
 retention:
   timeInMonths: ${RETENTION_TIME_IN_MONTHS:36}

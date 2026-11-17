@@ -7,14 +7,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.cslearning.record.domain.*;
 import uk.gov.cslearning.record.dto.BookingCancellationReason;
 import uk.gov.cslearning.record.dto.EventStatus;
-import uk.gov.cslearning.record.service.catalogue.Audience;
-import uk.gov.cslearning.record.service.catalogue.Course;
-import uk.gov.cslearning.record.service.catalogue.Module;
 import uk.gov.cslearning.record.util.IUtilService;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
 
 @Component
 @Data
@@ -88,25 +83,6 @@ public class TestDataService {
             cr.addModuleRecord(mr);
         }
         return cr;
-    }
-
-    public Course generateCourse(String id, String title) {
-        return new Course(id, title, List.of(), List.of());
-    }
-
-    public Module generateModule(String id, boolean optional) {
-        Module module = new Module();
-        module.setId(id);
-        module.setOptional(optional);
-        return module;
-    }
-
-    public Audience generateRequiredLearningAudience(List<String> departments, LocalDate requiredBy, String frequency) {
-        Audience audience = new Audience();
-        audience.setDepartments(departments);
-        audience.setRequiredBy(requiredBy);
-        audience.setFrequency(frequency);
-        return audience;
     }
 
     public Invite generateInvite(String learnerUid, String learnerEmail) {

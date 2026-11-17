@@ -12,8 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.cslearning.record.util.WireMockServer;
-import uk.gov.cslearning.record.util.stub.StubService;
 
 import java.time.Instant;
 import java.util.Map;
@@ -25,13 +23,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ActiveProfiles({"wiremock", "h2"})
 @Import(SpringTestConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class IntegrationTestBase extends WireMockServer {
+public class IntegrationTestBase {
 
     protected MockMvc mockMvc;
     @Autowired
     protected WebApplicationContext context;
-    @Autowired
-    protected StubService stubService;
+
     protected String userUid = "userId";
 
     protected Jwt getJwt() {

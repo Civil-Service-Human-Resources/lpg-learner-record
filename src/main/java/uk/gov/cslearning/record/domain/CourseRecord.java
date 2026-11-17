@@ -12,8 +12,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 import static com.google.gson.internal.$Gson$Preconditions.checkArgument;
 
@@ -66,7 +67,7 @@ public class CourseRecord {
     public Collection<ModuleRecord> getModuleRecords() {
         return moduleRecords;
     }
-    
+
     public void addModuleRecord(ModuleRecord moduleRecord) {
         checkArgument(moduleRecord != null);
         moduleRecord.setCourseRecord(this);
@@ -74,19 +75,6 @@ public class CourseRecord {
             moduleRecords = new ArrayList<>();
         }
         moduleRecords.add(moduleRecord);
-    }
-
-    @JsonIgnore
-    public LocalDateTime getEarliestCompletionDateForModules(List<String> moduleIds) {
-        Map<String, ModuleRecord> map = this.moduleRecords.stream().collect(Collectors.toMap(ModuleRecord::getModuleId, mr -> mr));
-        return moduleIds.stream().map(moduleId -> {
-            ModuleRecord mr = map.get(moduleId);
-            if (mr == null || mr.getCompletionDate() == null) {
-                return LocalDateTime.MIN;
-            } else {
-                return mr.getCompletionDate();
-            }
-        }).min(LocalDateTime::compareTo).orElse(LocalDateTime.MIN);
     }
 
 }

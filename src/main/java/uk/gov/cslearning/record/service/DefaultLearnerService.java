@@ -21,21 +21,17 @@ public class DefaultLearnerService implements LearnerService {
 
     private final InviteService inviteService;
 
-    private final NotificationService notificationService;
-
     private final int dataRetentionTime;
 
-    public DefaultLearnerService(UtilService utilService, @Value("${retention.timeInMonths}") int dataRetentionTime, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService, NotificationService notificationService) {
+    public DefaultLearnerService(UtilService utilService, @Value("${retention.timeInMonths}") int dataRetentionTime, BookingService bookingService, UserRecordService userRecordService, InviteService inviteService) {
         this.utilService = utilService;
         this.bookingService = bookingService;
         this.userRecordService = userRecordService;
         this.inviteService = inviteService;
-        this.notificationService = notificationService;
         this.dataRetentionTime = dataRetentionTime;
     }
 
     public void deleteLearnerByUid(String uid) {
-        notificationService.deleteByLearnerUid(uid);
         bookingService.deleteAllByLearnerUid(uid);
         inviteService.deleteByLearnerUid(uid);
         userRecordService.deleteUserRecords(uid);
@@ -45,7 +41,6 @@ public class DefaultLearnerService implements LearnerService {
         LocalDateTime localDateTime = utilService.getNowDateTime().minus(dataRetentionTime, ChronoUnit.MONTHS);
         log.info("localdatetime {}", localDateTime);
         bookingService.deleteAllByAge(localDateTime.toInstant(ZoneOffset.UTC));
-        notificationService.deleteAllByAge(localDateTime);
         userRecordService.deleteRecordsLastUpdatedBefore(localDateTime);
     }
 }
